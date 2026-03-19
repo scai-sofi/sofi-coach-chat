@@ -109,14 +109,14 @@ export default function ChatScreen() {
         )}
 
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
-
-        {showHistory && (
-          <ChatHistory onClose={() => {
-            setShowHistory(false);
-            setActivePanel('none');
-          }} />
-        )}
       </KeyboardAvoidingView>
+
+      {showHistory && (
+        <ChatHistory onClose={() => {
+          setShowHistory(false);
+          setActivePanel('none');
+        }} />
+      )}
     </View>
   );
 }
