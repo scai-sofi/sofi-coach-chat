@@ -11,6 +11,7 @@ import { EmptyChat } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
+import { ScenarioFab } from '@/components/ScenarioFab';
 import { Message } from '@/constants/types';
 
 export default function ChatScreen() {
@@ -83,6 +84,7 @@ export default function ChatScreen() {
               ) : null}
             />
           )}
+          <ScenarioFab />
           <InputBar />
         </View>
 
