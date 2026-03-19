@@ -13,6 +13,7 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 export function ScenarioFab() {
+  return null;
   const { setActivePanel, activePanel, messages } = useCoach();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
