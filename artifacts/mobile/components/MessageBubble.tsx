@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
@@ -241,6 +241,10 @@ function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap:
   );
 }
 
+const iconCopy = require('@/assets/images/icon-copy.png');
+const iconThumbsUp = require('@/assets/images/icon-thumbs-up.png');
+const iconThumbsDown = require('@/assets/images/icon-thumbs-down.png');
+
 function ActionFooter({ message }: { message: Message }) {
   const [copied, setCopied] = useState(false);
   const [thumbUp, setThumbUp] = useState(false);
@@ -251,13 +255,17 @@ function ActionFooter({ message }: { message: Message }) {
     <View>
       <View style={styles.actionRow}>
         <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
-          <Feather name={copied ? 'check' : 'copy'} size={20} color={copied ? Colors.contentPrimary : Colors.contentSecondary} />
+          {copied ? (
+            <Feather name="check" size={20} color={Colors.contentPrimary} />
+          ) : (
+            <Image source={iconCopy} style={[styles.actionIcon, { opacity: 0.7 }]} />
+          )}
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbUp(!thumbUp)}>
-          <Feather name="thumbs-up" size={20} color={thumbUp ? Colors.contentPrimary : Colors.contentSecondary} />
+          <Image source={iconThumbsUp} style={[styles.actionIcon, thumbUp && { opacity: 1 }]} />
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbDown(!thumbDown)}>
-          <Feather name="thumbs-down" size={20} color={thumbDown ? Colors.contentPrimary : Colors.contentSecondary} />
+          <Image source={iconThumbsDown} style={[styles.actionIcon, thumbDown && { opacity: 1 }]} />
         </Pressable>
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
@@ -399,6 +407,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   actionBtn: { padding: 4 },
+  actionIcon: { width: 20, height: 20, opacity: 0.7 },
   provenanceCard: {
     marginHorizontal: 4, paddingHorizontal: 12, paddingVertical: 10,
     borderRadius: 16, backgroundColor: Colors.surfaceTint, marginTop: 4,
