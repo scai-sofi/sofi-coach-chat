@@ -8,7 +8,7 @@ import { useCoach } from '@/context/CoachContext';
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat } = useCoach();
+  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat, chatMode, startLiveChat } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
@@ -23,6 +23,12 @@ export function ChatHeader() {
         </View>
         <View style={styles.centerZone}>
           <Text style={styles.title}>Coach</Text>
+          {chatMode === 'live' && (
+            <View style={styles.liveBadge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>Live</Text>
+            </View>
+          )}
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('scenarios')}>
@@ -48,7 +54,7 @@ export function ChatHeader() {
         <>
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setMenuOpen(false)} />
           <View style={styles.menu}>
-            <Pressable style={styles.menuItem} onPress={() => { clearConversation(); setMenuOpen(false); }}>
+            <Pressable style={styles.menuItem} onPress={() => { startLiveChat(); setMenuOpen(false); }}>
               <Text style={styles.menuText}>New chat</Text>
               <Feather name="edit" size={20} color={Colors.contentPrimary} />
             </Pressable>
@@ -97,6 +103,7 @@ const styles = StyleSheet.create({
   },
   centerZone: {
     flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -131,6 +138,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontFamily: Fonts.regular,
+  },
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#dcfce7',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginLeft: 6,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#22c55e',
+  },
+  liveText: {
+    fontSize: 11,
+    fontFamily: Fonts.medium,
+    color: '#16a34a',
+    lineHeight: 14,
   },
   menu: {
     position: 'absolute',

@@ -3,16 +3,22 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { useCoach } from '@/context/CoachContext';
 
 export function EmptyChat() {
+  const { chatMode } = useCoach();
+  const isLive = chatMode === 'live';
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconCircle}>
-        <Feather name="cpu" size={24} color={Colors.contentSecondary} />
+      <View style={[styles.iconCircle, isLive && styles.iconCircleLive]}>
+        <Feather name={isLive ? 'zap' : 'cpu'} size={24} color={isLive ? '#16a34a' : Colors.contentSecondary} />
       </View>
-      <Text style={styles.title}>Start a conversation</Text>
+      <Text style={styles.title}>{isLive ? 'Live Coach' : 'Start a conversation'}</Text>
       <Text style={styles.subtitle}>
-        Type a message or try one of these topics to explore the experience.
+        {isLive
+          ? 'Ask me anything about budgeting, saving, investing, or your financial goals.'
+          : 'Type a message or try one of these topics to explore the experience.'}
       </Text>
     </View>
   );
@@ -32,6 +38,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceTint,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  iconCircleLive: {
+    backgroundColor: '#dcfce7',
   },
   title: {
     fontSize: 16,

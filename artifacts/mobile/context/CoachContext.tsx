@@ -1,9 +1,33 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { Platform } from 'react-native';
 import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemorySource, GoalType, GoalStatus, Milestone } from '@/constants/types';
 import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
+
+export type ChatMode = 'demo' | 'live';
+
+function getApiBaseUrl(): string {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const proto = window.location.protocol;
+    if (host.includes('.expo.janeway.replit.dev')) {
+      const devDomain = host.replace('.expo.janeway.replit.dev', '.janeway.replit.dev');
+      return `${proto}//${devDomain}/api`;
+    }
+    if (host.includes('.expo.replit.dev')) {
+      const devDomain = host.replace('.expo.replit.dev', '.replit.dev');
+      return `${proto}//${devDomain}/api`;
+    }
+    return '/api';
+  }
+  const domain = process.env.EXPO_PUBLIC_DOMAIN;
+  if (domain) return `https://${domain}/api`;
+  return '/api';
+}
+
+const API_BASE = getApiBaseUrl();
 
 interface CoachState {
   messages: Message[];
@@ -14,6 +38,7 @@ interface CoachState {
   activePanel: PanelType;
   activeScenario: string;
   showOnboarding: boolean;
+  chatMode: ChatMode;
 }
 
 interface CoachContextType extends CoachState {
@@ -21,6 +46,7 @@ interface CoachContextType extends CoachState {
   setActivePanel: (panel: PanelType) => void;
   setTemporaryChat: (val: boolean) => void;
   switchScenario: (id: string) => void;
+  startLiveChat: () => void;
   confirmMemory: (messageId: string) => void;
   dismissMemoryProposal: (messageId: string) => void;
   confirmGoal: (messageId: string) => void;
@@ -54,6 +80,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [activePanel, setActivePanelState] = useState<PanelType>('none');
   const [activeScenario, setActiveScenario] = useState('returning-member');
   const [showOnboarding, setShowOnboarding] = useState(true);
+  const [chatMode, setChatMode] = useState<ChatMode>('demo');
 
   const memoriesRef = useRef(memories);
   memoriesRef.current = memories;
@@ -61,7 +88,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   goalsRef.current = goals;
   const tempChatRef = useRef(temporaryChat);
   tempChatRef.current = temporaryChat;
+  const chatModeRef = useRef(chatMode);
+  chatModeRef.current = chatMode;
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const sessionVersionRef = useRef(0);
 
   const setActivePanel = useCallback((panel: PanelType) => {
@@ -72,7 +102,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const scenario = SCENARIOS.find(s => s.id === id);
     if (!scenario) return;
     if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
     sessionVersionRef.current += 1;
+    setChatMode('demo');
     setMessages([...scenario.messages]);
     setMemories([...scenario.memories]);
     setGoals([...scenario.goals]);
@@ -81,6 +113,21 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setActivePanelState('none');
     setActiveScenario(id);
     setShowOnboarding(id === 'cold-start');
+  }, []);
+
+  const startLiveChat = useCallback(() => {
+    if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
+    sessionVersionRef.current += 1;
+    setChatMode('live');
+    setMessages([]);
+    setMemories([]);
+    setGoals([]);
+    setIsTyping(false);
+    setTemporaryChat(false);
+    setActivePanelState('none');
+    setActiveScenario('');
+    setShowOnboarding(false);
   }, []);
 
   const addGoalFromProposal = useCallback((proposal: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }) => {
@@ -134,6 +181,65 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const sendLiveMessage = useCallback(async (text: string, version: number) => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    try {
+      const currentMessages = [...(messagesRef.current || [])];
+      const history = currentMessages
+        .filter(m => m.role === 'user' || m.role === 'ai')
+        .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
+
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history }),
+        signal: controller.signal,
+      });
+
+      if (sessionVersionRef.current !== version) return;
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Something went wrong' }));
+        const errorMsg: Message = {
+          id: uid(), role: 'ai',
+          content: errData.error || 'Something went wrong. Please try again.',
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, errorMsg]);
+        setIsTyping(false);
+        return;
+      }
+
+      const data = await res.json();
+      if (sessionVersionRef.current !== version) return;
+
+      const aiMsg: Message = {
+        id: uid(), role: 'ai',
+        content: data.reply || 'I couldn\'t generate a response. Please try again.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, aiMsg]);
+      setIsTyping(false);
+    } catch (err: any) {
+      if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
+      const errorMsg: Message = {
+        id: uid(), role: 'ai',
+        content: 'Unable to connect to the server. Please check your connection and try again.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+      setIsTyping(false);
+    } finally {
+      if (abortControllerRef.current === controller) abortControllerRef.current = null;
+    }
+  }, []);
+
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
   const sendMessage = useCallback((text: string) => {
     const userMsg: Message = {
       id: uid(), role: 'user', content: text, timestamp: new Date(),
@@ -141,10 +247,16 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages(prev => [...prev, userMsg]);
     setIsTyping(true);
 
+    const version = sessionVersionRef.current;
+
+    if (chatModeRef.current === 'live') {
+      sendLiveMessage(text, version);
+      return;
+    }
+
     const currentMemories = memoriesRef.current;
     const currentGoals = goalsRef.current;
     const isTempChat = tempChatRef.current;
-    const version = sessionVersionRef.current;
 
     const delay = 800 + Math.random() * 700;
     if (pendingTimerRef.current) clearTimeout(pendingTimerRef.current);
@@ -206,7 +318,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
     }, delay);
-  }, [addGoalFromProposal, updateGoalSettings]);
+  }, [addGoalFromProposal, updateGoalSettings, sendLiveMessage]);
 
   const confirmMemory = useCallback((messageId: string) => {
     setMessages(prev => prev.map(m => {
@@ -303,16 +415,17 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   const clearConversation = useCallback(() => {
     if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
     sessionVersionRef.current += 1;
     setMessages([]);
     setIsTyping(false);
-    setShowOnboarding(true);
+    setShowOnboarding(chatModeRef.current === 'demo');
   }, []);
 
   return (
     <CoachContext.Provider value={{
-      messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding,
-      sendMessage, setActivePanel, setTemporaryChat, switchScenario,
+      messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding, chatMode,
+      sendMessage, setActivePanel, setTemporaryChat, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
       addMemory, editMemory, pauseMemory, deleteMemory, clearConversation,

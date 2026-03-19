@@ -56,8 +56,8 @@ Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` 
 
 - Entry: `src/index.ts` — reads `PORT`, starts Express
 - App setup: `src/app.ts` — mounts CORS, JSON/urlencoded parsing, routes at `/api`
-- Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /health` (full path: `/api/health`)
-- Depends on: `@workspace/db`, `@workspace/api-zod`
+- Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /healthz`; `src/routes/chat.ts` exposes `POST /chat` (full path: `/api/chat`) — AI financial coach endpoint using OpenAI via Replit AI Integrations proxy, with in-memory rate limiting (20 req/min per IP) and input validation
+- Depends on: `@workspace/db`, `@workspace/api-zod`, `@workspace/integrations-openai-ai-server`
 - `pnpm --filter @workspace/api-server run dev` — run the dev server
 - `pnpm --filter @workspace/api-server run build` — production esbuild bundle (`dist/index.cjs`)
 - Build bundles an allowlist of deps (express, cors, pg, drizzle-orm, zod, etc.) and externalizes the rest
@@ -95,18 +95,27 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
 
+### `lib/integrations-openai-ai-server` (`@workspace/integrations-openai-ai-server`)
+
+OpenAI integration via Replit AI Integrations proxy. Provides pre-configured OpenAI SDK client using `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY` env vars (auto-provisioned, no user API key needed). Exports `openai` client instance plus image/audio/batch utilities.
+
 ### `artifacts/mobile` (`@workspace/mobile`)
 
-Expo/React Native mobile app — "SoFi Coach Chat", an interactive AI financial coach chat interface. Entirely frontend with mock data, no backend required.
+Expo/React Native mobile app — "SoFi Coach Chat", an interactive AI financial coach chat interface. Supports both demo scenarios (mock data) and live AI chat mode (real OpenAI responses via API server).
 
 - **Entry**: `app/index.tsx` — single-screen chat interface
 - **Layout**: `app/_layout.tsx` — wraps app with CoachProvider, KeyboardProvider, SafeAreaProvider
-- **State**: `context/CoachContext.tsx` — all state management (messages, memories, goals, panels, scenarios)
+- **State**: `context/CoachContext.tsx` — all state management (messages, memories, goals, panels, scenarios, chat mode)
+  - `chatMode`: `'demo' | 'live'` — demo uses mock responses, live calls API server
+  - `startLiveChat()`: switches to live mode, clears conversation
+  - `sendLiveMessage()`: sends user message + history to `POST /api/chat`, handles errors/abort
+  - `getApiBaseUrl()`: resolves API URL for web (handles Expo dev domain → dev domain mapping) and native
 - **Constants**: `constants/types.ts` (type system), `constants/colors.ts` (SoFi brand palette), `constants/scenarios.ts` (10 demo scenarios), `constants/aiResponse.ts` (keyword-matching AI responses)
-- **Components**: `ChatHeader`, `InputBar`, `MessageBubble` (chips, proposals, safety tiers), `MemoryCenter` (CRUD), `GoalsDashboard` (SVG progress rings), `ScenarioSwitcher`, `TypingIndicator`, `EmptyChat`
-- **Features**: 10 pre-built demo scenarios, mock AI keyword-matching responses, Memory Center (CRUD for coach memories), Goals Dashboard (progress rings, milestones), message chips/proposals/safety tiers, temporary chat mode, scenario switcher panel
+- **Components**: `ChatHeader` (live badge indicator), `InputBar`, `MessageBubble` (chips, proposals, safety tiers), `MemoryCenter` (CRUD), `GoalsDashboard` (SVG progress rings), `ScenarioSwitcher`, `TypingIndicator`, `EmptyChat` (mode-aware content)
+- **Features**: 10 pre-built demo scenarios, mock AI keyword-matching responses, **Live AI Chat** (real OpenAI responses via API server with financial coach system prompt), Memory Center (CRUD for coach memories), Goals Dashboard (progress rings, milestones), message chips/proposals/safety tiers, temporary chat mode, scenario switcher panel
+- **Live Chat Flow**: Header menu "New chat" → `startLiveChat()` → empty chat with green "Live" badge → user types → `POST /api/chat` → real AI response. Selecting a demo scenario from FAB switches back to demo mode.
 - **Typography**: TT Norms font family (Regular, Medium, Bold, Italic, BoldItalic) loaded via expo-font from `assets/fonts/`
 - **Design**: SoFi brand colors (#faf8f5 base, #1a1919 primary), matched to Figma spec (file key: 8c5TuXaL1MvZh2rkkf1e1Y)
 - **Font config**: `constants/fonts.ts` exports `Fonts` object with named keys (regular, medium, bold, italic, boldItalic)
-- **Default state**: Opens with scenarios panel visible, "returning-member" scenario active
+- **Default state**: Opens in demo mode with "returning-member" scenario active
 - **Run**: `pnpm --filter @workspace/mobile run dev`
