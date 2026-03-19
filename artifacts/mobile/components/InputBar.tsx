@@ -86,9 +86,6 @@ export function InputBar() {
           <Text style={styles.disclaimerLink}>Privacy policy</Text>
         </Text>
       </View>
-      <View style={styles.homeIndicator}>
-        <View style={styles.homeBar} />
-      </View>
     </View>
   );
 }
@@ -192,16 +189,5 @@ const styles = StyleSheet.create({
   },
   disclaimerLink: {
     textDecorationLine: 'underline',
-  },
-  homeIndicator: {
-    alignItems: 'center',
-    paddingBottom: 8,
-    paddingTop: 4,
-  },
-  homeBar: {
-    width: 134,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: 'rgba(10,10,10,0.2)',
   },
 });
