@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
   sendBtn: {
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.contentPrimary,
+    borderRadius: 100,
+    backgroundColor: '#5c5b5a',
     alignItems: 'center',
     justifyContent: 'center',
   },
