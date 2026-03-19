@@ -8,13 +8,52 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { SCENARIOS } from '@/constants/scenarios';
 
-function ClockIcon({ size = 20, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function CloseIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  const s = size * 0.614;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4.93 4.93C5.32 4.54 5.95 4.54 6.34 4.93L12 10.59L17.66 4.93C18.05 4.54 18.68 4.54 19.07 4.93C19.46 5.32 19.46 5.95 19.07 6.34L13.41 12L19.07 17.66C19.46 18.05 19.46 18.68 19.07 19.07C18.68 19.46 18.05 19.46 17.66 19.07L12 13.41L6.34 19.07C5.95 19.46 5.32 19.46 4.93 19.07C4.54 18.68 4.54 18.05 4.93 17.66L10.59 12L4.93 6.34C4.54 5.95 4.54 5.32 4.93 4.93Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+function ClockIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
       <Path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10ZM9.99878 4.5C10.5511 4.5 10.9988 4.94772 10.9988 5.5V8.84582C10.9988 9.20313 11.1894 9.5333 11.4989 9.71191L13.531 10.8848C14.0093 11.1609 14.1733 11.7724 13.8972 12.2508C13.6211 12.7291 13.0095 12.8931 12.5312 12.617L10.4991 11.4441C9.57072 10.9082 8.99878 9.91776 8.99878 8.84582V5.5C8.99878 4.94772 9.44649 4.5 9.99878 4.5Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10Z"
+        fill={color}
+      />
+      <Path
+        d="M7 10C7 10.6904 6.44036 11.25 5.75 11.25C5.05964 11.25 4.5 10.6904 4.5 10C4.5 9.30964 5.05964 8.75 5.75 8.75C6.44036 8.75 7 9.30964 7 10Z"
+        fill={color}
+      />
+      <Path
+        d="M11.25 10C11.25 10.6904 10.6904 11.25 10 11.25C9.30964 11.25 8.75 10.6904 8.75 10C8.75 9.30964 9.30964 8.75 10 8.75C10.6904 8.75 11.25 9.30964 11.25 10Z"
+        fill={color}
+      />
+      <Path
+        d="M15.5 10C15.5 10.6904 14.9404 11.25 14.25 11.25C13.5596 11.25 13 10.6904 13 10C13 9.30964 13.5596 8.75 14.25 8.75C14.9404 8.75 15.5 9.30964 15.5 10Z"
         fill={color}
       />
     </Svg>
@@ -29,36 +68,45 @@ export function ChatHeader() {
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
 
   const demoScenario = chatMode === 'demo' ? SCENARIOS.find(s => s.id === activeScenario) : null;
-  const showMenu = messages.length > 0 || chatMode === 'demo';
+  const hasActiveChat = messages.length > 0 || chatMode === 'demo';
+
+  const firstUserMsg = messages.find(m => m.role === 'user');
+  const sessionTitle = demoScenario
+    ? demoScenario.title
+    : firstUserMsg
+      ? firstUserMsg.content.length > 30
+        ? firstUserMsg.content.substring(0, 30) + '...'
+        : firstUserMsg.content
+      : 'Coach';
 
   return (
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
       <View style={styles.titleBar}>
         <View style={styles.leftZone}>
           <Pressable style={styles.iconBtn} onPress={() => {
-            if (messages.length === 0 && chatMode !== 'demo') {
+            if (!hasActiveChat) {
               setActivePanel('scenarios');
             } else {
               saveAndClose();
             }
           }}>
-            {messages.length === 0 && chatMode !== 'demo' ? (
+            {!hasActiveChat ? (
               <Feather name="play-circle" size={20} color={Colors.contentSecondary} />
             ) : (
-              <Feather name="x" size={14} color={Colors.contentPrimary} />
+              <CloseIcon size={24} color={Colors.contentPrimary} />
             )}
           </Pressable>
         </View>
         <View style={styles.centerZone}>
-          <Text style={styles.title}>Coach</Text>
+          <Text style={styles.title} numberOfLines={1}>{sessionTitle}</Text>
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('history')}>
             <ClockIcon size={20} color={Colors.contentPrimary} />
           </Pressable>
-          {showMenu && (
+          {hasActiveChat && (
             <Pressable style={styles.iconBtn} onPress={() => setMenuOpen(!menuOpen)}>
-              <Feather name="more-horizontal" size={20} color={Colors.contentSecondary} />
+              <MoreIcon size={20} color={Colors.contentPrimary} />
             </Pressable>
           )}
         </View>
@@ -68,7 +116,7 @@ export function ChatHeader() {
         <View style={styles.demoBanner}>
           <Text style={styles.demoBannerText}>Demo · {demoScenario.title}</Text>
           <Pressable onPress={() => startLiveChat()} hitSlop={8}>
-            <Feather name="x" size={14} color={Colors.contentSecondary} />
+            <CloseIcon size={16} color={Colors.contentSecondary} />
           </Pressable>
         </View>
       )}
@@ -128,6 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   rightZone: {
     width: 104,
@@ -147,13 +196,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
     lineHeight: 20,
-  },
-  subtitle: {
-    fontSize: 12,
-    fontFamily: Fonts.regular,
-    color: Colors.contentSecondary,
-    lineHeight: 16,
-    letterSpacing: 0.1,
   },
   demoBanner: {
     backgroundColor: Colors.surfaceTint,
