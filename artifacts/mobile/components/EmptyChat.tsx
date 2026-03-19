@@ -4,13 +4,17 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  withSpring,
+  withDelay,
+  interpolate,
   Easing,
 } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
-const ANIM_CONFIG = { duration: 350, easing: Easing.bezier(0.25, 0.1, 0.25, 1) };
+const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
+const EASE_OUT = { duration: 400, easing: Easing.bezier(0.16, 1, 0.3, 1) };
 
 const SUGGESTIONS = [
   {
@@ -36,29 +40,43 @@ export function EmptyChat() {
   const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
   const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
 
-  const orbTranslateY = useSharedValue(0);
-  const suggestionsOpacity = useSharedValue(1);
-  const suggestionsTranslateY = useSharedValue(0);
+  const progress = useSharedValue(0);
+  const fullCardProgress = useSharedValue(0);
+  const halfCardProgress = useSharedValue(0);
 
   useEffect(() => {
     if (inputFocused) {
-      orbTranslateY.value = withTiming(-60, ANIM_CONFIG);
-      suggestionsOpacity.value = withTiming(0, { duration: 200 });
-      suggestionsTranslateY.value = withTiming(30, { duration: 200 });
+      fullCardProgress.value = withTiming(1, { duration: 250, easing: Easing.bezier(0.4, 0, 1, 1) });
+      halfCardProgress.value = withDelay(60, withTiming(1, { duration: 220, easing: Easing.bezier(0.4, 0, 1, 1) }));
+      progress.value = withDelay(80, withSpring(1, SPRING_CONFIG));
     } else {
-      orbTranslateY.value = withTiming(0, ANIM_CONFIG);
-      suggestionsOpacity.value = withTiming(1, ANIM_CONFIG);
-      suggestionsTranslateY.value = withTiming(0, ANIM_CONFIG);
+      progress.value = withSpring(0, SPRING_CONFIG);
+      halfCardProgress.value = withDelay(100, withTiming(0, EASE_OUT));
+      fullCardProgress.value = withDelay(160, withTiming(0, EASE_OUT));
     }
   }, [inputFocused]);
 
   const orbAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: orbTranslateY.value }],
+    transform: [
+      { translateY: interpolate(progress.value, [0, 1], [0, -60]) },
+      { scale: interpolate(progress.value, [0, 1], [1, 0.95]) },
+    ],
   }));
 
-  const suggestionsAnimStyle = useAnimatedStyle(() => ({
-    opacity: suggestionsOpacity.value,
-    transform: [{ translateY: suggestionsTranslateY.value }],
+  const fullCardAnimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
+    transform: [
+      { translateY: interpolate(fullCardProgress.value, [0, 1], [0, 20]) },
+      { scale: interpolate(fullCardProgress.value, [0, 1], [1, 0.97]) },
+    ],
+  }));
+
+  const halfCardAnimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(halfCardProgress.value, [0, 1], [1, 0]),
+    transform: [
+      { translateY: interpolate(halfCardProgress.value, [0, 1], [0, 24]) },
+      { scale: interpolate(halfCardProgress.value, [0, 1], [1, 0.97]) },
+    ],
   }));
 
   return (
@@ -76,16 +94,18 @@ export function EmptyChat() {
         </Text>
       </Animated.View>
 
-      <Animated.View style={[styles.suggestionsSection, suggestionsAnimStyle]}>
-        <Pressable
-          style={styles.fullCard}
-          onPress={() => sendMessage(fullCard.text)}
-        >
-          <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
-          <Text style={styles.cardText}>{fullCard.text}</Text>
-        </Pressable>
+      <View style={styles.suggestionsSection}>
+        <Animated.View style={fullCardAnimStyle}>
+          <Pressable
+            style={styles.fullCard}
+            onPress={() => sendMessage(fullCard.text)}
+          >
+            <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
+            <Text style={styles.cardText}>{fullCard.text}</Text>
+          </Pressable>
+        </Animated.View>
 
-        <View style={styles.halfRow}>
+        <Animated.View style={[styles.halfRow, halfCardAnimStyle]}>
           {halfCards.map((card, i) => (
             <Pressable
               key={i}
@@ -98,8 +118,8 @@ export function EmptyChat() {
               </Text>
             </Pressable>
           ))}
-        </View>
-      </Animated.View>
+        </Animated.View>
+      </View>
     </View>
   );
 }
