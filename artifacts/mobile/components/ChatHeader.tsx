@@ -21,7 +21,13 @@ export function ChatHeader() {
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
       <View style={styles.titleBar}>
         <View style={styles.leftZone}>
-          <Pressable style={styles.iconBtn} onPress={() => saveAndClose()}>
+          <Pressable style={styles.iconBtn} onPress={() => {
+            if (messages.length === 0 && chatMode !== 'demo') {
+              setActivePanel('scenarios');
+            } else {
+              saveAndClose();
+            }
+          }}>
             <Feather name="x" size={14} color={Colors.contentPrimary} />
           </Pressable>
         </View>
