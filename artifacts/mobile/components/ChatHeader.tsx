@@ -54,7 +54,7 @@ export function ChatHeader() {
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('history')}>
-            <ClockIcon size={20} color={Colors.contentSecondary} />
+            <ClockIcon size={20} color={Colors.contentPrimary} />
           </Pressable>
           {showMenu && (
             <Pressable style={styles.iconBtn} onPress={() => setMenuOpen(!menuOpen)}>
