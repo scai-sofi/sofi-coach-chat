@@ -9,7 +9,7 @@ import { SCENARIOS } from '@/constants/scenarios';
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages } = useCoach();
+  const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages, saveAndClose } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
@@ -21,7 +21,7 @@ export function ChatHeader() {
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
       <View style={styles.titleBar}>
         <View style={styles.leftZone}>
-          <Pressable style={styles.iconBtn} onPress={() => {}}>
+          <Pressable style={styles.iconBtn} onPress={() => saveAndClose()}>
             <Feather name="x" size={14} color={Colors.contentPrimary} />
           </Pressable>
         </View>
@@ -29,7 +29,7 @@ export function ChatHeader() {
           <Text style={styles.title}>Coach</Text>
         </View>
         <View style={styles.rightZone}>
-          <Pressable style={styles.iconBtn} onPress={() => setActivePanel('scenarios')}>
+          <Pressable style={styles.iconBtn} onPress={() => setActivePanel('history')}>
             <Feather name="clock" size={20} color={Colors.contentSecondary} />
           </Pressable>
           {showMenu && (

@@ -8,6 +8,16 @@ const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9
 
 export type ChatMode = 'demo' | 'live';
 
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  memories: Memory[];
+  goals: Goal[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 function getApiBaseUrl(): string {
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     const host = window.location.hostname;
@@ -40,6 +50,8 @@ interface CoachState {
   showOnboarding: boolean;
   chatMode: ChatMode;
   inputFocused: boolean;
+  chatHistory: ChatSession[];
+  currentSessionId: string | null;
 }
 
 interface CoachContextType extends CoachState {
@@ -61,6 +73,9 @@ interface CoachContextType extends CoachState {
   deleteMemory: (id: string) => void;
   clearConversation: () => void;
   setInputFocused: (val: boolean) => void;
+  saveAndClose: () => void;
+  loadSession: (id: string) => void;
+  deleteSession: (id: string) => void;
 }
 
 const CoachContext = createContext<CoachContextType | null>(null);
@@ -82,6 +97,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>('live');
   const [inputFocused, setInputFocused] = useState(false);
+  const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   const memoriesRef = useRef(memories);
   memoriesRef.current = memories;
@@ -245,7 +262,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const userMsg: Message = {
       id: uid(), role: 'user', content: text, timestamp: new Date(),
     };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(prev => {
+      if (prev.length === 0) {
+        setCurrentSessionId(uid());
+      }
+      return [...prev, userMsg];
+    });
     setIsTyping(true);
 
     const version = sessionVersionRef.current;
@@ -414,6 +436,73 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories(prev => prev.map(m => m.id === id ? { ...m, status: 'DELETED' } : m));
   }, []);
 
+  const saveAndClose = useCallback(() => {
+    const currentMessages = messagesRef.current;
+    if (currentMessages.length > 0 && chatModeRef.current === 'live') {
+      const firstUserMsg = currentMessages.find(m => m.role === 'user');
+      const title = firstUserMsg
+        ? firstUserMsg.content.length > 50
+          ? firstUserMsg.content.substring(0, 50) + '...'
+          : firstUserMsg.content
+        : 'New conversation';
+      const now = new Date();
+      const sessionId = currentSessionId || uid();
+      setChatHistory(prev => {
+        const existing = prev.findIndex(s => s.id === sessionId);
+        const session: ChatSession = {
+          id: sessionId,
+          title,
+          messages: [...currentMessages],
+          memories: [...memoriesRef.current],
+          goals: [...goalsRef.current],
+          createdAt: existing >= 0 ? prev[existing].createdAt : now,
+          updatedAt: now,
+        };
+        if (existing >= 0) {
+          const updated = [...prev];
+          updated[existing] = session;
+          return updated;
+        }
+        return [session, ...prev];
+      });
+    }
+    if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
+    sessionVersionRef.current += 1;
+    setChatMode('live');
+    setMessages([]);
+    setMemories([]);
+    setGoals([]);
+    setIsTyping(false);
+    setTemporaryChat(false);
+    setActivePanelState('none');
+    setActiveScenario('');
+    setShowOnboarding(false);
+    setCurrentSessionId(null);
+  }, [currentSessionId]);
+
+  const loadSession = useCallback((id: string) => {
+    const session = chatHistory.find(s => s.id === id);
+    if (!session) return;
+    if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
+    sessionVersionRef.current += 1;
+    setChatMode('live');
+    setMessages([...session.messages]);
+    setMemories([...session.memories]);
+    setGoals([...session.goals]);
+    setIsTyping(false);
+    setTemporaryChat(false);
+    setActivePanelState('none');
+    setActiveScenario('');
+    setShowOnboarding(false);
+    setCurrentSessionId(id);
+  }, [chatHistory]);
+
+  const deleteSession = useCallback((id: string) => {
+    setChatHistory(prev => prev.filter(s => s.id !== id));
+  }, []);
+
   const clearConversation = useCallback(() => {
     if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
     if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
@@ -426,10 +515,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   return (
     <CoachContext.Provider value={{
       messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
+      chatHistory, currentSessionId,
       sendMessage, setActivePanel, setTemporaryChat, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
       addMemory, editMemory, pauseMemory, deleteMemory, clearConversation, setInputFocused,
+      saveAndClose, loadSession, deleteSession,
     }}>
       {children}
     </CoachContext.Provider>

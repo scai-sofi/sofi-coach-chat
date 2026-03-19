@@ -12,6 +12,7 @@ import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
 import { ScenarioFab } from '@/components/ScenarioFab';
+import { ChatHistory } from '@/components/ChatHistory';
 import { Message } from '@/constants/types';
 
 export default function ChatScreen() {
@@ -46,6 +47,7 @@ export default function ChatScreen() {
   }, [isTyping]);
 
   const showNonScenarioPanel = activePanel === 'memory' || activePanel === 'goals';
+  const showHistory = activePanel === 'history';
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => (
     <View style={styles.msgWrap}>
@@ -101,6 +103,12 @@ export default function ChatScreen() {
         )}
 
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
+
+        {showHistory && (
+          <View style={StyleSheet.absoluteFill}>
+            <ChatHistory />
+          </View>
+        )}
       </KeyboardAvoidingView>
     </View>
   );
