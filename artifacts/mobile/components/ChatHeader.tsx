@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceTint,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     gap: 8,
     paddingVertical: 6,
     paddingHorizontal: 16,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     color: Colors.contentSecondary,
     lineHeight: 16,
     flex: 1,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   tempBanner: {
     backgroundColor: Colors.contentPrimary,
