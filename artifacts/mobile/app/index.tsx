@@ -11,7 +11,6 @@ import { EmptyChat } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
-import { PhoneFrame } from '@/components/PhoneFrame';
 import { Message } from '@/constants/types';
 
 export default function ChatScreen() {
@@ -54,50 +53,48 @@ export default function ChatScreen() {
   );
 
   return (
-    <PhoneFrame>
-      <View style={styles.screen}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior="padding"
-          keyboardVerticalOffset={0}
-        >
-          <ChatHeader />
+    <View style={styles.screen}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior="padding"
+        keyboardVerticalOffset={0}
+      >
+        <ChatHeader />
 
-          <View style={[styles.chatContent, showPanel && styles.chatHidden]}>
-            {messages.length === 0 ? (
-              <View style={styles.flex}>
-                <EmptyChat />
-              </View>
-            ) : (
-              <FlatList
-                ref={listRef}
-                data={messages}
-                renderItem={renderMessage}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={[styles.listContent]}
-                keyboardDismissMode="interactive"
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-                ListFooterComponent={isTyping ? (
-                  <View style={styles.msgWrap}>
-                    <TypingIndicator />
-                  </View>
-                ) : null}
-              />
-            )}
-            <InputBar />
-          </View>
-
-          {showPanel && (
-            <View style={styles.panelOverlay}>
-              {activePanel === 'memory' && <MemoryCenter />}
-              {activePanel === 'goals' && <GoalsDashboard />}
-              {activePanel === 'scenarios' && <ScenarioSwitcher />}
+        <View style={[styles.chatContent, showPanel && styles.chatHidden]}>
+          {messages.length === 0 ? (
+            <View style={styles.flex}>
+              <EmptyChat />
             </View>
+          ) : (
+            <FlatList
+              ref={listRef}
+              data={messages}
+              renderItem={renderMessage}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={[styles.listContent]}
+              keyboardDismissMode="interactive"
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              ListFooterComponent={isTyping ? (
+                <View style={styles.msgWrap}>
+                  <TypingIndicator />
+                </View>
+              ) : null}
+            />
           )}
-        </KeyboardAvoidingView>
-      </View>
-    </PhoneFrame>
+          <InputBar />
+        </View>
+
+        {showPanel && (
+          <View style={styles.panelOverlay}>
+            {activePanel === 'memory' && <MemoryCenter />}
+            {activePanel === 'goals' && <GoalsDashboard />}
+            {activePanel === 'scenarios' && <ScenarioSwitcher />}
+          </View>
+        )}
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 

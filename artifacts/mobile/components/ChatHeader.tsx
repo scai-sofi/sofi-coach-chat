@@ -11,7 +11,7 @@ export function ChatHeader() {
   const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const topPad = Platform.OS === 'web' ? 0 : insets.top;
+  const topPad = Platform.OS === 'web' ? 54 : insets.top;
 
   return (
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
