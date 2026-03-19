@@ -1,8 +1,16 @@
-import React from 'react';
-import { View, Text, Image, Pressable, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
+
+const ANIM_CONFIG = { duration: 350, easing: Easing.bezier(0.25, 0.1, 0.25, 1) };
 
 const SUGGESTIONS = [
   {
@@ -28,19 +36,34 @@ export function EmptyChat() {
   const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
   const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
 
-  const showSuggestions = !inputFocused;
+  const orbTranslateY = useSharedValue(0);
+  const suggestionsOpacity = useSharedValue(1);
+  const suggestionsTranslateY = useSharedValue(0);
+
+  useEffect(() => {
+    if (inputFocused) {
+      orbTranslateY.value = withTiming(-60, ANIM_CONFIG);
+      suggestionsOpacity.value = withTiming(0, { duration: 200 });
+      suggestionsTranslateY.value = withTiming(30, { duration: 200 });
+    } else {
+      orbTranslateY.value = withTiming(0, ANIM_CONFIG);
+      suggestionsOpacity.value = withTiming(1, ANIM_CONFIG);
+      suggestionsTranslateY.value = withTiming(0, ANIM_CONFIG);
+    }
+  }, [inputFocused]);
+
+  const orbAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: orbTranslateY.value }],
+  }));
+
+  const suggestionsAnimStyle = useAnimatedStyle(() => ({
+    opacity: suggestionsOpacity.value,
+    transform: [{ translateY: suggestionsTranslateY.value }],
+  }));
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={[
-        styles.container,
-        !showSuggestions && styles.containerCentered,
-      ]}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={styles.orbSection}>
+    <View style={styles.wrapper}>
+      <Animated.View style={[styles.orbSection, orbAnimStyle]}>
         <View style={styles.orbCombo}>
           <Image
             source={require('@/assets/images/orb-combo.png')}
@@ -51,35 +74,33 @@ export function EmptyChat() {
         <Text style={styles.greeting}>
           {"I'm Coach.\nHow can I help?"}
         </Text>
-      </View>
+      </Animated.View>
 
-      {showSuggestions && (
-        <View style={styles.suggestionsSection}>
-          <Pressable
-            style={styles.fullCard}
-            onPress={() => sendMessage(fullCard.text)}
-          >
-            <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
-            <Text style={styles.cardText}>{fullCard.text}</Text>
-          </Pressable>
+      <Animated.View style={[styles.suggestionsSection, suggestionsAnimStyle]}>
+        <Pressable
+          style={styles.fullCard}
+          onPress={() => sendMessage(fullCard.text)}
+        >
+          <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
+          <Text style={styles.cardText}>{fullCard.text}</Text>
+        </Pressable>
 
-          <View style={styles.halfRow}>
-            {halfCards.map((card, i) => (
-              <Pressable
-                key={i}
-                style={styles.halfCard}
-                onPress={() => sendMessage(card.text)}
-              >
-                <Text style={styles.cardLabel}>{card.label.toUpperCase()}</Text>
-                <Text style={styles.halfCardText} numberOfLines={2}>
-                  {card.text}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+        <View style={styles.halfRow}>
+          {halfCards.map((card, i) => (
+            <Pressable
+              key={i}
+              style={styles.halfCard}
+              onPress={() => sendMessage(card.text)}
+            >
+              <Text style={styles.cardLabel}>{card.label.toUpperCase()}</Text>
+              <Text style={styles.halfCardText} numberOfLines={2}>
+                {card.text}
+              </Text>
+            </Pressable>
+          ))}
         </View>
-      )}
-    </ScrollView>
+      </Animated.View>
+    </View>
   );
 }
 
@@ -92,16 +113,10 @@ const cardShadow = {
 };
 
 const styles = StyleSheet.create({
-  scroll: {
+  wrapper: {
     flex: 1,
-  },
-  container: {
-    flexGrow: 1,
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-  },
-  containerCentered: {
-    justifyContent: 'center',
   },
   orbSection: {
     alignItems: 'center',
