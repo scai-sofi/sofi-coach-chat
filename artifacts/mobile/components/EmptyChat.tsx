@@ -46,13 +46,13 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      fullCardProgress.value = withTiming(1, { duration: 250, easing: Easing.bezier(0.4, 0, 1, 1) });
-      halfCardProgress.value = withDelay(60, withTiming(1, { duration: 220, easing: Easing.bezier(0.4, 0, 1, 1) }));
-      progress.value = withDelay(80, withSpring(1, SPRING_CONFIG));
+      fullCardProgress.value = withTiming(1, { duration: 350, easing: Easing.bezier(0.4, 0, 0.2, 1) });
+      halfCardProgress.value = withDelay(80, withTiming(1, { duration: 300, easing: Easing.bezier(0.4, 0, 0.2, 1) }));
+      progress.value = withDelay(100, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
-      halfCardProgress.value = withDelay(100, withTiming(0, EASE_OUT));
-      fullCardProgress.value = withDelay(160, withTiming(0, EASE_OUT));
+      halfCardProgress.value = withDelay(120, withTiming(0, EASE_OUT));
+      fullCardProgress.value = withDelay(200, withTiming(0, EASE_OUT));
     }
   }, [inputFocused]);
 

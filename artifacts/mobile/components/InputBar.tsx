@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingTop: 0,
     paddingBottom: 8,
   },
   inputPill: {
