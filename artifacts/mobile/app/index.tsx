@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
   },
   msgWrap: {
     marginBottom: 16,
+    paddingHorizontal: 0,
   },
   panelOverlay: {
     flex: 1,

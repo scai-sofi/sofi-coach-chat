@@ -23,10 +23,21 @@ const SAFETY_STYLES: Record<SafetyTier, { bg: string; color: string; icon: strin
   handoff: { bg: Colors.infoBg, color: Colors.info, icon: 'arrow-up-right', text: 'Complex — human advisor recommended' },
 };
 
+function Divider() {
+  return <View style={styles.divider} />;
+}
+
 function renderContent(content: string) {
   const lines = content.split('\n');
-  return lines.map((line, i) => {
-    if (line.trim() === '') return <View key={i} style={{ height: 12 }} />;
+  const elements: React.ReactNode[] = [];
+  let prevWasHeader = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim() === '') {
+      prevWasHeader = false;
+      continue;
+    }
 
     const parts: React.ReactNode[] = [];
     const boldRegex = /\*\*(.*?)\*\*/g;
@@ -56,16 +67,24 @@ function renderContent(content: string) {
       parts.push(<Text key={keyIdx++}>{line.slice(lastIndex)}</Text>);
     }
 
-    return (
-      <Text key={i} style={[
+    if (isStandaloneBold && elements.length > 0 && !prevWasHeader) {
+      elements.push(<Divider key={`div-${i}`} />);
+    }
+
+    elements.push(
+      <Text key={`line-${i}`} style={[
         styles.aiText,
-        isBullet && { paddingLeft: 8 },
-        isStandaloneBold && parts.length === 1 && { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
+        isBullet && styles.bulletText,
+        isStandaloneBold && parts.length === 1 && styles.headerText,
       ]}>
         {parts}
       </Text>
     );
-  });
+
+    prevWasHeader = isStandaloneBold;
+  }
+
+  return elements;
 }
 
 function ChipBadge({ chip }: { chip: MessageChip }) {
@@ -232,13 +251,13 @@ function ActionFooter({ message }: { message: Message }) {
     <View>
       <View style={styles.actionRow}>
         <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
-          <Feather name={copied ? 'check' : 'copy'} size={16} color={copied ? Colors.contentPrimary : Colors.contentSecondary} />
+          <Feather name={copied ? 'check' : 'copy'} size={20} color={copied ? Colors.contentPrimary : Colors.contentSecondary} />
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbUp(!thumbUp)}>
-          <Feather name="thumbs-up" size={16} color={thumbUp ? Colors.contentPrimary : Colors.contentSecondary} />
+          <Feather name="thumbs-up" size={20} color={thumbUp ? Colors.contentPrimary : Colors.contentSecondary} />
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbDown(!thumbDown)}>
-          <Feather name="thumbs-down" size={16} color={thumbDown ? Colors.contentPrimary : Colors.contentSecondary} />
+          <Feather name="thumbs-down" size={20} color={thumbDown ? Colors.contentPrimary : Colors.contentSecondary} />
         </Pressable>
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
@@ -325,23 +344,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, maxWidth: 298,
   },
   userText: { fontSize: 16, color: '#fff', fontFamily: Fonts.regular, lineHeight: 20 },
-  aiRow: { gap: 8 },
+  aiRow: { gap: 16 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 4 },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
-  aiContent: { paddingHorizontal: 4, gap: 6 },
-  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 22 },
+  aiContent: { paddingHorizontal: 4, gap: 8 },
+  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
+  headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
+  bulletText: { paddingLeft: 8 },
+  divider: {
+    height: 0.75,
+    backgroundColor: 'rgba(10,10,10,0.1)',
+    marginVertical: 4,
+  },
   safetyBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4,
-    alignSelf: 'flex-start', marginTop: 4, marginLeft: 4,
+    alignSelf: 'flex-start', marginLeft: 4,
   },
   safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
-    marginTop: 12, backgroundColor: Colors.surfaceTint,
+    backgroundColor: Colors.surfaceTint,
     borderWidth: 1, borderColor: 'rgba(10,10,10,0.05)',
     borderRadius: 16, padding: 12,
   },
@@ -369,8 +395,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginTop: 2,
   },
   actionRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingHorizontal: 4, marginTop: 4,
+    flexDirection: 'row', alignItems: 'center', gap: 16,
+    paddingHorizontal: 4,
   },
   actionBtn: { padding: 4 },
   provenanceCard: {
@@ -379,11 +405,11 @@ const styles = StyleSheet.create({
   },
   provenanceText: { fontSize: 12, color: Colors.contentSecondary, lineHeight: 16, fontFamily: Fonts.regular },
   suggestions: {
-    alignItems: 'flex-end', marginTop: 4, gap: 8,
+    alignItems: 'flex-end', gap: 8,
   },
   suggestionPill: {
     borderWidth: 0.75, borderColor: Colors.contentBone600,
     borderRadius: 24, paddingTop: 11, paddingBottom: 12, paddingHorizontal: 16,
   },
-  suggestionText: { fontSize: 15, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
+  suggestionText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
 });

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
     backgroundColor: '#fff',
     borderRadius: 24,
-    borderWidth: 1,
+    borderWidth: 0.75,
     borderColor: 'rgba(10,10,10,0.1)',
     flexDirection: 'row',
     alignItems: 'center',
