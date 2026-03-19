@@ -94,3 +94,16 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+### `artifacts/mobile` (`@workspace/mobile`)
+
+Expo/React Native mobile app — "SoFi Coach Chat", an interactive AI financial coach chat interface. Entirely frontend with mock data, no backend required.
+
+- **Entry**: `app/index.tsx` — single-screen chat interface
+- **Layout**: `app/_layout.tsx` — wraps app with CoachProvider, KeyboardProvider, SafeAreaProvider
+- **State**: `context/CoachContext.tsx` — all state management (messages, memories, goals, panels, scenarios)
+- **Constants**: `constants/types.ts` (type system), `constants/colors.ts` (SoFi brand palette), `constants/scenarios.ts` (10 demo scenarios), `constants/aiResponse.ts` (keyword-matching AI responses)
+- **Components**: `ChatHeader`, `InputBar`, `MessageBubble` (chips, proposals, safety tiers), `MemoryCenter` (CRUD), `GoalsDashboard` (SVG progress rings), `ScenarioSwitcher`, `TypingIndicator`, `EmptyChat`
+- **Features**: 10 pre-built demo scenarios, mock AI keyword-matching responses, Memory Center (CRUD for coach memories), Goals Dashboard (progress rings, milestones), message chips/proposals/safety tiers, temporary chat mode, scenario switcher panel
+- **Design**: SoFi brand colors (#faf8f5 base, #1a1919 primary), Inter font family
+- **Run**: `pnpm --filter @workspace/mobile run dev`

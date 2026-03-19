@@ -1,0 +1,155 @@
+---
+
+## Prompt
+
+Build a Flutter mobile app called **SoFi Coach Chat** — an interactive AI financial coach chat interface. This is a self-contained demo app with mock AI responses (no backend needed). The complete design specification is attached as `SoFi_Coach_Chat_Design_Spec.md` — follow it exactly for all design tokens, components, data models, and interaction patterns.
+
+### What the app does
+
+A chat interface where users interact with a SoFi financial coach. The coach demonstrates:
+1. **Memory lifecycle** — the AI remembers user preferences and financial context, proposes saving new memories, and users can confirm or dismiss them
+2. **Goal discovery & tracking** — the AI creates and updates financial goals with progress rings and milestones
+3. **Proactive alerts** — the AI surfaces risk warnings and actionable suggestions
+4. **Milestone celebrations** — confetti-style celebrations when goals are reached
+5. **Safety tiers** — different response levels (informational → actionable → handoff to specialist)
+6. **Cross-product orchestration** — the AI connects different SoFi products (invest, credit, loans)
+7. **Temporary chat mode** — privacy mode that disables memory/goal saving
+8. **Demo scenarios** — 10 pre-built conversation scenarios to showcase different features
+
+### Architecture
+
+- **State management:** Use Riverpod (or Provider). Port the Zustand store pattern from the spec — a single CoachStore holding messages, memories, goals, typing state, active panel, and scenario data.
+- **Mock AI engine:** Implement `generateAIResponse()` as a local function that pattern-matches keywords in user input to produce contextual responses with chips, proposals, and actions. No real AI/API calls needed.
+- **Navigation:** Single screen with panel overlays (Memory Center, Goals Dashboard, Scenario Switcher). No router needed.
+- **Font:** Use TT Norms (Regular, Medium, Bold). Include the .otf files in `assets/fonts/`. If unavailable, fall back to the system sans-serif.
+
+### Key screens & components to build
+
+1. **Phone frame wrapper** (for tablet/web preview) — 390×844 logical pixels, border-radius 40px, drop shadow, centered on a `#e8e4de` background
+2. **iOS-style status bar** — fake status bar with time, signal, wifi, battery icons
+3. **Chat header** — "Coach" title, sparkle icon, more menu (three dots) with "Coach memory", "Goals", "Clear conversation" options
+4. **Message list** — scrollable, with AI bubbles (left-aligned, no bubble bg) and user bubbles (right-aligned, `#5C5B5A` bg, white text, 24px radius)
+5. **AI message features:** inline chips (category tags, risk alerts, savings chips), memory proposal cards, goal proposal cards, insight-to-action cards, safety tier badges, provenance/source cards, suggestion pills, and auto-saved memory confirmations
+6. **Typing indicator** — three bouncing dots with 1.2s animation cycle and 200ms stagger
+7. **Input bar** — text field with send button, temporary chat toggle (shield icon), and onboarding starter prompts for empty conversations
+8. **Memory Center panel** — slide-over panel with search, category filters (All/Financial/Preferences/Life Events/Behavioral), grouped memory cards with edit/delete, and manual "Add Memory" form
+9. **Goals Dashboard panel** — panel showing active goal cards with SVG-style progress rings, milestone lists, and a completed goals section with divider
+10. **Scenario Switcher panel** — panel listing 10 demo scenarios with icons, active state highlighting, and tap-to-load behavior
+11. **Demo Selector** — external dropdown (outside phone frame) for quick scenario switching
+
+### Design tokens (summary — see full spec for complete list)
+
+- **Colors:** Surface base `#faf8f5`, primary text `#1a1919`, secondary `#706f6e`, user bubble `#5C5B5A`, tint `#f0ede8`, danger `#fa2d25`, success `#22c55e`, warning `#b45309`, info `#2563eb`
+- **Typography:** TT Norms. Status bar 15px semibold, titles 16-18px medium, body 15-16px regular, labels 12-13px, micro 11px
+- **Radii:** Cards 16px, input/user bubbles 24px, phone frame 40px, circular buttons 9999px
+- **Shadows:** Phone frame `0 20px 60px rgba(0,0,0,0.2)`, cards `0 1px 2px rgba(0,0,0,0.05)`
+
+### Data models to implement
+
+```dart
+// Core types
+enum MessageSender { user, ai }
+enum MemoryCategory { FINANCIAL, PREFERENCES, LIFE_EVENTS, BEHAVIORAL }
+enum MemorySource { EXPLICIT, IMPLICIT_CONFIRMED, SYSTEM_DETECTED }
+enum GoalType { EMERGENCY_FUND, DEBT_PAYOFF, SAVINGS_TARGET, CUSTOM }
+enum GoalStatus { DRAFT, ACTIVE, ON_TRACK, AT_RISK, COMPLETED, PAUSED }
+enum SafetyTier { INFO, SUGGESTION, ACTIONABLE, HANDOFF }
+
+class Message {
+  String id;
+  MessageSender sender;
+  String text;
+  DateTime timestamp;
+  List<Chip>? chips;
+  MemoryProposal? memoryProposal;
+  GoalProposal? goalProposal;
+  SafetyTier? safetyTier;
+  String? safetyMessage;
+  InsightToAction? insightToAction;
+  ProvenanceSource? provenance;
+  List<String>? suggestions;
+  AutoSaveMemory? autoSaveMemory;
+  AutoCreateGoal? autoCreateGoal;
+  AutoUpdateGoal? autoUpdateGoal;
+}
+
+class Memory {
+  String id;
+  MemoryCategory category;
+  String content;
+  DateTime learnedAt;
+  MemorySource source;
+  int confidence; // 0-100
+}
+
+class Goal {
+  String id;
+  GoalType type;
+  String title;
+  double targetAmount;
+  double currentAmount;
+  DateTime? targetDate;
+  GoalStatus status;
+  List<Milestone> milestones;
+  DateTime createdAt;
+}
+```
+
+### 10 Demo scenarios (in order)
+
+1. **Cold Start** (sparkles) — "First-time member onboarding" — empty chat with starter prompts
+2. **Returning Member** (user-check) — "Personalized with saved context" — pre-loaded with 5 memories and 2 goals
+3. **Memory Lifecycle** (brain) — "Watch memories form in real time"
+4. **Goal Discovery** (target) — "From conversation to structured goal"
+5. **Proactive Risk** (alert-triangle) — "AI-initiated risk alerts"
+6. **Milestone Celebration** (party-popper) — "Goal completion flow"
+7. **Weekly Recap** (calendar-check) — "Periodic financial summary"
+8. **Cross-Product** (layers) — "Multi-product orchestration"
+9. **Tiered Safety** (shield-check) — "Escalating response levels"
+10. **Free Chat** (message-circle) — "Open sandbox mode" — starts with 2 memories and 1 goal
+
+### Important behaviors
+
+- **Temporary chat:** Toggle via shield button. Disables autoSaveMemory, memoryProposal, insightToAction, and autoCreateGoal. Goal proposals and autoUpdateGoal still work.
+- **Auto-scroll:** Always scroll to bottom on new message (no scroll-position guard). On scenario switch, reset scroll to top.
+- **AI response delay:** 800 + random(700) milliseconds before showing response.
+- **Animations:** fade-in (200ms ease), confirm-pulse (500ms scale+green flash), typing bounce (1.2s infinite, 6px translateY, 200ms stagger per dot).
+- **Paused goals** are filtered out of the Goals Dashboard (not displayed).
+
+### File structure suggestion
+
+```
+lib/
+  main.dart
+  models/          — Message, Memory, Goal, enums
+  store/           — CoachStore (state management), scenario data, AI response generator
+  screens/
+    chat_screen.dart
+  widgets/
+    phone_frame.dart
+    status_bar.dart
+    chat_header.dart
+    message_bubble.dart
+    typing_indicator.dart
+    input_bar.dart
+    memory_center.dart
+    goals_dashboard.dart
+    scenario_switcher.dart
+    demo_selector.dart
+assets/
+  fonts/           — TT Norms .otf files
+```
+
+### Getting started
+
+1. Create a new Flutter project on Replit
+2. Copy `SoFi_Coach_Chat_Design_Spec.md` into the project root as a reference
+3. Copy the TT Norms font files into `assets/fonts/`
+4. Start with the data models and state store
+5. Build the phone frame and chat screen shell
+6. Implement message bubbles with all variant types
+7. Add the AI response generator and demo scenarios
+8. Build the panels (Memory Center, Goals Dashboard, Scenario Switcher)
+9. Add animations and polish
+
+The full 870-line design spec (`SoFi_Coach_Chat_Design_Spec.md`) is the authoritative reference for every pixel measurement, color value, spacing detail, and interaction behavior. Copy it into the new project and follow it exactly.
