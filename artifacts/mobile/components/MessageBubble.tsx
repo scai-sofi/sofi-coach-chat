@@ -258,7 +258,9 @@ function ActionFooter({ message }: { message: Message }) {
       <View style={styles.actionRow}>
         <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
           {copied ? (
-            <Feather name="check" size={20} color={Colors.contentPrimary} />
+            <View style={styles.actionIconWrap}>
+              <Feather name="check" size={20} color={Colors.contentBone600} />
+            </View>
           ) : (
             <Image source={iconCopy} style={styles.actionIcon} />
           )}
@@ -410,6 +412,7 @@ const styles = StyleSheet.create({
   },
   actionBtn: { padding: 4 },
   actionIcon: { width: 20, height: 20 },
+  actionIconWrap: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
   provenanceCard: {
     marginHorizontal: 4, paddingHorizontal: 12, paddingVertical: 10,
     borderRadius: 16, backgroundColor: Colors.surfaceTint, marginTop: 4,
