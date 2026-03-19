@@ -9,12 +9,13 @@ import { SCENARIOS } from '@/constants/scenarios';
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat, chatMode, activeScenario, startLiveChat } = useCoach();
+  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat, chatMode, activeScenario, startLiveChat, messages } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
 
   const demoScenario = chatMode === 'demo' ? SCENARIOS.find(s => s.id === activeScenario) : null;
+  const showMenu = messages.length > 0 || chatMode === 'demo';
 
   return (
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
@@ -26,14 +27,17 @@ export function ChatHeader() {
         </View>
         <View style={styles.centerZone}>
           <Text style={styles.title}>Coach</Text>
+          <Text style={styles.subtitle}>Beta</Text>
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('scenarios')}>
             <Feather name="clock" size={20} color={Colors.contentSecondary} />
           </Pressable>
-          <Pressable style={styles.iconBtn} onPress={() => setMenuOpen(!menuOpen)}>
-            <Feather name="more-horizontal" size={20} color={Colors.contentSecondary} />
-          </Pressable>
+          {showMenu && (
+            <Pressable style={styles.iconBtn} onPress={() => setMenuOpen(!menuOpen)}>
+              <Feather name="more-horizontal" size={20} color={Colors.contentSecondary} />
+            </Pressable>
+          )}
         </View>
       </View>
 
@@ -130,6 +134,13 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
     lineHeight: 20,
+  },
+  subtitle: {
+    fontSize: 12,
+    fontFamily: Fonts.regular,
+    color: Colors.contentSecondary,
+    lineHeight: 16,
+    letterSpacing: 0.1,
   },
   demoBanner: {
     backgroundColor: Colors.surfaceTint,

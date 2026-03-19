@@ -78,6 +78,14 @@ export function InputBar() {
           )}
         </View>
       </View>
+      <View style={styles.disclaimer}>
+        <Text style={styles.disclaimerText}>
+          AI can make mistakes.{' '}
+          <Text style={styles.disclaimerLink}>Learn more</Text>
+          {'   '}
+          <Text style={styles.disclaimerLink}>Privacy policy</Text>
+        </Text>
+      </View>
       <View style={styles.homeIndicator}>
         <View style={styles.homeBar} />
       </View>
@@ -169,6 +177,22 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     whiteSpace: 'nowrap',
   } as any,
+  disclaimer: {
+    alignItems: 'center',
+    paddingTop: 4,
+    paddingBottom: 2,
+    paddingHorizontal: 16,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    fontFamily: Fonts.regular,
+    color: Colors.contentSecondary,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
+  disclaimerLink: {
+    textDecorationLine: 'underline',
+  },
   homeIndicator: {
     alignItems: 'center',
     paddingBottom: 8,

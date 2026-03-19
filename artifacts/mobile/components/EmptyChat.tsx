@@ -1,49 +1,171 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { View, Text, Image, Pressable, StyleSheet, ScrollView } from 'react-native';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { useCoach } from '@/context/CoachContext';
+
+const SUGGESTIONS = [
+  {
+    label: 'Support',
+    text: 'I need help with my SoFi account.',
+    type: 'full' as const,
+  },
+  {
+    label: 'Credit score',
+    text: 'Why did my credit score change?',
+    type: 'half' as const,
+  },
+  {
+    label: 'Spending',
+    text: 'Review monthly spending.',
+    type: 'half' as const,
+  },
+];
 
 export function EmptyChat() {
+  const { sendMessage } = useCoach();
+
+  const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
+  const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
+
   return (
-    <View style={styles.container}>
-      <View style={styles.iconCircle}>
-        <Feather name="cpu" size={24} color={Colors.contentSecondary} />
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.orbSection}>
+        <View style={styles.orbCombo}>
+          <Image
+            source={require('@/assets/images/orb.png')}
+            style={styles.orbImage}
+            resizeMode="contain"
+          />
+          <Image
+            source={require('@/assets/images/caustic.png')}
+            style={styles.causticImage}
+            resizeMode="contain"
+          />
+        </View>
+        <Text style={styles.greeting}>
+          {"I'm Coach.\nHow can I help?"}
+        </Text>
       </View>
-      <Text style={styles.title}>Start a conversation</Text>
-      <Text style={styles.subtitle}>
-        Ask me anything about budgeting, saving, investing, or your financial goals.
-      </Text>
-    </View>
+
+      <View style={styles.suggestionsSection}>
+        <Pressable
+          style={styles.fullCard}
+          onPress={() => sendMessage(fullCard.text)}
+        >
+          <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
+          <Text style={styles.cardText}>{fullCard.text}</Text>
+        </Pressable>
+
+        <View style={styles.halfRow}>
+          {halfCards.map((card, i) => (
+            <Pressable
+              key={i}
+              style={styles.halfCard}
+              onPress={() => sendMessage(card.text)}
+            >
+              <Text style={styles.cardLabel}>{card.label.toUpperCase()}</Text>
+              <Text style={styles.halfCardText} numberOfLines={2}>
+                {card.text}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
+const cardShadow = {
+  shadowColor: 'rgba(10,10,10,0.16)',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 1,
+  shadowRadius: 8,
+  elevation: 4,
+};
+
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-    gap: 16,
+    flexGrow: 1,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
-  iconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Colors.surfaceTint,
+  orbSection: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 24,
+    paddingTop: 100,
   },
-  title: {
-    fontSize: 16,
+  orbCombo: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  orbImage: {
+    width: 78,
+    height: 78,
+  },
+  causticImage: {
+    width: 96,
+    height: 16,
+    opacity: 0.6,
+  },
+  greeting: {
+    fontSize: 24,
     fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Colors.contentSecondary,
-    fontFamily: Fonts.regular,
     textAlign: 'center',
-    maxWidth: 260,
+    lineHeight: 28,
+    letterSpacing: -0.5,
+  },
+  suggestionsSection: {
+    gap: 12,
+    paddingBottom: 16,
+    paddingTop: 40,
+  },
+  fullCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    gap: 4,
+    ...cardShadow,
+  },
+  halfRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  halfCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 16,
+    height: 92,
+    ...cardShadow,
+  },
+  cardLabel: {
+    fontSize: 12,
+    fontFamily: Fonts.medium,
+    color: Colors.contentSecondary,
+    lineHeight: 16,
+    letterSpacing: 0.6,
+  },
+  cardText: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: Colors.contentPrimary,
+    lineHeight: 20,
+  },
+  halfCardText: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: Colors.contentPrimary,
+    lineHeight: 20,
     marginTop: 4,
   },
 });

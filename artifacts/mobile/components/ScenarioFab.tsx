@@ -13,7 +13,7 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 export function ScenarioFab() {
-  const { setActivePanel, activePanel } = useCoach();
+  const { setActivePanel, activePanel, messages } = useCoach();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const offsetX = useSharedValue(0);
@@ -54,7 +54,7 @@ export function ScenarioFab() {
     ],
   }));
 
-  if (activePanel !== 'none') return null;
+  if (activePanel !== 'none' || messages.length === 0) return null;
 
   return (
     <GestureDetector gesture={composed}>
