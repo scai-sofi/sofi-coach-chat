@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -124,13 +124,15 @@ export function EmptyChat() {
   );
 }
 
-const cardShadow = {
-  shadowColor: 'rgba(10,10,10,0.16)',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 1,
-  shadowRadius: 8,
-  elevation: 4,
-};
+const cardShadow = Platform.OS === 'web'
+  ? { boxShadow: '0px 0px 1px 0px rgba(10,10,10,0.16), 0px 2px 8px 0px rgba(10,10,10,0.04), 0px 4px 16px 0px rgba(10,10,10,0.02)' }
+  : {
+      shadowColor: 'rgba(10,10,10,0.16)',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 1,
+      shadowRadius: 4,
+      elevation: 2,
+    };
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -178,7 +180,7 @@ const styles = StyleSheet.create({
   halfCard: {
     flex: 1,
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 16,
     height: 92,
     ...cardShadow,
