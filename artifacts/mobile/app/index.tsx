@@ -45,7 +45,7 @@ export default function ChatScreen() {
     return () => clearTimeout(timer);
   }, [isTyping]);
 
-  const showPanel = activePanel !== 'none';
+  const showNonScenarioPanel = activePanel === 'memory' || activePanel === 'goals';
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => (
     <View style={styles.msgWrap}>
@@ -62,7 +62,7 @@ export default function ChatScreen() {
       >
         <ChatHeader />
 
-        <View style={[styles.chatContent, showPanel && styles.chatHidden]}>
+        <View style={[styles.chatContent, showNonScenarioPanel && styles.chatHidden]}>
           {messages.length === 0 ? (
             <View style={styles.flex}>
               <EmptyChat />
@@ -88,13 +88,14 @@ export default function ChatScreen() {
           <InputBar />
         </View>
 
-        {showPanel && (
+        {showNonScenarioPanel && (
           <View style={styles.panelOverlay}>
             {activePanel === 'memory' && <MemoryCenter />}
             {activePanel === 'goals' && <GoalsDashboard />}
-            {activePanel === 'scenarios' && <ScenarioSwitcher />}
           </View>
         )}
+
+        {activePanel === 'scenarios' && <ScenarioSwitcher />}
       </KeyboardAvoidingView>
     </View>
   );
