@@ -9,7 +9,7 @@ import { SCENARIOS } from '@/constants/scenarios';
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat, chatMode, activeScenario, startLiveChat, messages } = useCoach();
+  const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
@@ -46,16 +46,6 @@ export function ChatHeader() {
           <Text style={styles.demoBannerText}>Demo · {demoScenario.title}</Text>
           <Pressable onPress={() => startLiveChat()} hitSlop={8}>
             <Feather name="x" size={14} color={Colors.contentSecondary} />
-          </Pressable>
-        </View>
-      )}
-
-      {temporaryChat && (
-        <View style={styles.tempBanner}>
-          <Feather name="shield-off" size={12} color="#fff" />
-          <Text style={styles.tempText}>Temporary chat — nothing will be remembered</Text>
-          <Pressable onPress={() => setTemporaryChat(false)} hitSlop={8}>
-            <Feather name="x" size={12} color="rgba(255,255,255,0.7)" />
           </Pressable>
         </View>
       )}
@@ -158,19 +148,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     flex: 1,
     textAlign: 'left',
-  },
-  tempBanner: {
-    backgroundColor: Colors.contentPrimary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 8,
-  },
-  tempText: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: Fonts.regular,
   },
   menu: {
     position: 'absolute',

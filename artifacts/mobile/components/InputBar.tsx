@@ -8,11 +8,9 @@ import { useCoach } from '@/context/CoachContext';
 
 export function InputBar() {
   const [text, setText] = useState('');
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [hasShownTooltip, setHasShownTooltip] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const insets = useSafeAreaInsets();
-  const { sendMessage, temporaryChat, setTemporaryChat, isTyping, messages, showOnboarding } = useCoach();
+  const { sendMessage, isTyping } = useCoach();
 
   const handleSend = () => {
     if (!text.trim() || isTyping) return;
@@ -21,31 +19,8 @@ export function InputBar() {
     inputRef.current?.focus();
   };
 
-  const toggleTempChat = () => {
-    const newVal = !temporaryChat;
-    setTemporaryChat(newVal);
-    if (newVal && !hasShownTooltip) {
-      setShowTooltip(true);
-      setHasShownTooltip(true);
-      setTimeout(() => setShowTooltip(false), 3000);
-    }
-  };
-
-  const starterPrompts = ['What\'s my financial snapshot?', 'Help me set a goal', 'How does my memory work?', 'Show my spending breakdown'];
-
-  const showStarters = messages.length === 0 && showOnboarding;
-
   return (
     <View style={[styles.footer, { paddingBottom: Platform.OS === 'web' ? 20 : Math.max(insets.bottom, 8) }]}>
-      {showStarters && (
-        <View style={styles.starters}>
-          {starterPrompts.map((prompt, i) => (
-            <Pressable key={i} style={styles.starterBtn} onPress={() => sendMessage(prompt)}>
-              <Text style={styles.starterText}>{prompt}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
       <View style={styles.inputRow}>
         <View style={styles.inputPill}>
           <TextInput
@@ -64,18 +39,7 @@ export function InputBar() {
             <Pressable style={[styles.sendBtn, isTyping && { opacity: 0.4 }]} onPress={handleSend} disabled={isTyping}>
               <Feather name="arrow-up" size={14} color="#fff" />
             </Pressable>
-          ) : (
-            <View>
-              {showTooltip && (
-                <View style={styles.tooltip}>
-                  <Text style={styles.tooltipText}>Chat without saving to memory</Text>
-                </View>
-              )}
-              <Pressable style={styles.tempBtn} onPress={toggleTempChat}>
-                <Feather name="shield-off" size={16} color={temporaryChat ? Colors.contentPrimary : Colors.contentSecondary} />
-              </Pressable>
-            </View>
-          )}
+          ) : null}
         </View>
       </View>
       <View style={styles.disclaimer}>
@@ -93,28 +57,6 @@ export function InputBar() {
 const styles = StyleSheet.create({
   footer: {
     backgroundColor: Colors.surfaceBase,
-  },
-  starters: {
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    gap: 8,
-    maxWidth: 300,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  starterBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.1)',
-  },
-  starterText: {
-    fontSize: 14,
-    color: Colors.contentPrimary,
-    fontFamily: Fonts.regular,
-    lineHeight: 18,
-    textAlign: 'left',
   },
   inputRow: {
     paddingHorizontal: 16,
@@ -151,29 +93,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tempBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tooltip: {
-    position: 'absolute',
-    bottom: 40,
-    right: 0,
-    backgroundColor: Colors.contentPrimary,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    zIndex: 50,
-  },
-  tooltipText: {
-    color: '#fff',
-    fontSize: 11,
-    fontFamily: Fonts.regular,
-    whiteSpace: 'nowrap',
-  } as any,
   disclaimer: {
     alignItems: 'center',
     paddingTop: 4,
