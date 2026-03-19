@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, FlatList, StyleSheet, Platform } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { useCoach } from '@/context/CoachContext';
 import { ChatHeader } from '@/components/ChatHeader';
@@ -12,12 +11,12 @@ import { EmptyChat } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
+import { PhoneFrame } from '@/components/PhoneFrame';
 import { Message } from '@/constants/types';
 
 export default function ChatScreen() {
   const { messages, isTyping, activePanel, activeScenario } = useCoach();
   const listRef = useRef<FlatList>(null);
-  const insets = useSafeAreaInsets();
   const prevMsgCount = useRef(messages.length);
   const prevScenario = useRef(activeScenario);
 
@@ -55,48 +54,50 @@ export default function ChatScreen() {
   );
 
   return (
-    <View style={styles.screen}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior="padding"
-        keyboardVerticalOffset={0}
-      >
-        <ChatHeader />
+    <PhoneFrame>
+      <View style={styles.screen}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior="padding"
+          keyboardVerticalOffset={0}
+        >
+          <ChatHeader />
 
-        <View style={[styles.chatContent, showPanel && styles.chatHidden]}>
-          {messages.length === 0 ? (
-            <View style={styles.flex}>
-              <EmptyChat />
-            </View>
-          ) : (
-            <FlatList
-              ref={listRef}
-              data={messages}
-              renderItem={renderMessage}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={[styles.listContent]}
-              keyboardDismissMode="interactive"
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              ListFooterComponent={isTyping ? (
-                <View style={styles.msgWrap}>
-                  <TypingIndicator />
-                </View>
-              ) : null}
-            />
-          )}
-          <InputBar />
-        </View>
-
-        {showPanel && (
-          <View style={[styles.panelOverlay, { paddingTop: Platform.OS === 'web' ? 0 : 0 }]}>
-            {activePanel === 'memory' && <MemoryCenter />}
-            {activePanel === 'goals' && <GoalsDashboard />}
-            {activePanel === 'scenarios' && <ScenarioSwitcher />}
+          <View style={[styles.chatContent, showPanel && styles.chatHidden]}>
+            {messages.length === 0 ? (
+              <View style={styles.flex}>
+                <EmptyChat />
+              </View>
+            ) : (
+              <FlatList
+                ref={listRef}
+                data={messages}
+                renderItem={renderMessage}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={[styles.listContent]}
+                keyboardDismissMode="interactive"
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                ListFooterComponent={isTyping ? (
+                  <View style={styles.msgWrap}>
+                    <TypingIndicator />
+                  </View>
+                ) : null}
+              />
+            )}
+            <InputBar />
           </View>
-        )}
-      </KeyboardAvoidingView>
-    </View>
+
+          {showPanel && (
+            <View style={styles.panelOverlay}>
+              {activePanel === 'memory' && <MemoryCenter />}
+              {activePanel === 'goals' && <GoalsDashboard />}
+              {activePanel === 'scenarios' && <ScenarioSwitcher />}
+            </View>
+          )}
+        </KeyboardAvoidingView>
+      </View>
+    </PhoneFrame>
   );
 }
 
