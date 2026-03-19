@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
+import { Fonts } from '@/constants/fonts';
 
 export function EmptyChat() {
   return (
@@ -34,12 +35,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontFamily: 'Inter_500Medium',
+    fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
   },
   subtitle: {
     fontSize: 14,
     color: Colors.contentSecondary,
+    fontFamily: Fonts.regular,
     textAlign: 'center',
     maxWidth: 260,
     marginTop: 4,

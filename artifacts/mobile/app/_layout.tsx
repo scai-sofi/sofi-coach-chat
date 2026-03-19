@@ -1,10 +1,4 @@
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from "@expo-google-fonts/inter";
+import { useFonts } from "expo-font";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -30,10 +24,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
+    'TTNorms-Regular': require('../assets/fonts/TTNorms-Regular.otf'),
+    'TTNorms-Medium': require('../assets/fonts/TTNorms-Medium.otf'),
+    'TTNorms-Bold': require('../assets/fonts/TTNorms-Bold.otf'),
+    'TTNorms-Italic': require('../assets/fonts/TTNorms-Italic.otf'),
+    'TTNorms-BoldItalic': require('../assets/fonts/TTNorms-BoldItalic.otf'),
   });
 
   useEffect(() => {

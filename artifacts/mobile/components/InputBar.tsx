@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, TextInput, Pressable, Text, StyleSheet, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
+import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 export function InputBar() {
@@ -61,7 +62,7 @@ export function InputBar() {
           />
           {text.trim() ? (
             <Pressable style={[styles.sendBtn, isTyping && { opacity: 0.4 }]} onPress={handleSend} disabled={isTyping}>
-              <Feather name="arrow-up" size={16} color="#fff" />
+              <Feather name="arrow-up" size={14} color="#fff" />
             </Pressable>
           ) : (
             <View>
@@ -92,6 +93,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     gap: 8,
+    maxWidth: 300,
+    alignSelf: 'center',
+    width: '100%',
   },
   starterBtn: {
     paddingVertical: 12,
@@ -103,7 +107,9 @@ const styles = StyleSheet.create({
   starterText: {
     fontSize: 14,
     color: Colors.contentPrimary,
-    fontFamily: 'Inter_400Regular',
+    fontFamily: Fonts.regular,
+    lineHeight: 18,
+    textAlign: 'left',
   },
   inputRow: {
     paddingHorizontal: 16,
@@ -127,7 +133,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: Colors.contentPrimary,
-    fontFamily: 'Inter_400Regular',
+    fontFamily: Fonts.regular,
     lineHeight: 20,
     maxHeight: 96,
     paddingVertical: 4,
@@ -160,7 +166,7 @@ const styles = StyleSheet.create({
   tooltipText: {
     color: '#fff',
     fontSize: 11,
-    fontFamily: 'Inter_400Regular',
+    fontFamily: Fonts.regular,
     whiteSpace: 'nowrap',
   } as any,
   homeIndicator: {

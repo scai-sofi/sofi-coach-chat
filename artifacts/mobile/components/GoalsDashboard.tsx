@@ -3,11 +3,15 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import Colors from '@/constants/colors';
+import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { Goal, GOAL_TYPE_LABELS } from '@/constants/types';
 
 function ProgressRing({ percentage, status, size = 72 }: { percentage: number; status: string; size?: number }) {
-  const r = (size / 2) - 8;
+  const strokeWidth = 4;
+  const r = (size - strokeWidth) / 2 - 2;
+  const cx = size / 2;
+  const cy = size / 2;
   const circumference = 2 * Math.PI * r;
   const strokeDashoffset = circumference * (1 - Math.min(percentage / 100, 1));
 
@@ -18,12 +22,12 @@ function ProgressRing({ percentage, status, size = 72 }: { percentage: number; s
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={Colors.progressTrack} strokeWidth={4} fill="none" />
+        <Circle cx={cx} cy={cy} r={r} stroke={Colors.progressTrack} strokeWidth={strokeWidth} fill="none" />
         <Circle
-          cx={size / 2} cy={size / 2} r={r}
-          stroke={strokeColor} strokeWidth={4} fill="none"
+          cx={cx} cy={cy} r={r}
+          stroke={strokeColor} strokeWidth={strokeWidth} fill="none"
           strokeLinecap="round"
-          strokeDasharray={circumference}
+          strokeDasharray={`${circumference}`}
           strokeDashoffset={strokeDashoffset}
         />
       </Svg>
@@ -177,9 +181,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 16,
     borderBottomWidth: 1, borderBottomColor: 'rgba(10,10,10,0.1)',
   },
-  backBtn: { padding: 4, borderRadius: 999 },
+  backBtn: { padding: 4, borderRadius: 9999 },
   headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  headerText: { fontSize: 16, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary },
+  headerText: { fontSize: 16, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 20 },
   content: { flex: 1 },
   goalCard: {
     backgroundColor: '#fff', borderRadius: 16, borderWidth: 1,
@@ -190,59 +194,59 @@ const styles = StyleSheet.create({
   },
   goalTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   ringText: {
-    position: 'absolute', fontSize: 13, fontFamily: 'Inter_500Medium',
+    position: 'absolute', fontSize: 13, fontFamily: Fonts.medium,
   },
   goalInfo: { flex: 1, minWidth: 0 },
   goalTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  goalTitle: { fontSize: 15, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary, lineHeight: 20 },
+  goalTitle: { fontSize: 15, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 20 },
   typeBadge: {
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4,
     backgroundColor: Colors.surfaceTint,
   },
   typeBadgeCompleted: { backgroundColor: Colors.successBg },
   typeBadgeText: {
-    fontSize: 10, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary,
+    fontSize: 10, fontFamily: Fonts.medium, color: Colors.contentSecondary,
     textTransform: 'uppercase',
   },
-  goalAmount: { fontSize: 13, color: Colors.contentSecondary, marginTop: 2 },
+  goalAmount: { fontSize: 13, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginTop: 2 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  statusText: { fontSize: 12, fontFamily: 'Inter_500Medium' },
-  confidenceText: { fontSize: 12, color: Colors.contentSecondary, marginLeft: 4 },
+  statusText: { fontSize: 12, fontFamily: Fonts.medium },
+  confidenceText: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginLeft: 4 },
   detailRows: { gap: 6 },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  detailLabel: { fontSize: 12, color: Colors.contentSecondary },
-  detailValue: { fontSize: 12, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary },
+  detailLabel: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular },
+  detailValue: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentPrimary },
   milestones: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   milestone: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999,
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999,
     backgroundColor: Colors.surfaceTint,
   },
   milestoneReached: { backgroundColor: Colors.contentPrimary },
   milestoneCompleted: { backgroundColor: Colors.successBg },
-  milestoneText: { fontSize: 11, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary },
+  milestoneText: { fontSize: 11, fontFamily: Fonts.medium, color: Colors.contentSecondary },
   askBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 8, borderRadius: 999,
+    paddingVertical: 8, borderRadius: 9999,
     borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)',
   },
-  askBtnText: { fontSize: 13, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary },
+  askBtnText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary },
   divider: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8,
   },
   dividerLine: { flex: 1, height: 1, backgroundColor: Colors.progressTrack },
   dividerText: {
-    fontSize: 11, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary,
+    fontSize: 11, fontFamily: Fonts.medium, color: Colors.contentSecondary,
     textTransform: 'uppercase', letterSpacing: 1,
   },
   empty: {
     alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12,
   },
-  emptyText: { fontSize: 14, color: Colors.contentSecondary, textAlign: 'center' },
+  emptyText: { fontSize: 14, color: Colors.contentSecondary, fontFamily: Fonts.regular, textAlign: 'center' },
   footer: {
     paddingHorizontal: 16, paddingVertical: 16,
     borderTopWidth: 1, borderTopColor: 'rgba(10,10,10,0.1)',
     alignItems: 'center',
   },
-  footerText: { fontSize: 12, color: Colors.contentSecondary },
+  footerText: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular },
 });

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
+import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory } from '@/constants/types';
 
@@ -220,7 +221,7 @@ export function MemoryCenter() {
 
         {visibleMemories.length === 0 ? (
           <View style={styles.empty}>
-            <Feather name={search || filterCat ? 'search' : 'cpu'} size={32} color={Colors.contentMuted} />
+            <Feather name={search || filterCat ? 'search' : 'cpu'} size={search || filterCat ? 24 : 32} color={Colors.contentMuted} />
             <Text style={styles.emptyText}>
               {search || filterCat ? 'No memories match your search' : 'No memories yet. The coach will start learning as you chat.'}
             </Text>
@@ -258,10 +259,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 16,
     borderBottomWidth: 1, borderBottomColor: 'rgba(10,10,10,0.1)',
   },
-  backBtn: { padding: 4, borderRadius: 999 },
+  backBtn: { padding: 4, borderRadius: 9999 },
   headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  headerText: { fontSize: 16, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary },
-  addBtn: { padding: 6, borderRadius: 999 },
+  headerText: { fontSize: 16, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 20 },
+  addBtn: { padding: 6, borderRadius: 9999 },
   addBtnActive: { backgroundColor: Colors.contentPrimary },
   addForm: {
     paddingHorizontal: 16, paddingVertical: 12,
@@ -270,70 +271,70 @@ const styles = StyleSheet.create({
   addInput: {
     backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)',
     paddingHorizontal: 16, paddingVertical: 12, fontSize: 15, color: Colors.contentPrimary,
-    fontFamily: 'Inter_400Regular', lineHeight: 20, minHeight: 60, textAlignVertical: 'top',
+    fontFamily: Fonts.regular, lineHeight: 20, minHeight: 60, textAlignVertical: 'top',
   },
   addControls: { marginTop: 10 },
   catPicker: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   catChipSmall: {
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
+    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
     backgroundColor: Colors.surfaceTint,
   },
   catChipActive: { backgroundColor: Colors.contentPrimary },
-  catChipSmallText: { fontSize: 12, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary },
+  catChipSmallText: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary },
   addBtnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 10 },
-  cancelText: { fontSize: 12, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary, paddingHorizontal: 12, paddingVertical: 6 },
-  saveBtn: { backgroundColor: Colors.contentPrimary, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  saveBtnText: { color: '#fff', fontSize: 12, fontFamily: 'Inter_500Medium' },
+  cancelText: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary, paddingHorizontal: 12, paddingVertical: 6 },
+  saveBtn: { backgroundColor: Colors.contentPrimary, borderRadius: 9999, paddingHorizontal: 12, paddingVertical: 6 },
+  saveBtnText: { color: '#fff', fontSize: 12, fontFamily: Fonts.medium },
   searchSection: { paddingHorizontal: 16, paddingVertical: 12 },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   searchInputWrap: { flex: 1, height: 48, borderRadius: 24, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', justifyContent: 'center' },
   searchIcon: { position: 'absolute', left: 16 },
-  searchInput: { paddingLeft: 40, paddingRight: 36, fontSize: 16, color: Colors.contentPrimary, fontFamily: 'Inter_400Regular', height: '100%' },
-  clearBtn: { position: 'absolute', right: 14, padding: 2, borderRadius: 999 },
+  searchInput: { paddingLeft: 40, paddingRight: 36, fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, height: '100%' },
+  clearBtn: { position: 'absolute', right: 14, padding: 2, borderRadius: 9999 },
   filterBtn: { width: 32, height: 32, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   filterBtnActive: { backgroundColor: Colors.contentPrimary },
   filterRow: { marginTop: 10, flexDirection: 'row' },
   filterChip: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
+    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
     backgroundColor: Colors.surfaceTint, marginRight: 6,
   },
   filterChipActive: { backgroundColor: Colors.contentPrimary },
-  filterChipText: { fontSize: 12, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary },
+  filterChipText: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary },
   filterCount: { fontSize: 11, color: 'rgba(112,111,110,0.6)' },
   content: { flex: 1, paddingHorizontal: 16 },
-  helpText: { fontSize: 13, color: Colors.contentSecondary, lineHeight: 18, paddingVertical: 8 },
+  helpText: { fontSize: 13, color: Colors.contentSecondary, fontFamily: Fonts.regular, lineHeight: 18, paddingVertical: 8 },
   group: { marginTop: 12 },
   groupHeader: {
-    fontSize: 12, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary,
+    fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary,
     textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8,
   },
   memCard: {
     backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)',
     padding: 12, marginBottom: 8,
   },
-  memContent: { fontSize: 15, color: Colors.contentPrimary, fontFamily: 'Inter_400Regular', lineHeight: 20 },
+  memContent: { fontSize: 15, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
   memMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 4 },
-  memMetaText: { fontSize: 12, color: Colors.contentSecondary, flex: 1 },
+  memMetaText: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, flex: 1 },
   memActions: { flexDirection: 'row', gap: 0 },
-  memActionBtn: { padding: 6, borderRadius: 999 },
+  memActionBtn: { padding: 6, borderRadius: 9999 },
   editInput: {
-    fontSize: 15, color: Colors.contentPrimary, fontFamily: 'Inter_400Regular', lineHeight: 20,
+    fontSize: 15, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20,
     borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 8, padding: 8, minHeight: 50,
     textAlignVertical: 'top',
   },
   editButtons: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  saveMiniBtn: { backgroundColor: Colors.contentPrimary, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  saveMiniText: { color: '#fff', fontSize: 13, fontFamily: 'Inter_500Medium' },
-  cancelMiniBtn: { borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  cancelMiniText: { color: Colors.contentSecondary, fontSize: 13, fontFamily: 'Inter_500Medium' },
+  saveMiniBtn: { backgroundColor: Colors.contentPrimary, borderRadius: 9999, paddingHorizontal: 12, paddingVertical: 6 },
+  saveMiniText: { color: '#fff', fontSize: 13, fontFamily: Fonts.medium },
+  cancelMiniBtn: { borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 9999, paddingHorizontal: 12, paddingVertical: 6 },
+  cancelMiniText: { color: Colors.contentSecondary, fontSize: 13, fontFamily: Fonts.medium },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
-  emptyText: { fontSize: 14, color: Colors.contentSecondary, textAlign: 'center', maxWidth: 260 },
-  clearFilters: { fontSize: 13, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary },
+  emptyText: { fontSize: 14, color: Colors.contentSecondary, fontFamily: Fonts.regular, textAlign: 'center', maxWidth: 260 },
+  clearFilters: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary },
   footer: {
     paddingHorizontal: 16, paddingVertical: 12,
     borderTopWidth: 1, borderTopColor: 'rgba(10,10,10,0.1)',
     alignItems: 'center',
   },
-  footerText: { fontSize: 12, color: Colors.contentSecondary },
+  footerText: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular },
 });

@@ -7,24 +7,35 @@ export function TypingIndicator() {
   const dot1 = useSharedValue(0);
   const dot2 = useSharedValue(0);
   const dot3 = useSharedValue(0);
+  const op1 = useSharedValue(0.4);
+  const op2 = useSharedValue(0.4);
+  const op3 = useSharedValue(0.4);
 
   useEffect(() => {
-    const anim = (sv: Animated.SharedValue<number>, delay: number) => {
+    const animY = (sv: Animated.SharedValue<number>, delay: number) => {
       sv.value = withDelay(delay, withRepeat(
         withSequence(
-          withTiming(-6, { duration: 400 }),
-          withTiming(0, { duration: 400 }),
+          withTiming(-6, { duration: 480 }),
+          withTiming(0, { duration: 480 }),
         ), -1, false
       ));
     };
-    anim(dot1, 0);
-    anim(dot2, 200);
-    anim(dot3, 400);
+    const animOp = (sv: Animated.SharedValue<number>, delay: number) => {
+      sv.value = withDelay(delay, withRepeat(
+        withSequence(
+          withTiming(1, { duration: 480 }),
+          withTiming(0.4, { duration: 480 }),
+        ), -1, false
+      ));
+    };
+    animY(dot1, 0); animOp(op1, 0);
+    animY(dot2, 200); animOp(op2, 200);
+    animY(dot3, 400); animOp(op3, 400);
   }, []);
 
-  const style1 = useAnimatedStyle(() => ({ transform: [{ translateY: dot1.value }], opacity: dot1.value < -2 ? 1 : 0.4 }));
-  const style2 = useAnimatedStyle(() => ({ transform: [{ translateY: dot2.value }], opacity: dot2.value < -2 ? 1 : 0.4 }));
-  const style3 = useAnimatedStyle(() => ({ transform: [{ translateY: dot3.value }], opacity: dot3.value < -2 ? 1 : 0.4 }));
+  const style1 = useAnimatedStyle(() => ({ transform: [{ translateY: dot1.value }], opacity: op1.value }));
+  const style2 = useAnimatedStyle(() => ({ transform: [{ translateY: dot2.value }], opacity: op2.value }));
+  const style3 = useAnimatedStyle(() => ({ transform: [{ translateY: dot3.value }], opacity: op3.value }));
 
   return (
     <View style={styles.container}>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
+import { Fonts } from '@/constants/fonts';
 import { Message, MessageChip, SafetyTier } from '@/constants/types';
 import { useCoach } from '@/context/CoachContext';
 
@@ -42,8 +43,9 @@ function renderContent(content: string) {
       }
       parts.push(
         <Text key={keyIdx++} style={{
-          fontFamily: 'Inter_500Medium',
+          fontFamily: Fonts.medium,
           fontSize: isStandaloneBold ? 18 : 16,
+          letterSpacing: isStandaloneBold ? -0.2 : 0,
         }}>
           {match[1]}
         </Text>
@@ -58,7 +60,7 @@ function renderContent(content: string) {
       <Text key={i} style={[
         styles.aiText,
         isBullet && { paddingLeft: 8 },
-        isStandaloneBold && parts.length === 1 && { fontSize: 18, fontFamily: 'Inter_500Medium' },
+        isStandaloneBold && parts.length === 1 && { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
       ]}>
         {parts}
       </Text>
@@ -101,14 +103,14 @@ function MemoryProposalCard({ message }: { message: Message }) {
   }
 
   return (
-    <View style={styles.proposalCard}>
+    <View style={[styles.proposalCard, { paddingBottom: 16 }]}>
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={14} color={Colors.contentSecondary} style={{ marginTop: 2 }} />
         <Text style={styles.proposalText}>
-          Want me to remember: <Text style={{ fontStyle: 'italic' }}>"{proposal.content}"</Text>?
+          Want me to remember: <Text style={{ fontFamily: Fonts.italic }}>"{proposal.content}"</Text>?
         </Text>
       </View>
-      <View style={styles.proposalButtons}>
+      <View style={[styles.proposalButtons, { marginLeft: 16 }]}>
         <Pressable style={styles.confirmBtn} onPress={() => confirmMemory(message.id)}>
           <Text style={styles.confirmBtnText}>Remember</Text>
         </Pressable>
@@ -190,7 +192,7 @@ function InsightToActionCard({ message }: { message: Message }) {
           <Feather name="target" size={14} color="#fff" />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.proposalText, { fontSize: 14 }]}>{gp.title}</Text>
+          <Text style={[styles.proposalText, { fontSize: 14, lineHeight: 18 }]}>{gp.title}</Text>
           <Text style={styles.proposalDetail}>
             ${gp.targetAmount.toLocaleString()} · ${gp.monthlyContribution}/mo · ~{months} months
           </Text>
@@ -201,7 +203,7 @@ function InsightToActionCard({ message }: { message: Message }) {
           <Text style={[styles.confirmBtnText, { fontSize: 13 }]}>Set up goal</Text>
         </Pressable>
         <Pressable onPress={() => saveInsightMemoryOnly(message.id)} style={{ paddingHorizontal: 14, paddingVertical: 7 }}>
-          <Text style={{ fontSize: 13, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary }}>Just remember</Text>
+          <Text style={{ fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary }}>Just remember</Text>
         </Pressable>
       </View>
     </View>
@@ -240,7 +242,7 @@ function ActionFooter({ message }: { message: Message }) {
         </Pressable>
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
-            <Text style={{ fontSize: 12, color: Colors.contentSecondary, fontFamily: 'Inter_400Regular' }}>Why this?</Text>
+            <Text style={{ fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
             <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={Colors.contentSecondary} />
           </Pressable>
         )}
@@ -311,33 +313,33 @@ const styles = StyleSheet.create({
   systemRow: { alignItems: 'center', paddingVertical: 8 },
   systemPill: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999,
+    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 9999,
     backgroundColor: Colors.surfaceTint,
   },
   systemProactive: { backgroundColor: Colors.contentPrimary },
-  systemText: { fontSize: 13, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary },
+  systemText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
   userRow: { alignItems: 'flex-end', paddingLeft: 60 },
   userBubble: {
     backgroundColor: Colors.contentBone600,
     borderRadius: 24, paddingTop: 11, paddingBottom: 12,
     paddingHorizontal: 16, maxWidth: 298,
   },
-  userText: { fontSize: 16, color: '#fff', fontFamily: 'Inter_400Regular', lineHeight: 20 },
-  aiRow: { gap: 4 },
+  userText: { fontSize: 16, color: '#fff', fontFamily: Fonts.regular, lineHeight: 20 },
+  aiRow: { gap: 8 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 4 },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
+    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
   },
-  chipText: { fontSize: 12, fontFamily: 'Inter_500Medium' },
+  chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
   aiContent: { paddingHorizontal: 4, gap: 6 },
-  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: 'Inter_400Regular', lineHeight: 22 },
+  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 22 },
   safetyBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4,
     alignSelf: 'flex-start', marginTop: 4, marginLeft: 4,
   },
-  safetyText: { fontSize: 10, fontFamily: 'Inter_500Medium' },
+  safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
     marginTop: 12, backgroundColor: Colors.surfaceTint,
     borderWidth: 1, borderColor: 'rgba(10,10,10,0.05)',
@@ -346,21 +348,21 @@ const styles = StyleSheet.create({
   confirmedCard: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
   },
-  confirmedText: { fontSize: 13, fontFamily: 'Inter_500Medium', color: Colors.contentSecondary },
+  confirmedText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 10 },
-  proposalText: { fontSize: 13, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
-  proposalDetail: { fontSize: 12, color: Colors.contentSecondary, marginTop: 2, lineHeight: 16 },
-  proposalButtons: { flexDirection: 'row', gap: 8, marginLeft: 0 },
+  proposalText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
+  proposalDetail: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
+  proposalButtons: { flexDirection: 'row', gap: 8 },
   confirmBtn: {
-    backgroundColor: Colors.contentPrimary, borderRadius: 999,
+    backgroundColor: Colors.contentPrimary, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  confirmBtnText: { color: '#fff', fontSize: 12, fontFamily: 'Inter_500Medium' },
+  confirmBtnText: { color: '#fff', fontSize: 12, fontFamily: Fonts.medium },
   dismissBtn: {
-    borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 999,
+    borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  dismissBtnText: { color: Colors.contentSecondary, fontSize: 12, fontFamily: 'Inter_500Medium' },
+  dismissBtnText: { color: Colors.contentSecondary, fontSize: 12, fontFamily: Fonts.medium },
   insightIcon: {
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: Colors.contentPrimary,
@@ -375,7 +377,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4, paddingHorizontal: 12, paddingVertical: 10,
     borderRadius: 16, backgroundColor: Colors.surfaceTint, marginTop: 4,
   },
-  provenanceText: { fontSize: 12, color: Colors.contentSecondary, lineHeight: 16, fontFamily: 'Inter_400Regular' },
+  provenanceText: { fontSize: 12, color: Colors.contentSecondary, lineHeight: 16, fontFamily: Fonts.regular },
   suggestions: {
     alignItems: 'flex-end', marginTop: 4, gap: 8,
   },
@@ -383,5 +385,5 @@ const styles = StyleSheet.create({
     borderWidth: 0.75, borderColor: Colors.contentBone600,
     borderRadius: 24, paddingTop: 11, paddingBottom: 12, paddingHorizontal: 16,
   },
-  suggestionText: { fontSize: 15, color: Colors.contentPrimary, fontFamily: 'Inter_400Regular', lineHeight: 20 },
+  suggestionText: { fontSize: 15, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
 });

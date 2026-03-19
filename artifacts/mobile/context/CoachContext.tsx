@@ -51,7 +51,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [goals, setGoals] = useState<Goal[]>([...defaultScenario.goals]);
   const [isTyping, setIsTyping] = useState(false);
   const [temporaryChat, setTemporaryChat] = useState(false);
-  const [activePanel, setActivePanelState] = useState<PanelType>('none');
+  const [activePanel, setActivePanelState] = useState<PanelType>('scenarios');
   const [activeScenario, setActiveScenario] = useState('returning-member');
   const [showOnboarding, setShowOnboarding] = useState(true);
 

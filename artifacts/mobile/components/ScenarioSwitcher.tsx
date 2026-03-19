@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
+import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
 
@@ -44,9 +45,7 @@ export function ScenarioSwitcher() {
             <Pressable
               key={scenario.id}
               style={[styles.card, isActive && styles.cardActive]}
-              onPress={() => {
-                switchScenario(scenario.id);
-              }}
+              onPress={() => switchScenario(scenario.id)}
             >
               <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
                 <Feather name={iconName as any} size={14} color={isActive ? '#fff' : Colors.contentPrimary} />
@@ -76,11 +75,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 16,
     borderBottomWidth: 1, borderBottomColor: 'rgba(10,10,10,0.1)',
   },
-  headerTitle: { fontSize: 16, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary },
-  closeBtn: { padding: 6, borderRadius: 999 },
+  headerTitle: { fontSize: 16, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 20 },
+  closeBtn: { padding: 6, borderRadius: 9999 },
   content: { flex: 1 },
   intro: {
-    fontSize: 13, color: Colors.contentSecondary, lineHeight: 18, marginBottom: 8,
+    fontSize: 13, color: Colors.contentSecondary, fontFamily: Fonts.regular, lineHeight: 18, marginBottom: 8,
   },
   card: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 12,
@@ -91,18 +90,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.contentPrimary, borderColor: Colors.contentPrimary,
   },
   iconWrap: {
-    padding: 6, borderRadius: 999, backgroundColor: Colors.surfaceTint,
+    padding: 6, borderRadius: 9999, backgroundColor: Colors.surfaceTint,
   },
   iconWrapActive: {
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
   cardContent: { flex: 1 },
-  cardTitle: { fontSize: 14, fontFamily: 'Inter_500Medium', color: Colors.contentPrimary, lineHeight: 18 },
-  cardSubtitle: { fontSize: 12, color: Colors.contentSecondary, lineHeight: 16, marginTop: 2 },
+  cardTitle: { fontSize: 14, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18 },
+  cardSubtitle: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, lineHeight: 16, marginTop: 2 },
   footer: {
     paddingHorizontal: 16, paddingVertical: 12,
     borderTopWidth: 1, borderTopColor: 'rgba(10,10,10,0.1)',
     alignItems: 'center',
   },
-  footerText: { fontSize: 11, color: Colors.contentSecondary, textAlign: 'center', lineHeight: 14 },
+  footerText: { fontSize: 11, color: Colors.contentSecondary, fontFamily: Fonts.regular, textAlign: 'center', lineHeight: 14 },
 });

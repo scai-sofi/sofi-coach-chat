@@ -105,5 +105,8 @@ Expo/React Native mobile app — "SoFi Coach Chat", an interactive AI financial 
 - **Constants**: `constants/types.ts` (type system), `constants/colors.ts` (SoFi brand palette), `constants/scenarios.ts` (10 demo scenarios), `constants/aiResponse.ts` (keyword-matching AI responses)
 - **Components**: `ChatHeader`, `InputBar`, `MessageBubble` (chips, proposals, safety tiers), `MemoryCenter` (CRUD), `GoalsDashboard` (SVG progress rings), `ScenarioSwitcher`, `TypingIndicator`, `EmptyChat`
 - **Features**: 10 pre-built demo scenarios, mock AI keyword-matching responses, Memory Center (CRUD for coach memories), Goals Dashboard (progress rings, milestones), message chips/proposals/safety tiers, temporary chat mode, scenario switcher panel
-- **Design**: SoFi brand colors (#faf8f5 base, #1a1919 primary), Inter font family
+- **Typography**: TT Norms font family (Regular, Medium, Bold, Italic, BoldItalic) loaded via expo-font from `assets/fonts/`
+- **Design**: SoFi brand colors (#faf8f5 base, #1a1919 primary), matched to Figma spec (file key: 8c5TuXaL1MvZh2rkkf1e1Y)
+- **Font config**: `constants/fonts.ts` exports `Fonts` object with named keys (regular, medium, bold, italic, boldItalic)
+- **Default state**: Opens with scenarios panel visible, "returning-member" scenario active
 - **Run**: `pnpm --filter @workspace/mobile run dev`
