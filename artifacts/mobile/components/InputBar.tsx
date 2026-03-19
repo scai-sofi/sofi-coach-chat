@@ -34,6 +34,8 @@ export function InputBar() {
             maxLength={2000}
             onSubmitEditing={handleSend}
             blurOnSubmit={false}
+            cursorColor="#5c5b5a"
+            selectionColor="rgba(92,91,90,0.3)"
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}
           />

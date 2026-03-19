@@ -27,7 +27,6 @@ export function ChatHeader() {
         </View>
         <View style={styles.centerZone}>
           <Text style={styles.title}>Coach</Text>
-          <Text style={styles.subtitle}>Beta</Text>
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('scenarios')}>
