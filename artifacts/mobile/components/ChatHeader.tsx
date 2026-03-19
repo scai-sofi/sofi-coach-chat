@@ -28,7 +28,11 @@ export function ChatHeader() {
               saveAndClose();
             }
           }}>
-            <Feather name="x" size={14} color={Colors.contentPrimary} />
+            {messages.length === 0 && chatMode !== 'demo' ? (
+              <Feather name="play-circle" size={20} color={Colors.contentSecondary} />
+            ) : (
+              <Feather name="x" size={14} color={Colors.contentPrimary} />
+            )}
           </Pressable>
         </View>
         <View style={styles.centerZone}>
