@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Platform } from 'react-native';
+import { View, FlatList, StyleSheet, Platform, Keyboard, Pressable } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Colors from '@/constants/colors';
 import { useCoach } from '@/context/CoachContext';
@@ -64,9 +64,14 @@ export default function ChatScreen() {
 
         <View style={[styles.chatContent, showNonScenarioPanel && styles.chatHidden]}>
           {messages.length === 0 ? (
-            <View style={styles.flex}>
+            <Pressable style={styles.flex} onPress={() => {
+              Keyboard.dismiss();
+              if (Platform.OS === 'web' && typeof document !== 'undefined') {
+                (document.activeElement as HTMLElement)?.blur?.();
+              }
+            }}>
               <EmptyChat />
-            </View>
+            </Pressable>
           ) : (
             <FlatList
               ref={listRef}
