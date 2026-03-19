@@ -243,7 +243,9 @@ function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap:
 
 const iconCopy = require('@/assets/images/icon-copy.png');
 const iconThumbsUp = require('@/assets/images/icon-thumbs-up.png');
+const iconThumbsUpFilled = require('@/assets/images/icon-thumbs-up-filled.png');
 const iconThumbsDown = require('@/assets/images/icon-thumbs-down.png');
+const iconThumbsDownFilled = require('@/assets/images/icon-thumbs-down-filled.png');
 
 function ActionFooter({ message }: { message: Message }) {
   const [copied, setCopied] = useState(false);
@@ -258,14 +260,14 @@ function ActionFooter({ message }: { message: Message }) {
           {copied ? (
             <Feather name="check" size={20} color={Colors.contentPrimary} />
           ) : (
-            <Image source={iconCopy} style={[styles.actionIcon, { opacity: 0.7 }]} />
+            <Image source={iconCopy} style={styles.actionIcon} />
           )}
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbUp(!thumbUp)}>
-          <Image source={iconThumbsUp} style={[styles.actionIcon, thumbUp && { opacity: 1 }]} />
+          <Image source={thumbUp ? iconThumbsUpFilled : iconThumbsUp} style={styles.actionIcon} />
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbDown(!thumbDown)}>
-          <Image source={iconThumbsDown} style={[styles.actionIcon, thumbDown && { opacity: 1 }]} />
+          <Image source={thumbDown ? iconThumbsDownFilled : iconThumbsDown} style={styles.actionIcon} />
         </Pressable>
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
@@ -407,7 +409,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   actionBtn: { padding: 4 },
-  actionIcon: { width: 20, height: 20, opacity: 0.7 },
+  actionIcon: { width: 20, height: 20 },
   provenanceCard: {
     marginHorizontal: 4, paddingHorizontal: 12, paddingVertical: 10,
     borderRadius: 16, backgroundColor: Colors.surfaceTint, marginTop: 4,
