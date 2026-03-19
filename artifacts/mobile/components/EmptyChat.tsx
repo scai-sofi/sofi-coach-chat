@@ -23,15 +23,20 @@ const SUGGESTIONS = [
 ];
 
 export function EmptyChat() {
-  const { sendMessage } = useCoach();
+  const { sendMessage, inputFocused } = useCoach();
 
   const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
   const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
 
+  const showSuggestions = !inputFocused;
+
   return (
     <ScrollView
       style={styles.scroll}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        !showSuggestions && styles.containerCentered,
+      ]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
@@ -48,30 +53,32 @@ export function EmptyChat() {
         </Text>
       </View>
 
-      <View style={styles.suggestionsSection}>
-        <Pressable
-          style={styles.fullCard}
-          onPress={() => sendMessage(fullCard.text)}
-        >
-          <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
-          <Text style={styles.cardText}>{fullCard.text}</Text>
-        </Pressable>
+      {showSuggestions && (
+        <View style={styles.suggestionsSection}>
+          <Pressable
+            style={styles.fullCard}
+            onPress={() => sendMessage(fullCard.text)}
+          >
+            <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
+            <Text style={styles.cardText}>{fullCard.text}</Text>
+          </Pressable>
 
-        <View style={styles.halfRow}>
-          {halfCards.map((card, i) => (
-            <Pressable
-              key={i}
-              style={styles.halfCard}
-              onPress={() => sendMessage(card.text)}
-            >
-              <Text style={styles.cardLabel}>{card.label.toUpperCase()}</Text>
-              <Text style={styles.halfCardText} numberOfLines={2}>
-                {card.text}
-              </Text>
-            </Pressable>
-          ))}
+          <View style={styles.halfRow}>
+            {halfCards.map((card, i) => (
+              <Pressable
+                key={i}
+                style={styles.halfCard}
+                onPress={() => sendMessage(card.text)}
+              >
+                <Text style={styles.cardLabel}>{card.label.toUpperCase()}</Text>
+                <Text style={styles.halfCardText} numberOfLines={2}>
+                  {card.text}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
-      </View>
+      )}
     </ScrollView>
   );
 }
@@ -92,6 +99,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+  },
+  containerCentered: {
+    justifyContent: 'center',
   },
   orbSection: {
     alignItems: 'center',

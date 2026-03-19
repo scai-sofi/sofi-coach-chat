@@ -10,7 +10,7 @@ export function InputBar() {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   const insets = useSafeAreaInsets();
-  const { sendMessage, isTyping } = useCoach();
+  const { sendMessage, isTyping, setInputFocused } = useCoach();
 
   const handleSend = () => {
     if (!text.trim() || isTyping) return;
@@ -34,6 +34,8 @@ export function InputBar() {
             maxLength={2000}
             onSubmitEditing={handleSend}
             blurOnSubmit={false}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
           />
           {text.trim() ? (
             <Pressable style={[styles.sendBtn, isTyping && { opacity: 0.4 }]} onPress={handleSend} disabled={isTyping}>

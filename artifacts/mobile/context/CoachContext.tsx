@@ -39,6 +39,7 @@ interface CoachState {
   activeScenario: string;
   showOnboarding: boolean;
   chatMode: ChatMode;
+  inputFocused: boolean;
 }
 
 interface CoachContextType extends CoachState {
@@ -59,6 +60,7 @@ interface CoachContextType extends CoachState {
   pauseMemory: (id: string) => void;
   deleteMemory: (id: string) => void;
   clearConversation: () => void;
+  setInputFocused: (val: boolean) => void;
 }
 
 const CoachContext = createContext<CoachContextType | null>(null);
@@ -79,6 +81,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [activeScenario, setActiveScenario] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>('live');
+  const [inputFocused, setInputFocused] = useState(false);
 
   const memoriesRef = useRef(memories);
   memoriesRef.current = memories;
@@ -422,11 +425,11 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CoachContext.Provider value={{
-      messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding, chatMode,
+      messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
       sendMessage, setActivePanel, setTemporaryChat, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
-      addMemory, editMemory, pauseMemory, deleteMemory, clearConversation,
+      addMemory, editMemory, pauseMemory, deleteMemory, clearConversation, setInputFocused,
     }}>
       {children}
     </CoachContext.Provider>
