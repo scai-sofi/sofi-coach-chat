@@ -38,13 +38,8 @@ export function EmptyChat() {
       <View style={styles.orbSection}>
         <View style={styles.orbCombo}>
           <Image
-            source={require('@/assets/images/orb.png')}
-            style={styles.orbImage}
-            resizeMode="contain"
-          />
-          <Image
-            source={require('@/assets/images/caustic.png')}
-            style={styles.causticImage}
+            source={require('@/assets/images/orb-combo.png')}
+            style={styles.orbComboImage}
             resizeMode="contain"
           />
         </View>
@@ -107,14 +102,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  orbImage: {
-    width: 78,
-    height: 78,
-  },
-  causticImage: {
+  orbComboImage: {
     width: 96,
-    height: 16,
-    opacity: 0.6,
+    height: 120,
   },
   greeting: {
     fontSize: 24,
