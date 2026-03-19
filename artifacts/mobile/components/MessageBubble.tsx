@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
@@ -259,7 +260,9 @@ function ActionFooter({ message }: { message: Message }) {
         <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
           {copied ? (
             <View style={styles.actionIconWrap}>
-              <Feather name="check" size={20} color={Colors.contentBone600} />
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
             </View>
           ) : (
             <Image source={iconCopy} style={styles.actionIcon} />
