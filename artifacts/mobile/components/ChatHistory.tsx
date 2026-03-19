@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Platform } from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Platform, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
@@ -50,10 +51,44 @@ function groupByMonth(sessions: ChatSession[]): { label: string; sessions: ChatS
   return order.map(label => ({ label, sessions: groups[label] }));
 }
 
-export function ChatHistory() {
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SLIDE_DURATION = 300;
+const SLIDE_EASING = Easing.bezier(0.4, 0, 0.2, 1);
+
+export function ChatHistory({ onClose }: { onClose: () => void }) {
   const insets = useSafeAreaInsets();
-  const { chatHistory, loadSession, deleteSession, setActivePanel, saveAndClose } = useCoach();
+  const { chatHistory, loadSession, saveAndClose } = useCoach();
   const [search, setSearch] = useState('');
+
+  const slideX = useSharedValue(SCREEN_WIDTH);
+
+  useEffect(() => {
+    slideX.value = withTiming(0, { duration: SLIDE_DURATION, easing: SLIDE_EASING });
+  }, []);
+
+  const handleClose = () => {
+    slideX.value = withTiming(SCREEN_WIDTH, { duration: SLIDE_DURATION, easing: SLIDE_EASING }, () => {
+      runOnJS(onClose)();
+    });
+  };
+
+  const handleLoadSession = (id: string) => {
+    slideX.value = withTiming(SCREEN_WIDTH, { duration: SLIDE_DURATION, easing: SLIDE_EASING }, () => {
+      runOnJS(loadSession)(id);
+      runOnJS(onClose)();
+    });
+  };
+
+  const handleNewChat = () => {
+    slideX.value = withTiming(SCREEN_WIDTH, { duration: SLIDE_DURATION, easing: SLIDE_EASING }, () => {
+      runOnJS(saveAndClose)();
+      runOnJS(onClose)();
+    });
+  };
+
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: slideX.value }],
+  }));
 
   const filtered = useMemo(() => {
     if (!search.trim()) return chatHistory;
@@ -66,13 +101,15 @@ export function ChatHistory() {
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
 
   return (
-    <View style={[styles.container, { paddingTop: topPad }]}>
+    <Animated.View style={[styles.container, { paddingTop: topPad }, animStyle]}>
       <View style={styles.titleBar}>
-        <Pressable style={styles.iconBtn} onPress={() => setActivePanel('none')}>
+        <Pressable style={styles.backBtn} onPress={handleClose} hitSlop={8}>
           <Feather name="chevron-left" size={24} color={Colors.contentPrimary} />
         </Pressable>
-        <Text style={styles.title}>Chat history</Text>
-        <Pressable style={styles.iconBtn} onPress={() => { saveAndClose(); }}>
+        <View style={styles.titleCenter}>
+          <Text style={styles.title}>Chat history</Text>
+        </View>
+        <Pressable style={styles.newChatBtn} onPress={handleNewChat} hitSlop={8}>
           <NewChatIcon size={24} color={Colors.contentPrimary} />
         </Pressable>
       </View>
@@ -107,7 +144,7 @@ export function ChatHistory() {
                     {idx > 0 && <View style={styles.divider} />}
                     <Pressable
                       style={styles.sessionRow}
-                      onPress={() => loadSession(session.id)}
+                      onPress={() => handleLoadSession(session.id)}
                     >
                       <Text style={styles.sessionTitle} numberOfLines={1}>{session.title}</Text>
                     </Pressable>
@@ -118,25 +155,31 @@ export function ChatHistory() {
           ))
         )}
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: Colors.surfaceBase,
   },
   titleBar: {
     height: 44,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 14,
   },
-  iconBtn: {
+  backBtn: {
     width: 24,
     height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleCenter: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -145,6 +188,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
     lineHeight: 20,
+  },
+  newChatBtn: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   searchRow: {
     paddingHorizontal: 16,

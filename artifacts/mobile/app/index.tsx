@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet, Platform, Keyboard, Pressable } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Colors from '@/constants/colors';
@@ -16,7 +16,7 @@ import { ChatHistory } from '@/components/ChatHistory';
 import { Message } from '@/constants/types';
 
 export default function ChatScreen() {
-  const { messages, isTyping, activePanel, activeScenario } = useCoach();
+  const { messages, isTyping, activePanel, activeScenario, setActivePanel } = useCoach();
   const listRef = useRef<FlatList>(null);
   const prevMsgCount = useRef(messages.length);
   const prevScenario = useRef(activeScenario);
@@ -47,7 +47,13 @@ export default function ChatScreen() {
   }, [isTyping]);
 
   const showNonScenarioPanel = activePanel === 'memory' || activePanel === 'goals';
-  const showHistory = activePanel === 'history';
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    if (activePanel === 'history') {
+      setShowHistory(true);
+    }
+  }, [activePanel]);
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => (
     <View style={styles.msgWrap}>
@@ -105,9 +111,10 @@ export default function ChatScreen() {
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
 
         {showHistory && (
-          <View style={StyleSheet.absoluteFill}>
-            <ChatHistory />
-          </View>
+          <ChatHistory onClose={() => {
+            setShowHistory(false);
+            setActivePanel('none');
+          }} />
         )}
       </KeyboardAvoidingView>
     </View>
