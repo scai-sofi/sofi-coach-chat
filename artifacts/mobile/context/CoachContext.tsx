@@ -52,6 +52,7 @@ interface CoachState {
   inputFocused: boolean;
   chatHistory: ChatSession[];
   currentSessionId: string | null;
+  sessionTitle: string;
 }
 
 interface CoachContextType extends CoachState {
@@ -99,6 +100,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [inputFocused, setInputFocused] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [sessionTitle, setSessionTitle] = useState('Coach');
+  const titleGeneratedRef = useRef(false);
 
   const memoriesRef = useRef(memories);
   memoriesRef.current = memories;
@@ -131,6 +134,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setActivePanelState('none');
     setActiveScenario(id);
     setShowOnboarding(id === 'cold-start');
+    setSessionTitle(scenario.title);
+    titleGeneratedRef.current = true;
   }, []);
 
   const startLiveChat = useCallback(() => {
@@ -146,6 +151,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setActivePanelState('none');
     setActiveScenario('');
     setShowOnboarding(false);
+    setSessionTitle('Coach');
+    titleGeneratedRef.current = false;
   }, []);
 
   const addGoalFromProposal = useCallback((proposal: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }) => {
@@ -199,6 +206,26 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const generateTitle = useCallback(async (allMessages: Message[], version: number) => {
+    try {
+      const formatted = allMessages
+        .filter(m => m.role === 'user' || m.role === 'ai')
+        .map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content }));
+      const res = await fetch(`${API_BASE}/title`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: formatted }),
+      });
+      if (sessionVersionRef.current !== version) return;
+      if (res.ok) {
+        const data = await res.json();
+        if (sessionVersionRef.current === version && data.title) {
+          setSessionTitle(data.title);
+        }
+      }
+    } catch {}
+  }, []);
+
   const sendLiveMessage = useCallback(async (text: string, version: number) => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
@@ -239,7 +266,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         content: data.reply || 'I couldn\'t generate a response. Please try again.',
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, aiMsg]);
+      setMessages(prev => {
+        const updated = [...prev, aiMsg];
+        if (!titleGeneratedRef.current) {
+          titleGeneratedRef.current = true;
+          generateTitle(updated, version);
+        }
+        return updated;
+      });
       setIsTyping(false);
     } catch (err: any) {
       if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
@@ -253,7 +287,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     } finally {
       if (abortControllerRef.current === controller) abortControllerRef.current = null;
     }
-  }, []);
+  }, [generateTitle]);
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -436,15 +470,13 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories(prev => prev.map(m => m.id === id ? { ...m, status: 'DELETED' } : m));
   }, []);
 
+  const sessionTitleRef = useRef(sessionTitle);
+  sessionTitleRef.current = sessionTitle;
+
   const saveAndClose = useCallback(() => {
     const currentMessages = messagesRef.current;
     if (currentMessages.length > 0 && chatModeRef.current === 'live') {
-      const firstUserMsg = currentMessages.find(m => m.role === 'user');
-      const title = firstUserMsg
-        ? firstUserMsg.content.length > 50
-          ? firstUserMsg.content.substring(0, 50) + '...'
-          : firstUserMsg.content
-        : 'New conversation';
+      const title = sessionTitleRef.current !== 'Coach' ? sessionTitleRef.current : 'New conversation';
       const now = new Date();
       const sessionId = currentSessionId || uid();
       setChatHistory(prev => {
@@ -479,6 +511,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setActiveScenario('');
     setShowOnboarding(false);
     setCurrentSessionId(null);
+    setSessionTitle('Coach');
+    titleGeneratedRef.current = false;
   }, [currentSessionId]);
 
   const loadSession = useCallback((id: string) => {
@@ -497,6 +531,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setActiveScenario('');
     setShowOnboarding(false);
     setCurrentSessionId(id);
+    setSessionTitle(session.title);
+    titleGeneratedRef.current = true;
   }, [chatHistory]);
 
   const deleteSession = useCallback((id: string) => {
@@ -515,7 +551,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   return (
     <CoachContext.Provider value={{
       messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
-      chatHistory, currentSessionId,
+      chatHistory, currentSessionId, sessionTitle,
       sendMessage, setActivePanel, setTemporaryChat, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,

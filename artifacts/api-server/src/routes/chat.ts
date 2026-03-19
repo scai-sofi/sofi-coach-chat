@@ -126,4 +126,38 @@ router.post("/chat", async (req, res) => {
   }
 });
 
+router.post("/title", async (req, res) => {
+  try {
+    const { messages } = req.body as { messages?: Array<{ role: string; content: string }> };
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: "Messages are required" });
+      return;
+    }
+
+    const trimmed = messages.slice(-6).map(m => ({
+      role: m.role === "assistant" ? "assistant" as const : "user" as const,
+      content: m.content.slice(0, 500),
+    }));
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "Generate a very short title (3-6 words) for this financial coaching conversation. The title should capture the main topic. Return ONLY the title text, nothing else. No quotes, no punctuation at the end.",
+        },
+        ...trimmed,
+      ],
+      max_completion_tokens: 30,
+    });
+
+    const title = completion.choices[0]?.message?.content?.trim() || "New conversation";
+    res.json({ title });
+  } catch (error: any) {
+    console.error("Title API error:", error?.message || error);
+    res.status(500).json({ error: "Could not generate title" });
+  }
+});
+
 export default router;

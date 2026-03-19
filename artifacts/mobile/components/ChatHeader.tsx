@@ -62,22 +62,13 @@ function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number;
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages, saveAndClose } = useCoach();
+  const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages, saveAndClose, sessionTitle } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
 
   const demoScenario = chatMode === 'demo' ? SCENARIOS.find(s => s.id === activeScenario) : null;
   const hasActiveChat = messages.length > 0 || chatMode === 'demo';
-
-  const firstUserMsg = messages.find(m => m.role === 'user');
-  const sessionTitle = demoScenario
-    ? demoScenario.title
-    : firstUserMsg
-      ? firstUserMsg.content.length > 30
-        ? firstUserMsg.content.substring(0, 30) + '...'
-        : firstUserMsg.content
-      : 'Coach';
 
   return (
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
