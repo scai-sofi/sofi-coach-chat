@@ -111,11 +111,11 @@ Expo/React Native mobile app — "SoFi Coach Chat", an interactive AI financial 
   - `sendLiveMessage()`: sends user message + history to `POST /api/chat`, handles errors/abort
   - `getApiBaseUrl()`: resolves API URL for web (handles Expo dev domain → dev domain mapping) and native
 - **Constants**: `constants/types.ts` (type system), `constants/colors.ts` (SoFi brand palette), `constants/scenarios.ts` (10 demo scenarios), `constants/aiResponse.ts` (keyword-matching AI responses)
-- **Components**: `ChatHeader` (live badge indicator), `InputBar`, `MessageBubble` (chips, proposals, safety tiers), `MemoryCenter` (CRUD), `GoalsDashboard` (SVG progress rings), `ScenarioSwitcher`, `TypingIndicator`, `EmptyChat` (mode-aware content)
-- **Features**: 10 pre-built demo scenarios, mock AI keyword-matching responses, **Live AI Chat** (real OpenAI responses via API server with financial coach system prompt), Memory Center (CRUD for coach memories), Goals Dashboard (progress rings, milestones), message chips/proposals/safety tiers, temporary chat mode, scenario switcher panel
-- **Live Chat Flow**: Header menu "New chat" → `startLiveChat()` → empty chat with green "Live" badge → user types → `POST /api/chat` → real AI response. Selecting a demo scenario from FAB switches back to demo mode.
+- **Components**: `ChatHeader` (demo banner when in demo mode), `InputBar`, `MessageBubble` (chips, proposals, safety tiers), `MemoryCenter` (CRUD), `GoalsDashboard` (SVG progress rings), `ScenarioSwitcher`, `TypingIndicator`, `EmptyChat`
+- **Features**: **Live AI Chat** (default — real OpenAI responses via API server with financial coach system prompt), 10 pre-built demo scenarios (secondary — accessed via Demos FAB), Memory Center (CRUD for coach memories), Goals Dashboard (progress rings, milestones), message chips/proposals/safety tiers, temporary chat mode, scenario switcher panel
+- **Mode design**: Live chat is the default with no visual indicators. Demo mode shows a subtle "Demo · [Scenario Name]" banner below the header with × to exit back to live. "New chat" in menu always returns to live mode.
 - **Typography**: TT Norms font family (Regular, Medium, Bold, Italic, BoldItalic) loaded via expo-font from `assets/fonts/`
 - **Design**: SoFi brand colors (#faf8f5 base, #1a1919 primary), matched to Figma spec (file key: 8c5TuXaL1MvZh2rkkf1e1Y)
 - **Font config**: `constants/fonts.ts` exports `Fonts` object with named keys (regular, medium, bold, italic, boldItalic)
-- **Default state**: Opens in demo mode with "returning-member" scenario active
+- **Default state**: Opens in live chat mode (empty conversation, ready to chat with AI)
 - **Run**: `pnpm --filter @workspace/mobile run dev`

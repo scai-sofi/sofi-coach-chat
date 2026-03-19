@@ -69,18 +69,16 @@ export function useCoach() {
   return ctx;
 }
 
-const defaultScenario = SCENARIOS.find(s => s.id === 'returning-member')!;
-
 export function CoachProvider({ children }: { children: React.ReactNode }) {
-  const [messages, setMessages] = useState<Message[]>([...defaultScenario.messages]);
-  const [memories, setMemories] = useState<Memory[]>([...defaultScenario.memories]);
-  const [goals, setGoals] = useState<Goal[]>([...defaultScenario.goals]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [memories, setMemories] = useState<Memory[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [temporaryChat, setTemporaryChat] = useState(false);
   const [activePanel, setActivePanelState] = useState<PanelType>('none');
-  const [activeScenario, setActiveScenario] = useState('returning-member');
-  const [showOnboarding, setShowOnboarding] = useState(true);
-  const [chatMode, setChatMode] = useState<ChatMode>('demo');
+  const [activeScenario, setActiveScenario] = useState('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [chatMode, setChatMode] = useState<ChatMode>('live');
 
   const memoriesRef = useRef(memories);
   memoriesRef.current = memories;

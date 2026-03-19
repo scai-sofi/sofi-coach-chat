@@ -5,13 +5,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
+import { SCENARIOS } from '@/constants/scenarios';
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat, chatMode, startLiveChat } = useCoach();
+  const { setActivePanel, clearConversation, temporaryChat, setTemporaryChat, chatMode, activeScenario, startLiveChat } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = Platform.OS === 'web' ? 54 : insets.top;
+
+  const demoScenario = chatMode === 'demo' ? SCENARIOS.find(s => s.id === activeScenario) : null;
 
   return (
     <View style={[styles.headerWrap, { paddingTop: topPad }]}>
@@ -23,12 +26,6 @@ export function ChatHeader() {
         </View>
         <View style={styles.centerZone}>
           <Text style={styles.title}>Coach</Text>
-          {chatMode === 'live' && (
-            <View style={styles.liveBadge}>
-              <View style={styles.liveDot} />
-              <Text style={styles.liveText}>Live</Text>
-            </View>
-          )}
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('scenarios')}>
@@ -39,6 +36,15 @@ export function ChatHeader() {
           </Pressable>
         </View>
       </View>
+
+      {demoScenario && (
+        <View style={styles.demoBanner}>
+          <Text style={styles.demoBannerText}>Demo · {demoScenario.title}</Text>
+          <Pressable onPress={() => startLiveChat()} hitSlop={8}>
+            <Feather name="x" size={14} color={Colors.contentSecondary} />
+          </Pressable>
+        </View>
+      )}
 
       {temporaryChat && (
         <View style={styles.tempBanner}>
@@ -103,7 +109,6 @@ const styles = StyleSheet.create({
   },
   centerZone: {
     flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -126,6 +131,23 @@ const styles = StyleSheet.create({
     color: Colors.contentPrimary,
     lineHeight: 20,
   },
+  demoBanner: {
+    backgroundColor: Colors.surfaceTint,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+  },
+  demoBannerText: {
+    fontSize: 12,
+    fontFamily: Fonts.regular,
+    color: Colors.contentSecondary,
+    lineHeight: 16,
+    flex: 1,
+    textAlign: 'center',
+  },
   tempBanner: {
     backgroundColor: Colors.contentPrimary,
     flexDirection: 'row',
@@ -138,28 +160,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontFamily: Fonts.regular,
-  },
-  liveBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#dcfce7',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    marginLeft: 6,
-  },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#22c55e',
-  },
-  liveText: {
-    fontSize: 11,
-    fontFamily: Fonts.medium,
-    color: '#16a34a',
-    lineHeight: 14,
   },
   menu: {
     position: 'absolute',
