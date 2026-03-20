@@ -176,46 +176,42 @@ export function MemoryCenter() {
       </View>
 
       <View style={styles.searchSection}>
-        <View style={styles.searchRow}>
-          <View style={styles.searchInputWrap}>
-            <View style={styles.searchIconWrap}>
-              <SearchIcon size={16} color={Colors.contentSecondary} />
-            </View>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search"
-              placeholderTextColor={Colors.contentSecondary}
-              value={search}
-              onChangeText={setSearch}
-            />
-          </View>
-          <Pressable
-            style={[styles.filterBtn, (showFilters || filterCat) && styles.filterBtnActive]}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <FilterIcon size={16} color={(showFilters || filterCat) ? '#fff' : Colors.contentSecondary} />
-          </Pressable>
+        <View style={styles.searchInputWrap}>
+          <SearchIcon size={16} color={Colors.contentSecondary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search"
+            placeholderTextColor={Colors.contentSecondary}
+            value={search}
+            onChangeText={setSearch}
+          />
         </View>
-
-        {(showFilters || filterCat) && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
-            {MEMORY_CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => (
-              <Pressable
-                key={cat}
-                style={[styles.filterChip, filterCat === cat && styles.filterChipActive]}
-                onPress={() => setFilterCat(filterCat === cat ? null : cat)}
-              >
-                <Text style={[styles.filterChipText, filterCat === cat && { color: '#fff' }]}>
-                  {MEMORY_CATEGORY_LABELS[cat]}
-                </Text>
-                <Text style={[styles.filterCount, filterCat === cat && { color: 'rgba(255,255,255,0.6)' }]}>
-                  {catCounts[cat] || 0}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        )}
+        <Pressable
+          style={[styles.filterBtn, (showFilters || filterCat) && styles.filterBtnActive]}
+          onPress={() => setShowFilters(!showFilters)}
+        >
+          <FilterIcon size={16} color={(showFilters || filterCat) ? '#fff' : Colors.contentSecondary} />
+        </Pressable>
       </View>
+
+      {(showFilters || filterCat) && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
+          {MEMORY_CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => (
+            <Pressable
+              key={cat}
+              style={[styles.filterChip, filterCat === cat && styles.filterChipActive]}
+              onPress={() => setFilterCat(filterCat === cat ? null : cat)}
+            >
+              <Text style={[styles.filterChipText, filterCat === cat && { color: '#fff' }]}>
+                {MEMORY_CATEGORY_LABELS[cat]}
+              </Text>
+              <Text style={[styles.filterCount, filterCat === cat && { color: 'rgba(255,255,255,0.6)' }]}>
+                {catCounts[cat] || 0}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {visibleMemories.length === 0 ? (
@@ -288,28 +284,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchSection: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    height: 60,
+    paddingTop: 12,
+    paddingBottom: 0,
+    paddingHorizontal: 16,
   },
   searchInputWrap: {
     flex: 1,
-    height: 40,
-    borderRadius: 20,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: Colors.surfaceElevated,
-    borderWidth: 0.75,
-    borderColor: 'rgba(10,10,10,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(10,10,10,0.1)',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  searchIconWrap: {
-    paddingLeft: 14,
-    paddingRight: 8,
+    paddingHorizontal: 16,
+    gap: 8,
   },
   searchInput: {
     flex: 1,
@@ -317,17 +310,17 @@ const styles = StyleSheet.create({
     color: Colors.contentPrimary,
     fontFamily: Fonts.regular,
     lineHeight: 20,
-    paddingRight: 14,
   },
   filterBtn: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   filterBtnActive: { backgroundColor: Colors.contentPrimary },
-  filterRow: { marginTop: 10, flexDirection: 'row' },
+  filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 40 },
+  filterRowContent: { flexDirection: 'row', gap: 6 },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -336,7 +329,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 9999,
     backgroundColor: Colors.surfaceTint,
-    marginRight: 6,
   },
   filterChipActive: { backgroundColor: Colors.contentPrimary },
   filterChipText: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary },
