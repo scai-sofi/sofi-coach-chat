@@ -65,7 +65,7 @@ function buildScenarios(): Scenario[] {
       icon: 'sparkles',
       messages: [
         {
-          id: uid(), role: 'ai', content: "Welcome to SoFi! I'm your financial coach — here to help you understand your money, set goals, and make smarter decisions.\n\nI learn from our conversations to give you more personalized advice over time. Everything stays private and you're always in control of what I remember.\n\nWhat would you like to start with?",
+          id: uid(), role: 'ai', content: "Hey there — welcome to SoFi! I'm Coach, your AI financial advisor. I'm here to help you make sense of your money, set goals, and build habits that actually stick.\n\nAs we talk, I'll learn what matters to you so my advice gets more personal over time. You're always in control — you can see, edit, or delete anything I remember in the Memory Center.\n\nWhat would you like to explore first?",
           timestamp: new Date(now.getTime() - 60000),
           suggestions: ['What\'s my financial snapshot?', 'Help me set a goal', 'How does my memory work?', 'Show my spending breakdown'],
         },
@@ -81,7 +81,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'What are my top spending categories this month?', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Here's your spending breakdown for this month — I know you like the detailed version:\n\n**1. Housing — $2,450**\nRent + utilities. Stable month-over-month.\n\n**2. Dining Out — $485**\nDown 12% from last month. Your focus on reducing dining spend is working! Bay Area prices make this impressive for a household of 2.\n\n**3. Groceries — $380**\nUp slightly, but expected given the shift from dining out.\n\n**4. Transportation — $220**\nConsistent with your 3-month average.\n\n**5. Entertainment — $145**\nIncludes the concert tickets from last week.",
+          id: uid(), role: 'ai', content: "Here's your detailed breakdown for this month — since I know you like the numbers:\n\n**1. Housing — $2,450**\nRent and utilities, steady month over month.\n\n**2. Dining Out — $485**\nDown 12% from last month. Your effort to cut back on dining is clearly working — especially impressive in the Bay Area for a household of two.\n\n**3. Groceries — $380**\nUp a bit, which makes sense as you shift away from restaurants.\n\n**4. Transportation — $220**\nRight in line with your 3-month average.\n\n**5. Entertainment — $145**\nIncludes those concert tickets from last week.\n\nOverall you're trending well. Want to dig into any of these?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [
             { type: 'goal-progress', label: 'Emergency Fund 70%' },
@@ -102,19 +102,19 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'I want you to remember that I\'m risk-averse with investments', timestamp: new Date(now.getTime() - 300000) },
         {
-          id: uid(), role: 'ai', content: "Got it! I've noted that you're risk-averse with investments. This will help me tailor any investment suggestions to your comfort level — focusing on stable, lower-risk options.",
+          id: uid(), role: 'ai', content: "Got it — saved! I've noted that you prefer a conservative approach to investing. Going forward, I'll focus on lower-risk strategies like index funds and bonds when we discuss your portfolio.\n\nThis is something you can always update in the Memory Center if your comfort level changes.",
           timestamp: new Date(now.getTime() - 290000),
           chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
           autoSaveMemory: { content: 'Risk-averse with investments', category: 'FINANCIAL_ATTITUDE' },
         },
         { id: uid(), role: 'user', content: 'What do you know about me?', timestamp: new Date(now.getTime() - 240000) },
         {
-          id: uid(), role: 'ai', content: "Here's what I've learned about you so far:\n\n**Preferences**\n• Prefers detailed breakdowns with numbers\n• Prefers weekly check-ins over daily notifications\n\n**Financial Attitudes**\n• Dining out is a focus area for spending reduction\n• Risk-averse with investments\n\n**Life Context**\n• Household of 2, living in San Francisco Bay Area\n\n**Constraints**\n• Saving for a wedding in October 2027\n\nYou can edit or remove any of these in the Memory Center — tap the brain icon in the menu.",
+          id: uid(), role: 'ai', content: "Here's what I've learned so far:\n\n**Preferences**\n• Prefers detailed breakdowns with numbers\n• Prefers weekly check-ins over daily notifications\n\n**Financial Attitudes**\n• Dining out is a focus area for spending reduction\n• Risk-averse with investments\n\n**Life Context**\n• Household of 2, living in San Francisco Bay Area\n\n**Constraints**\n• Saving for a wedding in October 2027\n\nYou can edit or remove any of these anytime — just tap the brain icon in the menu to open the Memory Center.",
           timestamp: new Date(now.getTime() - 230000),
         },
         { id: uid(), role: 'user', content: 'Actually, that dining thing is outdated — I\'ve been cooking more lately', timestamp: new Date(now.getTime() - 180000) },
         {
-          id: uid(), role: 'ai', content: "Updated! I've changed your dining preference to reflect that you've shifted to cooking more at home. That's great for both your budget and your emergency fund goal!\n\nI noticed you mentioned the shift in habits — would you also like me to remember that cooking at home is now a priority?",
+          id: uid(), role: 'ai', content: "Updated! I've adjusted that memory to reflect your shift toward cooking at home. That's a great move for both your budget and your emergency fund goal.\n\nSince you're making this a habit, would you like me to also remember that cooking at home is a priority for you? That way I can factor it into future spending advice.",
           timestamp: new Date(now.getTime() - 170000),
           chips: [{ type: 'memory-updated', label: 'Memory updated' }],
           memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PREFERENCE' },
@@ -134,7 +134,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'I really need to pay off my credit card. The balance is about $4,200', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Let's tackle that credit card debt! Here's what I can see:\n\n**Current Balance:** $4,200\n**Interest Rate:** 22.99% APR\n**Minimum Payment:** $84/month\n\nAt minimum payments, it would take over 7 years and cost $3,100+ in interest. But I have two better options:\n\n**Option A: Aggressive (6 months)**\n$720/month → paid off by July, saving $2,800 in interest\n\n**Option B: Balanced (12 months)**\n$380/month → paid off by January, saving $2,400 in interest",
+          id: uid(), role: 'ai', content: "Let's get a plan together for that. Here's what I'm seeing on your SoFi Credit Card:\n\n**Current Balance:** $4,200\n**Interest Rate:** 22.99% APR\n**Minimum Payment:** $84/month\n\nAt minimum payments only, you'd be paying for 7+ years and spend over $3,100 in interest. Let's do better than that.\n\n**Option A — Aggressive (6 months)**\n$720/month → paid off by July, saves ~$2,800 in interest\n\n**Option B — Balanced (12 months)**\n$380/month → paid off by January, saves ~$2,400 in interest\n\nBoth are solid choices — it comes down to how much breathing room you want in your monthly budget. Which feels more doable?",
           timestamp: new Date(now.getTime() - 60000),
           goalProposal: {
             id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
@@ -159,7 +159,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Coach noticed a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "I wanted to flag something about your **Credit Card Payoff** goal.\n\nYour confidence score dropped from 82% to 58% this week. Here's why:\n\n• Last 2 payments were $380 instead of the $420 target\n• A new $340 charge appeared on the card\n• At current pace, you'll miss your target date by ~6 weeks\n\nHere are some options:\n\n**1. Increase this month's payment** to $520 to get back on track\n**2. Extend your deadline** by 2 months (reduces monthly to $350)",
+          id: uid(), role: 'ai', content: "I wanted to give you a heads-up about your **Credit Card Payoff** goal.\n\nYour confidence score dropped from 82% to 58% this week. Here's what's going on:\n\n• Your last 2 payments were $380 instead of the $420 target\n• A new $340 charge hit the card\n• At this pace, you'd miss your target date by about 6 weeks\n\nNo need to panic — this is totally fixable. Here are two paths:\n\n**1. Bump this month's payment** to $520 to get back on track\n**2. Extend your deadline** by 2 months, which drops the monthly to $350\n\nWhat feels right for your budget this month?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'goal-risk', label: 'Credit Card at risk' }],
           memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'FINANCIAL_ATTITUDE' },
@@ -179,7 +179,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Your Emergency Fund hit a milestone!', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "You just hit **75% of your Emergency Fund goal!** That's $9,000 of your $12,000 target.\n\nHere's your journey so far:\n• **25%** reached 60 days ago\n• **50%** reached 20 days ago\n• **75%** reached today!\n• **100%** estimated in ~2 months\n\nAt your current pace of $460/month, you're actually ahead of schedule. Your consistency is paying off!\n\nOnly $3,000 to go — you've got this.",
+          id: uid(), role: 'ai', content: "You just hit **75% of your Emergency Fund goal!** That's $9,000 out of $12,000 — huge progress.\n\nHere's your journey so far:\n• **25%** reached 60 days ago\n• **50%** reached 20 days ago\n• **75%** reached today\n• **100%** on track for ~2 months from now\n\nYou've been contributing $460/month, which is actually $10 above your target. That consistency is the reason you're ahead of schedule.\n\nJust $3,000 to go. You've got this!",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'milestone', label: '75% milestone reached!' }],
           suggestions: ['Show my goals dashboard', 'What should I do when I reach 100%?', 'Can I increase my contribution?'],
@@ -203,7 +203,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Your weekly financial summary is ready', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "**Your Week in Review**\n\n**Spending:** $892 total (down 8% from last week)\n• Groceries: $165 — on budget\n• Dining: $95 — nice improvement!\n• Transportation: $52\n• Shopping: $580 — includes the new monitor\n\n**Goals Progress:**\n• Emergency Fund: $8,400 of $12,000 (70%) — on track\n• Credit Card: $2,940 of $4,200 (70%) — needs attention\n\n**One thing to consider:**\nI noticed a $14.99/month subscription to a streaming service you haven't used in 6 weeks. Canceling it would free up $180/year toward your emergency fund.",
+          id: uid(), role: 'ai', content: "**Your Week in Review**\n\n**Spending: $892** (down 8% from last week)\n• Groceries: $165 — on budget\n• Dining: $95 — solid improvement from your usual\n• Transportation: $52\n• Shopping: $580 — the new monitor purchase\n\n**Goals Update**\n• Emergency Fund: $8,400 of $12,000 (70%) — on track\n• Credit Card: $2,940 of $4,200 (70%) — needs attention\n\n**One thing worth looking at:**\nI spotted a $14.99/month streaming subscription you haven't used in 6 weeks. Canceling it would free up $180/year — that's almost half a month's emergency fund contribution.\n\nWant me to dig into any of these?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [
             { type: 'goal-progress', label: 'Emergency Fund on track' },
@@ -223,7 +223,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'I just got a $3,000 bonus at work. What should I do with it?', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Great news on the bonus! Based on your current goals and financial picture, here's my recommended split:\n\n**1. Credit Card Payoff — $1,260**\nThis would complete your remaining balance and close out that 22.99% APR. Guaranteed return on investment.\n\n**2. Emergency Fund — $1,200**\nBrings you to $9,600 (80% of goal). You'd hit your target ~6 weeks early.\n\n**3. SoFi Invest — $540**\nStart a diversified portfolio. Given your risk-averse preference, I'd suggest the Conservative portfolio (70% bonds, 30% index funds).\n\nThis approach eliminates your highest-cost debt, accelerates your safety net, and starts building long-term wealth — all at once.\n\nWant me to set up all three transfers?",
+          id: uid(), role: 'ai', content: "Congrats on the bonus! Here's how I'd split it based on your goals and financial picture:\n\n**1. Credit Card Payoff — $1,260**\nClears your remaining balance and eliminates that 22.99% APR. This is your highest-cost debt, so every dollar here is a guaranteed return.\n\n**2. Emergency Fund — $1,200**\nBrings you to $9,600 — that's 80% of your goal. You'd be about 6 weeks ahead of schedule.\n\n**3. SoFi Invest — $540**\nSince you prefer lower risk, I'd suggest the Conservative portfolio — roughly 70% bonds, 30% index funds. A solid way to start building long-term wealth.\n\nThis approach knocks out your most expensive debt, fast-tracks your safety net, and gets you into the market — all in one move.\n\nWant me to set up all three transfers?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'handoff', label: 'Cross-product recommendation' }],
           memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'FINANCIAL_ATTITUDE' },
@@ -241,21 +241,21 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'What\'s my checking balance?', timestamp: new Date(now.getTime() - 300000) },
         {
-          id: uid(), role: 'ai', content: 'Your SoFi Checking balance is **$3,847.52** as of today.\n\nYou have 2 pending transactions totaling $127.80 that will settle by tomorrow.',
+          id: uid(), role: 'ai', content: 'Your SoFi Checking balance is **$3,847.52** as of right now.\n\nYou have 2 pending transactions totaling $127.80 that should settle by tomorrow.',
           timestamp: new Date(now.getTime() - 290000),
           safetyTier: 'informational',
           safetyMessage: 'Informational',
         },
         { id: uid(), role: 'user', content: 'Any tips on reducing my dining spending?', timestamp: new Date(now.getTime() - 240000) },
         {
-          id: uid(), role: 'ai', content: "Based on your spending patterns, here are some suggestions:\n\n• **Meal prep on Sundays** — members who do this save an average of $200/month\n• **Set a weekly dining budget** of $100 (you've been averaging $120)\n• **Use SoFi Relay** to track dining in real-time with spending alerts",
+          id: uid(), role: 'ai', content: "Based on your recent spending patterns, here are a few ideas:\n\n• **Meal prep on Sundays** — members who batch-cook save an average of $200/month on dining\n• **Set a $100 weekly dining cap** — you've been averaging about $120, so this is a realistic stretch goal\n• **Turn on SoFi Relay alerts** for dining to get real-time nudges when you're close to your limit\n\nSmall shifts add up fast — even cutting $20/week frees up over $1,000 a year for your emergency fund.",
           timestamp: new Date(now.getTime() - 230000),
           safetyTier: 'suggestive',
           safetyMessage: 'Suggestion',
         },
         { id: uid(), role: 'user', content: 'Can you move $500 from checking to savings?', timestamp: new Date(now.getTime() - 180000) },
         {
-          id: uid(), role: 'ai', content: "I can set up that transfer for you:\n\n**From:** SoFi Checking ($3,847.52)\n**To:** SoFi Savings (Emergency Fund)\n**Amount:** $500.00\n\nThis would bring your Emergency Fund to $8,900 (74% of goal). Your checking balance after transfer: $3,347.52.\n\nShall I confirm this transfer?",
+          id: uid(), role: 'ai', content: "Here's what that transfer would look like:\n\n**From:** SoFi Checking ($3,847.52)\n**To:** SoFi Savings (Emergency Fund)\n**Amount:** $500.00\n\nAfter the transfer:\n• Emergency Fund jumps to $8,900 (74% of goal)\n• Checking balance: $3,347.52\n\nThat still leaves plenty of cushion in checking for your upcoming bills. Want me to confirm this transfer?",
           timestamp: new Date(now.getTime() - 170000),
           safetyTier: 'actionable',
           safetyMessage: 'Actionable — needs your approval',
@@ -263,7 +263,7 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: 'Should I rebalance my investment portfolio?', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Portfolio rebalancing involves complex considerations around tax implications, market timing, and your overall financial strategy.\n\nGiven your risk-averse preference and the current market conditions, I'd recommend speaking with a SoFi financial planner who can:\n\n• Review your complete investment picture\n• Assess tax-loss harvesting opportunities\n• Create a rebalancing strategy aligned with your goals\n\nI can connect you with a certified planner — SoFi members get free access.",
+          id: uid(), role: 'ai', content: "Portfolio rebalancing involves some nuance around tax implications, market timing, and how everything fits with your broader goals.\n\nGiven your risk-averse preference, I'd recommend connecting with a SoFi Certified Financial Planner — it's free for members. They can:\n\n• Review your full investment picture\n• Identify tax-loss harvesting opportunities\n• Build a rebalancing strategy that matches your comfort level\n\nI can share your relevant financial context (with your permission) so the planner has everything they need going in. Want me to set that up?",
           timestamp: new Date(now.getTime() - 60000),
           safetyTier: 'handoff',
           safetyMessage: 'Complex — human advisor recommended',
