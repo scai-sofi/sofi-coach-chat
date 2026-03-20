@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, maxWidth: 298,
   },
   userText: { fontSize: 16, color: '#fff', fontFamily: Fonts.regular, lineHeight: 20 },
-  aiRow: { gap: 16 },
+  aiRow: { gap: 16, paddingHorizontal: 4 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
