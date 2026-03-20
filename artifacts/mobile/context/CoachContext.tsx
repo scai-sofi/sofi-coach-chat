@@ -244,7 +244,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const decoder = new TextDecoder();
     let sseBuffer = '';
     let fullContent = '';
-    let firstTokenReceived = false;
+    const tokenQueue: string[] = [];
     let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
 
     while (true) {
@@ -265,20 +265,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           const event = JSON.parse(jsonStr);
           if (event.type === 'token') {
             fullContent += event.content;
-            const shown = fullContent;
-            if (!firstTokenReceived) {
-              firstTokenReceived = true;
-              setIsTyping(false);
-              setMessages(prev => prev.map(m =>
-                m.id === TYPING_INDICATOR_ID
-                  ? { ...m, id: aiMsgId, content: shown, isStreaming: true, isTypingIndicator: false }
-                  : m
-              ));
-            } else {
-              setMessages(prev => prev.map(m =>
-                m.id === aiMsgId ? { ...m, content: shown } : m
-              ));
-            }
+            tokenQueue.push(event.content);
           } else if (event.type === 'done') {
             donePayload = event;
           } else if (event.type === 'error') {
@@ -288,28 +275,74 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    setIsTyping(false);
-    const targetId = firstTokenReceived ? aiMsgId : TYPING_INDICATOR_ID;
+    const finalReply = donePayload?.reply || fullContent;
+    const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
 
     if (donePayload?.error) {
+      setIsTyping(false);
       setMessages(prev => prev.map(m =>
-        m.id === targetId ? { ...m, id: uid(), content: donePayload!.error!, isStreaming: false, isTypingIndicator: false } : m
+        m.id === TYPING_INDICATOR_ID
+          ? { ...m, id: uid(), content: donePayload!.error!, isStreaming: false, isTypingIndicator: false }
+          : m
       ));
-    } else {
-      const finalReply = donePayload?.reply || fullContent;
-      const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
-      setMessages(prev => {
-        const updated = prev.map(m =>
-          m.id === targetId ? { ...m, id: firstTokenReceived ? aiMsgId : uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions } : m
-        );
-        if (!titleGeneratedRef.current) {
-          titleGeneratedRef.current = true;
-          generateTitle(updated, version);
-        }
-        return updated;
-      });
+      return true;
     }
-    return true;
+
+    if (tokenQueue.length === 0) {
+      setIsTyping(false);
+      setMessages(prev => prev.map(m =>
+        m.id === TYPING_INDICATOR_ID
+          ? { ...m, id: uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions }
+          : m
+      ));
+      return true;
+    }
+
+    return new Promise<boolean>((resolve) => {
+      let displayed = '';
+      let idx = 0;
+      const TOKEN_MS = 15;
+
+      setIsTyping(false);
+      const firstToken = tokenQueue[0];
+      displayed = firstToken;
+      idx = 1;
+      setMessages(prev => prev.map(m =>
+        m.id === TYPING_INDICATOR_ID
+          ? { ...m, id: aiMsgId, content: displayed, isStreaming: true, isTypingIndicator: false }
+          : m
+      ));
+
+      const timer = setInterval(() => {
+        if (sessionVersionRef.current !== version) {
+          clearInterval(timer);
+          resolve(true);
+          return;
+        }
+
+        if (idx < tokenQueue.length) {
+          displayed += tokenQueue[idx];
+          idx++;
+          const shown = displayed;
+          setMessages(prev => prev.map(m =>
+            m.id === aiMsgId ? { ...m, content: shown } : m
+          ));
+        } else {
+          clearInterval(timer);
+          setMessages(prev => {
+            const updated = prev.map(m =>
+              m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+            );
+            if (!titleGeneratedRef.current) {
+              titleGeneratedRef.current = true;
+              generateTitle(updated, version);
+            }
+            return updated;
+          });
+          resolve(true);
+        }
+      }, TOKEN_MS);
+    });
   }, [generateTitle]);
 
   const fallbackNonStreaming = useCallback(async (
