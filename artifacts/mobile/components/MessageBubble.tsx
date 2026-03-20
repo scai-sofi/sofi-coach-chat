@@ -29,7 +29,7 @@ function Divider() {
 }
 
 function ParagraphSpacer() {
-  return <View style={{ height: 12 }} />;
+  return <View style={{ height: 8 }} />;
 }
 
 function renderContent(content: string) {
