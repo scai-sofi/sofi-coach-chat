@@ -32,40 +32,42 @@ type ContentBlock =
   | { type: 'header'; text: string }
   | { type: 'divider' };
 
-function sanitizeLine(raw: string): string {
+function normalizeLine(raw: string): string {
   let line = raw.trim();
 
-  line = line.replace(/^#{1,6}\s+/, '');
-
-  line = line.replace(/^>\s?/, '');
+  line = line.replace(/\*{3}(.+?)\*{3}/g, '**$1**');
+  line = line.replace(/_{3}(.+?)_{3}/g, '**$1**');
+  line = line.replace(/_{2}(.+?)_{2}/g, '**$1**');
 
   line = line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 
-  line = line.replace(/`{3,}[^\n]*/g, '');
-
   line = line.replace(/`([^`]+)`/g, '$1');
-
-  line = line.replace(/\*{3}(.+?)\*{3}/g, '**$1**');
-
-  line = line.replace(/_{3}(.+?)_{3}/g, '**$1**');
-  line = line.replace(/_{2}(.+?)_{2}/g, '**$1**');
-  line = line.replace(/_([^_]+)_/g, '$1');
 
   return line;
 }
 
-function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRule: boolean } {
-  const isStandaloneBold = /^\*\*[^*]+\*\*\s*$/.test(line);
-  const hasNumberedBold = /^\d+\.\s*\*\*/.test(line);
+function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRule: boolean; displayText: string } {
+  const hashMatch = line.match(/^#{1,6}\s+(.*)/);
+  if (hashMatch) {
+    const content = hashMatch[1].trim();
+    return { isHeader: true, isList: false, isRule: false, displayText: `**${content.replace(/^\*\*|\*\*$/g, '')}**` };
+  }
+
+  const blockquoteMatch = line.match(/^>\s?(.*)/);
+  const effective = blockquoteMatch ? blockquoteMatch[1] : line;
+
+  const isRule = /^[-*_]{3,}\s*$/.test(effective);
+  if (isRule) return { isHeader: false, isList: false, isRule: true, displayText: effective };
+
+  const isStandaloneBold = /^\*\*[^*]+\*\*\s*$/.test(effective);
+  const hasNumberedBold = /^\d+\.\s*\*\*/.test(effective);
   const isHeader = isStandaloneBold || hasNumberedBold;
 
-  const isBullet = line.startsWith('•') || line.startsWith('- ') || line === '-';
-  const isNumberedItem = /^\d+\.\s/.test(line) && !hasNumberedBold;
+  const isBullet = effective.startsWith('•') || effective.startsWith('- ') || effective === '-';
+  const isNumberedItem = /^\d+\.\s/.test(effective) && !hasNumberedBold;
   const isList = isBullet || isNumberedItem;
 
-  const isRule = /^[-*_]{3,}\s*$/.test(line);
-
-  return { isHeader, isList, isRule };
+  return { isHeader, isList, isRule: false, displayText: effective };
 }
 
 function parseContentBlocks(content: string): ContentBlock[] {
@@ -92,15 +94,15 @@ function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
-    const trimmed = sanitizeLine(rawLine);
+    const normalized = normalizeLine(rawLine);
 
-    if (trimmed === '') {
+    if (normalized === '') {
       if (blocks.length > 0) prevWasBlank = true;
       prevWasHeader = false;
       continue;
     }
 
-    const { isHeader, isList, isRule } = classifyLine(trimmed);
+    const { isHeader, isList, isRule, displayText: classified } = classifyLine(normalized);
 
     if (isRule) {
       if (blocks.length > 0) blocks.push({ type: 'divider' });
@@ -116,7 +118,7 @@ function parseContentBlocks(content: string): ContentBlock[] {
       || (!isList && prevWasBullet)
     );
 
-    let displayText = trimmed;
+    let displayText = classified;
     if (displayText.startsWith('- ')) {
       displayText = '• ' + displayText.slice(2);
     }
