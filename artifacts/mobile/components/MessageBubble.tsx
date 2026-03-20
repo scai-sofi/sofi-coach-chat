@@ -38,16 +38,23 @@ function parseContentBlocks(content: string): ContentBlock[] {
   let prevWasBlank = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim();
+    let trimmed = lines[i].trim();
     if (trimmed === '') {
       if (blocks.length > 0) prevWasBlank = true;
       prevWasHeader = false;
       continue;
     }
 
+    if (/^#{1,4}\s+/.test(trimmed)) {
+      trimmed = trimmed.replace(/^#{1,4}\s+/, '');
+      if (!trimmed.startsWith('**')) {
+        trimmed = `**${trimmed}**`;
+      }
+    }
+
     const isStandaloneBold = trimmed.startsWith('**') || /^\d+\.\s*\*\*/.test(trimmed);
     const isBullet = trimmed.startsWith('•') || trimmed.startsWith('- ');
-    const isNumberedItem = /^\d+\.\s/.test(trimmed);
+    const isNumberedItem = /^\d+\.\s/.test(trimmed) && !isStandaloneBold;
     const isList = isBullet || isNumberedItem;
 
     const paragraphGap = blocks.length > 0 && !isStandaloneBold && (
@@ -56,9 +63,9 @@ function parseContentBlocks(content: string): ContentBlock[] {
       || (!isList && prevWasBullet)
     );
 
-    let displayText = lines[i];
-    if (trimmed.startsWith('- ')) {
-      displayText = displayText.replace(/^(\s*)- /, '$1• ');
+    let displayText = trimmed;
+    if (displayText.startsWith('- ')) {
+      displayText = '• ' + displayText.slice(2);
     }
 
     if (isStandaloneBold) {
@@ -126,30 +133,30 @@ function BulletBlock({ block }: { block: Extract<ContentBlock, { type: 'bullet' 
 }
 
 function HeaderBlock({ block }: { block: Extract<ContentBlock, { type: 'header' }> }) {
+  const cleanText = block.text.replace(/^\d+\.\s*/, '');
   const boldRegex = /\*\*(.*?)\*\*/g;
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match;
   let keyIdx = 0;
 
-  while ((match = boldRegex.exec(block.text)) !== null) {
+  while ((match = boldRegex.exec(cleanText)) !== null) {
     if (match.index > lastIndex) {
-      parts.push(<Text key={keyIdx++}>{block.text.slice(lastIndex, match.index)}</Text>);
+      parts.push(<Text key={keyIdx++}>{cleanText.slice(lastIndex, match.index)}</Text>);
     }
     parts.push(
-      <Text key={keyIdx++} style={{ fontFamily: Fonts.medium, fontSize: 18, letterSpacing: -0.2, lineHeight: 24 }}>
+      <Text key={keyIdx++} style={{ fontFamily: Fonts.medium }}>
         {match[1]}
       </Text>
     );
     lastIndex = match.index + match[0].length;
   }
-  if (lastIndex < block.text.length) {
-    parts.push(<Text key={keyIdx++}>{block.text.slice(lastIndex)}</Text>);
+  if (lastIndex < cleanText.length) {
+    parts.push(<Text key={keyIdx++}>{cleanText.slice(lastIndex)}</Text>);
   }
 
-  const isSingleBold = parts.length === 1;
   return (
-    <Text style={[styles.aiText, isSingleBold && styles.headerText]}>
+    <Text style={[styles.aiText, styles.headerText]}>
       {parts}
     </Text>
   );
