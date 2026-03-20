@@ -10,7 +10,12 @@ import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory }
 function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M15 18L9 12L15 6" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M16.7071 3.29289C17.0976 3.68342 17.0976 4.31658 16.7071 4.70711L9.41421 12L16.7071 19.2929C17.0976 19.6834 17.0976 20.3166 16.7071 20.7071C16.3166 21.0976 15.6834 21.0976 15.2929 20.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L15.2929 3.29289C15.6834 2.90237 16.3166 2.90237 16.7071 3.29289Z"
+        fill={color}
+      />
     </Svg>
   );
 }
@@ -213,7 +218,7 @@ export function MemoryCenter() {
       <View style={[styles.appBar, { paddingTop: insets.top }]}>
         <View style={styles.titleBar}>
           <View style={styles.leftControls}>
-            <Pressable style={styles.iconBtn} onPress={() => setActivePanel('none')}>
+            <Pressable style={styles.iconBtn} onPress={() => setActivePanel('none')} hitSlop={8}>
               <ChevronLeftIcon size={24} color={Colors.contentPrimary} />
             </Pressable>
           </View>
