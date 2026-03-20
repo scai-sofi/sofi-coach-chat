@@ -439,6 +439,29 @@ function ActionFooter({ message }: { message: Message }) {
   );
 }
 
+function StreamingContent({ content }: { content: string }) {
+  const fadeAnim = useRef(new RNAnimated.Value(0)).current;
+  const prevLenRef = useRef(0);
+
+  useEffect(() => {
+    if (content.length > prevLenRef.current) {
+      prevLenRef.current = content.length;
+      fadeAnim.setValue(0.4);
+      RNAnimated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [content, fadeAnim]);
+
+  return (
+    <RNAnimated.View style={{ opacity: fadeAnim }}>
+      {renderContent(content)}
+    </RNAnimated.View>
+  );
+}
+
 export function MessageBubble({ message, isLatest }: { message: Message; isLatest: boolean }) {
   const { sendMessage } = useCoach();
 
@@ -476,8 +499,16 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       )}
 
       <View style={styles.aiContent}>
-        {message.content ? renderContent(message.content) : null}
-        {streaming && <StreamingCursor />}
+        {streaming && message.content ? (
+          <>
+            <StreamingContent content={message.content} />
+            <StreamingCursor />
+          </>
+        ) : message.content ? (
+          renderContent(message.content)
+        ) : streaming ? (
+          <StreamingCursor />
+        ) : null}
       </View>
 
       {!streaming && message.safetyTier && <SafetyBadge tier={message.safetyTier} />}

@@ -220,7 +220,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     abortControllerRef.current = controller;
 
     const aiMsgId = uid();
-    const drainTimerRef = { current: null as ReturnType<typeof setInterval> | null };
 
     try {
       const currentMessages = [...(messagesRef.current || [])];
@@ -262,55 +261,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       const decoder = new TextDecoder();
       let sseBuffer = '';
       let fullContent = '';
-      let displayedContent = '';
-      const tokenQueue: string[] = [];
-      let streamDone = false;
       let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
-
-      const TOKEN_INTERVAL = 30;
-
-      const finalize = () => {
-        if (donePayload?.error) {
-          setMessages(prev => prev.map(m =>
-            m.id === aiMsgId ? { ...m, content: donePayload!.error!, isStreaming: false } : m
-          ));
-        } else {
-          const finalReply = donePayload?.reply || fullContent;
-          const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
-          setMessages(prev => {
-            const updated = prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
-            );
-            if (!titleGeneratedRef.current) {
-              titleGeneratedRef.current = true;
-              generateTitle(updated, version);
-            }
-            return updated;
-          });
-        }
-      };
-
-      const startDrain = () => {
-        if (drainTimerRef.current) return;
-        drainTimerRef.current = setInterval(() => {
-          if (sessionVersionRef.current !== version) {
-            if (drainTimerRef.current) { clearInterval(drainTimerRef.current); drainTimerRef.current = null; }
-            return;
-          }
-
-          if (tokenQueue.length > 0) {
-            const token = tokenQueue.shift()!;
-            displayedContent += token;
-            const shown = displayedContent;
-            setMessages(prev => prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: shown } : m
-            ));
-          } else if (streamDone) {
-            if (drainTimerRef.current) { clearInterval(drainTimerRef.current); drainTimerRef.current = null; }
-            finalize();
-          }
-        }, TOKEN_INTERVAL);
-      };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -330,8 +281,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
             const event = JSON.parse(jsonStr);
             if (event.type === 'token') {
               fullContent += event.content;
-              tokenQueue.push(event.content);
-              startDrain();
+              const shown = fullContent;
+              setMessages(prev => prev.map(m =>
+                m.id === aiMsgId ? { ...m, content: shown } : m
+              ));
             } else if (event.type === 'done') {
               donePayload = event;
             } else if (event.type === 'error') {
@@ -341,12 +294,25 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      streamDone = true;
-      if (tokenQueue.length === 0 && !drainTimerRef.current) {
-        finalize();
+      if (donePayload?.error) {
+        setMessages(prev => prev.map(m =>
+          m.id === aiMsgId ? { ...m, content: donePayload!.error!, isStreaming: false } : m
+        ));
+      } else {
+        const finalReply = donePayload?.reply || fullContent;
+        const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
+        setMessages(prev => {
+          const updated = prev.map(m =>
+            m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+          );
+          if (!titleGeneratedRef.current) {
+            titleGeneratedRef.current = true;
+            generateTitle(updated, version);
+          }
+          return updated;
+        });
       }
     } catch (err: any) {
-      if (drainTimerRef.current) { clearInterval(drainTimerRef.current); drainTimerRef.current = null; }
       if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
       const fallback = 'Unable to connect to the server. Please check your connection and try again.';
       setMessages(prev => {
