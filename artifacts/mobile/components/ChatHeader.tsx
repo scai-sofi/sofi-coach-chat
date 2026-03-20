@@ -6,7 +6,6 @@ import Svg, { Path, G } from 'react-native-svg';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
-import { SCENARIOS } from '@/constants/scenarios';
 
 function DemoIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
@@ -79,12 +78,11 @@ function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number;
 
 export function ChatHeader() {
   const insets = useSafeAreaInsets();
-  const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages, saveAndClose, sessionTitle } = useCoach();
+  const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const topPad = insets.top;
 
-  const demoScenario = chatMode === 'demo' ? SCENARIOS.find(s => s.id === activeScenario) : null;
   const hasActiveChat = messages.length > 0 || chatMode === 'demo';
 
   return (
@@ -119,15 +117,6 @@ export function ChatHeader() {
           )}
         </View>
       </View>
-
-      {demoScenario && (
-        <View style={styles.demoBanner}>
-          <Text style={styles.demoBannerText}>Demo · {demoScenario.title}</Text>
-          <Pressable onPress={() => startLiveChat()} hitSlop={8}>
-            <CloseIcon size={16} color={Colors.contentSecondary} />
-          </Pressable>
-        </View>
-      )}
 
       {menuOpen && (
         <>
@@ -204,23 +193,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
     lineHeight: 20,
-  },
-  demoBanner: {
-    backgroundColor: Colors.surfaceTint,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-  },
-  demoBannerText: {
-    fontSize: 12,
-    fontFamily: Fonts.regular,
-    color: Colors.contentSecondary,
-    lineHeight: 16,
-    flex: 1,
-    textAlign: 'left',
   },
   menu: {
     position: 'absolute',
