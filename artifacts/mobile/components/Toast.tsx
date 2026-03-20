@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useRef, useEff
 import { View, Text, Pressable, StyleSheet, Animated as RNAnimated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
-import Fonts from '@/constants/fonts';
+import { Fonts } from '@/constants/fonts';
 
 interface ToastAction {
   label: string;
