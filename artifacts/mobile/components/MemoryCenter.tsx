@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -83,6 +83,7 @@ function MemoryCard({ memory }: { memory: Memory }) {
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const handleSave = () => {
+    Keyboard.dismiss();
     const trimmed = editText.trim();
     if (trimmed.length > 0 && trimmed.length <= MAX_CHARS) {
       editMemory(memory.id, trimmed);
@@ -91,6 +92,7 @@ function MemoryCard({ memory }: { memory: Memory }) {
   };
 
   const handleCancel = () => {
+    Keyboard.dismiss();
     setEditText(memory.content);
     setEditing(false);
   };
@@ -233,7 +235,7 @@ export function MemoryCenter() {
         </ScrollView>
       )}
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} keyboardShouldPersistTaps="handled">
         {visibleMemories.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>
