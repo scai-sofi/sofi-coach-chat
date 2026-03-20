@@ -308,10 +308,10 @@ export function MemoryCenter() {
               )}
             </View>
           ) : (
-            Object.entries(grouped).map(([cat, mems]) => (
+            Object.entries(grouped).map(([cat, mems], idx) => (
               <View key={cat}>
                 {!filterCat && (
-                  <View style={styles.subHeader}>
+                  <View style={[styles.subHeader, idx === 0 && { paddingTop: 12 }]}>
                     <Text style={styles.subHeaderText}>{MEMORY_CATEGORY_LABELS[cat as MemoryCategory]}</Text>
                   </View>
                 )}
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   contentInner: { paddingHorizontal: 16, paddingBottom: 40 },
   subHeader: {
-    paddingTop: 12,
+    paddingTop: 24,
     paddingBottom: 12,
     paddingHorizontal: 4,
   },
