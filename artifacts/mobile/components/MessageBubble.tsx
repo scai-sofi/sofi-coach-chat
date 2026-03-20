@@ -28,10 +28,6 @@ function Divider() {
   return <View style={styles.divider} />;
 }
 
-function ParagraphSpacer() {
-  return <View style={{ height: 8 }} />;
-}
-
 function renderContent(content: string) {
   const lines = content.split('\n');
   const elements: React.ReactNode[] = [];
@@ -64,13 +60,11 @@ function renderContent(content: string) {
       displayLine = line.replace(/^(\s*)- /, '$1• ');
     }
 
-    const needsParagraphGap = prevWasBlank
-      || (isBullet && !prevWasBullet && elements.length > 0)
-      || (!isBullet && !isNumberedItem && prevWasBullet && elements.length > 0);
-
-    if (needsParagraphGap && !isStandaloneBold) {
-      elements.push(<ParagraphSpacer key={`spacer-${i}`} />);
-    }
+    const needsParagraphGap = elements.length > 0 && !isStandaloneBold && (
+      prevWasBlank
+      || (isBullet && !prevWasBullet)
+      || (!isBullet && !isNumberedItem && prevWasBullet)
+    );
 
     while ((match = boldRegex.exec(displayLine)) !== null) {
       if (match.index > lastIndex) {
@@ -101,6 +95,7 @@ function renderContent(content: string) {
         styles.aiText,
         (isBullet || isNumberedItem) && styles.bulletText,
         isStandaloneBold && parts.length === 1 && styles.headerText,
+        needsParagraphGap && { marginTop: 8 },
       ]}>
         {parts}
       </Text>
