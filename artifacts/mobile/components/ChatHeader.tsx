@@ -105,6 +105,12 @@ export function ChatHeader() {
         </View>
         <View style={styles.centerZone}>
           <Text style={styles.title} numberOfLines={1}>{sessionTitle}</Text>
+          {chatMode === 'demo' && (
+            <View style={styles.agentStatus}>
+              <View style={styles.agentStatusDot} />
+              <Text style={styles.agentStatusText}>Demo</Text>
+            </View>
+          )}
         </View>
         <View style={styles.rightZone}>
           <Pressable style={styles.iconBtn} onPress={() => setActivePanel('history')}>
@@ -193,6 +199,24 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
     lineHeight: 20,
+  },
+  agentStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  agentStatusDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.contentBrand,
+  },
+  agentStatusText: {
+    fontSize: 12,
+    fontFamily: Fonts.medium,
+    color: Colors.contentBrand,
+    lineHeight: 16,
+    letterSpacing: 0.1,
   },
   menu: {
     position: 'absolute',
