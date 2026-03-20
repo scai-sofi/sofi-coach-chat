@@ -24,89 +24,155 @@ const SAFETY_STYLES: Record<SafetyTier, { bg: string; color: string; icon: strin
   handoff: { bg: Colors.infoBg, color: Colors.info, icon: 'arrow-up-right', text: 'Complex — human advisor recommended' },
 };
 
-function Divider() {
-  return <View style={styles.divider} />;
-}
+type ContentBlock =
+  | { type: 'text'; text: string; paragraphGap: boolean }
+  | { type: 'bullet'; text: string; paragraphGap: boolean }
+  | { type: 'header'; text: string }
+  | { type: 'divider' };
 
-function renderContent(content: string) {
+function parseContentBlocks(content: string): ContentBlock[] {
   const lines = content.split('\n');
-  const elements: React.ReactNode[] = [];
+  const blocks: ContentBlock[] = [];
   let prevWasHeader = false;
   let prevWasBullet = false;
   let prevWasBlank = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trim() === '') {
-      if (elements.length > 0) {
-        prevWasBlank = true;
-      }
+    const trimmed = lines[i].trim();
+    if (trimmed === '') {
+      if (blocks.length > 0) prevWasBlank = true;
       prevWasHeader = false;
       continue;
     }
 
-    const parts: React.ReactNode[] = [];
-    const boldRegex = /\*\*(.*?)\*\*/g;
-    let lastIndex = 0;
-    let match;
-    let keyIdx = 0;
+    const isStandaloneBold = trimmed.startsWith('**') || /^\d+\.\s*\*\*/.test(trimmed);
+    const isBullet = trimmed.startsWith('•') || trimmed.startsWith('- ');
+    const isNumberedItem = /^\d+\.\s/.test(trimmed);
+    const isList = isBullet || isNumberedItem;
 
-    const isStandaloneBold = line.trim().startsWith('**') || /^\d+\.\s*\*\*/.test(line.trim());
-    const isBullet = line.trim().startsWith('•') || line.trim().startsWith('- ');
-    const isNumberedItem = /^\d+\.\s/.test(line.trim());
-
-    let displayLine = line;
-    if (line.trim().startsWith('- ')) {
-      displayLine = line.replace(/^(\s*)- /, '$1• ');
-    }
-
-    const needsParagraphGap = elements.length > 0 && !isStandaloneBold && (
+    const paragraphGap = blocks.length > 0 && !isStandaloneBold && (
       prevWasBlank
-      || (isBullet && !prevWasBullet)
-      || (!isBullet && !isNumberedItem && prevWasBullet)
+      || (isList && !prevWasBullet)
+      || (!isList && prevWasBullet)
     );
 
-    while ((match = boldRegex.exec(displayLine)) !== null) {
-      if (match.index > lastIndex) {
-        parts.push(<Text key={keyIdx++}>{displayLine.slice(lastIndex, match.index)}</Text>);
+    let displayText = lines[i];
+    if (trimmed.startsWith('- ')) {
+      displayText = displayText.replace(/^(\s*)- /, '$1• ');
+    }
+
+    if (isStandaloneBold) {
+      if (blocks.length > 0 && !prevWasHeader) {
+        blocks.push({ type: 'divider' });
       }
-      parts.push(
-        <Text key={keyIdx++} style={{
-          fontFamily: Fonts.medium,
-          fontSize: isStandaloneBold ? 18 : 16,
-          letterSpacing: isStandaloneBold ? -0.2 : 0,
-          lineHeight: isStandaloneBold ? 24 : 20,
-        }}>
-          {match[1]}
-        </Text>
-      );
-      lastIndex = match.index + match[0].length;
+      blocks.push({ type: 'header', text: displayText });
+    } else if (isList) {
+      blocks.push({ type: 'bullet', text: displayText, paragraphGap });
+    } else {
+      blocks.push({ type: 'text', text: displayText, paragraphGap });
     }
-    if (lastIndex < displayLine.length) {
-      parts.push(<Text key={keyIdx++}>{displayLine.slice(lastIndex)}</Text>);
-    }
-
-    if (isStandaloneBold && elements.length > 0 && !prevWasHeader) {
-      elements.push(<Divider key={`div-${i}`} />);
-    }
-
-    elements.push(
-      <Text key={`line-${i}`} style={[
-        styles.aiText,
-        (isBullet || isNumberedItem) && styles.bulletText,
-        isStandaloneBold && parts.length === 1 && styles.headerText,
-        needsParagraphGap && { marginTop: 8 },
-      ]}>
-        {parts}
-      </Text>
-    );
 
     prevWasHeader = isStandaloneBold;
-    prevWasBullet = isBullet || isNumberedItem;
+    prevWasBullet = isList;
     prevWasBlank = false;
   }
 
-  return elements;
+  return blocks;
+}
+
+function formatInlineStyles(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  let lastIndex = 0;
+  let match;
+  let keyIdx = 0;
+
+  while ((match = boldRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(<Text key={keyIdx++}>{text.slice(lastIndex, match.index)}</Text>);
+    }
+    parts.push(
+      <Text key={keyIdx++} style={{ fontFamily: Fonts.medium, lineHeight: 20 }}>
+        {match[1]}
+      </Text>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(<Text key={keyIdx++}>{text.slice(lastIndex)}</Text>);
+  }
+
+  return parts;
+}
+
+function BlockDivider() {
+  return <View style={styles.divider} />;
+}
+
+function TextBlock({ block }: { block: Extract<ContentBlock, { type: 'text' }> }) {
+  return (
+    <Text style={[styles.aiText, block.paragraphGap && { marginTop: 8 }]}>
+      {formatInlineStyles(block.text)}
+    </Text>
+  );
+}
+
+function BulletBlock({ block }: { block: Extract<ContentBlock, { type: 'bullet' }> }) {
+  return (
+    <Text style={[styles.aiText, styles.bulletText, block.paragraphGap && { marginTop: 8 }]}>
+      {formatInlineStyles(block.text)}
+    </Text>
+  );
+}
+
+function HeaderBlock({ block }: { block: Extract<ContentBlock, { type: 'header' }> }) {
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+  let keyIdx = 0;
+
+  while ((match = boldRegex.exec(block.text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(<Text key={keyIdx++}>{block.text.slice(lastIndex, match.index)}</Text>);
+    }
+    parts.push(
+      <Text key={keyIdx++} style={{ fontFamily: Fonts.medium, fontSize: 18, letterSpacing: -0.2, lineHeight: 24 }}>
+        {match[1]}
+      </Text>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < block.text.length) {
+    parts.push(<Text key={keyIdx++}>{block.text.slice(lastIndex)}</Text>);
+  }
+
+  const isSingleBold = parts.length === 1;
+  return (
+    <Text style={[styles.aiText, isSingleBold && styles.headerText]}>
+      {parts}
+    </Text>
+  );
+}
+
+function renderBlock(block: ContentBlock, index: number): React.ReactNode {
+  switch (block.type) {
+    case 'divider':
+      return <BlockDivider key={`div-${index}`} />;
+    case 'header':
+      return <HeaderBlock key={`hdr-${index}`} block={block} />;
+    case 'bullet':
+      return <BulletBlock key={`blt-${index}`} block={block} />;
+    case 'text':
+      return <TextBlock key={`txt-${index}`} block={block} />;
+    default:
+      return null;
+  }
+}
+
+function renderContent(content: string): React.ReactNode[] {
+  const blocks = parseContentBlocks(content);
+  return blocks.map((block, i) => renderBlock(block, i));
 }
 
 function ChipBadge({ chip }: { chip: MessageChip }) {

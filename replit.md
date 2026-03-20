@@ -199,20 +199,35 @@ This prototype uses only standard React Native APIs (no web-only CSS properties)
 | `/api/title` | POST | `{ messages: [{role, content}] }` | `{ title: string }` | Auto-generate session title |
 | `/api/healthz` | GET | — | `{ status: "ok" }` | Health check |
 
-### Chat Message Rendering (`renderContent` in `MessageBubble.tsx`)
+### Chat Message Rendering (Block-Based Architecture in `MessageBubble.tsx`)
 
-The AI response text is parsed line-by-line with this logic:
-1. Empty lines → insert 8px spacer (total 16px gap with container gap)
-2. Lines starting with `**` or `N. **` → section headers (18px, medium weight, 24px lineHeight), preceded by a divider
-3. Lines starting with `•` or `- ` → bullet items (dash auto-converted to `•`), no indentation
-4. Inline `**bold**` → medium weight spans
-5. All body text: 16px, regular weight, 20px lineHeight
+Content rendering uses a **parse → render** pipeline for clean extensibility:
+
+**Step 1: Parse** — `parseContentBlocks(content)` converts raw markdown text into typed `ContentBlock[]`:
+- `{ type: 'text', text, paragraphGap }` — body paragraph
+- `{ type: 'bullet', text, paragraphGap }` — bullet or numbered list item (`-` auto-converted to `•`)
+- `{ type: 'header', text }` — section header (lines starting with `**` or `N. **`)
+- `{ type: 'divider' }` — horizontal rule before headers
+
+**Step 2: Render** — `renderBlock(block, index)` dispatches each block to its dedicated component:
+- `TextBlock` / `BulletBlock` / `HeaderBlock` / `BlockDivider`
+- Inline bold (`**text**`) handled by shared `formatInlineStyles()` utility
+
+**Spacing**: Container `gap: 8` + `marginTop: 8` on paragraph breaks = exactly **16px** between paragraphs.
+
+**To add a new widget type** (e.g. chart, card, action button):
+1. Add a new variant to the `ContentBlock` union type
+2. Create a new block component (e.g. `ChartBlock`)
+3. Add a case to `renderBlock`
+4. Add detection logic to `parseContentBlocks`
+
+Flutter equivalent: `ContentBlock` → sealed class, each block → a `Widget`, `renderBlock` → pattern match in `ListView.builder`
 
 ### Header Behavior
 
 | State | Left Icon | Center Title | Right Icons |
 |---|---|---|---|
-| Welcome (no messages) | Play-circle (opens scenario picker) | "Coach" | Clock (history) |
+| Welcome (no messages) | Beaker/demo icon (opens scenario picker) | "Coach" | Clock (history) |
 | Active chat | × close (saves & returns to welcome) | AI-generated title | Clock + More (⋯ in circle) |
 | Demo mode | × close (saves & returns) | Scenario title | Clock + More |
 
