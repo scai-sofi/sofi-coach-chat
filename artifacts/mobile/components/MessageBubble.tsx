@@ -32,35 +32,83 @@ type ContentBlock =
   | { type: 'header'; text: string }
   | { type: 'divider' };
 
+function sanitizeLine(raw: string): string {
+  let line = raw.trim();
+
+  line = line.replace(/^#{1,6}\s+/, '');
+
+  line = line.replace(/^>\s?/, '');
+
+  line = line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+  line = line.replace(/`{3,}[^\n]*/g, '');
+
+  line = line.replace(/`([^`]+)`/g, '$1');
+
+  line = line.replace(/\*{3}(.+?)\*{3}/g, '**$1**');
+
+  line = line.replace(/_{3}(.+?)_{3}/g, '**$1**');
+  line = line.replace(/_{2}(.+?)_{2}/g, '**$1**');
+  line = line.replace(/_([^_]+)_/g, '$1');
+
+  return line;
+}
+
+function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRule: boolean } {
+  const isStandaloneBold = /^\*\*[^*]+\*\*\s*$/.test(line);
+  const hasNumberedBold = /^\d+\.\s*\*\*/.test(line);
+  const isHeader = isStandaloneBold || hasNumberedBold;
+
+  const isBullet = line.startsWith('•') || line.startsWith('- ') || line === '-';
+  const isNumberedItem = /^\d+\.\s/.test(line) && !hasNumberedBold;
+  const isList = isBullet || isNumberedItem;
+
+  const isRule = /^[-*_]{3,}\s*$/.test(line);
+
+  return { isHeader, isList, isRule };
+}
+
 function parseContentBlocks(content: string): ContentBlock[] {
   const lines = content.split('\n');
   const blocks: ContentBlock[] = [];
   let prevWasHeader = false;
   let prevWasBullet = false;
   let prevWasBlank = false;
+  let inCodeBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
-    let trimmed = lines[i].trim();
+    const rawLine = lines[i];
+
+    if (/^`{3}/.test(rawLine.trim())) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) {
+      const codeLine = rawLine.replace(/\t/g, '  ');
+      blocks.push({ type: 'text', text: codeLine, paragraphGap: false });
+      prevWasBlank = false;
+      prevWasHeader = false;
+      prevWasBullet = false;
+      continue;
+    }
+
+    const trimmed = sanitizeLine(rawLine);
+
     if (trimmed === '') {
       if (blocks.length > 0) prevWasBlank = true;
       prevWasHeader = false;
       continue;
     }
 
-    if (/^#{1,4}\s+/.test(trimmed)) {
-      trimmed = trimmed.replace(/^#{1,4}\s+/, '');
-      if (!trimmed.startsWith('**')) {
-        trimmed = `**${trimmed}**`;
-      }
+    const { isHeader, isList, isRule } = classifyLine(trimmed);
+
+    if (isRule) {
+      if (blocks.length > 0) blocks.push({ type: 'divider' });
+      prevWasBlank = false;
+      prevWasHeader = false;
+      prevWasBullet = false;
+      continue;
     }
-
-    const isStandaloneBold = /^\*\*[^*]+\*\*/.test(trimmed) && !trimmed.startsWith('• ') && !trimmed.startsWith('- ');
-    const hasNumberedBold = /^\d+\.\s*\*\*/.test(trimmed);
-    const isHeader = (isStandaloneBold && trimmed.startsWith('**')) || hasNumberedBold;
-
-    const isBullet = trimmed.startsWith('•') || trimmed.startsWith('- ');
-    const isNumberedItem = /^\d+\.\s/.test(trimmed) && !hasNumberedBold;
-    const isList = isBullet || isNumberedItem;
 
     const paragraphGap = blocks.length > 0 && !isHeader && (
       prevWasBlank
@@ -74,12 +122,15 @@ function parseContentBlocks(content: string): ContentBlock[] {
     }
 
     if (isHeader) {
+      if (!displayText.startsWith('**')) {
+        displayText = `**${displayText}**`;
+      }
       if (blocks.length > 0 && !prevWasHeader) {
         blocks.push({ type: 'divider' });
       }
       blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
-      if (isNumberedItem) {
+      if (/^\d+\.\s/.test(displayText)) {
         displayText = displayText.replace(/^\d+\.\s*/, '• ');
       }
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
@@ -97,12 +148,12 @@ function parseContentBlocks(content: string): ContentBlock[] {
 
 function formatInlineStyles(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
-  const boldRegex = /\*\*(.*?)\*\*/g;
+  const inlineRegex = /\*\*(.+?)\*\*/g;
   let lastIndex = 0;
   let match;
   let keyIdx = 0;
 
-  while ((match = boldRegex.exec(text)) !== null) {
+  while ((match = inlineRegex.exec(text)) !== null) {
     if (match.index > lastIndex) {
       parts.push(<Text key={keyIdx++}>{text.slice(lastIndex, match.index)}</Text>);
     }
@@ -113,11 +164,14 @@ function formatInlineStyles(text: string): React.ReactNode[] {
     );
     lastIndex = match.index + match[0].length;
   }
-  if (lastIndex < text.length) {
-    parts.push(<Text key={keyIdx++}>{text.slice(lastIndex)}</Text>);
+
+  const remaining = text.slice(lastIndex);
+  if (remaining) {
+    const cleaned = remaining.replace(/\*+/g, '');
+    if (cleaned) parts.push(<Text key={keyIdx++}>{cleaned}</Text>);
   }
 
-  return parts;
+  return parts.length > 0 ? parts : [<Text key={0}>{text}</Text>];
 }
 
 function BlockDivider() {
@@ -142,30 +196,9 @@ function BulletBlock({ block }: { block: Extract<ContentBlock, { type: 'bullet' 
 
 function HeaderBlock({ block }: { block: Extract<ContentBlock, { type: 'header' }> }) {
   const cleanText = block.text.replace(/^\d+\.\s*/, '');
-  const boldRegex = /\*\*(.*?)\*\*/g;
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  let match;
-  let keyIdx = 0;
-
-  while ((match = boldRegex.exec(cleanText)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(<Text key={keyIdx++}>{cleanText.slice(lastIndex, match.index)}</Text>);
-    }
-    parts.push(
-      <Text key={keyIdx++} style={{ fontFamily: Fonts.medium }}>
-        {match[1]}
-      </Text>
-    );
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < cleanText.length) {
-    parts.push(<Text key={keyIdx++}>{cleanText.slice(lastIndex)}</Text>);
-  }
-
   return (
     <Text style={[styles.aiText, styles.headerText]}>
-      {parts}
+      {formatInlineStyles(cleanText)}
     </Text>
   );
 }
