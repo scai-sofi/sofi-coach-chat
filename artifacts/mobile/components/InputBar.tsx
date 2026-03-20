@@ -21,6 +21,7 @@ export function InputBar() {
 
   return (
     <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+      <View style={styles.footerBg} />
       <View style={styles.inputRow}>
         <View style={styles.inputPill}>
           <TextInput
@@ -60,6 +61,14 @@ export function InputBar() {
 
 const styles = StyleSheet.create({
   footer: {
+    backgroundColor: 'transparent',
+  },
+  footerBg: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 24,
     backgroundColor: Colors.surfaceBase,
   },
   inputRow: {
