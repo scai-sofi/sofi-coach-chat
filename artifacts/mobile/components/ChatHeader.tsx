@@ -213,27 +213,29 @@ export function ChatHeader() {
         <View style={styles.menuOverlay}>
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setMenuOpen(false)} />
           <View style={[styles.menuPositioner, { paddingTop: headerHeight }]}>
-            <View style={styles.menu}>
-              <Pressable style={styles.menuItem} onPress={() => { startLiveChat(); setMenuOpen(false); }}>
-                <Text style={styles.menuText}>New chat</Text>
-                <ChatNewIcon size={24} color={Colors.contentPrimary} />
-              </Pressable>
-              <Pressable style={styles.menuItem} onPress={() => { setActivePanel('memory'); setMenuOpen(false); }}>
-                <Text style={styles.menuText}>Chat memory</Text>
-                <MemoryMenuIcon size={24} color={Colors.contentPrimary} />
-              </Pressable>
-              <Pressable style={styles.menuItem} onPress={() => { setActivePanel('goals'); setMenuOpen(false); }}>
-                <Text style={styles.menuText}>Goals</Text>
-                <GoalsMenuIcon size={24} color={Colors.contentPrimary} />
-              </Pressable>
-              <Pressable style={styles.menuItem} onPress={() => setMenuOpen(false)}>
-                <Text style={styles.menuText}>Rename</Text>
-                <PencilMenuIcon size={24} color={Colors.contentPrimary} />
-              </Pressable>
-              <Pressable style={styles.menuItemLast} onPress={() => { clearConversation(); setMenuOpen(false); }}>
-                <Text style={[styles.menuText, { color: Colors.danger }]}>Delete</Text>
-                <DeleteMenuIcon size={24} color={Colors.danger} />
-              </Pressable>
+            <View style={styles.menuShadow}>
+              <View style={styles.menuInner}>
+                <Pressable style={styles.menuItem} onPress={() => { startLiveChat(); setMenuOpen(false); }}>
+                  <Text style={styles.menuText}>New chat</Text>
+                  <ChatNewIcon size={24} color={Colors.contentPrimary} />
+                </Pressable>
+                <Pressable style={styles.menuItem} onPress={() => { setActivePanel('memory'); setMenuOpen(false); }}>
+                  <Text style={styles.menuText}>Chat memory</Text>
+                  <MemoryMenuIcon size={24} color={Colors.contentPrimary} />
+                </Pressable>
+                <Pressable style={styles.menuItem} onPress={() => { setActivePanel('goals'); setMenuOpen(false); }}>
+                  <Text style={styles.menuText}>Goals</Text>
+                  <GoalsMenuIcon size={24} color={Colors.contentPrimary} />
+                </Pressable>
+                <Pressable style={styles.menuItem} onPress={() => setMenuOpen(false)}>
+                  <Text style={styles.menuText}>Rename</Text>
+                  <PencilMenuIcon size={24} color={Colors.contentPrimary} />
+                </Pressable>
+                <Pressable style={styles.menuItemLast} onPress={() => { clearConversation(); setMenuOpen(false); }}>
+                  <Text style={[styles.menuText, { color: Colors.danger }]}>Delete</Text>
+                  <DeleteMenuIcon size={24} color={Colors.danger} />
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>
@@ -315,17 +317,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 16,
   },
-  menu: {
+  menuShadow: {
     width: 212,
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    paddingVertical: 2,
-    paddingHorizontal: 16,
     shadowColor: 'rgba(10,10,10,0.16)',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 1,
     shadowRadius: 16,
     elevation: 8,
+  },
+  menuInner: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 2,
+    paddingHorizontal: 16,
     overflow: 'hidden',
   },
   menuItem: {
