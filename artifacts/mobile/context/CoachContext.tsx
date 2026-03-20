@@ -251,6 +251,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         id: uid(), role: 'ai',
         content: data.reply || 'I couldn\'t generate a response. Please try again.',
         timestamp: new Date(),
+        suggestions: Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined,
       };
       setMessages(prev => {
         const updated = [...prev, aiMsg];
@@ -311,6 +312,11 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         goals: currentGoals,
         temporaryChat: isTempChat,
       });
+
+      if (!response) {
+        sendLiveMessage(text, version);
+        return;
+      }
 
       if (isTempChat) {
         response.memoryProposal = undefined;

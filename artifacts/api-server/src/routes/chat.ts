@@ -61,7 +61,40 @@ Adapt your depth and tone based on the topic:
 - Never provide specific investment recommendations for individual securities
 - Always note that past performance doesn't guarantee future results when discussing investments
 - Recommend professional advisors for complex tax, legal, or estate planning situations
-- Be honest about uncertainty — it's okay to say "I'm not sure" and suggest where to find the answer`;
+- Be honest about uncertainty — it's okay to say "I'm not sure" and suggest where to find the answer
+
+## CRITICAL: Follow-Up Suggestions
+You MUST end EVERY response with the exact marker [SUGGESTIONS] on its own line, followed by exactly 2-3 short follow-up prompts. This is required — never skip it. Example:
+
+Your main response text here.
+
+[SUGGESTIONS]
+How do I start budgeting?
+What's a good savings target?
+Tell me about index funds
+
+Rules:
+- The marker [SUGGESTIONS] must appear exactly as shown, on its own line
+- Each suggestion is on its own line after the marker, no bullets or numbers
+- Suggestions must be under 40 characters, written as the user would type them
+- Suggestions must be contextually relevant to THIS conversation — never generic
+- Do NOT include [SUGGESTIONS] or the suggestions anywhere in the main response body`;
+
+function parseSuggestions(text: string): { reply: string; suggestions: string[] } {
+  const marker = "[SUGGESTIONS]";
+  const idx = text.lastIndexOf(marker);
+  if (idx === -1) {
+    return { reply: text.trim(), suggestions: [] };
+  }
+  const reply = text.slice(0, idx).trim();
+  const suggestionsBlock = text.slice(idx + marker.length).trim();
+  const suggestions = suggestionsBlock
+    .split("\n")
+    .map((s) => s.replace(/^[-•*\d.)\s]+/, "").trim())
+    .filter((s) => s.length > 0 && s.length <= 60)
+    .slice(0, 3);
+  return { reply, suggestions };
+}
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -113,9 +146,10 @@ router.post("/chat", async (req, res) => {
       max_completion_tokens: 8192,
     });
 
-    const reply = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
+    const raw = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
+    const { reply, suggestions } = parseSuggestions(raw);
 
-    res.json({ reply });
+    res.json({ reply, suggestions });
   } catch (error: any) {
     console.error("Chat API error:", error?.message || error);
     if (error?.status === 429) {

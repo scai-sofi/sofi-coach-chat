@@ -8,7 +8,7 @@ interface StoreState {
   temporaryChat: boolean;
 }
 
-export function generateAIResponse(userInput: string, store: StoreState): Partial<Message> {
+export function generateAIResponse(userInput: string, store: StoreState): Partial<Message> | null {
   const input = userInput.toLowerCase().trim();
   const prefersDetail = store.memories.some(m => m.content.toLowerCase().includes('detailed breakdown'));
   const hasGoals = store.goals.filter(g => g.status !== 'COMPLETED' && g.status !== 'PAUSED').length > 0;
@@ -294,8 +294,5 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
     };
   }
 
-  return {
-    content: "I'd be happy to help with that! I'm here for anything money-related — tracking spending, setting goals, understanding your accounts, or just thinking through a financial decision.\n\nHere are some things we can explore:",
-    suggestions: ['What\'s my financial snapshot?', 'Help me set a goal', 'Show my spending breakdown', 'What can you help with?'],
-  };
+  return null;
 }
