@@ -147,6 +147,8 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
             multiline
             autoFocus
             underlineColorAndroid="transparent"
+            textAlignVertical="top"
+            scrollEnabled={false}
           />
           <View style={styles.editToolRow}>
             <Text style={styles.editCharCount}>{editText.length}/{MAX_CHARS}</Text>
@@ -486,6 +488,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     lineHeight: 20,
     padding: 0,
+    margin: 0,
     minHeight: 20,
     textAlignVertical: 'top',
   },
