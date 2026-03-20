@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, ComponentProps } from 'react';
-import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
@@ -367,7 +367,7 @@ function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap:
   return (
     <View style={styles.suggestions}>
       {suggestions.slice(0, 3).map((s, i) => (
-        <Pressable key={i} style={styles.suggestionPill} onPress={() => onTap(s)}>
+        <Pressable key={i} style={styles.suggestionPill} onPress={() => { Keyboard.dismiss(); onTap(s); }}>
           <Text style={styles.suggestionText} numberOfLines={1}>{s}</Text>
         </Pressable>
       ))}

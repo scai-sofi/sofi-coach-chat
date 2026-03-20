@@ -223,7 +223,7 @@ export default function ChatScreen() {
               renderItem={renderMessage}
               keyExtractor={(item) => item.id}
               contentContainerStyle={styles.listContent}
-              keyboardDismissMode="interactive"
+              keyboardDismissMode="on-drag"
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               onScrollToIndexFailed={handleScrollToIndexFailed}

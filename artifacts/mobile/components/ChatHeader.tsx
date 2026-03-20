@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '@/constants/colors';
@@ -171,6 +171,7 @@ export function ChatHeader() {
         <View style={styles.titleBar}>
           <View style={styles.leftZone}>
             <Pressable style={styles.iconBtn} onPress={() => {
+              Keyboard.dismiss();
               if (!hasActiveChat) {
                 setActivePanel('scenarios');
               } else {
@@ -194,13 +195,13 @@ export function ChatHeader() {
             )}
           </View>
           <View style={styles.rightZone}>
-            <Pressable style={styles.iconBtn} onPress={() => setActivePanel('history')}>
+            <Pressable style={styles.iconBtn} onPress={() => { Keyboard.dismiss(); setActivePanel('history'); }}>
               <ClockIcon size={20} color={Colors.contentPrimary} />
             </Pressable>
             {hasActiveChat && (
               <Pressable
                 style={styles.iconBtn}
-                onPress={() => setMenuOpen(!menuOpen)}
+                onPress={() => { Keyboard.dismiss(); setMenuOpen(!menuOpen); }}
               >
                 <MoreIcon size={20} color={menuOpen ? '#BDBBB9' : Colors.contentPrimary} />
               </Pressable>
