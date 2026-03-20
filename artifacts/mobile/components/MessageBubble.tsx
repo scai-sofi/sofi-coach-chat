@@ -56,8 +56,13 @@ function renderContent(content: string) {
     let keyIdx = 0;
 
     const isStandaloneBold = line.trim().startsWith('**') || /^\d+\.\s*\*\*/.test(line.trim());
-    const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-');
+    const isBullet = line.trim().startsWith('•') || line.trim().startsWith('- ');
     const isNumberedItem = /^\d+\.\s/.test(line.trim());
+
+    let displayLine = line;
+    if (line.trim().startsWith('- ')) {
+      displayLine = line.replace(/^(\s*)- /, '$1• ');
+    }
 
     const needsParagraphGap = prevWasBlank
       || (isBullet && !prevWasBullet && elements.length > 0)
@@ -67,9 +72,9 @@ function renderContent(content: string) {
       elements.push(<ParagraphSpacer key={`spacer-${i}`} />);
     }
 
-    while ((match = boldRegex.exec(line)) !== null) {
+    while ((match = boldRegex.exec(displayLine)) !== null) {
       if (match.index > lastIndex) {
-        parts.push(<Text key={keyIdx++}>{line.slice(lastIndex, match.index)}</Text>);
+        parts.push(<Text key={keyIdx++}>{displayLine.slice(lastIndex, match.index)}</Text>);
       }
       parts.push(
         <Text key={keyIdx++} style={{
@@ -83,8 +88,8 @@ function renderContent(content: string) {
       );
       lastIndex = match.index + match[0].length;
     }
-    if (lastIndex < line.length) {
-      parts.push(<Text key={keyIdx++}>{line.slice(lastIndex)}</Text>);
+    if (lastIndex < displayLine.length) {
+      parts.push(<Text key={keyIdx++}>{displayLine.slice(lastIndex)}</Text>);
     }
 
     if (isStandaloneBold && elements.length > 0 && !prevWasHeader) {
@@ -390,7 +395,7 @@ const styles = StyleSheet.create({
   aiContent: { paddingHorizontal: 4, gap: 8 },
   aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
   headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
-  bulletText: { paddingLeft: 8 },
+  bulletText: {},
   divider: {
     height: 0.75,
     backgroundColor: 'rgba(10,10,10,0.1)',
