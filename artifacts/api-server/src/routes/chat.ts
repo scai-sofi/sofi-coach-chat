@@ -188,14 +188,15 @@ router.post("/title", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "Generate a very short title (3-6 words) for this financial coaching conversation. The title should capture the main topic. Return ONLY the title text, nothing else. No quotes, no punctuation at the end.",
+          content: "Generate a very short title (3-6 words) for this financial coaching conversation. The title should capture the main topic. Return ONLY the plain title text. No markdown, no asterisks, no bold formatting, no quotes, no punctuation at the end.",
         },
         ...trimmed,
       ],
       max_completion_tokens: 30,
     });
 
-    const title = completion.choices[0]?.message?.content?.trim() || "New conversation";
+    const rawTitle = completion.choices[0]?.message?.content?.trim() || "New conversation";
+    const title = rawTitle.replace(/\*+/g, '').replace(/^["']|["']$/g, '').trim();
     res.json({ title });
   } catch (error: any) {
     console.error("Title API error:", error?.message || error);
