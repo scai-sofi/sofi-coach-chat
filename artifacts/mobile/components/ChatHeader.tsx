@@ -85,13 +85,44 @@ function ChatNewIcon({ size = 24, color = Colors.contentPrimary }: { size?: numb
   );
 }
 
-function FpoIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+function MemoryMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M3 5.6C3 4.16406 4.16406 3 5.6 3H7.2002C7.75248 3 8.2002 3.44772 8.2002 4C8.2002 4.55228 7.75248 5 7.2002 5H5.6C5.26863 5 5 5.26863 5 5.6V11H12.0006C12.332 11 12.6006 10.7314 12.6006 10.4V5.6C12.6006 5.26871 12.3319 5 12.0005 5C11.669 5 11.4004 5.26871 11.4004 5.6V8.8C11.4004 9.35228 10.9527 9.8 10.4004 9.8C9.84811 9.8 9.40039 9.35228 9.40039 8.8V5.6C9.40039 4.16398 10.5646 3 12.0005 3C13.4363 3 14.6006 4.16398 14.6006 5.6V10.4C14.6006 11.8359 13.4365 13 12.0006 13H5V20C5 20.5523 4.55228 21 4 21C3.44772 21 3 20.5523 3 20V5.6ZM18.4004 5C18.0692 5 17.8008 5.26845 17.8008 5.59961V18.4004C17.8008 18.7315 18.0692 19 18.4004 19C18.7315 19 19 18.7315 19 18.4004V5.59961C19 5.26845 18.7315 5 18.4004 5ZM15.8008 5.59961C15.8008 4.16388 16.9647 3 18.4004 3C19.8361 3 21 4.16388 21 5.59961V18.4004C21 19.8361 19.8361 21 18.4004 21C16.9647 21 15.8008 19.8361 15.8008 18.4004V5.59961ZM10.4004 14.2C10.9527 14.2 11.4004 14.6477 11.4004 15.2V20C11.4004 20.5523 10.9527 21 10.4004 21C9.84811 21 9.40039 20.5523 9.40039 20V15.2C9.40039 14.6477 9.84811 14.2 10.4004 14.2Z"
+        d="M12 2C8.13401 2 5 5.13401 5 9C5 11.3866 6.20964 13.492 8.0625 14.7188C8.64355 15.1025 9 15.7572 9 16.4571V17C9 17.5523 9.44772 18 10 18H14C14.5523 18 15 17.5523 15 17V16.4571C15 15.7572 15.3564 15.1025 15.9375 14.7188C17.7904 13.492 19 11.3866 19 9C19 5.13401 15.866 2 12 2ZM7 9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9C17 10.7752 16.0767 12.3368 14.6719 13.2656C13.8396 13.8153 13.2729 14.6264 13.0709 15.5455C13.048 15.6493 12.9568 15.7266 12.8509 15.7266H11.1491C11.0432 15.7266 10.952 15.6493 10.9291 15.5455C10.7271 14.6264 10.1604 13.8153 9.32812 13.2656C7.92328 12.3368 7 10.7752 7 9Z"
+        fill={color}
+      />
+      <Path
+        d="M9 20C9 19.4477 9.44772 19 10 19H14C14.5523 19 15 19.4477 15 20C15 20.5523 14.5523 21 14 21H10C9.44772 21 9 20.5523 9 20Z"
+        fill={color}
+      />
+      <Path
+        d="M10 22C10 21.4477 10.4477 21 11 21H13C13.5523 21 14 21.4477 14 22C14 22.5523 13.5523 23 13 23H11C10.4477 23 10 22.5523 10 22Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+function GoalsMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z"
+        fill={color}
+      />
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8ZM6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12Z"
+        fill={color}
+      />
+      <Path
+        d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"
         fill={color}
       />
     </Svg>
@@ -189,11 +220,11 @@ export function ChatHeader() {
               </Pressable>
               <Pressable style={styles.menuItem} onPress={() => { setActivePanel('memory'); setMenuOpen(false); }}>
                 <Text style={styles.menuText}>Chat memory</Text>
-                <FpoIcon size={24} color={Colors.contentPrimary} />
+                <MemoryMenuIcon size={24} color={Colors.contentPrimary} />
               </Pressable>
               <Pressable style={styles.menuItem} onPress={() => { setActivePanel('goals'); setMenuOpen(false); }}>
                 <Text style={styles.menuText}>Goals</Text>
-                <FpoIcon size={24} color={Colors.contentPrimary} />
+                <GoalsMenuIcon size={24} color={Colors.contentPrimary} />
               </Pressable>
               <Pressable style={styles.menuItem} onPress={() => setMenuOpen(false)}>
                 <Text style={styles.menuText}>Rename</Text>
