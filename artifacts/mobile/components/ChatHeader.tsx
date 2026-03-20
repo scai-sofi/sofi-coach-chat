@@ -193,10 +193,10 @@ export function ChatHeader() {
             </Pressable>
             {hasActiveChat && (
               <Pressable
-                style={[styles.iconBtn, menuOpen && styles.iconBtnPressed]}
+                style={styles.iconBtn}
                 onPress={() => setMenuOpen(!menuOpen)}
               >
-                <MoreIcon size={20} color={menuOpen ? '#FFFFFF' : Colors.contentPrimary} />
+                <MoreIcon size={20} color={Colors.contentPrimary} />
               </Pressable>
             )}
           </View>
@@ -272,9 +272,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-  },
-  iconBtnPressed: {
-    backgroundColor: Colors.contentPrimary,
   },
   title: {
     fontSize: 16,
