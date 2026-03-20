@@ -77,51 +77,71 @@ function MemoryCard({ memory }: { memory: Memory }) {
   const { editMemory, pauseMemory, deleteMemory } = useCoach();
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(memory.content);
+  const MAX_CHARS = 300;
 
   const sourceLabel = memory.source === 'EXPLICIT' ? 'You created' : 'AI inferred';
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
+  const handleSave = () => {
+    const trimmed = editText.trim();
+    if (trimmed.length > 0 && trimmed.length <= MAX_CHARS) {
+      editMemory(memory.id, trimmed);
+    }
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditText(memory.content);
+    setEditing(false);
+  };
+
   return (
     <View style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }]}>
       {editing ? (
-        <View>
+        <>
           <TextInput
             style={styles.editInput}
             value={editText}
-            onChangeText={setEditText}
+            onChangeText={(t) => { if (t.length <= MAX_CHARS) setEditText(t); }}
             multiline
             autoFocus
+            underlineColorAndroid="transparent"
           />
-          <View style={styles.editButtons}>
-            <Pressable style={styles.saveMiniBtn} onPress={() => { editMemory(memory.id, editText); setEditing(false); }}>
-              <Text style={styles.saveMiniText}>Save</Text>
-            </Pressable>
-            <Pressable style={styles.cancelMiniBtn} onPress={() => { setEditText(memory.content); setEditing(false); }}>
-              <Text style={styles.cancelMiniText}>Cancel</Text>
-            </Pressable>
+          <View style={styles.editToolRow}>
+            <Text style={styles.editCharCount}>{editText.length}/{MAX_CHARS}</Text>
+            <View style={styles.editButtonGroup}>
+              <Pressable style={styles.editSaveBtn} onPress={handleSave}>
+                <Text style={styles.editSaveText}>Save</Text>
+              </Pressable>
+              <Pressable style={styles.editCancelBtn} onPress={handleCancel}>
+                <Text style={styles.editCancelText}>Cancel</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
+        </>
       ) : (
-        <Text style={styles.memContent}>{memory.content}</Text>
+        <>
+          <Text style={styles.memContent}>{memory.content}</Text>
+          <View style={styles.memMeta}>
+            <Text style={styles.memMetaText}>{sourceLabel} · {dateLabel}</Text>
+            <View style={styles.memActions}>
+              <Pressable style={styles.memActionBtn} onPress={() => setEditing(true)}>
+                <PencilIcon size={16} color={Colors.contentSecondary} />
+              </Pressable>
+              <Pressable style={styles.memActionBtn} onPress={() => pauseMemory(memory.id)}>
+                {memory.status === 'PAUSED' ? (
+                  <PlayIcon size={16} color={Colors.contentSecondary} />
+                ) : (
+                  <PauseIcon size={16} color={Colors.contentSecondary} />
+                )}
+              </Pressable>
+              <Pressable style={styles.memActionBtn} onPress={() => deleteMemory(memory.id)}>
+                <DeleteIcon size={16} color={Colors.danger} />
+              </Pressable>
+            </View>
+          </View>
+        </>
       )}
-      <View style={styles.memMeta}>
-        <Text style={styles.memMetaText}>{sourceLabel} · {dateLabel}</Text>
-        <View style={styles.memActions}>
-          <Pressable style={styles.memActionBtn} onPress={() => setEditing(true)}>
-            <PencilIcon size={16} color={Colors.contentSecondary} />
-          </Pressable>
-          <Pressable style={styles.memActionBtn} onPress={() => pauseMemory(memory.id)}>
-            {memory.status === 'PAUSED' ? (
-              <PlayIcon size={16} color={Colors.contentSecondary} />
-            ) : (
-              <PauseIcon size={16} color={Colors.contentSecondary} />
-            )}
-          </Pressable>
-          <Pressable style={styles.memActionBtn} onPress={() => deleteMemory(memory.id)}>
-            <DeleteIcon size={16} color={Colors.danger} />
-          </Pressable>
-        </View>
-      </View>
     </View>
   );
 }
@@ -391,29 +411,52 @@ const styles = StyleSheet.create({
     color: Colors.contentPrimary,
     fontFamily: Fonts.regular,
     lineHeight: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.1)',
-    borderRadius: 12,
-    padding: 12,
-    minHeight: 50,
+    padding: 0,
+    minHeight: 20,
     textAlignVertical: 'top',
   },
-  editButtons: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  saveMiniBtn: {
-    backgroundColor: Colors.contentPrimary,
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  editToolRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingTop: 4,
   },
-  saveMiniText: { color: '#fff', fontSize: 13, fontFamily: Fonts.medium },
-  cancelMiniBtn: {
-    borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.1)',
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  editCharCount: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    color: '#BDBBB9',
+    lineHeight: 20,
   },
-  cancelMiniText: { color: Colors.contentSecondary, fontSize: 13, fontFamily: Fonts.medium },
+  editButtonGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  editSaveBtn: {
+    backgroundColor: '#00A2C7',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  editSaveText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+  },
+  editCancelBtn: {
+    borderWidth: 1.5,
+    borderColor: 'rgba(10,10,10,0.2)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  editCancelText: {
+    color: Colors.contentPrimary,
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+  },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
   emptyText: {
     fontSize: 14,
