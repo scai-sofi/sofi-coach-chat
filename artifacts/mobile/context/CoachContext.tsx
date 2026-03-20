@@ -345,6 +345,56 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     });
   }, [generateTitle]);
 
+  const drainReplyWithAnimation = useCallback((
+    reply: string, aiMsgId: string, version: number,
+    suggestions?: string[],
+  ) => {
+    const words = reply.split(/(\s+)/);
+    const TOKEN_MS = 8;
+    let displayed = '';
+    let idx = 0;
+
+    setIsTyping(false);
+    displayed = words[0] || '';
+    idx = 1;
+    setMessages(prev => prev.map(m =>
+      m.id === TYPING_INDICATOR_ID
+        ? { ...m, id: aiMsgId, content: displayed, isStreaming: true, isTypingIndicator: false }
+        : m
+    ));
+
+    return new Promise<void>((resolve) => {
+      const timer = setInterval(() => {
+        if (sessionVersionRef.current !== version) {
+          clearInterval(timer);
+          resolve();
+          return;
+        }
+        if (idx < words.length) {
+          displayed += words[idx];
+          idx++;
+          const shown = displayed;
+          setMessages(prev => prev.map(m =>
+            m.id === aiMsgId ? { ...m, content: shown } : m
+          ));
+        } else {
+          clearInterval(timer);
+          setMessages(prev => {
+            const updated = prev.map(m =>
+              m.id === aiMsgId ? { ...m, content: reply, isStreaming: false, suggestions } : m
+            );
+            if (!titleGeneratedRef.current) {
+              titleGeneratedRef.current = true;
+              generateTitle(updated, version);
+            }
+            return updated;
+          });
+          resolve();
+        }
+      }, TOKEN_MS);
+    });
+  }, [generateTitle]);
+
   const fallbackNonStreaming = useCallback(async (
     text: string, history: { role: 'user' | 'assistant'; content: string }[],
     controller: AbortController, aiMsgId: string, version: number,
@@ -370,21 +420,11 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setIsTyping(false);
     const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
-    setMessages(prev => {
-      const updated = prev.map(m => {
-        if (m.id === aiMsgId) return { ...m, content: data.reply, isStreaming: false, suggestions };
-        if (m.id === TYPING_INDICATOR_ID) return { ...m, id: aiMsgId, content: data.reply, isTypingIndicator: false, suggestions };
-        return m;
-      });
-      if (!titleGeneratedRef.current) {
-        titleGeneratedRef.current = true;
-        generateTitle(updated, version);
-      }
-      return updated;
-    });
-  }, [generateTitle]);
+    await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions);
+  }, [drainReplyWithAnimation]);
+
+  const supportsStreaming = typeof ReadableStream !== 'undefined';
 
   const sendLiveMessage = useCallback(async (text: string, version: number) => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
@@ -397,6 +437,40 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const history = currentMessages
       .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
       .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
+
+    if (!supportsStreaming) {
+      try {
+        const res = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history }),
+          signal: controller.signal,
+        });
+        if (sessionVersionRef.current !== version) return;
+        const data = await res.json();
+        if (!res.ok) {
+          setMessages(prev => prev.map(m =>
+            m.id === TYPING_INDICATOR_ID
+              ? { ...m, id: uid(), content: data.error || 'Something went wrong.', isTypingIndicator: false }
+              : m
+          ));
+          setIsTyping(false);
+          return;
+        }
+        const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
+        await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions);
+        return;
+      } catch (err: any) {
+        if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
+        setMessages(prev => prev.map(m =>
+          m.id === TYPING_INDICATOR_ID
+            ? { ...m, id: uid(), content: 'Unable to connect to the server. Please check your connection and try again.', isTypingIndicator: false }
+            : m
+        ));
+        setIsTyping(false);
+        return;
+      }
+    }
 
     const MAX_RETRIES = 2;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -434,7 +508,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       );
     });
     setIsTyping(false);
-  }, [attemptStreamRequest, fallbackNonStreaming]);
+  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation]);
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
