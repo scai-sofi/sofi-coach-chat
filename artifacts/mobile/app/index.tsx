@@ -47,6 +47,17 @@ export default function ChatScreen() {
     };
   }, []);
 
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidShow', () => {
+      if (messages.length > 0) {
+        setTimeout(() => {
+          listRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    });
+    return () => sub.remove();
+  }, [messages.length]);
+
   const handleInputBarLayout = useCallback((e: LayoutChangeEvent) => {
     setInputBarHeight(e.nativeEvent.layout.height);
   }, []);
