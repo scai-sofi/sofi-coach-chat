@@ -52,12 +52,15 @@ function parseContentBlocks(content: string): ContentBlock[] {
       }
     }
 
-    const isStandaloneBold = trimmed.startsWith('**') || /^\d+\.\s*\*\*/.test(trimmed);
+    const isStandaloneBold = /^\*\*[^*]+\*\*/.test(trimmed) && !trimmed.startsWith('• ') && !trimmed.startsWith('- ');
+    const hasNumberedBold = /^\d+\.\s*\*\*/.test(trimmed);
+    const isHeader = (isStandaloneBold && trimmed.startsWith('**')) || hasNumberedBold;
+
     const isBullet = trimmed.startsWith('•') || trimmed.startsWith('- ');
-    const isNumberedItem = /^\d+\.\s/.test(trimmed) && !isStandaloneBold;
+    const isNumberedItem = /^\d+\.\s/.test(trimmed) && !hasNumberedBold;
     const isList = isBullet || isNumberedItem;
 
-    const paragraphGap = blocks.length > 0 && !isStandaloneBold && (
+    const paragraphGap = blocks.length > 0 && !isHeader && (
       prevWasBlank
       || (isList && !prevWasBullet)
       || (!isList && prevWasBullet)
@@ -68,18 +71,21 @@ function parseContentBlocks(content: string): ContentBlock[] {
       displayText = '• ' + displayText.slice(2);
     }
 
-    if (isStandaloneBold) {
+    if (isHeader) {
       if (blocks.length > 0 && !prevWasHeader) {
         blocks.push({ type: 'divider' });
       }
       blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
+      if (isNumberedItem) {
+        displayText = displayText.replace(/^\d+\.\s*/, '• ');
+      }
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
     } else {
       blocks.push({ type: 'text', text: displayText, paragraphGap });
     }
 
-    prevWasHeader = isStandaloneBold;
+    prevWasHeader = isHeader;
     prevWasBullet = isList;
     prevWasBlank = false;
   }

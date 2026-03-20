@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { View, TextInput, Pressable, Text, StyleSheet } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, TextInput, Pressable, Text, StyleSheet, Keyboard } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -12,11 +12,17 @@ export function InputBar() {
   const insets = useSafeAreaInsets();
   const { sendMessage, isTyping, setInputFocused } = useCoach();
 
+  useEffect(() => {
+    if (isTyping) {
+      inputRef.current?.blur();
+      Keyboard.dismiss();
+    }
+  }, [isTyping]);
+
   const handleSend = () => {
     if (!text.trim() || isTyping) return;
     sendMessage(text.trim());
     setText('');
-    inputRef.current?.focus();
   };
 
   return (
