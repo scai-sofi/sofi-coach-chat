@@ -239,19 +239,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return true;
     }
 
-    setIsTyping(false);
-
-    setMessages(prev => prev.map(m =>
-      m.id === TYPING_INDICATOR_ID
-        ? { ...m, id: aiMsgId, content: '', isStreaming: true, isTypingIndicator: false }
-        : m
-    ));
-
     const reader = res.body?.getReader();
     if (!reader) throw new Error('No reader');
     const decoder = new TextDecoder();
     let sseBuffer = '';
     let fullContent = '';
+    let firstTokenReceived = false;
     let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
 
     while (true) {
@@ -273,9 +266,19 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           if (event.type === 'token') {
             fullContent += event.content;
             const shown = fullContent;
-            setMessages(prev => prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: shown } : m
-            ));
+            if (!firstTokenReceived) {
+              firstTokenReceived = true;
+              setIsTyping(false);
+              setMessages(prev => prev.map(m =>
+                m.id === TYPING_INDICATOR_ID
+                  ? { ...m, id: aiMsgId, content: shown, isStreaming: true, isTypingIndicator: false }
+                  : m
+              ));
+            } else {
+              setMessages(prev => prev.map(m =>
+                m.id === aiMsgId ? { ...m, content: shown } : m
+              ));
+            }
           } else if (event.type === 'done') {
             donePayload = event;
           } else if (event.type === 'error') {
@@ -285,16 +288,19 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    setIsTyping(false);
+    const targetId = firstTokenReceived ? aiMsgId : TYPING_INDICATOR_ID;
+
     if (donePayload?.error) {
       setMessages(prev => prev.map(m =>
-        m.id === aiMsgId ? { ...m, content: donePayload!.error!, isStreaming: false } : m
+        m.id === targetId ? { ...m, id: uid(), content: donePayload!.error!, isStreaming: false, isTypingIndicator: false } : m
       ));
     } else {
       const finalReply = donePayload?.reply || fullContent;
       const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
       setMessages(prev => {
         const updated = prev.map(m =>
-          m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+          m.id === targetId ? { ...m, id: firstTokenReceived ? aiMsgId : uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions } : m
         );
         if (!titleGeneratedRef.current) {
           titleGeneratedRef.current = true;

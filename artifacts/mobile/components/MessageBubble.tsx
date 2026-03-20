@@ -172,25 +172,6 @@ function formatInlineStyles(text: string): React.ReactNode[] {
   return parts.length > 0 ? parts : [<Text key={0}>{text}</Text>];
 }
 
-function StreamingCursor() {
-  const opacity = useRef(new RNAnimated.Value(1)).current;
-
-  useEffect(() => {
-    const anim = RNAnimated.loop(
-      RNAnimated.sequence([
-        RNAnimated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: true }),
-        RNAnimated.timing(opacity, { toValue: 1, duration: 400, useNativeDriver: true }),
-      ])
-    );
-    anim.start();
-    return () => anim.stop();
-  }, [opacity]);
-
-  return (
-    <RNAnimated.View style={[styles.cursor, { opacity }]} />
-  );
-}
-
 function BlockDivider() {
   return <View style={styles.divider} />;
 }
@@ -504,14 +485,9 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
 
       <View style={styles.aiContent}>
         {streaming && message.content ? (
-          <>
-            <StreamingContent content={message.content} />
-            <StreamingCursor />
-          </>
+          <StreamingContent content={message.content} />
         ) : message.content ? (
           renderContent(message.content)
-        ) : streaming ? (
-          <StreamingCursor />
         ) : null}
       </View>
 
@@ -616,11 +592,4 @@ const styles = StyleSheet.create({
     borderRadius: 24, paddingTop: 11, paddingBottom: 12, paddingHorizontal: 16,
   },
   suggestionText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
-  cursor: {
-    width: 2,
-    height: 18,
-    backgroundColor: Colors.contentPrimary,
-    borderRadius: 1,
-    marginTop: 2,
-  },
 });
