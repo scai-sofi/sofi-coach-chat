@@ -71,12 +71,14 @@ function PauseIcon({ size = 13, color = Colors.contentSecondary }: { size?: numb
 function PlayIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
   const w = size * (11 / 13);
   return (
-    <Svg width={w} height={size} viewBox="0 0 11 13" fill="none">
-      <Path
-        d="M1.75 1.51795V11.482C1.75 11.7784 2.07378 11.9568 2.32283 11.7916L9.82717 6.80959C10.0506 6.66148 10.0506 6.33852 9.82717 6.19041L2.32283 1.20836C2.07378 1.04318 1.75 1.22159 1.75 1.51795Z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
-      />
-    </Svg>
+    <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingLeft: 1.5 }}>
+      <Svg width={w} height={size} viewBox="0 0 11 13" fill="none">
+        <Path
+          d="M1.75 1.51795V11.482C1.75 11.7784 2.07378 11.9568 2.32283 11.7916L9.82717 6.80959C10.0506 6.66148 10.0506 6.33852 9.82717 6.19041L2.32283 1.20836C2.07378 1.04318 1.75 1.22159 1.75 1.51795Z"
+          stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+        />
+      </Svg>
+    </View>
   );
 }
 
