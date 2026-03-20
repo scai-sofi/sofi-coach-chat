@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
+import { useToast } from '@/components/Toast';
 import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory } from '@/constants/types';
 
 function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
@@ -103,7 +104,8 @@ function DeleteIcon({ size = 14.5, color = Colors.danger }: { size?: number; col
 }
 
 function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y: number) => void }) {
-  const { editMemory, pauseMemory, deleteMemory } = useCoach();
+  const { editMemory, pauseMemory, deleteMemory, restoreMemory } = useCoach();
+  const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(memory.content);
   const cardRef = useRef<View>(null);
@@ -173,14 +175,27 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
               <Pressable style={styles.memActionBtn} onPress={handleEdit}>
                 <PencilIcon />
               </Pressable>
-              <Pressable style={styles.memActionBtn} onPress={() => pauseMemory(memory.id)}>
+              <Pressable style={styles.memActionBtn} onPress={() => {
+                const wasPaused = memory.status === 'PAUSED';
+                pauseMemory(memory.id);
+                showToast({
+                  message: wasPaused ? 'Memory resumed.' : 'Memory paused.',
+                  action: { label: 'Undo', onPress: () => pauseMemory(memory.id) },
+                });
+              }}>
                 {memory.status === 'PAUSED' ? (
                   <PlayIcon />
                 ) : (
                   <PauseIcon />
                 )}
               </Pressable>
-              <Pressable style={styles.memActionBtn} onPress={() => deleteMemory(memory.id)}>
+              <Pressable style={styles.memActionBtn} onPress={() => {
+                deleteMemory(memory.id);
+                showToast({
+                  message: 'Memory deleted.',
+                  action: { label: 'Undo', onPress: () => restoreMemory(memory.id) },
+                });
+              }}>
                 <DeleteIcon />
               </Pressable>
             </View>

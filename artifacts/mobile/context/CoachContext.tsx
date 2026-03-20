@@ -60,6 +60,7 @@ interface CoachContextType extends CoachState {
   editMemory: (id: string, content: string) => void;
   pauseMemory: (id: string) => void;
   deleteMemory: (id: string) => void;
+  restoreMemory: (id: string) => void;
   clearConversation: () => void;
   setInputFocused: (val: boolean) => void;
   saveAndClose: () => void;
@@ -701,6 +702,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories(prev => prev.map(m => m.id === id ? { ...m, status: 'DELETED' } : m));
   }, []);
 
+  const restoreMemory = useCallback((id: string) => {
+    setMemories(prev => prev.map(m => m.id === id ? { ...m, status: 'ACTIVE' } : m));
+  }, []);
+
   const sessionTitleRef = useRef(sessionTitle);
   sessionTitleRef.current = sessionTitle;
 
@@ -786,7 +791,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       sendMessage, setActivePanel, setTemporaryChat, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
-      addMemory, editMemory, pauseMemory, deleteMemory, clearConversation, setInputFocused,
+      addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
       saveAndClose, loadSession, deleteSession,
     }}>
       {children}
