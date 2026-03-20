@@ -52,9 +52,10 @@ function PencilIcon({ size = 16, color = Colors.contentSecondary }: { size?: num
   );
 }
 
-function PauseIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PauseIcon({ size = 12, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+  const aspect = 9.83333 / 12.1667;
   return (
-    <Svg width={size} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
+    <Svg width={size * aspect} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
       <Path
         d="M8.41667 0.75H7.08333C6.71514 0.75 6.41667 1.04848 6.41667 1.41667V10.75C6.41667 11.1182 6.71514 11.4167 7.08333 11.4167H8.41667C8.78486 11.4167 9.08333 11.1182 9.08333 10.75V1.41667C9.08333 1.04848 8.78486 0.75 8.41667 0.75Z"
         stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
@@ -75,9 +76,10 @@ function PlayIcon({ size = 16, color = Colors.contentSecondary }: { size?: numbe
   );
 }
 
-function DeleteIcon({ size = 16, color = Colors.danger }: { size?: number; color?: string }) {
+function DeleteIcon({ size = 14.5, color = Colors.danger }: { size?: number; color?: string }) {
+  const aspect = 11.5 / 14.5;
   return (
-    <Svg width={size} height={size} viewBox="0 0 11.5 14.5" fill="none">
+    <Svg width={size * aspect} height={size} viewBox="0 0 11.5 14.5" fill="none">
       <Path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -159,17 +161,17 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
             <Text style={styles.memMetaText}>{sourceLabel} · {dateLabel}</Text>
             <View style={styles.memActions}>
               <Pressable style={styles.memActionBtn} onPress={handleEdit}>
-                <PencilIcon size={16} color={Colors.contentSecondary} />
+                <PencilIcon size={13} color={Colors.contentSecondary} />
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => pauseMemory(memory.id)}>
                 {memory.status === 'PAUSED' ? (
-                  <PlayIcon size={16} color={Colors.contentSecondary} />
+                  <PlayIcon size={12} color={Colors.contentSecondary} />
                 ) : (
-                  <PauseIcon size={16} color={Colors.contentSecondary} />
+                  <PauseIcon size={12} color={Colors.contentSecondary} />
                 )}
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => deleteMemory(memory.id)}>
-                <DeleteIcon size={16} color={Colors.danger} />
+                <DeleteIcon size={14.5} color={Colors.danger} />
               </Pressable>
             </View>
           </View>
