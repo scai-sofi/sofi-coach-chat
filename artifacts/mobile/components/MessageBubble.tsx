@@ -28,14 +28,23 @@ function Divider() {
   return <View style={styles.divider} />;
 }
 
+function ParagraphSpacer() {
+  return <View style={{ height: 12 }} />;
+}
+
 function renderContent(content: string) {
   const lines = content.split('\n');
   const elements: React.ReactNode[] = [];
   let prevWasHeader = false;
+  let prevWasBullet = false;
+  let prevWasBlank = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (line.trim() === '') {
+      if (elements.length > 0) {
+        prevWasBlank = true;
+      }
       prevWasHeader = false;
       continue;
     }
@@ -47,7 +56,16 @@ function renderContent(content: string) {
     let keyIdx = 0;
 
     const isStandaloneBold = line.trim().startsWith('**') || /^\d+\.\s*\*\*/.test(line.trim());
-    const isBullet = line.trim().startsWith('•');
+    const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-');
+    const isNumberedItem = /^\d+\.\s/.test(line.trim());
+
+    const needsParagraphGap = prevWasBlank
+      || (isBullet && !prevWasBullet && elements.length > 0)
+      || (!isBullet && !isNumberedItem && prevWasBullet && elements.length > 0);
+
+    if (needsParagraphGap && !isStandaloneBold) {
+      elements.push(<ParagraphSpacer key={`spacer-${i}`} />);
+    }
 
     while ((match = boldRegex.exec(line)) !== null) {
       if (match.index > lastIndex) {
@@ -76,7 +94,7 @@ function renderContent(content: string) {
     elements.push(
       <Text key={`line-${i}`} style={[
         styles.aiText,
-        isBullet && styles.bulletText,
+        (isBullet || isNumberedItem) && styles.bulletText,
         isStandaloneBold && parts.length === 1 && styles.headerText,
       ]}>
         {parts}
@@ -84,6 +102,8 @@ function renderContent(content: string) {
     );
 
     prevWasHeader = isStandaloneBold;
+    prevWasBullet = isBullet || isNumberedItem;
+    prevWasBlank = false;
   }
 
   return elements;
