@@ -90,8 +90,7 @@ const styles = StyleSheet.create({
     maxHeight: 96,
     paddingTop: 6,
     paddingBottom: 6,
-    ...(Platform.OS === 'web' ? { caretColor: Colors.contentBone600, outlineStyle: 'none' } : {}),
-  } as any,
+  },
   sendBtn: {
     width: 32,
     height: 32,

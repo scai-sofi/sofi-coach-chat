@@ -119,3 +119,112 @@ Expo/React Native mobile app — "SoFi Coach Chat", an interactive AI financial 
 - **Font config**: `constants/fonts.ts` exports `Fonts` object with named keys (regular, medium, bold, italic, boldItalic)
 - **Default state**: Opens in live chat mode (empty conversation, ready to chat with AI)
 - **Run**: `pnpm --filter @workspace/mobile run dev`
+
+## Flutter Migration Guide
+
+This prototype uses only standard React Native APIs (no web-only CSS properties). Every component maps cleanly to Flutter widgets.
+
+### Design Tokens (`constants/colors.ts`)
+
+| Token | Value | Usage |
+|---|---|---|
+| `surfaceBase` | `#FAF8F5` | App background, header background |
+| `contentPrimary` | `#1A1919` | Primary text, icon fills |
+| `contentSecondary` | `#706F6E` | Secondary text, placeholders |
+| `contentBone600` | `#5C5B5A` | User message bubble bg, cursor/caret color, send button bg |
+| `surfaceTint` | `#F0EEEB` | Chip backgrounds, proposal cards, demo banner |
+| `surfaceMuted` | `#E6E4E1` | Muted surface areas |
+
+### Typography (`constants/fonts.ts`)
+
+| Weight | Font Family | Usage |
+|---|---|---|
+| Regular (400) | TT Norms Regular | Body text, input, placeholders |
+| Medium (500) | TT Norms Medium | Headers, labels, buttons |
+| Bold (700) | TT Norms Bold | Emphasis (rarely used) |
+
+### Spacing & Layout
+
+| Element | Value |
+|---|---|
+| Body text `fontSize` | 16 |
+| Body text `lineHeight` | 20 |
+| Section header `fontSize` | 18 |
+| Section header `lineHeight` | 24 |
+| Between-line gap (within paragraph) | 8 |
+| Between-paragraph gap | 16 (8 gap + 8 spacer) |
+| Between-bullet-list gap | 16 (same) |
+| Header bar height | 44 |
+| Header left/right zone width | 104 |
+| Input pill `minHeight` | 48 |
+| Input text `minHeight` | 32 |
+| Input `paddingVertical` | 6 |
+| Input `maxHeight` (multiline) | 96 |
+| Card `borderRadius` | 16 |
+| Pill/bubble `borderRadius` | 24 |
+| Icon button size | 24×24 |
+
+### Component → Flutter Widget Mapping
+
+| React Native Component | Flutter Widget | Key File |
+|---|---|---|
+| `ChatHeader` | `AppBar` or custom `Container` | `components/ChatHeader.tsx` |
+| `InputBar` | `TextField` in `Container` | `components/InputBar.tsx` |
+| `MessageBubble` | `Container` with `BoxDecoration` | `components/MessageBubble.tsx` |
+| `EmptyChat` | `Column` with animated orb | `components/EmptyChat.tsx` |
+| `ChatHistory` | `Scaffold` with `ListView` | `components/ChatHistory.tsx` |
+| `TypingIndicator` | `AnimatedBuilder` with dots | `components/TypingIndicator.tsx` |
+| `MemoryCenter` | `Scaffold` with `ListView` | `components/MemoryCenter.tsx` |
+| `GoalsDashboard` | `CustomPaint` for progress rings | `components/GoalsDashboard.tsx` |
+| `ScenarioSwitcher` | `BottomSheet` with `ListView` | `components/ScenarioSwitcher.tsx` |
+
+### API Endpoints
+
+| Endpoint | Method | Body | Response | Purpose |
+|---|---|---|---|---|
+| `/api/chat` | POST | `{ message: string, history: [{role, content}] }` | `{ reply: string }` | AI chat (GPT-4o-mini) |
+| `/api/title` | POST | `{ messages: [{role, content}] }` | `{ title: string }` | Auto-generate session title |
+| `/api/healthz` | GET | — | `{ status: "ok" }` | Health check |
+
+### Chat Message Rendering (`renderContent` in `MessageBubble.tsx`)
+
+The AI response text is parsed line-by-line with this logic:
+1. Empty lines → insert 8px spacer (total 16px gap with container gap)
+2. Lines starting with `**` or `N. **` → section headers (18px, medium weight, 24px lineHeight), preceded by a divider
+3. Lines starting with `•` or `- ` → bullet items (dash auto-converted to `•`), no indentation
+4. Inline `**bold**` → medium weight spans
+5. All body text: 16px, regular weight, 20px lineHeight
+
+### Header Behavior
+
+| State | Left Icon | Center Title | Right Icons |
+|---|---|---|---|
+| Welcome (no messages) | Play-circle (opens scenario picker) | "Coach" | Clock (history) |
+| Active chat | × close (saves & returns to welcome) | AI-generated title | Clock + More (⋯ in circle) |
+| Demo mode | × close (saves & returns) | Scenario title | Clock + More |
+
+### Chat History Panel
+
+- Slides in from right (300ms, cubic-bezier 0.4/0/0.2/1)
+- Sessions grouped by month, sorted newest first
+- Search filters by title
+- Session dividers: 0.75px, `rgba(10,10,10,0.06)`
+- Card border: 0.75px, `rgba(10,10,10,0.06)`
+
+### Custom SVG Icons (exact paths in `ChatHeader.tsx`, `ChatHistory.tsx`)
+
+All icons use fill color `#1A1919` (contentPrimary):
+- **CloseIcon**: × glyph, viewBox 0 0 24 24
+- **ClockIcon**: Clock outline, viewBox 0 0 20 20
+- **MoreIcon**: Three dots in circle, viewBox 0 0 20 20
+- **ChevronLeftIcon**: Back arrow, viewBox 0 0 24 24
+- **NewChatIcon**: Chat bubble with +, viewBox 0 0 24 24
+
+### Shadow Spec (suggestion cards)
+
+Native shadow properties (maps to Flutter `BoxShadow`):
+- `shadowColor`: `rgba(10,10,10,0.16)`
+- `shadowOffset`: `{width: 0, height: 1}`
+- `shadowOpacity`: 1
+- `shadowRadius`: 4
+- `elevation`: 2 (Android)
