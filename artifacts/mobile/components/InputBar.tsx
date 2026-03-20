@@ -8,6 +8,7 @@ import { useCoach } from '@/context/CoachContext';
 
 export function InputBar() {
   const [text, setText] = useState('');
+  const [keyboardUp, setKeyboardUp] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const insets = useSafeAreaInsets();
   const { sendMessage, isTyping, setInputFocused } = useCoach();
@@ -19,6 +20,12 @@ export function InputBar() {
     }
   }, [isTyping]);
 
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardWillShow', () => setKeyboardUp(true));
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => setKeyboardUp(false));
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
+
   const handleSend = () => {
     if (!text.trim() || isTyping) return;
     sendMessage(text.trim());
@@ -26,7 +33,7 @@ export function InputBar() {
   };
 
   return (
-    <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+    <View style={[styles.footer, { paddingBottom: keyboardUp ? 4 : Math.max(insets.bottom, 8) }]}>
       <View style={styles.footerBg} />
       <View style={styles.inputRow}>
         <View style={styles.inputPill}>
@@ -123,8 +130,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     alignItems: 'center',
-    paddingTop: 4,
-    paddingBottom: 2,
+    paddingVertical: 4,
     paddingHorizontal: 16,
   },
   disclaimerText: {
