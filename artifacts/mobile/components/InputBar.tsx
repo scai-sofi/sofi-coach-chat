@@ -130,7 +130,8 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingTop: 4,
+    paddingBottom: 8,
     paddingHorizontal: 16,
   },
   disclaimerText: {
