@@ -214,6 +214,139 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
+  const attemptStreamRequest = useCallback(async (
+    text: string, history: { role: 'user' | 'assistant'; content: string }[],
+    controller: AbortController, aiMsgId: string, version: number,
+  ): Promise<boolean> => {
+    const res = await fetch(`${API_BASE}/chat/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history }),
+      signal: controller.signal,
+    });
+
+    if (sessionVersionRef.current !== version) return true;
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({ error: 'Something went wrong' }));
+      const errContent = errData.error || 'Something went wrong. Please try again.';
+      setMessages(prev => prev.map(m =>
+        m.id === TYPING_INDICATOR_ID
+          ? { ...m, id: uid(), content: errContent, isTypingIndicator: false }
+          : m
+      ));
+      setIsTyping(false);
+      return true;
+    }
+
+    setIsTyping(false);
+
+    setMessages(prev => prev.map(m =>
+      m.id === TYPING_INDICATOR_ID
+        ? { ...m, id: aiMsgId, content: '', isStreaming: true, isTypingIndicator: false }
+        : m
+    ));
+
+    const reader = res.body?.getReader();
+    if (!reader) throw new Error('No reader');
+    const decoder = new TextDecoder();
+    let sseBuffer = '';
+    let fullContent = '';
+    let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (sessionVersionRef.current !== version) { reader.cancel(); return true; }
+
+      sseBuffer += decoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6);
+        if (!jsonStr) continue;
+
+        try {
+          const event = JSON.parse(jsonStr);
+          if (event.type === 'token') {
+            fullContent += event.content;
+            const shown = fullContent;
+            setMessages(prev => prev.map(m =>
+              m.id === aiMsgId ? { ...m, content: shown } : m
+            ));
+          } else if (event.type === 'done') {
+            donePayload = event;
+          } else if (event.type === 'error') {
+            donePayload = { error: event.error };
+          }
+        } catch {}
+      }
+    }
+
+    if (donePayload?.error) {
+      setMessages(prev => prev.map(m =>
+        m.id === aiMsgId ? { ...m, content: donePayload!.error!, isStreaming: false } : m
+      ));
+    } else {
+      const finalReply = donePayload?.reply || fullContent;
+      const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
+      setMessages(prev => {
+        const updated = prev.map(m =>
+          m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+        );
+        if (!titleGeneratedRef.current) {
+          titleGeneratedRef.current = true;
+          generateTitle(updated, version);
+        }
+        return updated;
+      });
+    }
+    return true;
+  }, [generateTitle]);
+
+  const fallbackNonStreaming = useCallback(async (
+    text: string, history: { role: 'user' | 'assistant'; content: string }[],
+    controller: AbortController, aiMsgId: string, version: number,
+  ) => {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history }),
+      signal: controller.signal,
+    });
+
+    if (sessionVersionRef.current !== version) return;
+
+    const data = await res.json();
+    if (!res.ok) {
+      const errContent = data.error || 'Something went wrong. Please try again.';
+      setMessages(prev => prev.map(m => {
+        if (m.id === aiMsgId) return { ...m, content: errContent, isStreaming: false };
+        if (m.id === TYPING_INDICATOR_ID) return { ...m, id: uid(), content: errContent, isTypingIndicator: false };
+        return m;
+      }));
+      setIsTyping(false);
+      return;
+    }
+
+    setIsTyping(false);
+    const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
+    setMessages(prev => {
+      const updated = prev.map(m => {
+        if (m.id === aiMsgId) return { ...m, content: data.reply, isStreaming: false, suggestions };
+        if (m.id === TYPING_INDICATOR_ID) return { ...m, id: aiMsgId, content: data.reply, isTypingIndicator: false, suggestions };
+        return m;
+      });
+      if (!titleGeneratedRef.current) {
+        titleGeneratedRef.current = true;
+        generateTitle(updated, version);
+      }
+      return updated;
+    });
+  }, [generateTitle]);
+
   const sendLiveMessage = useCallback(async (text: string, version: number) => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
@@ -221,119 +354,48 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const aiMsgId = uid();
 
-    try {
-      const currentMessages = [...(messagesRef.current || [])];
-      const history = currentMessages
-        .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
-        .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
+    const currentMessages = [...(messagesRef.current || [])];
+    const history = currentMessages
+      .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
+      .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
 
-      const res = await fetch(`${API_BASE}/chat/stream`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history }),
-        signal: controller.signal,
-      });
-
-      if (sessionVersionRef.current !== version) return;
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({ error: 'Something went wrong' }));
-        const errContent = errData.error || 'Something went wrong. Please try again.';
-        setMessages(prev => prev.map(m =>
-          m.id === TYPING_INDICATOR_ID
-            ? { ...m, id: uid(), content: errContent, isTypingIndicator: false }
-            : m
-        ));
-        setIsTyping(false);
+    const MAX_RETRIES = 2;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await attemptStreamRequest(text, history, controller, aiMsgId, version);
         return;
-      }
-
-      setIsTyping(false);
-
-      setMessages(prev => prev.map(m =>
-        m.id === TYPING_INDICATOR_ID
-          ? { ...m, id: aiMsgId, content: '', isStreaming: true, isTypingIndicator: false }
-          : m
-      ));
-
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error('No reader');
-      const decoder = new TextDecoder();
-      let sseBuffer = '';
-      let fullContent = '';
-      let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (sessionVersionRef.current !== version) { reader.cancel(); return; }
-
-        sseBuffer += decoder.decode(value, { stream: true });
-        const lines = sseBuffer.split('\n');
-        sseBuffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const jsonStr = line.slice(6);
-          if (!jsonStr) continue;
-
-          try {
-            const event = JSON.parse(jsonStr);
-            if (event.type === 'token') {
-              fullContent += event.content;
-              const shown = fullContent;
-              setMessages(prev => prev.map(m =>
-                m.id === aiMsgId ? { ...m, content: shown } : m
-              ));
-            } else if (event.type === 'done') {
-              donePayload = event;
-            } else if (event.type === 'error') {
-              donePayload = { error: event.error };
-            }
-          } catch {}
+      } catch (err: any) {
+        if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+          continue;
+        }
+        try {
+          await fallbackNonStreaming(text, history, controller, aiMsgId, version);
+          return;
+        } catch (fallbackErr: any) {
+          if (fallbackErr.name === 'AbortError' || sessionVersionRef.current !== version) return;
         }
       }
-
-      if (donePayload?.error) {
-        setMessages(prev => prev.map(m =>
-          m.id === aiMsgId ? { ...m, content: donePayload!.error!, isStreaming: false } : m
-        ));
-      } else {
-        const finalReply = donePayload?.reply || fullContent;
-        const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
-        setMessages(prev => {
-          const updated = prev.map(m =>
-            m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
-          );
-          if (!titleGeneratedRef.current) {
-            titleGeneratedRef.current = true;
-            generateTitle(updated, version);
-          }
-          return updated;
-        });
-      }
-    } catch (err: any) {
-      if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
-      const fallback = 'Unable to connect to the server. Please check your connection and try again.';
-      setMessages(prev => {
-        const hasStreamMsg = prev.some(m => m.id === aiMsgId);
-        if (hasStreamMsg) {
-          return prev.map(m => m.id === aiMsgId
-            ? { ...m, content: m.content || fallback, isStreaming: false }
-            : m
-          );
-        }
-        return prev.map(m =>
-          m.id === TYPING_INDICATOR_ID
-            ? { ...m, id: uid(), content: fallback, isTypingIndicator: false }
-            : m
-        );
-      });
-      setIsTyping(false);
-    } finally {
-      if (abortControllerRef.current === controller) abortControllerRef.current = null;
     }
-  }, [generateTitle]);
+
+    const fallback = 'Unable to connect to the server. Please check your connection and try again.';
+    setMessages(prev => {
+      const hasStreamMsg = prev.some(m => m.id === aiMsgId);
+      if (hasStreamMsg) {
+        return prev.map(m => m.id === aiMsgId
+          ? { ...m, content: m.content || fallback, isStreaming: false }
+          : m
+        );
+      }
+      return prev.map(m =>
+        m.id === TYPING_INDICATOR_ID
+          ? { ...m, id: uid(), content: fallback, isTypingIndicator: false }
+          : m
+      );
+    });
+    setIsTyping(false);
+  }, [attemptStreamRequest, fallbackNonStreaming]);
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
