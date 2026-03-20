@@ -86,8 +86,17 @@ export default function ChatScreen() {
   }, [checkAnchorVisibility]);
 
   const handleContentSizeChange = useCallback((_w: number, h: number) => {
+    const prevHeight = contentHeightRef.current;
     contentHeightRef.current = h;
     checkAnchorVisibility();
+
+    if (h > prevHeight && viewportHeightRef.current > 0) {
+      const maxScroll = prevHeight - viewportHeightRef.current;
+      const distanceFromBottom = maxScroll - scrollOffsetRef.current;
+      if (distanceFromBottom < 120) {
+        listRef.current?.scrollToEnd({ animated: false });
+      }
+    }
   }, [checkAnchorVisibility]);
 
   const handleListLayout = useCallback((e: LayoutChangeEvent) => {

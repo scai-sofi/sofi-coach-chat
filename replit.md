@@ -44,7 +44,8 @@ The project is structured as a pnpm workspace monorepo.
 - **Goals Dashboard:** Displays progress rings and milestones.
 - **Message Rendering:** Employs a parse-render pipeline for chat message content, converting markdown into typed `ContentBlock[]` for extensible rendering.
 - **Chat History Panel:** Slides in from the right, groups sessions by month, supports search, and displays session titles.
-- **API Server (`@workspace/api-server`):** Handles API requests, including `/api/chat` for AI interaction, `/api/title` for auto-generating session titles, and `/api/healthz`. Includes in-memory rate limiting for the chat endpoint.
+- **API Server (`@workspace/api-server`):** Handles API requests, including `/api/chat` for AI interaction, `/api/chat/stream` for SSE-based token streaming, `/api/title` for auto-generating session titles, and `/api/healthz`. Includes in-memory rate limiting for the chat endpoint.
+- **Text Streaming:** Live AI responses stream token-by-token via Server-Sent Events (SSE). The typing indicator shows while waiting for the first token, then transitions to a streaming message with a blinking cursor. The FlatList auto-scrolls when the user is near the bottom. Action footer, suggestion pills, and safety badges only appear after streaming completes.
 - **Database Layer (`@workspace/db`):** Manages database connection and Drizzle ORM schema.
 - **API Specifications (`@workspace/api-spec`):** Contains the OpenAPI 3.1 spec and Orval configuration.
 - **Generated API Clients (`@workspace/api-zod`, `@workspace/api-client-react`):** Provide Zod schemas and React Query hooks based on the OpenAPI spec.

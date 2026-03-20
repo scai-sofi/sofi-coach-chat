@@ -127,38 +127,45 @@ interface ChatRequest {
   history?: ChatMessage[];
 }
 
+function validateChatRequest(req: Request, res: any): { message: string; sanitizedHistory: Array<{ role: "user" | "assistant"; content: string }> } | null {
+  const clientIp = getClientIp(req);
+  if (!checkRateLimit(clientIp)) {
+    res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
+    return null;
+  }
+
+  const { message, history = [] } = req.body as ChatRequest;
+
+  if (!message || typeof message !== "string") {
+    res.status(400).json({ error: "Message is required" });
+    return null;
+  }
+
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    res.status(400).json({ error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters.` });
+    return null;
+  }
+
+  const sanitizedHistory = (Array.isArray(history) ? history : [])
+    .slice(-MAX_HISTORY_LENGTH)
+    .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content.slice(0, MAX_HISTORY_CONTENT_LENGTH),
+    }));
+
+  return { message, sanitizedHistory };
+}
+
 router.post("/chat", async (req, res) => {
   try {
-    const clientIp = getClientIp(req);
-    if (!checkRateLimit(clientIp)) {
-      res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
-      return;
-    }
-
-    const { message, history = [] } = req.body as ChatRequest;
-
-    if (!message || typeof message !== "string") {
-      res.status(400).json({ error: "Message is required" });
-      return;
-    }
-
-    if (message.length > MAX_MESSAGE_LENGTH) {
-      res.status(400).json({ error: `Message too long. Maximum ${MAX_MESSAGE_LENGTH} characters.` });
-      return;
-    }
-
-    const sanitizedHistory = (Array.isArray(history) ? history : [])
-      .slice(-MAX_HISTORY_LENGTH)
-      .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-      .map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content.slice(0, MAX_HISTORY_CONTENT_LENGTH),
-      }));
+    const validated = validateChatRequest(req, res);
+    if (!validated) return;
 
     const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
       { role: "system", content: SYSTEM_PROMPT },
-      ...sanitizedHistory,
-      { role: "user", content: message },
+      ...validated.sanitizedHistory,
+      { role: "user", content: validated.message },
     ];
 
     const completion = await openai.chat.completions.create({
@@ -178,6 +185,54 @@ router.post("/chat", async (req, res) => {
       return;
     }
     res.status(500).json({ error: "Something went wrong. Please try again." });
+  }
+});
+
+router.post("/chat/stream", async (req, res) => {
+  try {
+    const validated = validateChatRequest(req, res);
+    if (!validated) return;
+
+    const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...validated.sanitizedHistory,
+      { role: "user", content: validated.message },
+    ];
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+    });
+
+    let fullText = "";
+
+    const stream = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+      max_completion_tokens: 8192,
+      stream: true,
+    });
+
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullText += delta;
+        res.write(`data: ${JSON.stringify({ type: "token", content: delta })}\n\n`);
+      }
+    }
+
+    const { reply, suggestions } = parseSuggestions(fullText);
+    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions })}\n\n`);
+    res.end();
+  } catch (error: any) {
+    console.error("Chat stream error:", error?.message || error);
+    const errMsg = error?.status === 429
+      ? "Too many requests. Please wait a moment and try again."
+      : "Something went wrong. Please try again.";
+    res.write(`data: ${JSON.stringify({ type: "error", error: errMsg })}\n\n`);
+    res.end();
   }
 });
 

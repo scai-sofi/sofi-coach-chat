@@ -217,13 +217,15 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    const aiMsgId = uid();
+
     try {
       const currentMessages = [...(messagesRef.current || [])];
       const history = currentMessages
         .filter(m => m.role === 'user' || m.role === 'ai')
         .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
 
-      const res = await fetch(`${API_BASE}/chat`, {
+      const res = await fetch(`${API_BASE}/chat/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, history }),
@@ -244,32 +246,80 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const data = await res.json();
-      if (sessionVersionRef.current !== version) return;
-
-      const aiMsg: Message = {
-        id: uid(), role: 'ai',
-        content: data.reply || 'I couldn\'t generate a response. Please try again.',
-        timestamp: new Date(),
-        suggestions: Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined,
-      };
-      setMessages(prev => {
-        const updated = [...prev, aiMsg];
-        if (!titleGeneratedRef.current) {
-          titleGeneratedRef.current = true;
-          generateTitle(updated, version);
-        }
-        return updated;
-      });
       setIsTyping(false);
+
+      const streamingMsg: Message = {
+        id: aiMsgId, role: 'ai', content: '', timestamp: new Date(), isStreaming: true,
+      };
+      setMessages(prev => [...prev, streamingMsg]);
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('No reader');
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (sessionVersionRef.current !== version) { reader.cancel(); return; }
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const jsonStr = line.slice(6);
+          if (!jsonStr) continue;
+
+          try {
+            const event = JSON.parse(jsonStr);
+            if (event.type === 'token') {
+              fullContent += event.content;
+              setMessages(prev => prev.map(m =>
+                m.id === aiMsgId ? { ...m, content: fullContent } : m
+              ));
+            } else if (event.type === 'done') {
+              const suggestions = Array.isArray(event.suggestions) && event.suggestions.length > 0 ? event.suggestions : undefined;
+              setMessages(prev => {
+                const updated = prev.map(m =>
+                  m.id === aiMsgId ? { ...m, content: event.reply || fullContent, isStreaming: false, suggestions } : m
+                );
+                if (!titleGeneratedRef.current) {
+                  titleGeneratedRef.current = true;
+                  generateTitle(updated, version);
+                }
+                return updated;
+              });
+            } else if (event.type === 'error') {
+              setMessages(prev => prev.map(m =>
+                m.id === aiMsgId ? { ...m, content: event.error, isStreaming: false } : m
+              ));
+            }
+          } catch {}
+        }
+      }
+
+      setMessages(prev => prev.map(m =>
+        m.id === aiMsgId && m.isStreaming ? { ...m, isStreaming: false } : m
+      ));
     } catch (err: any) {
       if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
-      const errorMsg: Message = {
-        id: uid(), role: 'ai',
-        content: 'Unable to connect to the server. Please check your connection and try again.',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMsg]);
+      setMessages(prev => {
+        const hasStreamMsg = prev.some(m => m.id === aiMsgId);
+        if (hasStreamMsg) {
+          return prev.map(m => m.id === aiMsgId
+            ? { ...m, content: m.content || 'Unable to connect to the server. Please check your connection and try again.', isStreaming: false }
+            : m
+          );
+        }
+        return [...prev, {
+          id: uid(), role: 'ai' as const,
+          content: 'Unable to connect to the server. Please check your connection and try again.',
+          timestamp: new Date(),
+        }];
+      });
       setIsTyping(false);
     } finally {
       if (abortControllerRef.current === controller) abortControllerRef.current = null;

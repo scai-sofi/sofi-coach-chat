@@ -1,5 +1,5 @@
-import React, { useState, ComponentProps } from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect, useRef, ComponentProps } from 'react';
+import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import Colors from '@/constants/colors';
@@ -175,6 +175,25 @@ function formatInlineStyles(text: string): React.ReactNode[] {
   }
 
   return parts.length > 0 ? parts : [<Text key={0}>{text}</Text>];
+}
+
+function StreamingCursor() {
+  const opacity = useRef(new RNAnimated.Value(1)).current;
+
+  useEffect(() => {
+    const anim = RNAnimated.loop(
+      RNAnimated.sequence([
+        RNAnimated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: true }),
+        RNAnimated.timing(opacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [opacity]);
+
+  return (
+    <RNAnimated.View style={[styles.cursor, { opacity }]} />
+  );
 }
 
 function BlockDivider() {
@@ -455,6 +474,8 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
     );
   }
 
+  const streaming = message.isStreaming === true;
+
   return (
     <View style={styles.aiRow}>
       {message.chips && message.chips.length > 0 && (
@@ -464,18 +485,19 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       )}
 
       <View style={styles.aiContent}>
-        {renderContent(message.content)}
+        {message.content ? renderContent(message.content) : null}
+        {streaming && <StreamingCursor />}
       </View>
 
-      {message.safetyTier && <SafetyBadge tier={message.safetyTier} />}
+      {!streaming && message.safetyTier && <SafetyBadge tier={message.safetyTier} />}
 
-      {message.memoryProposal && <MemoryProposalCard message={message} />}
-      {message.goalProposal && <GoalProposalCard message={message} />}
-      {message.insightToAction && <InsightToActionCard message={message} />}
+      {!streaming && message.memoryProposal && <MemoryProposalCard message={message} />}
+      {!streaming && message.goalProposal && <GoalProposalCard message={message} />}
+      {!streaming && message.insightToAction && <InsightToActionCard message={message} />}
 
-      <ActionFooter message={message} />
+      {!streaming && <ActionFooter message={message} />}
 
-      {isLatest && message.suggestions && (
+      {!streaming && isLatest && message.suggestions && (
         <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
       )}
     </View>
@@ -568,4 +590,11 @@ const styles = StyleSheet.create({
     borderRadius: 24, paddingTop: 11, paddingBottom: 12, paddingHorizontal: 16,
   },
   suggestionText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
+  cursor: {
+    width: 2,
+    height: 18,
+    backgroundColor: Colors.contentPrimary,
+    borderRadius: 1,
+    marginTop: 2,
+  },
 });
