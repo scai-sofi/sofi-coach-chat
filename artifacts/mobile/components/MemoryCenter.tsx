@@ -52,7 +52,7 @@ function PencilIcon({ size = 13, color = Colors.contentSecondary }: { size?: num
   );
 }
 
-function PauseIcon({ size = 10.67, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PauseIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
   const w = size * (9.83333 / 12.1667);
   return (
     <Svg width={w} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
@@ -68,11 +68,14 @@ function PauseIcon({ size = 10.67, color = Colors.contentSecondary }: { size?: n
   );
 }
 
-function PlayIcon({ size = 10.67, color = Colors.contentSecondary }: { size?: number; color?: string }) {
-  const w = size * (9 / 11);
+function PlayIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+  const w = size * (11 / 13);
   return (
-    <Svg width={w} height={size} viewBox="0 0 9 11" fill="none">
-      <Path d="M8.14 4.634a1 1 0 010 1.732L1.5 10.165A1 1 0 010 9.299V1.701A1 1 0 011.5.835l6.64 3.799z" fill={color} />
+    <Svg width={w} height={size} viewBox="0 0 11 13" fill="none">
+      <Path
+        d="M1.75 1.51795V11.482C1.75 11.7784 2.07378 11.9568 2.32283 11.7916L9.82717 6.80959C10.0506 6.66148 10.0506 6.33852 9.82717 6.19041L2.32283 1.20836C2.07378 1.04318 1.75 1.22159 1.75 1.51795Z"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+      />
     </Svg>
   );
 }
