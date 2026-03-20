@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard } from 'react-native';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -73,14 +73,24 @@ function DeleteIcon({ size = 16, color = Colors.danger }: { size?: number; color
   );
 }
 
-function MemoryCard({ memory }: { memory: Memory }) {
+function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y: number) => void }) {
   const { editMemory, pauseMemory, deleteMemory } = useCoach();
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(memory.content);
+  const cardRef = useRef<View>(null);
   const MAX_CHARS = 300;
 
   const sourceLabel = memory.source === 'EXPLICIT' ? 'You created' : 'AI inferred';
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  const handleEdit = () => {
+    setEditing(true);
+    if (cardRef.current && onEditStart) {
+      cardRef.current.measureInWindow((_x, y, _w, h) => {
+        onEditStart(y + h);
+      });
+    }
+  };
 
   const handleSave = () => {
     Keyboard.dismiss();
@@ -98,7 +108,7 @@ function MemoryCard({ memory }: { memory: Memory }) {
   };
 
   return (
-    <View style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }]}>
+    <View ref={cardRef} style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }]}>
       {editing ? (
         <>
           <TextInput
@@ -127,7 +137,7 @@ function MemoryCard({ memory }: { memory: Memory }) {
           <View style={styles.memMeta}>
             <Text style={styles.memMetaText}>{sourceLabel} · {dateLabel}</Text>
             <View style={styles.memActions}>
-              <Pressable style={styles.memActionBtn} onPress={() => setEditing(true)}>
+              <Pressable style={styles.memActionBtn} onPress={handleEdit}>
                 <PencilIcon size={16} color={Colors.contentSecondary} />
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => pauseMemory(memory.id)}>
@@ -154,6 +164,8 @@ export function MemoryCenter() {
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollOffsetRef = useRef(0);
 
   const visibleMemories = useMemo(() => {
     return memories.filter(m => {
@@ -181,6 +193,21 @@ export function MemoryCenter() {
     return counts;
   }, [memories]);
 
+  const handleEditStart = useCallback((cardBottomY: number) => {
+    const keyboardApproxHeight = 320;
+    const screenHeight = Platform.OS === 'web' ? window.innerHeight : 800;
+    const visibleBottom = screenHeight - keyboardApproxHeight;
+    if (cardBottomY > visibleBottom) {
+      const scrollBy = cardBottomY - visibleBottom + 60;
+      setTimeout(() => {
+        scrollRef.current?.scrollTo({
+          y: scrollOffsetRef.current + scrollBy,
+          animated: true,
+        });
+      }, 350);
+    }
+  }, []);
+
   return (
     <View style={styles.panel}>
       <View style={[styles.appBar, { paddingTop: insets.top }]}>
@@ -197,71 +224,84 @@ export function MemoryCenter() {
         </View>
       </View>
 
-      <View style={styles.searchSection}>
-        <View style={styles.searchInputWrap}>
-          <SearchIcon size={16} color={Colors.contentSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            placeholderTextColor={Colors.contentSecondary}
-            value={search}
-            onChangeText={setSearch}
-          />
-        </View>
-        <Pressable
-          style={[styles.filterBtn, (showFilters || filterCat) && styles.filterBtnActive]}
-          onPress={() => setShowFilters(!showFilters)}
-        >
-          <FilterIcon size={16} color={(showFilters || filterCat) ? '#fff' : Colors.contentSecondary} />
-        </Pressable>
-      </View>
-
-      {(showFilters || filterCat) && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
-          {MEMORY_CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => (
-            <Pressable
-              key={cat}
-              style={[styles.filterChip, filterCat === cat && styles.filterChipActive]}
-              onPress={() => setFilterCat(filterCat === cat ? null : cat)}
-            >
-              <Text style={[styles.filterChipText, filterCat === cat && { color: '#fff' }]}>
-                {MEMORY_CATEGORY_LABELS[cat]}
-              </Text>
-              <Text style={[styles.filterCount, filterCat === cat && { color: 'rgba(255,255,255,0.6)' }]}>
-                {catCounts[cat] || 0}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      )}
-
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} keyboardShouldPersistTaps="handled">
-        {visibleMemories.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>
-              {search || filterCat ? 'No memories match your search' : 'No memories yet. The coach will start learning as you chat.'}
-            </Text>
-            {(search || filterCat) && (
-              <Pressable onPress={() => { setSearch(''); setFilterCat(null); }}>
-                <Text style={styles.clearFilters}>Clear filters</Text>
-              </Pressable>
-            )}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={insets.top + 44}
+      >
+        <View style={styles.searchSection}>
+          <View style={styles.searchInputWrap}>
+            <SearchIcon size={16} color={Colors.contentSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search"
+              placeholderTextColor={Colors.contentSecondary}
+              value={search}
+              onChangeText={setSearch}
+            />
           </View>
-        ) : (
-          Object.entries(grouped).map(([cat, mems]) => (
-            <View key={cat}>
-              {!filterCat && (
-                <View style={styles.subHeader}>
-                  <Text style={styles.subHeaderText}>{MEMORY_CATEGORY_LABELS[cat as MemoryCategory]}</Text>
-                </View>
-              )}
-              <View style={styles.cardGroup}>
-                {mems.map(m => <MemoryCard key={m.id} memory={m} />)}
-              </View>
-            </View>
-          ))
+          <Pressable
+            style={[styles.filterBtn, (showFilters || filterCat) && styles.filterBtnActive]}
+            onPress={() => setShowFilters(!showFilters)}
+          >
+            <FilterIcon size={16} color={(showFilters || filterCat) ? '#fff' : Colors.contentSecondary} />
+          </Pressable>
+        </View>
+
+        {(showFilters || filterCat) && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
+            {MEMORY_CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => (
+              <Pressable
+                key={cat}
+                style={[styles.filterChip, filterCat === cat && styles.filterChipActive]}
+                onPress={() => setFilterCat(filterCat === cat ? null : cat)}
+              >
+                <Text style={[styles.filterChipText, filterCat === cat && { color: '#fff' }]}>
+                  {MEMORY_CATEGORY_LABELS[cat]}
+                </Text>
+                <Text style={[styles.filterCount, filterCat === cat && { color: 'rgba(255,255,255,0.6)' }]}>
+                  {catCounts[cat] || 0}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
         )}
-      </ScrollView>
+
+        <ScrollView
+          ref={scrollRef}
+          style={styles.content}
+          contentContainerStyle={styles.contentInner}
+          keyboardShouldPersistTaps="handled"
+          onScroll={(e) => { scrollOffsetRef.current = e.nativeEvent.contentOffset.y; }}
+          scrollEventThrottle={16}
+        >
+          {visibleMemories.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyText}>
+                {search || filterCat ? 'No memories match your search' : 'No memories yet. The coach will start learning as you chat.'}
+              </Text>
+              {(search || filterCat) && (
+                <Pressable onPress={() => { setSearch(''); setFilterCat(null); }}>
+                  <Text style={styles.clearFilters}>Clear filters</Text>
+                </Pressable>
+              )}
+            </View>
+          ) : (
+            Object.entries(grouped).map(([cat, mems]) => (
+              <View key={cat}>
+                {!filterCat && (
+                  <View style={styles.subHeader}>
+                    <Text style={styles.subHeaderText}>{MEMORY_CATEGORY_LABELS[cat as MemoryCategory]}</Text>
+                  </View>
+                )}
+                <View style={styles.cardGroup}>
+                  {mems.map(m => <MemoryCard key={m.id} memory={m} onEditStart={handleEditStart} />)}
+                </View>
+              </View>
+            ))
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
