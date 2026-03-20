@@ -1,11 +1,20 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { Goal, GOAL_TYPE_LABELS } from '@/constants/types';
+
+function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M15 18L9 12L15 6" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
 
 function ProgressRing({ percentage, status, size = 72 }: { percentage: number; status: string; size?: number }) {
   const strokeWidth = 4;
@@ -125,6 +134,7 @@ function GoalCard({ goal }: { goal: Goal }) {
 }
 
 export function GoalsDashboard() {
+  const insets = useSafeAreaInsets();
   const { goals, setActivePanel } = useCoach();
 
   const activeGoals = goals.filter(g => !['COMPLETED', 'PAUSED'].includes(g.status));
@@ -132,17 +142,21 @@ export function GoalsDashboard() {
 
   return (
     <View style={styles.panel}>
-      <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => setActivePanel('none')}>
-          <Feather name="chevron-left" size={22} color={Colors.contentPrimary} />
-        </Pressable>
-        <View style={styles.headerTitle}>
-          <Feather name="target" size={18} color={Colors.contentPrimary} />
-          <Text style={styles.headerText}>My Goals</Text>
+      <View style={[styles.appBar, { paddingTop: insets.top }]}>
+        <View style={styles.titleBar}>
+          <View style={styles.leftControls}>
+            <Pressable style={styles.iconBtn} onPress={() => setActivePanel('none')}>
+              <ChevronLeftIcon size={24} color={Colors.contentPrimary} />
+            </Pressable>
+          </View>
+          <View style={styles.titleArea}>
+            <Text style={styles.titleText} numberOfLines={1}>My goals</Text>
+          </View>
+          <View style={styles.rightControls} />
         </View>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 20 }}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {activeGoals.length === 0 && completedGoals.length === 0 ? (
           <View style={styles.empty}>
             <Feather name="target" size={32} color={Colors.contentMuted} />
@@ -175,22 +189,69 @@ export function GoalsDashboard() {
 }
 
 const styles = StyleSheet.create({
-  panel: { flex: 1, backgroundColor: Colors.surfaceBase },
-  header: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingHorizontal: 16, paddingVertical: 16,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(10,10,10,0.1)',
+  panel: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Colors.surfaceBase,
+    zIndex: 100,
   },
-  backBtn: { padding: 4, borderRadius: 9999 },
-  headerTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  headerText: { fontSize: 16, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 20 },
+  appBar: {
+    backgroundColor: Colors.surfaceBase,
+  },
+  titleBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 44,
+  },
+  leftControls: {
+    width: 100,
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 16,
+    paddingRight: 4,
+  },
+  titleArea: {
+    flex: 1,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleText: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    color: Colors.contentPrimary,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  rightControls: {
+    width: 100,
+    height: 44,
+  },
+  iconBtn: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   content: { flex: 1 },
+  contentInner: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    gap: 12,
+  },
   goalCard: {
-    backgroundColor: '#fff', borderRadius: 16, borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.1)', padding: 16, gap: 12,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 16,
+    gap: 12,
+    shadowColor: 'rgba(10,10,10,0.16)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   goalCardCompleted: {
-    backgroundColor: Colors.successBgLight, borderColor: Colors.successBorder,
+    backgroundColor: Colors.successBgLight,
   },
   goalTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   ringText: {
@@ -242,10 +303,9 @@ const styles = StyleSheet.create({
   empty: {
     alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12,
   },
-  emptyText: { fontSize: 14, color: Colors.contentSecondary, fontFamily: Fonts.regular, textAlign: 'center' },
+  emptyText: { fontSize: 14, color: Colors.contentSecondary, fontFamily: Fonts.regular, textAlign: 'center', maxWidth: 260 },
   footer: {
     paddingHorizontal: 16, paddingVertical: 16,
-    borderTopWidth: 1, borderTopColor: 'rgba(10,10,10,0.1)',
     alignItems: 'center',
   },
   footerText: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular },
