@@ -5,6 +5,8 @@ import { generateAIResponse } from '@/constants/aiResponse';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
+export const TYPING_INDICATOR_ID = '__typing_indicator__';
+
 export type ChatMode = 'demo' | 'live';
 
 export interface ChatSession {
@@ -222,7 +224,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     try {
       const currentMessages = [...(messagesRef.current || [])];
       const history = currentMessages
-        .filter(m => m.role === 'user' || m.role === 'ai')
+        .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
         .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
 
       const res = await fetch(`${API_BASE}/chat/stream`, {
@@ -236,22 +238,23 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({ error: 'Something went wrong' }));
-        const errorMsg: Message = {
-          id: uid(), role: 'ai',
-          content: errData.error || 'Something went wrong. Please try again.',
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, errorMsg]);
+        const errContent = errData.error || 'Something went wrong. Please try again.';
+        setMessages(prev => prev.map(m =>
+          m.id === TYPING_INDICATOR_ID
+            ? { ...m, id: uid(), content: errContent, isTypingIndicator: false }
+            : m
+        ));
         setIsTyping(false);
         return;
       }
 
       setIsTyping(false);
 
-      const streamingMsg: Message = {
-        id: aiMsgId, role: 'ai', content: '', timestamp: new Date(), isStreaming: true,
-      };
-      setMessages(prev => [...prev, streamingMsg]);
+      setMessages(prev => prev.map(m =>
+        m.id === TYPING_INDICATOR_ID
+          ? { ...m, id: aiMsgId, content: '', isStreaming: true, isTypingIndicator: false }
+          : m
+      ));
 
       const reader = res.body?.getReader();
       if (!reader) throw new Error('No reader');
@@ -354,19 +357,20 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err: any) {
       if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
+      const fallback = 'Unable to connect to the server. Please check your connection and try again.';
       setMessages(prev => {
         const hasStreamMsg = prev.some(m => m.id === aiMsgId);
         if (hasStreamMsg) {
           return prev.map(m => m.id === aiMsgId
-            ? { ...m, content: m.content || 'Unable to connect to the server. Please check your connection and try again.', isStreaming: false }
+            ? { ...m, content: m.content || fallback, isStreaming: false }
             : m
           );
         }
-        return [...prev, {
-          id: uid(), role: 'ai' as const,
-          content: 'Unable to connect to the server. Please check your connection and try again.',
-          timestamp: new Date(),
-        }];
+        return prev.map(m =>
+          m.id === TYPING_INDICATOR_ID
+            ? { ...m, id: uid(), content: fallback, isTypingIndicator: false }
+            : m
+        );
       });
       setIsTyping(false);
     } finally {
@@ -381,11 +385,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const userMsg: Message = {
       id: uid(), role: 'user', content: text, timestamp: new Date(),
     };
+    const typingMsg: Message = {
+      id: TYPING_INDICATOR_ID, role: 'ai', content: '', timestamp: new Date(), isTypingIndicator: true,
+    };
     setMessages(prev => {
       if (prev.length === 0) {
         setCurrentSessionId(uid());
       }
-      return [...prev, userMsg];
+      return [...prev.filter(m => m.id !== TYPING_INDICATOR_ID), userMsg, typingMsg];
     });
     setIsTyping(true);
 
@@ -462,7 +469,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         safetyMessage: response.safetyMessage,
       };
 
-      setMessages(prev => [...prev, aiMsg]);
+      setMessages(prev => prev.map(m =>
+        m.id === TYPING_INDICATOR_ID ? aiMsg : m
+      ));
       setIsTyping(false);
     }, delay);
   }, [addGoalFromProposal, updateGoalSettings, sendLiveMessage]);
@@ -574,7 +583,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         const session: ChatSession = {
           id: sessionId,
           title,
-          messages: [...currentMessages],
+          messages: currentMessages.filter(m => !m.isTypingIndicator),
           memories: [...memoriesRef.current],
           goals: [...goalsRef.current],
           createdAt: existing >= 0 ? prev[existing].createdAt : now,

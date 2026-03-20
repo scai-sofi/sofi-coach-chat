@@ -170,7 +170,11 @@ export default function ChatScreen() {
 
   const renderMessage = useCallback(({ item, index }: { item: Message; index: number }) => (
     <View style={styles.msgWrap}>
-      <MessageBubble message={item} isLatest={index === messages.length - 1 && !isTyping} />
+      {item.isTypingIndicator ? (
+        <TypingIndicator />
+      ) : (
+        <MessageBubble message={item} isLatest={index === messages.length - 1 && !isTyping} />
+      )}
     </View>
   ), [messages.length, isTyping]);
 
@@ -209,11 +213,7 @@ export default function ChatScreen() {
                 minIndexForVisible: 0,
                 autoscrollToTopThreshold: undefined,
               }}
-              ListFooterComponent={isTyping ? (
-                <View style={styles.msgWrap}>
-                  <TypingIndicator />
-                </View>
-              ) : null}
+              ListFooterComponent={null}
             />
           )}
 

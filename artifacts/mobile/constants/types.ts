@@ -82,6 +82,7 @@ export interface Message {
   safetyMessage?: string;
   isProactive?: boolean;
   isStreaming?: boolean;
+  isTypingIndicator?: boolean;
 }
 
 export interface Memory {
