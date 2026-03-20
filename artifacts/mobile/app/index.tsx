@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet, Keyboard, Pressable, Platform, UIManager, NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { useCoach } from '@/context/CoachContext';
 import { ChatHeader } from '@/components/ChatHeader';
@@ -33,7 +33,7 @@ export default function ChatScreen() {
   const [showAnchor, setShowAnchor] = useState(false);
   const showAnchorRef = useRef(false);
   const anchorOpacity = useSharedValue(0);
-  const anchorTranslateY = useSharedValue(8);
+  const anchorScale = useSharedValue(0.8);
   const [inputBarHeight, setInputBarHeight] = useState(0);
 
   const contentHeightRef = useRef(0);
@@ -63,12 +63,12 @@ export default function ChatScreen() {
       }
       showAnchorRef.current = true;
       setShowAnchor(true);
-      anchorOpacity.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) });
-      anchorTranslateY.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) });
+      anchorOpacity.value = withSpring(1, { damping: 20, stiffness: 300 });
+      anchorScale.value = withSpring(1, { damping: 12, stiffness: 200 });
     } else if (!shouldShow && showAnchorRef.current) {
       showAnchorRef.current = false;
       anchorOpacity.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.ease) });
-      anchorTranslateY.value = withTiming(8, { duration: 150, easing: Easing.in(Easing.ease) });
+      anchorScale.value = withTiming(0.8, { duration: 150, easing: Easing.in(Easing.ease) });
       if (hideTimer.current) clearTimeout(hideTimer.current);
       hideTimer.current = setTimeout(() => setShowAnchor(false), 160);
     }
@@ -101,7 +101,7 @@ export default function ChatScreen() {
 
   const anchorAnimStyle = useAnimatedStyle(() => ({
     opacity: anchorOpacity.value,
-    transform: [{ translateY: anchorTranslateY.value }],
+    transform: [{ scale: anchorScale.value }],
   }));
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function ChatScreen() {
       showAnchorRef.current = false;
       setShowAnchor(false);
       anchorOpacity.value = 0;
-      anchorTranslateY.value = 8;
+      anchorScale.value = 0.8;
       const timer = setTimeout(() => {
         listRef.current?.scrollToOffset({ offset: 0, animated: false });
       }, 100);
@@ -272,7 +272,10 @@ const styles = StyleSheet.create({
   },
   anchorWrap: {
     position: 'absolute',
-    right: 16,
+    alignSelf: 'center',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
     zIndex: 50,
   },
 });
