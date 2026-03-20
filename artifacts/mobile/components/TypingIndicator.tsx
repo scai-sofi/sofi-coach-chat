@@ -1,52 +1,185 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withDelay, withSequence } from 'react-native-reanimated';
-import Colors from '@/constants/colors';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+  interpolateColor,
+  interpolate,
+} from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Fonts } from '@/constants/fonts';
 
-export function TypingIndicator() {
-  const dot1 = useSharedValue(0);
-  const dot2 = useSharedValue(0);
-  const dot3 = useSharedValue(0);
-  const op1 = useSharedValue(0.4);
-  const op2 = useSharedValue(0.4);
-  const op3 = useSharedValue(0.4);
+function AnimatedOrb() {
+  const rotation = useSharedValue(0);
+  const pulse = useSharedValue(0);
 
   useEffect(() => {
-    const animY = (sv: Animated.SharedValue<number>, delay: number) => {
-      sv.value = withDelay(delay, withRepeat(
-        withSequence(
-          withTiming(-6, { duration: 480 }),
-          withTiming(0, { duration: 480 }),
-        ), -1, false
-      ));
-    };
-    const animOp = (sv: Animated.SharedValue<number>, delay: number) => {
-      sv.value = withDelay(delay, withRepeat(
-        withSequence(
-          withTiming(1, { duration: 480 }),
-          withTiming(0.4, { duration: 480 }),
-        ), -1, false
-      ));
-    };
-    animY(dot1, 0); animOp(op1, 0);
-    animY(dot2, 200); animOp(op2, 200);
-    animY(dot3, 400); animOp(op3, 400);
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 2400, easing: Easing.linear }),
+      -1,
+      false
+    );
+    pulse.value = withRepeat(
+      withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
   }, []);
 
-  const style1 = useAnimatedStyle(() => ({ transform: [{ translateY: dot1.value }], opacity: op1.value }));
-  const style2 = useAnimatedStyle(() => ({ transform: [{ translateY: dot2.value }], opacity: op2.value }));
-  const style3 = useAnimatedStyle(() => ({ transform: [{ translateY: dot3.value }], opacity: op3.value }));
+  const orbStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  const glowStyle = useAnimatedStyle(() => {
+    const scale = 1 + pulse.value * 0.2;
+    const opacity = 0.25 + pulse.value * 0.25;
+    return {
+      transform: [{ scale }],
+      opacity,
+    };
+  });
+
+  const innerPulseStyle = useAnimatedStyle(() => {
+    const opacity = 0.6 + pulse.value * 0.4;
+    return { opacity };
+  });
 
   return (
+    <View style={orbStyles.wrapper}>
+      <Animated.View style={[orbStyles.glow, glowStyle]}>
+        <LinearGradient
+          colors={['rgba(0,162,199,0.5)', 'rgba(244,228,193,0.3)', 'rgba(0,162,199,0.5)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={orbStyles.glowFill}
+        />
+      </Animated.View>
+
+      <Animated.View style={[orbStyles.orbOuter, orbStyle]}>
+        <LinearGradient
+          colors={['#f4e4c1', '#00a2c7', '#006a83']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={orbStyles.orbGradient}
+        />
+      </Animated.View>
+
+      <Animated.View style={[orbStyles.innerHighlight, innerPulseStyle]}>
+        <LinearGradient
+          colors={['rgba(255,255,255,0.45)', 'rgba(255,255,255,0)']}
+          start={{ x: 0.3, y: 0 }}
+          end={{ x: 0.7, y: 1 }}
+          style={orbStyles.innerHighlightFill}
+        />
+      </Animated.View>
+    </View>
+  );
+}
+
+const ORB_SIZE = 14.5;
+
+const orbStyles = StyleSheet.create({
+  wrapper: {
+    width: ORB_SIZE,
+    height: ORB_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  glow: {
+    position: 'absolute',
+    width: ORB_SIZE + 8,
+    height: ORB_SIZE + 8,
+    borderRadius: (ORB_SIZE + 8) / 2,
+    overflow: 'hidden',
+  },
+  glowFill: {
+    flex: 1,
+    borderRadius: (ORB_SIZE + 8) / 2,
+  },
+  orbOuter: {
+    width: ORB_SIZE,
+    height: ORB_SIZE,
+    borderRadius: 60,
+    overflow: 'hidden',
+  },
+  orbGradient: {
+    flex: 1,
+  },
+  innerHighlight: {
+    position: 'absolute',
+    width: ORB_SIZE * 0.7,
+    height: ORB_SIZE * 0.5,
+    borderRadius: ORB_SIZE,
+    overflow: 'hidden',
+    top: 1,
+  },
+  innerHighlightFill: {
+    flex: 1,
+  },
+});
+
+function ShimmerText() {
+  const sweep = useSharedValue(0);
+
+  useEffect(() => {
+    sweep.value = withRepeat(
+      withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, []);
+
+  const char0 = useAnimatedStyle(() => {
+    const color = interpolateColor(sweep.value, [0, 0.3, 0.5, 0.8, 1], ['#c4a882', '#00a2c7', '#00a2c7', '#00a2c7', '#c4a882']);
+    return { color };
+  });
+  const char1 = useAnimatedStyle(() => {
+    const color = interpolateColor(sweep.value, [0, 0.15, 0.4, 0.7, 1], ['#c4a882', '#c4a882', '#00a2c7', '#00a2c7', '#c4a882']);
+    return { color };
+  });
+  const char2 = useAnimatedStyle(() => {
+    const color = interpolateColor(sweep.value, [0, 0.3, 0.55, 0.85, 1], ['#c4a882', '#c4a882', '#c4a882', '#00a2c7', '#c4a882']);
+    return { color };
+  });
+
+  const textBase = styles.analyzingText;
+
+  return (
+    <View style={styles.textRow}>
+      <Animated.Text style={[textBase, char0]}>Ana</Animated.Text>
+      <Animated.Text style={[textBase, char1]}>lyzi</Animated.Text>
+      <Animated.Text style={[textBase, char2]}>ng...</Animated.Text>
+    </View>
+  );
+}
+
+export function TypingIndicator() {
+  return (
     <View style={styles.container}>
-      <Animated.View style={[styles.dot, style1]} />
-      <Animated.View style={[styles.dot, style2]} />
-      <Animated.View style={[styles.dot, style3]} />
+      <AnimatedOrb />
+      <ShimmerText />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingVertical: 8 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.contentPrimary },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 4,
+    paddingVertical: 8,
+  },
+  textRow: {
+    flexDirection: 'row',
+  },
+  analyzingText: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
+    letterSpacing: 0,
+  },
 });

@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Keyboard, Pressable } from 'react-native';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { View, FlatList, StyleSheet, Keyboard, Pressable, Platform, UIManager } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Colors from '@/constants/colors';
 import { useCoach } from '@/context/CoachContext';
@@ -15,36 +15,71 @@ import { ScenarioFab } from '@/components/ScenarioFab';
 import { ChatHistory } from '@/components/ChatHistory';
 import { Message } from '@/constants/types';
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 export default function ChatScreen() {
   const { messages, isTyping, activePanel, activeScenario, setActivePanel } = useCoach();
   const listRef = useRef<FlatList>(null);
   const prevMsgCount = useRef(messages.length);
   const prevScenario = useRef(activeScenario);
+  const lastUserMsgIndex = useRef<number | null>(null);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
     if (activeScenario !== prevScenario.current) {
       prevScenario.current = activeScenario;
       prevMsgCount.current = messages.length;
-      timer = setTimeout(() => {
+      lastUserMsgIndex.current = null;
+      const timer = setTimeout(() => {
         listRef.current?.scrollToOffset({ offset: 0, animated: false });
       }, 100);
-    } else if (messages.length > prevMsgCount.current) {
-      prevMsgCount.current = messages.length;
-      timer = setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 50);
+      return () => clearTimeout(timer);
     }
-    return () => { if (timer) clearTimeout(timer); };
+
+    if (messages.length > prevMsgCount.current) {
+      const newMsg = messages[messages.length - 1];
+      prevMsgCount.current = messages.length;
+
+      if (newMsg?.role === 'user') {
+        lastUserMsgIndex.current = messages.length - 1;
+        const timer = setTimeout(() => {
+          const targetIndex = lastUserMsgIndex.current;
+          if (targetIndex !== null && targetIndex < messages.length) {
+            try {
+              listRef.current?.scrollToIndex({
+                index: targetIndex,
+                animated: true,
+                viewPosition: 0,
+                viewOffset: 0,
+              });
+            } catch {
+              listRef.current?.scrollToEnd({ animated: true });
+            }
+          }
+        }, 80);
+        return () => clearTimeout(timer);
+      }
+    }
   }, [messages.length, activeScenario]);
 
-  useEffect(() => {
-    if (!isTyping) return;
-    const timer = setTimeout(() => {
-      listRef.current?.scrollToEnd({ animated: true });
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [isTyping]);
+  const handleScrollToIndexFailed = useCallback((info: {
+    index: number;
+    highestMeasuredFrameIndex: number;
+    averageItemLength: number;
+  }) => {
+    const offset = info.averageItemLength * info.index;
+    listRef.current?.scrollToOffset({ offset, animated: true });
+    setTimeout(() => {
+      try {
+        listRef.current?.scrollToIndex({
+          index: info.index,
+          animated: true,
+          viewPosition: 0,
+        });
+      } catch {}
+    }, 200);
+  }, []);
 
   const [showHistory, setShowHistory] = useState(false);
 
@@ -54,11 +89,11 @@ export default function ChatScreen() {
     }
   }, [activePanel]);
 
-  const renderMessage = ({ item, index }: { item: Message; index: number }) => (
+  const renderMessage = useCallback(({ item, index }: { item: Message; index: number }) => (
     <View style={styles.msgWrap}>
       <MessageBubble message={item} isLatest={index === messages.length - 1 && !isTyping} />
     </View>
-  );
+  ), [messages.length, isTyping]);
 
   return (
     <View style={styles.screen}>
@@ -82,10 +117,15 @@ export default function ChatScreen() {
               data={messages}
               renderItem={renderMessage}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={[styles.listContent]}
+              contentContainerStyle={styles.listContent}
               keyboardDismissMode="interactive"
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
+              onScrollToIndexFailed={handleScrollToIndexFailed}
+              maintainVisibleContentPosition={{
+                minIndexForVisible: 0,
+                autoscrollToTopThreshold: undefined,
+              }}
               ListFooterComponent={isTyping ? (
                 <View style={styles.msgWrap}>
                   <TypingIndicator />
