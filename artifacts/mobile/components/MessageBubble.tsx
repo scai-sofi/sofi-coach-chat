@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, maxWidth: 298,
   },
   userText: { fontSize: 16, color: '#fff', fontFamily: Fonts.regular, lineHeight: 20 },
-  aiRow: { gap: 16, paddingHorizontal: 4 },
+  aiRow: { gap: 16 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
   aiContent: { gap: 8 },
-  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
+  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20, paddingHorizontal: 4 },
   headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
   bulletText: {},
   divider: {
