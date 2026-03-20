@@ -59,13 +59,12 @@ function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRul
   const isRule = /^[-*_]{3,}\s*$/.test(effective);
   if (isRule) return { isHeader: false, isList: false, isRule: true, displayText: effective };
 
-  const isStandaloneBold = /^\*\*[^*]+\*\*\s*$/.test(effective);
-  const hasNumberedBold = /^\d+\.\s*\*\*/.test(effective);
-  const isHeader = isStandaloneBold || hasNumberedBold;
+  const isNumbered = /^\d+\.\s/.test(effective);
+  const isStandaloneBold = /^\*\*[^*]+\*\*\s*$/.test(effective) && !isNumbered;
+  const isHeader = isStandaloneBold;
 
   const isBullet = effective.startsWith('•') || effective.startsWith('- ') || effective === '-';
-  const isNumberedItem = /^\d+\.\s/.test(effective) && !hasNumberedBold;
-  const isList = isBullet || isNumberedItem;
+  const isList = isBullet || isNumbered;
 
   return { isHeader, isList, isRule: false, displayText: effective };
 }
