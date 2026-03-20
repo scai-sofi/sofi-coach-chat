@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -200,7 +200,7 @@ export function MemoryCenter() {
 
   const handleEditStart = useCallback((cardBottomY: number) => {
     const keyboardApproxHeight = 320;
-    const screenHeight = Platform.OS === 'web' ? window.innerHeight : 800;
+    const screenHeight = Dimensions.get('window').height;
     const visibleBottom = screenHeight - keyboardApproxHeight;
     if (cardBottomY > visibleBottom) {
       const scrollBy = cardBottomY - visibleBottom + 60;

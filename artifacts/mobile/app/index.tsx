@@ -85,7 +85,7 @@ export default function ChatScreen() {
     checkAnchorVisibility();
   }, [checkAnchorVisibility]);
 
-  const handleContentSizeChange = useCallback((w: number, h: number) => {
+  const handleContentSizeChange = useCallback((_w: number, h: number) => {
     contentHeightRef.current = h;
     checkAnchorVisibility();
   }, [checkAnchorVisibility]);

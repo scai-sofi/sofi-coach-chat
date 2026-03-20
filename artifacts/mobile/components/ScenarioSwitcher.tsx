@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -9,7 +9,9 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
 
-const ICON_MAP: Record<string, string> = {
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
+
+const ICON_MAP: Record<string, FeatherIconName> = {
   'sparkles': 'star',
   'user-check': 'user-check',
   'brain': 'cpu',
@@ -89,7 +91,7 @@ export function ScenarioSwitcher() {
           >
             {orderedScenarios.map(scenario => {
               const isActive = activeScenario === scenario.id;
-              const iconName = ICON_MAP[scenario.icon] || 'message-circle';
+              const iconName: FeatherIconName = ICON_MAP[scenario.icon] || 'message-circle';
 
               return (
                 <Pressable
@@ -98,7 +100,7 @@ export function ScenarioSwitcher() {
                   onPress={() => { switchScenario(scenario.id); setActivePanel('none'); }}
                 >
                   <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
-                    <Feather name={iconName as any} size={14} color={isActive ? '#fff' : Colors.contentPrimary} />
+                    <Feather name={iconName} size={14} color={isActive ? '#fff' : Colors.contentPrimary} />
                   </View>
                   <View style={styles.rowContent}>
                     <Text style={[styles.rowTitle, isActive && { color: '#fff' }]} numberOfLines={1}>{scenario.title}</Text>

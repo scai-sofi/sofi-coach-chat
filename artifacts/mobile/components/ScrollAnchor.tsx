@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Pressable, StyleSheet, Platform } from 'react-native';
+import { View, Pressable, StyleSheet } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 interface ScrollAnchorProps {
@@ -8,7 +8,7 @@ interface ScrollAnchorProps {
 
 export function ScrollAnchor({ onPress }: ScrollAnchorProps) {
   return (
-    <Pressable style={[styles.button, Platform.OS === 'web' && styles.buttonWeb]} onPress={onPress}>
+    <Pressable style={styles.button} onPress={onPress}>
       <View style={styles.iconWrap}>
         <Svg width={14.5} height={11.5} viewBox="0 0 14.5 11.5" fill="none">
           <Path
@@ -31,15 +31,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: 'rgba(10,10,10,1)',
+    shadowColor: '#0A0A0A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
   },
-  buttonWeb: {
-    boxShadow: '0px 0px 1px 0px rgba(10,10,10,0.16), 0px 2px 8px 0px rgba(10,10,10,0.04), 0px 4px 16px 0px rgba(10,10,10,0.02)',
-  } as any,
   iconWrap: {
     width: 16,
     height: 16,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, ComponentProps } from 'react';
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
@@ -7,7 +7,9 @@ import { Fonts } from '@/constants/fonts';
 import { Message, MessageChip, SafetyTier } from '@/constants/types';
 import { useCoach } from '@/context/CoachContext';
 
-const CHIP_STYLES: Record<string, { bg: string; color: string; icon: string }> = {
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
+
+const CHIP_STYLES: Record<string, { bg: string; color: string; icon: FeatherIconName }> = {
   'memory-saved': { bg: Colors.surfaceTint, color: Colors.contentPrimary, icon: 'cpu' },
   'memory-updated': { bg: Colors.surfaceTint, color: Colors.contentPrimary, icon: 'cpu' },
   'goal-progress': { bg: Colors.surfaceTint, color: Colors.contentPrimary, icon: 'target' },
@@ -17,7 +19,7 @@ const CHIP_STYLES: Record<string, { bg: string; color: string; icon: string }> =
   'alert': { bg: Colors.dangerChipBg, color: Colors.dangerChipText, icon: 'alert-triangle' },
 };
 
-const SAFETY_STYLES: Record<SafetyTier, { bg: string; color: string; icon: string; text: string }> = {
+const SAFETY_STYLES: Record<SafetyTier, { bg: string; color: string; icon: FeatherIconName; text: string }> = {
   informational: { bg: Colors.surfaceMuted, color: Colors.contentSecondary, icon: 'shield', text: 'Informational' },
   suggestive: { bg: Colors.surfaceMuted, color: Colors.contentSecondary, icon: 'shield', text: 'Suggestion' },
   actionable: { bg: Colors.warningBg, color: Colors.warning, icon: 'shield', text: 'Actionable — needs your approval' },
@@ -192,7 +194,7 @@ function ChipBadge({ chip }: { chip: MessageChip }) {
   const style = CHIP_STYLES[chip.type] || CHIP_STYLES['memory-saved'];
   return (
     <View style={[styles.chip, { backgroundColor: style.bg }]}>
-      <Feather name={style.icon as any} size={11} color={style.color} />
+      <Feather name={style.icon} size={11} color={style.color} />
       <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
     </View>
   );
@@ -202,7 +204,7 @@ function SafetyBadge({ tier }: { tier: SafetyTier }) {
   const style = SAFETY_STYLES[tier];
   return (
     <View style={[styles.safetyBadge, { backgroundColor: style.bg }]}>
-      <Feather name={style.icon as any} size={10} color={style.color} />
+      <Feather name={style.icon} size={10} color={style.color} />
       <Text style={[styles.safetyText, { color: style.color }]}>{style.text}</Text>
     </View>
   );
@@ -281,7 +283,7 @@ function GoalProposalCard({ message }: { message: Message }) {
 }
 
 function InsightToActionCard({ message }: { message: Message }) {
-  const { acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction } = useCoach();
+  const { acceptInsightToAction, saveInsightMemoryOnly } = useCoach();
   const insight = message.insightToAction;
   if (!insight || insight.dismissed) return null;
 

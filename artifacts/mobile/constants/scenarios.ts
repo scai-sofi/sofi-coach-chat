@@ -1,4 +1,4 @@
-import { Memory, Goal, Message, Scenario, Milestone } from './types';
+import { Memory, Goal, Scenario, Milestone } from './types';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 

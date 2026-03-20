@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -55,7 +57,7 @@ function GoalCard({ goal }: { goal: Goal }) {
   const percentage = (goal.currentAmount / goal.targetAmount) * 100;
   const isCompleted = goal.status === 'COMPLETED';
 
-  const statusIcon = isCompleted ? 'check-circle' : goal.status === 'AT_RISK' ? 'alert-triangle' : 'trending-up';
+  const statusIcon: FeatherIconName = isCompleted ? 'check-circle' : goal.status === 'AT_RISK' ? 'alert-triangle' : 'trending-up';
   const statusColor = isCompleted ? Colors.successDark : goal.status === 'AT_RISK' ? Colors.dangerLight : Colors.contentPrimary;
   const statusText = isCompleted ? 'Goal reached!' : goal.status === 'AT_RISK' ? 'At risk' : goal.status === 'ON_TRACK' ? 'On track' : 'Active';
 
@@ -78,7 +80,7 @@ function GoalCard({ goal }: { goal: Goal }) {
             ${goal.currentAmount.toLocaleString()} of ${goal.targetAmount.toLocaleString()}
           </Text>
           <View style={styles.statusRow}>
-            <Feather name={statusIcon as any} size={12} color={statusColor} />
+            <Feather name={statusIcon} size={12} color={statusColor} />
             <Text style={[styles.statusText, { color: statusColor }]}>{statusText}</Text>
             {!isCompleted && (
               <Text style={styles.confidenceText}> · {Math.round(goal.confidenceScore * 100)}% confidence</Text>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemorySource, GoalType, GoalStatus, Milestone } from '@/constants/types';
-import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
+import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, GoalType, GoalStatus, Milestone } from '@/constants/types';
+import { SCENARIOS } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);

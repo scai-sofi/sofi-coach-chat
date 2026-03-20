@@ -1,4 +1,4 @@
-import { Message, Memory, Goal, AutoSaveMemory, AutoCreateGoal, AutoUpdateGoal, MemoryProposal, GoalProposal, InsightToAction, MessageChip, SafetyTier } from './types';
+import { Message, Memory, Goal, SafetyTier } from './types';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
