@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 0.75,
     borderColor: 'rgba(10,10,10,0.06)',
-    overflow: 'hidden',
   },
   sessionRow: {
     paddingHorizontal: 16,
@@ -261,7 +260,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 0.75,
-    backgroundColor: 'rgba(10,10,10,0.08)',
+    backgroundColor: 'rgba(10,10,10,0.06)',
     marginHorizontal: 16,
   },
   emptyState: {
