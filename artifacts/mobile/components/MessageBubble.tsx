@@ -58,6 +58,7 @@ function renderContent(content: string) {
           fontFamily: Fonts.medium,
           fontSize: isStandaloneBold ? 18 : 16,
           letterSpacing: isStandaloneBold ? -0.2 : 0,
+          lineHeight: isStandaloneBold ? 24 : 20,
         }}>
           {match[1]}
         </Text>
