@@ -354,9 +354,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    height: 60,
     paddingTop: 12,
-    paddingBottom: 0,
+    paddingBottom: 12,
     paddingHorizontal: 16,
   },
   searchInputWrap: {
@@ -403,7 +402,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   contentInner: { paddingHorizontal: 16, paddingBottom: 40 },
   subHeader: {
-    paddingTop: 24,
+    paddingTop: 12,
     paddingBottom: 12,
     paddingHorizontal: 4,
   },
