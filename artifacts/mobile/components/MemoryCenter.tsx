@@ -38,8 +38,8 @@ function PencilIcon({ size = 16, color = Colors.contentSecondary }: { size?: num
   return (
     <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
       <Path
-        d="M11.333 2a1.886 1.886 0 012.667 2.667L5.333 13.333 2 14l.667-3.333L11.333 2z"
-        stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+        d="M9.886 2.276a1.6 1.6 0 012.263 0l1.575 1.575a1.6 1.6 0 010 2.263L6.14 13.698a.8.8 0 01-.382.21l-3.2.8a.8.8 0 01-.97-.97l.8-3.2a.8.8 0 01.21-.382L9.886 2.276zm1.131 1.131L3.72 10.704l-.48 1.92 1.92-.48 7.297-7.297-1.44-1.44z"
+        fill={color}
       />
     </Svg>
   );
@@ -48,8 +48,8 @@ function PencilIcon({ size = 16, color = Colors.contentSecondary }: { size?: num
 function PauseIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Rect x={4} y={3} width={2.5} height={10} rx={0.5} fill={color} />
-      <Rect x={9.5} y={3} width={2.5} height={10} rx={0.5} fill={color} />
+      <Rect x={4} y={2.667} width={2.167} height={10.667} rx={0.5} fill={color} />
+      <Rect x={9.833} y={2.667} width={2.167} height={10.667} rx={0.5} fill={color} />
     </Svg>
   );
 }
@@ -66,8 +66,8 @@ function DeleteIcon({ size = 16, color = Colors.danger }: { size?: number; color
   return (
     <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
       <Path
-        d="M2 4h12M5.333 4V2.667a1.333 1.333 0 011.334-1.334h2.666a1.333 1.333 0 011.334 1.334V4m2 0v9.333a1.333 1.333 0 01-1.334 1.334H4.667a1.333 1.333 0 01-1.334-1.334V4h9.334z"
-        stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+        d="M6.667 1.333A1.333 1.333 0 005.333 2.667V3.333H2.667a.667.667 0 000 1.334h.666v8A1.333 1.333 0 004.667 14h6.666a1.333 1.333 0 001.334-1.333v-8h.666a.667.667 0 000-1.334H10.667V2.667a1.333 1.333 0 00-1.334-1.334H6.667zm0 1.334h2.666v.666H6.667v-.666zm-2 2h6.666v8H4.667v-8z"
+        fill={color}
       />
     </Svg>
   );
@@ -363,11 +363,10 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     shadowColor: 'rgba(10,10,10,0.16)',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 3,
-    overflow: 'hidden',
+    shadowRadius: 4,
+    elevation: 2,
   },
   memContent: {
     fontSize: 16,
