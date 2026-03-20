@@ -256,17 +256,61 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       const reader = res.body?.getReader();
       if (!reader) throw new Error('No reader');
       const decoder = new TextDecoder();
-      let buffer = '';
+      let sseBuffer = '';
       let fullContent = '';
+      let displayedContent = '';
+      let tokenQueue: string[] = [];
+      let streamDone = false;
+      let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
+
+      const FLUSH_INTERVAL = 18;
+
+      const flushTokens = () => {
+        if (sessionVersionRef.current !== version) return;
+
+        if (tokenQueue.length > 0) {
+          const batch = tokenQueue.splice(0, Math.max(1, Math.ceil(tokenQueue.length / 3)));
+          displayedContent += batch.join('');
+          const shown = displayedContent;
+          setMessages(prev => prev.map(m =>
+            m.id === aiMsgId ? { ...m, content: shown } : m
+          ));
+        }
+
+        if (tokenQueue.length > 0) {
+          setTimeout(flushTokens, FLUSH_INTERVAL);
+        } else if (streamDone) {
+          if (donePayload?.error) {
+            setMessages(prev => prev.map(m =>
+              m.id === aiMsgId ? { ...m, content: donePayload!.error!, isStreaming: false } : m
+            ));
+          } else {
+            const finalReply = donePayload?.reply || fullContent;
+            const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
+            setMessages(prev => {
+              const updated = prev.map(m =>
+                m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+              );
+              if (!titleGeneratedRef.current) {
+                titleGeneratedRef.current = true;
+                generateTitle(updated, version);
+              }
+              return updated;
+            });
+          }
+        }
+      };
+
+      let flushScheduled = false;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         if (sessionVersionRef.current !== version) { reader.cancel(); return; }
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        sseBuffer += decoder.decode(value, { stream: true });
+        const lines = sseBuffer.split('\n');
+        sseBuffer = lines.pop() || '';
 
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
@@ -277,33 +321,37 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
             const event = JSON.parse(jsonStr);
             if (event.type === 'token') {
               fullContent += event.content;
-              setMessages(prev => prev.map(m =>
-                m.id === aiMsgId ? { ...m, content: fullContent } : m
-              ));
+              tokenQueue.push(event.content);
+              if (!flushScheduled) {
+                flushScheduled = true;
+                setTimeout(() => { flushScheduled = false; flushTokens(); }, FLUSH_INTERVAL);
+              }
             } else if (event.type === 'done') {
-              const suggestions = Array.isArray(event.suggestions) && event.suggestions.length > 0 ? event.suggestions : undefined;
-              setMessages(prev => {
-                const updated = prev.map(m =>
-                  m.id === aiMsgId ? { ...m, content: event.reply || fullContent, isStreaming: false, suggestions } : m
-                );
-                if (!titleGeneratedRef.current) {
-                  titleGeneratedRef.current = true;
-                  generateTitle(updated, version);
-                }
-                return updated;
-              });
+              donePayload = event;
             } else if (event.type === 'error') {
-              setMessages(prev => prev.map(m =>
-                m.id === aiMsgId ? { ...m, content: event.error, isStreaming: false } : m
-              ));
+              donePayload = { error: event.error };
             }
           } catch {}
         }
       }
 
-      setMessages(prev => prev.map(m =>
-        m.id === aiMsgId && m.isStreaming ? { ...m, isStreaming: false } : m
-      ));
+      streamDone = true;
+      if (tokenQueue.length > 0) {
+        flushTokens();
+      } else {
+        const finalReply = donePayload?.reply || fullContent;
+        const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
+        setMessages(prev => {
+          const updated = prev.map(m =>
+            m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+          );
+          if (!titleGeneratedRef.current) {
+            titleGeneratedRef.current = true;
+            generateTitle(updated, version);
+          }
+          return updated;
+        });
+      }
     } catch (err: any) {
       if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
       setMessages(prev => {
