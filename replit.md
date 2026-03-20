@@ -1,5 +1,18 @@
 # Workspace
 
+## IMPORTANT: Mobile Prototype for Flutter Conversion
+
+This is a **mobile app prototype** built in Expo/React Native because Replit does not support Flutter and we do not have access to SoFi's Pacific Flutter component library here. The goal is NOT to ship this React Native code — it is to prototype the UX, interactions, and AI integration so that a mobile engineer can easily pick it up and convert it into Flutter using the Pacific component library.
+
+**All development decisions must prioritize Flutter portability:**
+- Use only standard React Native APIs — no web-only CSS (`boxShadow`, `caretColor`, `cursor`, etc.)
+- No `Platform.OS === 'web'` branches in component/UI code
+- No `window.*` or `document.*` browser APIs
+- Keep components, state, and styling clean and well-documented
+- Every color, spacing value, font weight, and layout dimension should be explicitly defined so the Flutter engineer can replicate them exactly
+- SVG icon paths are provided inline so they can be converted to Flutter `CustomPaint` or SVG assets
+- API contracts (endpoints, request/response shapes) are documented for the backend integration
+
 ## Overview
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
