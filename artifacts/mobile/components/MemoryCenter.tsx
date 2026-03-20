@@ -166,7 +166,9 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
         <>
           <Text style={styles.memContent}>{memory.content}</Text>
           <View style={styles.memMeta}>
-            <Text style={styles.memMetaText}>{sourceLabel} · {dateLabel}</Text>
+            <Text style={styles.memMetaText}>
+              {memory.status === 'PAUSED' ? 'Paused · not used in chat' : `${sourceLabel} · ${dateLabel}`}
+            </Text>
             <View style={styles.memActions}>
               <Pressable style={styles.memActionBtn} onPress={handleEdit}>
                 <PencilIcon />
