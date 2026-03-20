@@ -39,7 +39,7 @@ function FilterIcon({ size = 16, color = Colors.contentSecondary }: { size?: num
   );
 }
 
-function PencilIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PencilIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 13 13" fill="none">
       <Path
@@ -52,10 +52,10 @@ function PencilIcon({ size = 16, color = Colors.contentSecondary }: { size?: num
   );
 }
 
-function PauseIcon({ size = 12, color = Colors.contentSecondary }: { size?: number; color?: string }) {
-  const aspect = 9.83333 / 12.1667;
+function PauseIcon({ size = 10.67, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+  const w = size * (9.83333 / 12.1667);
   return (
-    <Svg width={size * aspect} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
+    <Svg width={w} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
       <Path
         d="M8.41667 0.75H7.08333C6.71514 0.75 6.41667 1.04848 6.41667 1.41667V10.75C6.41667 11.1182 6.71514 11.4167 7.08333 11.4167H8.41667C8.78486 11.4167 9.08333 11.1182 9.08333 10.75V1.41667C9.08333 1.04848 8.78486 0.75 8.41667 0.75Z"
         stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
@@ -68,10 +68,11 @@ function PauseIcon({ size = 12, color = Colors.contentSecondary }: { size?: numb
   );
 }
 
-function PlayIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PlayIcon({ size = 10.67, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+  const w = size * (9 / 11);
   return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Path d="M5 3l8 5-8 5V3z" fill={color} />
+    <Svg width={w} height={size} viewBox="0 0 9 11" fill="none">
+      <Path d="M8.14 4.634a1 1 0 010 1.732L1.5 10.165A1 1 0 010 9.299V1.701A1 1 0 011.5.835l6.64 3.799z" fill={color} />
     </Svg>
   );
 }
@@ -161,17 +162,17 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
             <Text style={styles.memMetaText}>{sourceLabel} · {dateLabel}</Text>
             <View style={styles.memActions}>
               <Pressable style={styles.memActionBtn} onPress={handleEdit}>
-                <PencilIcon size={13} color={Colors.contentSecondary} />
+                <PencilIcon />
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => pauseMemory(memory.id)}>
                 {memory.status === 'PAUSED' ? (
-                  <PlayIcon size={12} color={Colors.contentSecondary} />
+                  <PlayIcon />
                 ) : (
-                  <PauseIcon size={12} color={Colors.contentSecondary} />
+                  <PauseIcon />
                 )}
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => deleteMemory(memory.id)}>
-                <DeleteIcon size={14.5} color={Colors.danger} />
+                <DeleteIcon />
               </Pressable>
             </View>
           </View>
@@ -469,6 +470,8 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   memActionBtn: {
+    width: 16,
+    height: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
