@@ -232,7 +232,7 @@ export function MemoryCenter() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={insets.top + 44}
+        keyboardVerticalOffset={0}
       >
         <View style={styles.searchSection}>
           <View style={styles.searchInputWrap}>
