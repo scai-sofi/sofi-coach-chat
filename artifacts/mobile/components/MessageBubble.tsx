@@ -460,7 +460,7 @@ function StreamingContent({ content }: { content: string }) {
   }
 
   return (
-    <RNAnimated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+    <RNAnimated.View style={[styles.aiContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
       {blocks.map((block, i) => {
         const blockOpacity = blockFades.current[i] || new RNAnimated.Value(1);
         return (
@@ -481,8 +481,38 @@ function StreamingContent({ content }: { content: string }) {
   );
 }
 
+function FadeInView({ delay = 0, duration = 300, children }: { delay?: number; duration?: number; children: React.ReactNode }) {
+  const opacity = useRef(new RNAnimated.Value(0)).current;
+  const translateY = useRef(new RNAnimated.Value(8)).current;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      RNAnimated.parallel([
+        RNAnimated.timing(opacity, { toValue: 1, duration, useNativeDriver: true }),
+        RNAnimated.timing(translateY, { toValue: 0, duration, useNativeDriver: true }),
+      ]).start();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [opacity, translateY, delay, duration]);
+
+  return (
+    <RNAnimated.View style={{ opacity, transform: [{ translateY }] }}>
+      {children}
+    </RNAnimated.View>
+  );
+}
+
 export function MessageBubble({ message, isLatest }: { message: Message; isLatest: boolean }) {
   const { sendMessage } = useCoach();
+  const wasStreamingRef = useRef(message.isStreaming === true);
+  const [justFinished, setJustFinished] = useState(false);
+
+  useEffect(() => {
+    if (wasStreamingRef.current && !message.isStreaming) {
+      setJustFinished(true);
+    }
+    wasStreamingRef.current = message.isStreaming === true;
+  }, [message.isStreaming]);
 
   if (message.role === 'system') {
     return (
@@ -508,6 +538,7 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   }
 
   const streaming = message.isStreaming === true;
+  const animate = justFinished;
 
   return (
     <View style={styles.aiRow}>
@@ -525,16 +556,62 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
         ) : null}
       </View>
 
-      {!streaming && message.safetyTier && <SafetyBadge tier={message.safetyTier} />}
+      {!streaming && message.safetyTier && (
+        animate ? (
+          <FadeInView delay={50} duration={250}>
+            <SafetyBadge tier={message.safetyTier} />
+          </FadeInView>
+        ) : (
+          <SafetyBadge tier={message.safetyTier} />
+        )
+      )}
 
-      {!streaming && message.memoryProposal && <MemoryProposalCard message={message} />}
-      {!streaming && message.goalProposal && <GoalProposalCard message={message} />}
-      {!streaming && message.insightToAction && <InsightToActionCard message={message} />}
+      {!streaming && message.memoryProposal && (
+        animate ? (
+          <FadeInView delay={100} duration={300}>
+            <MemoryProposalCard message={message} />
+          </FadeInView>
+        ) : (
+          <MemoryProposalCard message={message} />
+        )
+      )}
+      {!streaming && message.goalProposal && (
+        animate ? (
+          <FadeInView delay={100} duration={300}>
+            <GoalProposalCard message={message} />
+          </FadeInView>
+        ) : (
+          <GoalProposalCard message={message} />
+        )
+      )}
+      {!streaming && message.insightToAction && (
+        animate ? (
+          <FadeInView delay={100} duration={300}>
+            <InsightToActionCard message={message} />
+          </FadeInView>
+        ) : (
+          <InsightToActionCard message={message} />
+        )
+      )}
 
-      {!streaming && <ActionFooter message={message} />}
+      {!streaming && (
+        animate ? (
+          <FadeInView delay={200} duration={300}>
+            <ActionFooter message={message} />
+          </FadeInView>
+        ) : (
+          <ActionFooter message={message} />
+        )
+      )}
 
       {!streaming && isLatest && message.suggestions && (
-        <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
+        animate ? (
+          <FadeInView delay={400} duration={350}>
+            <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
+          </FadeInView>
+        ) : (
+          <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
+        )
       )}
     </View>
   );
