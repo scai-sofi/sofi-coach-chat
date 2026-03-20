@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 0.75,
     backgroundColor: 'rgba(10,10,10,0.1)',
-    marginVertical: 8,
+    marginVertical: 16,
   },
   safetyBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
