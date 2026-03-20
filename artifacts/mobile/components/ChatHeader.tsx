@@ -171,7 +171,7 @@ export function ChatHeader() {
                 style={styles.iconBtn}
                 onPress={() => setMenuOpen(!menuOpen)}
               >
-                <MoreIcon size={20} color={Colors.contentPrimary} />
+                <MoreIcon size={20} color={menuOpen ? '#BDBBB9' : Colors.contentPrimary} />
               </Pressable>
             )}
           </View>
