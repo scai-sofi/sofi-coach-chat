@@ -81,7 +81,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'What are my top spending categories this month?', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Here's your detailed breakdown for this month — since I know you like the numbers:\n\n**1. Housing — $2,450**\nRent and utilities, steady month over month.\n\n**2. Dining Out — $485**\nDown 12% from last month. Your effort to cut back on dining is clearly working — especially impressive in the Bay Area for a household of two.\n\n**3. Groceries — $380**\nUp a bit, which makes sense as you shift away from restaurants.\n\n**4. Transportation — $220**\nRight in line with your 3-month average.\n\n**5. Entertainment — $145**\nIncludes those concert tickets from last week.\n\nOverall you're trending well. Want to dig into any of these?",
+          id: uid(), role: 'ai', content: "Here's your detailed breakdown for this month — since I know you like the numbers:\n\n• **Housing:** $2,450 — rent and utilities, steady month over month\n• **Dining Out:** $485 — down 12% from last month. Your effort to cut back is clearly working, especially in the Bay Area for a household of two\n• **Groceries:** $380 — up a bit, which makes sense as you shift away from restaurants\n• **Transportation:** $220 — right in line with your 3-month average\n• **Entertainment:** $145 — includes those concert tickets from last week\n\nOverall you're trending well. Want to dig into any of these?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [
             { type: 'goal-progress', label: 'Emergency Fund 70%' },
@@ -134,7 +134,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'I really need to pay off my credit card. The balance is about $4,200', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Let's get a plan together for that. Here's what I'm seeing on your SoFi Credit Card:\n\n**Current Balance:** $4,200\n**Interest Rate:** 22.99% APR\n**Minimum Payment:** $84/month\n\nAt minimum payments only, you'd be paying for 7+ years and spend over $3,100 in interest. Let's do better than that.\n\n**Option A — Aggressive (6 months)**\n$720/month → paid off by July, saves ~$2,800 in interest\n\n**Option B — Balanced (12 months)**\n$380/month → paid off by January, saves ~$2,400 in interest\n\nBoth are solid choices — it comes down to how much breathing room you want in your monthly budget. Which feels more doable?",
+          id: uid(), role: 'ai', content: "Let's get a plan together for that. Here's what I'm seeing on your SoFi Credit Card:\n\n• **Balance:** $4,200\n• **Interest rate:** 22.99% APR\n• **Minimum payment:** $84/month\n\nAt minimum payments only, you'd be paying for 7+ years and spend over $3,100 in interest. Let's do better than that.\n\n**Option A — Aggressive (6 months)**\n$720/month → paid off by July, saves ~$2,800 in interest\n\n**Option B — Balanced (12 months)**\n$380/month → paid off by January, saves ~$2,400 in interest\n\nBoth are solid choices — it comes down to how much breathing room you want in your monthly budget. Which feels more doable?",
           timestamp: new Date(now.getTime() - 60000),
           goalProposal: {
             id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
@@ -159,7 +159,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Coach noticed a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "I wanted to give you a heads-up about your **Credit Card Payoff** goal.\n\nYour confidence score dropped from 82% to 58% this week. Here's what's going on:\n\n• Your last 2 payments were $380 instead of the $420 target\n• A new $340 charge hit the card\n• At this pace, you'd miss your target date by about 6 weeks\n\nNo need to panic — this is totally fixable. Here are two paths:\n\n**1. Bump this month's payment** to $520 to get back on track\n**2. Extend your deadline** by 2 months, which drops the monthly to $350\n\nWhat feels right for your budget this month?",
+          id: uid(), role: 'ai', content: "I wanted to give you a heads-up about your **Credit Card Payoff** goal.\n\nYour confidence score dropped from 82% to 58% this week. Here's what's going on:\n\n• Your last 2 payments were $380 instead of the $420 target\n• A new $340 charge hit the card\n• At this pace, you'd miss your target date by about 6 weeks\n\nNo need to panic — this is totally fixable. Here are two paths:\n\n• **Bump this month's payment** to $520 to get back on track\n• **Extend your deadline** by 2 months, which drops the monthly to $350\n\nWhat feels right for your budget this month?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'goal-risk', label: 'Credit Card at risk' }],
           memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'FINANCIAL_ATTITUDE' },
@@ -203,7 +203,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Your weekly financial summary is ready', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "**Your Week in Review**\n\n**Spending: $892** (down 8% from last week)\n• Groceries: $165 — on budget\n• Dining: $95 — solid improvement from your usual\n• Transportation: $52\n• Shopping: $580 — the new monitor purchase\n\n**Goals Update**\n• Emergency Fund: $8,400 of $12,000 (70%) — on track\n• Credit Card: $2,940 of $4,200 (70%) — needs attention\n\n**One thing worth looking at:**\nI spotted a $14.99/month streaming subscription you haven't used in 6 weeks. Canceling it would free up $180/year — that's almost half a month's emergency fund contribution.\n\nWant me to dig into any of these?",
+          id: uid(), role: 'ai', content: "**Your Week in Review**\n\nYou spent **$892** this week, down 8% from last week:\n• Groceries: $165 — on budget\n• Dining: $95 — solid improvement from your usual\n• Transportation: $52\n• Shopping: $580 — the new monitor purchase\n\nYour goals are moving:\n• Emergency Fund: $8,400 of $12,000 (70%) — on track\n• Credit Card: $2,940 of $4,200 (70%) — needs attention\n\nOne thing worth looking at — I spotted a $14.99/month streaming subscription you haven't used in 6 weeks. Canceling it would free up $180/year, almost half a month's emergency fund contribution.\n\nWant me to dig into any of these?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [
             { type: 'goal-progress', label: 'Emergency Fund on track' },
@@ -223,7 +223,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'I just got a $3,000 bonus at work. What should I do with it?', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "Congrats on the bonus! Here's how I'd split it based on your goals and financial picture:\n\n**1. Credit Card Payoff — $1,260**\nClears your remaining balance and eliminates that 22.99% APR. This is your highest-cost debt, so every dollar here is a guaranteed return.\n\n**2. Emergency Fund — $1,200**\nBrings you to $9,600 — that's 80% of your goal. You'd be about 6 weeks ahead of schedule.\n\n**3. SoFi Invest — $540**\nSince you prefer lower risk, I'd suggest the Conservative portfolio — roughly 70% bonds, 30% index funds. A solid way to start building long-term wealth.\n\nThis approach knocks out your most expensive debt, fast-tracks your safety net, and gets you into the market — all in one move.\n\nWant me to set up all three transfers?",
+          id: uid(), role: 'ai', content: "Congrats on the bonus! Here's how I'd split it based on your goals and financial picture:\n\n• **Credit Card Payoff — $1,260:** Clears your remaining balance and eliminates that 22.99% APR. This is your highest-cost debt, so every dollar here is a guaranteed return.\n\n• **Emergency Fund — $1,200:** Brings you to $9,600, that's 80% of your goal. You'd be about 6 weeks ahead of schedule.\n\n• **SoFi Invest — $540:** Since you prefer lower risk, I'd suggest the Conservative portfolio — roughly 70% bonds, 30% index funds. A solid way to start building long-term wealth.\n\nThis approach knocks out your most expensive debt, fast-tracks your safety net, and gets you into the market — all in one move.\n\nWant me to set up all three transfers?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'handoff', label: 'Cross-product recommendation' }],
           memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'FINANCIAL_ATTITUDE' },
@@ -255,7 +255,7 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: 'Can you move $500 from checking to savings?', timestamp: new Date(now.getTime() - 180000) },
         {
-          id: uid(), role: 'ai', content: "Here's what that transfer would look like:\n\n**From:** SoFi Checking ($3,847.52)\n**To:** SoFi Savings (Emergency Fund)\n**Amount:** $500.00\n\nAfter the transfer:\n• Emergency Fund jumps to $8,900 (74% of goal)\n• Checking balance: $3,347.52\n\nThat still leaves plenty of cushion in checking for your upcoming bills. Want me to confirm this transfer?",
+          id: uid(), role: 'ai', content: "Here's what that transfer would look like:\n\n• **From:** SoFi Checking ($3,847.52)\n• **To:** SoFi Savings (Emergency Fund)\n• **Amount:** $500.00\n\nAfter the transfer, your Emergency Fund jumps to $8,900 (74% of goal) and checking stays at $3,347.52 — plenty of cushion for upcoming bills.\n\nWant me to confirm this transfer?",
           timestamp: new Date(now.getTime() - 170000),
           safetyTier: 'actionable',
           safetyMessage: 'Actionable — needs your approval',

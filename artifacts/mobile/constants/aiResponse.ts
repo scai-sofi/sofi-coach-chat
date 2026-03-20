@@ -23,7 +23,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('help me pay off') || input.includes('pay off credit')) {
     return {
-      content: "Let's get a plan together for that. Here's what I'm seeing:\n\n**Current Balance:** $4,200\n**Interest Rate:** 22.99% APR\n**Minimum Payment:** $84/month\n\nAt minimum payments only, you'd be paying for 7+ years and spend over $3,100 in interest. Let's do better.\n\n**Option A — Aggressive (6 months)**\n$720/month → paid off by July, saves ~$2,800 in interest\n\n**Option B — Balanced (12 months)**\n$380/month → paid off by January, saves ~$2,400 in interest\n\nWhich feels more doable for your monthly budget?",
+      content: "Let's get a plan together for that. Here's what I'm seeing:\n\n• **Balance:** $4,200\n• **Interest rate:** 22.99% APR\n• **Minimum payment:** $84/month\n\nAt minimum payments only, you'd be paying for 7+ years and spend over $3,100 in interest. Let's do better.\n\n**Option A — Aggressive (6 months)**\n$720/month → paid off by July, saves ~$2,800 in interest\n\n**Option B — Balanced (12 months)**\n$380/month → paid off by January, saves ~$2,400 in interest\n\nWhich feels more doable for your monthly budget?",
       goalProposal: {
         id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
         targetAmount: 4200, targetDate: new Date(Date.now() + 180 * 86400000),
@@ -37,7 +37,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('help me prioritize')) {
     return {
-      content: "Here's how I'd rank your priorities based on the math:\n\n**1. Credit Card (22.99% APR)** — highest interest rate, so every dollar here gives you a guaranteed 23% return. Pay this first.\n\n**2. Emergency Fund** — you're at 70%, which is great. Keep building toward that $12,000 target for a solid safety net.\n\n**3. Wedding Savings** — start ramping this up once your emergency fund hits 90%. You've got time until October 2027.\n\nThe key insight: eliminating high-interest debt before stacking savings is almost always the best move. Want me to set up a plan around this order?",
+      content: "Here's how I'd rank your priorities based on the math:\n\n• **Credit Card (22.99% APR)** — highest interest rate, so every dollar here gives you a guaranteed 23% return. Pay this first.\n\n• **Emergency Fund** — you're at 70%, which is great. Keep building toward that $12,000 target for a solid safety net.\n\n• **Wedding Savings** — start ramping this up once your emergency fund hits 90%. You've got time until October 2027.\n\nThe key insight: eliminating high-interest debt before stacking savings is almost always the best move. Want me to set up a plan around this order?",
       suggestions: ['Sounds good, set it up', 'What about investing?', 'Show me the numbers'],
     };
   }
@@ -104,14 +104,14 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('detailed breakdown')) {
     return {
-      content: "My kind of person — let's dig into the numbers.\n\nHere's this week's breakdown:\n\n**Total Spent:** $892 (↓5% vs. weekly average)\n• Groceries: $165 — on budget\n• Dining: $95 — down 18% from last week\n• Transport: $52 — stable\n• Shopping: $580 — one-time monitor purchase\n\nIf we exclude that monitor, your baseline spending is $312 — well below your typical $380. That's real progress.",
+      content: "My kind of person — let's dig into the numbers.\n\nThis week you spent **$892** total, down 5% vs. your weekly average:\n• Groceries: $165 — on budget\n• Dining: $95 — down 18% from last week\n• Transport: $52 — stable\n• Shopping: $580 — one-time monitor purchase\n\nIf we exclude that monitor, your baseline spending is $312 — well below your typical $380. That's real progress.",
       autoSaveMemory: { content: 'Prefers detailed financial breakdowns with numbers and trends', category: 'PREFERENCE' },
     };
   }
 
   if (input.includes('set up option a')) {
     return {
-      content: "Done — your aggressive payoff plan is set up:\n\n**Plan:** $720/month for 6 months\n**From:** SoFi Checking\n**To:** SoFi Credit Card\n**First payment:** This Friday\n\nI've created your goal and I'll track your progress automatically. You can check in anytime from the Goals dashboard — I'll also send you weekly updates since that's your preference.",
+      content: "Done — your aggressive payoff plan is set up:\n\n• **Plan:** $720/month for 6 months\n• **From:** SoFi Checking → SoFi Credit Card\n• **First payment:** This Friday\n\nI've created your goal and I'll track your progress automatically. You can check in anytime from the Goals dashboard — I'll also send you weekly updates since that's your preference.",
       autoCreateGoal: {
         type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
         targetAmount: 4200, targetDate: new Date(Date.now() + 180 * 86400000),
@@ -123,7 +123,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('set up option b')) {
     return {
-      content: "All set — your balanced payoff plan is ready:\n\n**Plan:** $380/month for 12 months\n**From:** SoFi Checking\n**To:** SoFi Credit Card\n**First payment:** This Friday\n\nThis gives you more monthly flexibility while still making strong progress. I'll send weekly check-ins so you always know where you stand.",
+      content: "All set — your balanced payoff plan is ready:\n\n• **Plan:** $380/month for 12 months\n• **From:** SoFi Checking → SoFi Credit Card\n• **First payment:** This Friday\n\nThis gives you more monthly flexibility while still making strong progress. I'll send weekly check-ins so you always know where you stand.",
       autoCreateGoal: {
         type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
         targetAmount: 4200, targetDate: new Date(Date.now() + 365 * 86400000),
@@ -161,7 +161,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('confirm transfer') || input.includes('set up all three')) {
     return {
-      content: "All done! Here's the summary:\n\n**Credit Card:** $1,260 payment scheduled — this completes your payoff! That 22.99% APR is officially history.\n\n**Savings:** $1,200 transferred — Emergency Fund now at $9,600 (80% of goal)\n\n**Invest:** $540 allocated to the Conservative portfolio (70% bonds, 30% index funds)\n\nCongrats — you just eliminated your most expensive debt, accelerated your safety net, and started investing. That's a great day.",
+      content: "All done! Here's the summary:\n\n• **Credit Card:** $1,260 payment scheduled — this completes your payoff! That 22.99% APR is officially history.\n• **Savings:** $1,200 transferred — Emergency Fund now at $9,600 (80% of goal)\n• **Invest:** $540 allocated to the Conservative portfolio (70% bonds, 30% index funds)\n\nCongrats — you just eliminated your most expensive debt, accelerated your safety net, and started investing. That's a great day.",
       autoUpdateGoal: {
         goalTitle: 'Credit Card Payoff',
         currentAmount: 4200,
@@ -177,7 +177,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('connect me') || input.includes('planner')) {
     return {
-      content: "I'll set up a session with a SoFi Certified Financial Planner — it's completely free for SoFi members.\n\n**What to expect:**\n• A full review of your investment picture\n• Personalized rebalancing strategy based on your risk profile\n• Tax-optimization recommendations\n\nWith your permission, I'll share your relevant financial context so the planner can jump right in without starting from scratch. Want me to go ahead?",
+      content: "I'll set up a session with a SoFi Certified Financial Planner — it's completely free for SoFi members.\n\nHere's what you can expect:\n• A full review of your investment picture\n• Personalized rebalancing strategy based on your risk profile\n• Tax-optimization recommendations\n\nWith your permission, I'll share your relevant financial context so the planner can jump right in without starting from scratch. Want me to go ahead?",
       chips: [{ type: 'handoff', label: 'Connecting to specialist' }],
       safetyTier: 'handoff' as SafetyTier,
       safetyMessage: 'Complex — human advisor recommended',
@@ -186,7 +186,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('what can you help') || input.includes('what do you do')) {
     return {
-      content: "I can help across four main areas:\n\n**1. Spending Insights**\nTrack where your money goes, spot trends, and find opportunities to save — like that unused subscription I flagged last week.\n\n**2. Goals & Tracking**\nSet financial goals, monitor your progress with milestones, and get nudges when something needs attention.\n\n**3. SoFi Products**\nHelp you get the most out of checking, savings, investing, credit, and loans — all in one place.\n\n**4. Financial Planning**\nBudgeting strategies, debt payoff plans, and connecting you with human advisors for complex topics like tax planning or portfolio rebalancing.\n\nWhat sounds most useful right now?",
+      content: "I can help across four main areas:\n\n• **Spending Insights** — track where your money goes, spot trends, and find opportunities to save\n\n• **Goals & Tracking** — set financial goals, monitor progress with milestones, and get nudges when something needs attention\n\n• **SoFi Products** — help you get the most out of checking, savings, investing, credit, and loans\n\n• **Financial Planning** — budgeting strategies, debt payoff plans, and connecting you with human advisors for complex topics\n\nWhat sounds most useful right now?",
       suggestions: ['Show my spending', 'Help me set a goal', 'What products do I have?', 'I need financial advice'],
     };
   }
@@ -194,7 +194,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('dining trend')) {
     if (prefersDetail) {
       return {
-        content: "Here's your full dining trend analysis:\n\n**This Month:** $485 (↓12% from last month)\n**3-Month Average:** $530/month\n**6-Month Average:** $610/month\n**Trend:** Consistently decreasing — you're heading in the right direction.\n\n**Weekly Breakdown:**\n• Week 1: $145 (birthday dinner)\n• Week 2: $95\n• Week 3: $120\n• Week 4: $125 (so far)\n\n**Where It's Going:**\n1. DoorDash: $180 (37%)\n2. Local restaurants: $165 (34%)\n3. Coffee shops: $140 (29%)\n\nAt this rate, you'll save roughly $1,500/year compared to your peak. The shift to cooking at home is clearly showing in the numbers.",
+        content: "Here's your full dining trend analysis:\n\n• **This month:** $485 (↓12% from last month)\n• **3-month average:** $530/month\n• **6-month average:** $610/month\n• **Trend:** Consistently decreasing\n\n**Weekly Breakdown**\n• Week 1: $145 (birthday dinner)\n• Week 2: $95\n• Week 3: $120\n• Week 4: $125 (so far)\n\n**Where It's Going**\n• DoorDash: $180 (37%)\n• Local restaurants: $165 (34%)\n• Coffee shops: $140 (29%)\n\nAt this rate, you'll save roughly $1,500/year compared to your peak. The shift to cooking at home is clearly showing in the numbers.",
         provenance: 'Analysis based on SoFi Checking and Credit Card transactions. Categories are auto-classified and some may need manual adjustment.',
       };
     }
@@ -224,7 +224,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('snapshot') || input.includes('overview') || input.includes('financial snapshot')) {
     return {
-      content: "**Your Financial Snapshot**\n\n**Accounts**\n• Checking: $3,847.52\n• Savings: $8,400.00\n• Invest: $2,150.00\n• Credit Card: −$1,260 balance\n\n**Net Worth: $13,137.52**\nUp $840 from last month — solid progress.\n\n**Goals**\n• Emergency Fund: 70% complete, on track\n• Credit Card Payoff: 70% complete, needs attention\n\n**Monthly Cash Flow**\n• Income: $6,200\n• Expenses: $4,680\n• Surplus: $1,520\n\nThat $1,520 surplus is your biggest lever right now. Want to talk about how to allocate it?",
+      content: "**Your Financial Snapshot**\n\n**Accounts**\n• Checking: $3,847.52\n• Savings: $8,400.00\n• Invest: $2,150.00\n• Credit Card: −$1,260 balance\n\nYour net worth is **$13,137.52**, up $840 from last month.\n\n**Goals**\n• Emergency Fund: 70% complete, on track\n• Credit Card Payoff: 70% complete, needs attention\n\n**Monthly Cash Flow**\n• Income: $6,200\n• Expenses: $4,680\n• Surplus: $1,520\n\nThat $1,520 surplus is your biggest lever right now. Want to talk about how to allocate it?",
       suggestions: ['Tell me about my spending', 'How can I grow my net worth?', 'Show my goals'],
     };
   }
@@ -257,7 +257,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('how does my memory work') || input.includes('how does memory work')) {
     return {
-      content: "Great question! Here's the short version:\n\n**I Learn as We Talk**\nI pick up on your preferences, habits, and context from our conversations. I'll always ask before saving something new.\n\n**You're in Control**\nEverything I remember is visible in the Memory Center (brain icon in the menu). You can view, edit, pause, or delete anything at any time.\n\n**Temporary Chat Mode**\nTap the shield button in the input bar to chat without me remembering anything — useful for sensitive topics or just exploring.\n\n**What I Track**\nPreferences, financial attitudes, life context, constraints, and goal-related notes — all organized by category so it's easy to manage.",
+      content: "Great question! Here's the short version:\n\nI learn as we talk — picking up on your preferences, habits, and context. I'll always ask before saving something new.\n\nEverything I remember is visible in the Memory Center (brain icon in the menu). You can view, edit, pause, or delete anything at any time.\n\nYou can also use **Temporary Chat Mode** — tap the shield button in the input bar to chat without me remembering anything. Useful for sensitive topics or just exploring.\n\nI track things like preferences, financial attitudes, life context, constraints, and goal-related notes — all organized by category so it's easy to manage.",
       suggestions: ['Show me my memories', 'Start a temporary chat', 'What do you know about me?'],
     };
   }
@@ -271,7 +271,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('how can i save') || input.includes('save more')) {
     return {
-      content: "Based on your recent spending, here are the biggest opportunities:\n\n**1. Dining Out — save ~$150/month**\nYou're already trending down here. Keeping the cooking-at-home momentum could free up $150+ monthly.\n\n**2. Subscriptions — save ~$45/month**\nI've spotted a couple of services with low usage. Worth reviewing.\n\n**3. Automate Your Surplus**\nYou have a $1,520 monthly surplus. Setting up auto-transfers on payday means the money moves before you miss it.\n\nThe biggest win is usually the simplest: automate first, optimize second. Want me to help set up automatic savings transfers?",
+      content: "Based on your recent spending, here are the biggest opportunities:\n\n• **Dining Out** — save ~$150/month. You're already trending down here. Keeping the cooking-at-home momentum could free up $150+ monthly.\n\n• **Subscriptions** — save ~$45/month. I've spotted a couple of services with low usage. Worth reviewing.\n\n• **Automate your surplus** — you have $1,520/month after expenses. Setting up auto-transfers on payday means the money moves before you miss it.\n\nThe biggest win is usually the simplest: automate first, optimize second. Want me to help set up automatic savings transfers?",
       suggestions: ['Set up auto-transfers', 'Show me my subscriptions', 'What about my groceries?'],
     };
   }
@@ -289,7 +289,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('what about investing') || input.includes('should i invest')) {
     return {
-      content: "Investing is a great long-term wealth builder — but timing matters. Here's how I'd think about it:\n\n**Before investing, make sure you have:**\n• High-interest debt paid off (or a plan to)\n• At least 3 months of emergency savings\n• A comfortable monthly budget with room to invest consistently\n\nYou're close on both your debt payoff and emergency fund, so you're almost at the ideal starting point.\n\nWhen you're ready, SoFi Invest offers options from conservative (mostly bonds) to aggressive (mostly stocks). Given your risk-averse preference, I'd suggest starting with the Conservative portfolio.\n\nKeep in mind: all investing involves risk, and past performance doesn't guarantee future results. Want to explore your options?",
+      content: "Investing is a great long-term wealth builder — but timing matters.\n\nBefore investing, make sure you have:\n• High-interest debt paid off (or a plan to)\n• At least 3 months of emergency savings\n• A comfortable monthly budget with room to invest consistently\n\nYou're close on both your debt payoff and emergency fund, so you're almost at the ideal starting point.\n\nWhen you're ready, SoFi Invest offers options from conservative (mostly bonds) to aggressive (mostly stocks). Given your risk-averse preference, I'd suggest starting with the Conservative portfolio.\n\nKeep in mind: all investing involves risk, and past performance doesn't guarantee future results. Want to explore your options?",
       suggestions: ['Tell me about conservative portfolios', 'How much should I invest monthly?', 'I\'ll wait until my debt is paid off'],
     };
   }
