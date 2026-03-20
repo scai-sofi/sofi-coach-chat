@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet, Keyboard, Pressable, Platform, UIManager, NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { useCoach } from '@/context/CoachContext';
 import { ChatHeader } from '@/components/ChatHeader';
@@ -63,8 +63,8 @@ export default function ChatScreen() {
       }
       showAnchorRef.current = true;
       setShowAnchor(true);
-      anchorOpacity.value = withSpring(1, { damping: 20, stiffness: 300 });
-      anchorScale.value = withSpring(1, { damping: 12, stiffness: 200 });
+      anchorOpacity.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) });
+      anchorScale.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) });
     } else if (!shouldShow && showAnchorRef.current) {
       showAnchorRef.current = false;
       anchorOpacity.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.ease) });
