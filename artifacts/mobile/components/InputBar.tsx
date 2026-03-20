@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, TextInput, Pressable, Text, StyleSheet, Keyboard } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
@@ -48,7 +48,14 @@ export function InputBar() {
           />
           {text.trim() ? (
             <Pressable style={[styles.sendBtn, isTyping && { opacity: 0.4 }]} onPress={handleSend} disabled={isTyping}>
-              <Feather name="arrow-up" size={14} color="#fff" />
+              <Svg width={11.5} height={14.5} viewBox="0 0 11.5 14.5" fill="none">
+                <Path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M5.21967 0.21967C5.51256 -0.0732233 5.98744 -0.0732233 6.28033 0.21967L11.2803 5.21967C11.5732 5.51256 11.5732 5.98744 11.2803 6.28033C10.9874 6.57322 10.5126 6.57322 10.2197 6.28033L6.5 2.56066V13.75C6.5 14.1642 6.16421 14.5 5.75 14.5C5.33579 14.5 5 14.1642 5 13.75V2.56066L1.28033 6.28033C0.987437 6.57322 0.512563 6.57322 0.21967 6.28033C-0.0732233 5.98744 -0.0732233 5.51256 0.21967 5.21967L5.21967 0.21967Z"
+                  fill="#fff"
+                />
+              </Svg>
             </Pressable>
           ) : null}
         </View>
