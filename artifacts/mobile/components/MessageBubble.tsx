@@ -126,6 +126,10 @@ function parseContentBlocks(content: string): ContentBlock[] {
       if (!displayText.startsWith('**')) {
         displayText = `**${displayText}**`;
       }
+      const hasNonHeaderContent = blocks.some(b => b.type !== 'header' && b.type !== 'divider');
+      if (hasNonHeaderContent) {
+        blocks.push({ type: 'divider' });
+      }
       blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
