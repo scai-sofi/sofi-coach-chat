@@ -47,15 +47,34 @@ export default function ChatScreen() {
     };
   }, []);
 
+  const keyboardVisibleRef = useRef(false);
+
   useEffect(() => {
-    const sub = Keyboard.addListener('keyboardDidShow', () => {
+    const showSub = Keyboard.addListener('keyboardWillShow', () => {
+      keyboardVisibleRef.current = true;
+      if (showAnchorRef.current) {
+        showAnchorRef.current = false;
+        anchorOpacity.value = withTiming(0, { duration: 100 });
+        anchorScale.value = withTiming(0.8, { duration: 100 });
+        if (hideTimer.current) clearTimeout(hideTimer.current);
+        hideTimer.current = setTimeout(() => setShowAnchor(false), 110);
+      }
+    });
+    const didShowSub = Keyboard.addListener('keyboardDidShow', () => {
       if (messages.length > 0) {
         setTimeout(() => {
           listRef.current?.scrollToEnd({ animated: true });
         }, 100);
       }
     });
-    return () => sub.remove();
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => {
+      keyboardVisibleRef.current = false;
+    });
+    return () => {
+      showSub.remove();
+      didShowSub.remove();
+      hideSub.remove();
+    };
   }, [messages.length]);
 
   const handleInputBarLayout = useCallback((e: LayoutChangeEvent) => {
@@ -63,6 +82,7 @@ export default function ChatScreen() {
   }, []);
 
   const checkAnchorVisibility = useCallback(() => {
+    if (keyboardVisibleRef.current) return;
     const maxScroll = contentHeightRef.current - viewportHeightRef.current;
     const distanceFromBottom = maxScroll - scrollOffsetRef.current;
     const shouldShow = maxScroll > 0 && distanceFromBottom > SCROLL_THRESHOLD;
