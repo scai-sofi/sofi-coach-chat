@@ -86,8 +86,10 @@ const styles = StyleSheet.create({
     color: Colors.contentPrimary,
     fontFamily: Fonts.regular,
     lineHeight: 20,
+    minHeight: 32,
     maxHeight: 96,
-    paddingVertical: 4,
+    paddingTop: 6,
+    paddingBottom: 6,
   },
   sendBtn: {
     width: 32,
