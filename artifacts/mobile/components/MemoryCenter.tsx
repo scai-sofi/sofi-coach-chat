@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   filterChipText: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary },
   filterCount: { fontSize: 11, color: 'rgba(112,111,110,0.6)' },
   content: { flex: 1 },
-  contentInner: { paddingTop: 12, paddingHorizontal: 16, paddingBottom: 40 },
+  contentInner: { paddingHorizontal: 16, paddingBottom: 40 },
   subHeader: {
     paddingTop: 24,
     paddingBottom: 12,
