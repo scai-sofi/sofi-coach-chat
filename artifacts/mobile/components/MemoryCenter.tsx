@@ -249,7 +249,7 @@ export function MemoryCenter() {
 }
 
 const styles = StyleSheet.create({
-  panel: { flex: 1, backgroundColor: Colors.surfaceBase },
+  panel: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.surfaceBase, zIndex: 100 },
   appBar: { backgroundColor: Colors.surfaceBase },
   titleBar: {
     flexDirection: 'row',

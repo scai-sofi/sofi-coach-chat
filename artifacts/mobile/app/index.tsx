@@ -46,7 +46,6 @@ export default function ChatScreen() {
     return () => clearTimeout(timer);
   }, [isTyping]);
 
-  const showNonScenarioPanel = activePanel === 'memory' || activePanel === 'goals';
   const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
@@ -70,7 +69,7 @@ export default function ChatScreen() {
       >
         <ChatHeader />
 
-        <View style={[styles.chatContent, showNonScenarioPanel && styles.chatHidden]}>
+        <View style={styles.chatContent}>
           {messages.length === 0 ? (
             <Pressable style={styles.flex} onPress={() => {
               Keyboard.dismiss();
@@ -98,15 +97,11 @@ export default function ChatScreen() {
           <InputBar />
         </View>
 
-        {showNonScenarioPanel && (
-          <View style={styles.panelOverlay}>
-            {activePanel === 'memory' && <MemoryCenter />}
-            {activePanel === 'goals' && <GoalsDashboard />}
-          </View>
-        )}
-
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
       </KeyboardAvoidingView>
+
+      {activePanel === 'memory' && <MemoryCenter />}
+      {activePanel === 'goals' && <GoalsDashboard />}
 
       {showHistory && (
         <ChatHistory onClose={() => {
@@ -127,9 +122,6 @@ const styles = StyleSheet.create({
   chatContent: {
     flex: 1,
   },
-  chatHidden: {
-    display: 'none',
-  },
   listContent: {
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -138,8 +130,5 @@ const styles = StyleSheet.create({
   msgWrap: {
     marginBottom: 16,
     paddingHorizontal: 0,
-  },
-  panelOverlay: {
-    flex: 1,
   },
 });
