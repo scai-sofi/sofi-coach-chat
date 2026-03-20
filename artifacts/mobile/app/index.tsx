@@ -135,20 +135,8 @@ export default function ChatScreen() {
       if (newMsg?.role === 'user') {
         lastUserMsgIndex.current = messages.length - 1;
         const timer = setTimeout(() => {
-          const targetIndex = lastUserMsgIndex.current;
-          if (targetIndex !== null && targetIndex < messages.length) {
-            try {
-              listRef.current?.scrollToIndex({
-                index: targetIndex,
-                animated: true,
-                viewPosition: 0,
-                viewOffset: 0,
-              });
-            } catch {
-              listRef.current?.scrollToEnd({ animated: true });
-            }
-          }
-        }, 80);
+          listRef.current?.scrollToEnd({ animated: true });
+        }, 50);
         return () => clearTimeout(timer);
       }
     }
