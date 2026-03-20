@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -70,7 +70,7 @@ export function ScenarioFab() {
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    bottom: Platform.OS === 'web' ? 100 : 120,
+    bottom: 120,
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',

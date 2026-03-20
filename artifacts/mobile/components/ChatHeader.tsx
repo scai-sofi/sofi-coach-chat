@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -65,7 +65,7 @@ export function ChatHeader() {
   const { setActivePanel, clearConversation, chatMode, activeScenario, startLiveChat, messages, saveAndClose, sessionTitle } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const topPad = Platform.OS === 'web' ? 54 : insets.top;
+  const topPad = insets.top;
 
   const demoScenario = chatMode === 'demo' ? SCENARIOS.find(s => s.id === activeScenario) : null;
   const hasActiveChat = messages.length > 0 || chatMode === 'demo';

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, TextInput, Pressable, Text, StyleSheet, Platform } from 'react-native';
+import { View, TextInput, Pressable, Text, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -20,7 +20,7 @@ export function InputBar() {
   };
 
   return (
-    <View style={[styles.footer, { paddingBottom: Platform.OS === 'web' ? 20 : Math.max(insets.bottom, 8) }]}>
+    <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 8) }]}>
       <View style={styles.inputRow}>
         <View style={styles.inputPill}>
           <TextInput

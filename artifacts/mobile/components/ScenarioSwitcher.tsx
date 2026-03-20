@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Platform, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
@@ -29,7 +29,7 @@ export function ScenarioSwitcher() {
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
   const orderedScenarios = SCENARIO_ORDER.map(id => SCENARIOS.find(s => s.id === id)!).filter(Boolean);
-  const bottomPad = Platform.OS === 'web' ? 20 : Math.max(insets.bottom, 16);
+  const bottomPad = Math.max(insets.bottom, 16);
 
   const translateY = useSharedValue(0);
   const backdropOpacity = useSharedValue(1);

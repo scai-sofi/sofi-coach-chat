@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Platform } from 'react-native';
 import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemorySource, GoalType, GoalStatus, Milestone } from '@/constants/types';
 import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
@@ -19,19 +18,6 @@ export interface ChatSession {
 }
 
 function getApiBaseUrl(): string {
-  if (Platform.OS === 'web' && typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    const proto = window.location.protocol;
-    if (host.includes('.expo.janeway.replit.dev')) {
-      const devDomain = host.replace('.expo.janeway.replit.dev', '.janeway.replit.dev');
-      return `${proto}//${devDomain}/api`;
-    }
-    if (host.includes('.expo.replit.dev')) {
-      const devDomain = host.replace('.expo.replit.dev', '.replit.dev');
-      return `${proto}//${devDomain}/api`;
-    }
-    return '/api';
-  }
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
   if (domain) return `https://${domain}/api`;
   return '/api';

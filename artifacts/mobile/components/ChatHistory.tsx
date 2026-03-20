@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Platform, Dimensions } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -101,7 +101,7 @@ export function ChatHistory({ onClose }: { onClose: () => void }) {
 
   const groups = useMemo(() => groupByMonth(filtered), [filtered]);
 
-  const topPad = Platform.OS === 'web' ? 54 : insets.top;
+  const topPad = insets.top;
 
   return (
     <Animated.View style={[styles.container, { paddingTop: topPad }, animStyle]}>
