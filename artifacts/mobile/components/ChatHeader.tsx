@@ -2,11 +2,28 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, G } from 'react-native-svg';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { SCENARIOS } from '@/constants/scenarios';
+
+function DemoIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7 1C6.44772 1 6 1.44772 6 2C6 2.55228 6.44772 3 7 3V7.382L2.55279 16.2764C1.96298 17.456 2.82236 18.8333 4.13877 18.9836L4.23607 18.9917H15.7639L15.8612 18.9836C17.1776 18.8333 18.037 17.456 17.4472 16.2764L13 7.382V3C13.5523 3 14 2.55228 14 2C14 1.44772 13.5523 1 13 1H7ZM11 3H9V8C9 8.17943 8.9532 8.35591 8.86401 8.5122L8.78885 8.62918L4.76816 16.6756C4.67615 16.8516 4.72822 17 4.85 17H15.15C15.2718 17 15.3239 16.8516 15.2318 16.6756L11.2111 8.62918L11.136 8.5122C11.0532 8.36635 11.0065 8.20258 11.001 8.03356L11 8V3Z"
+        fill={color}
+      />
+      <Path
+        d="M7.5 14C7.5 13.4477 7.94772 13 8.5 13H11.5C12.0523 13 12.5 13.4477 12.5 14C12.5 14.5523 12.0523 15 11.5 15H8.5C7.94772 15 7.5 14.5523 7.5 14Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
 
 function CloseIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   const s = size * 0.614;
@@ -82,7 +99,7 @@ export function ChatHeader() {
             }
           }}>
             {!hasActiveChat ? (
-              <Feather name="play-circle" size={20} color={Colors.contentSecondary} />
+              <DemoIcon size={20} color={Colors.contentPrimary} />
             ) : (
               <CloseIcon size={24} color={Colors.contentPrimary} />
             )}
