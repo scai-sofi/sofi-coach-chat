@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { View, FlatList, StyleSheet, Keyboard, Pressable, Platform, UIManager } from 'react-native';
+import { View, FlatList, StyleSheet, Keyboard, Pressable, Platform, UIManager, NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { useCoach } from '@/context/CoachContext';
 import { ChatHeader } from '@/components/ChatHeader';
@@ -13,11 +14,14 @@ import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
 import { ScenarioFab } from '@/components/ScenarioFab';
 import { ChatHistory } from '@/components/ChatHistory';
+import { ScrollAnchor } from '@/components/ScrollAnchor';
 import { Message } from '@/constants/types';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
+
+const SCROLL_THRESHOLD = 120;
 
 export default function ChatScreen() {
   const { messages, isTyping, activePanel, activeScenario, setActivePanel } = useCoach();
@@ -26,11 +30,89 @@ export default function ChatScreen() {
   const prevScenario = useRef(activeScenario);
   const lastUserMsgIndex = useRef<number | null>(null);
 
+  const [showAnchor, setShowAnchor] = useState(false);
+  const showAnchorRef = useRef(false);
+  const anchorOpacity = useSharedValue(0);
+  const anchorTranslateY = useSharedValue(8);
+  const [inputBarHeight, setInputBarHeight] = useState(0);
+
+  const contentHeightRef = useRef(0);
+  const viewportHeightRef = useRef(0);
+  const scrollOffsetRef = useRef(0);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    };
+  }, []);
+
+  const handleInputBarLayout = useCallback((e: LayoutChangeEvent) => {
+    setInputBarHeight(e.nativeEvent.layout.height);
+  }, []);
+
+  const checkAnchorVisibility = useCallback(() => {
+    const maxScroll = contentHeightRef.current - viewportHeightRef.current;
+    const distanceFromBottom = maxScroll - scrollOffsetRef.current;
+    const shouldShow = maxScroll > 0 && distanceFromBottom > SCROLL_THRESHOLD;
+
+    if (shouldShow && !showAnchorRef.current) {
+      if (hideTimer.current) {
+        clearTimeout(hideTimer.current);
+        hideTimer.current = null;
+      }
+      showAnchorRef.current = true;
+      setShowAnchor(true);
+      anchorOpacity.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) });
+      anchorTranslateY.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) });
+    } else if (!shouldShow && showAnchorRef.current) {
+      showAnchorRef.current = false;
+      anchorOpacity.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.ease) });
+      anchorTranslateY.value = withTiming(8, { duration: 150, easing: Easing.in(Easing.ease) });
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+      hideTimer.current = setTimeout(() => setShowAnchor(false), 160);
+    }
+  }, []);
+
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
+    if (event.nativeEvent.contentSize?.height) {
+      contentHeightRef.current = event.nativeEvent.contentSize.height;
+    }
+    if (event.nativeEvent.layoutMeasurement?.height) {
+      viewportHeightRef.current = event.nativeEvent.layoutMeasurement.height;
+    }
+    checkAnchorVisibility();
+  }, [checkAnchorVisibility]);
+
+  const handleContentSizeChange = useCallback((w: number, h: number) => {
+    contentHeightRef.current = h;
+    checkAnchorVisibility();
+  }, [checkAnchorVisibility]);
+
+  const handleListLayout = useCallback((e: LayoutChangeEvent) => {
+    viewportHeightRef.current = e.nativeEvent.layout.height;
+    checkAnchorVisibility();
+  }, [checkAnchorVisibility]);
+
+  const handleScrollToBottom = useCallback(() => {
+    listRef.current?.scrollToEnd({ animated: true });
+  }, []);
+
+  const anchorAnimStyle = useAnimatedStyle(() => ({
+    opacity: anchorOpacity.value,
+    transform: [{ translateY: anchorTranslateY.value }],
+  }));
+
   useEffect(() => {
     if (activeScenario !== prevScenario.current) {
       prevScenario.current = activeScenario;
       prevMsgCount.current = messages.length;
       lastUserMsgIndex.current = null;
+      showAnchorRef.current = false;
+      setShowAnchor(false);
+      anchorOpacity.value = 0;
+      anchorTranslateY.value = 8;
       const timer = setTimeout(() => {
         listRef.current?.scrollToOffset({ offset: 0, animated: false });
       }, 100);
@@ -122,6 +204,10 @@ export default function ChatScreen() {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               onScrollToIndexFailed={handleScrollToIndexFailed}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              onContentSizeChange={handleContentSizeChange}
+              onLayout={handleListLayout}
               maintainVisibleContentPosition={{
                 minIndexForVisible: 0,
                 autoscrollToTopThreshold: undefined,
@@ -133,8 +219,21 @@ export default function ChatScreen() {
               ) : null}
             />
           )}
+
+          {showAnchor && messages.length > 0 && (
+            <Animated.View
+              style={[styles.anchorWrap, { bottom: inputBarHeight + 16 }, anchorAnimStyle]}
+              accessibilityRole="button"
+              accessibilityLabel="Scroll to bottom"
+            >
+              <ScrollAnchor onPress={handleScrollToBottom} />
+            </Animated.View>
+          )}
+
           <ScenarioFab />
-          <InputBar />
+          <View onLayout={handleInputBarLayout}>
+            <InputBar />
+          </View>
         </View>
 
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
@@ -170,5 +269,10 @@ const styles = StyleSheet.create({
   msgWrap: {
     marginBottom: 16,
     paddingHorizontal: 0,
+  },
+  anchorWrap: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 50,
   },
 });
