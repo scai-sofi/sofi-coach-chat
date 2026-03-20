@@ -120,6 +120,10 @@ function parseContentBlocks(content: string): ContentBlock[] {
     if (displayText.startsWith('- ')) {
       displayText = '• ' + displayText.slice(2);
     }
+    if (/^\d+\.\s/.test(displayText) && isList) {
+      displayText = displayText.replace(/^\d+\.\s*/, '• ');
+    }
+    displayText = displayText.replace(/^(•\s*){2,}/, '• ');
 
     if (isHeader) {
       if (!displayText.startsWith('**')) {
@@ -130,9 +134,6 @@ function parseContentBlocks(content: string): ContentBlock[] {
       }
       blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
-      if (/^\d+\.\s/.test(displayText)) {
-        displayText = displayText.replace(/^\d+\.\s*/, '• ');
-      }
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
     } else {
       blocks.push({ type: 'text', text: displayText, paragraphGap });
