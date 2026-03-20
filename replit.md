@@ -39,6 +39,7 @@ The project is structured as a pnpm workspace monorepo.
 ### Feature Specifications
 - **AI Financial Coach:** Interactive chat interface using OpenAI via Replit AI Integrations proxy.
 - **Chat Modes:** Supports "live" AI chat (default) and "demo" mode with mock data and pre-built scenarios.
+- **Suggestion Pills:** 0-3 contextual follow-up suggestion pills appear after coach responses. Only shown when they help the user act on next steps or keep the conversation moving. Pills are single-line only (never wrap or truncate), max 35 characters, server-side truncated with ellipsis if exceeded. Empty suggestions are gracefully hidden.
 - **Memory Center:** CRUD operations for managing coach memories.
 - **Goals Dashboard:** Displays progress rings and milestones.
 - **Message Rendering:** Employs a parse-render pipeline for chat message content, converting markdown into typed `ContentBlock[]` for extensible rendering.

@@ -45,7 +45,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('sounds good') || input.includes("let's go") || input.includes('let\'s go')) {
     return {
       content: "**Let's Get Started**\n\nHere are four areas we can focus on — pick the one that feels most important right now. We can always layer in more goals later.\n\n• **Building an emergency fund** — create a financial safety net for unexpected expenses\n• **Paying off debt** — eliminate high-interest debt and free up monthly cash flow\n• **Saving for a big purchase** — reverse-engineer a savings plan with a clear timeline\n• **Spending smarter** — find opportunities to optimize where your money goes\n\nEach one builds on the others, so there's no wrong starting point. What feels most urgent?",
-      suggestions: ['Building an emergency fund', 'Paying off debt', 'Saving for a big purchase', 'Spending smarter'],
+      suggestions: ['Build an emergency fund', 'Pay off debt faster', 'Save for a big purchase'],
     };
   }
 
@@ -187,7 +187,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('what can you help') || input.includes('what do you do')) {
     return {
       content: "**What I Can Help With**\n\nI'm your AI financial coach — here to help you understand, manage, and grow your money. Here's what I cover:\n\n**Spending Insights**\nTrack where your money goes, spot trends week-over-week, identify unused subscriptions, and find concrete opportunities to save. I'll do the math so you don't have to.\n\n**Goals & Tracking**\nSet financial goals with specific timelines, monitor progress with milestone tracking (25/50/75/100%), and get proactive alerts when something needs attention. Auto-transfers keep you on track.\n\n**SoFi Products**\nHelp you get the most out of checking, savings (4.00% APY), investing, credit, and loans. I can coordinate across accounts for optimal allocation.\n\n**Financial Planning**\nBudgeting strategies, debt payoff plans (avalanche vs. snowball), investment education, and connecting you with human SoFi Certified Financial Planners for complex topics — free for members.\n\nWhat sounds most useful right now?",
-      suggestions: ['Show my spending', 'Help me set a goal', 'What products do I have?', 'I need financial advice'],
+      suggestions: ['Show my spending', 'Help me set a goal', 'What products do I have?'],
     };
   }
 
@@ -295,7 +295,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('what about investing') || input.includes('should i invest')) {
     return {
       content: "**Should You Start Investing?**\n\nInvesting is a powerful long-term wealth builder, but timing and readiness matter. Here's where you stand:\n\n**Your Investment Readiness Checklist**\n• **High-interest debt:** $1,260 remaining at 22.99% APR — almost done\n• **Emergency fund:** $8,400 of $12,000 (70%) — solid progress\n• **Monthly surplus:** $1,520 available — plenty of room to invest\n• **Risk profile:** Conservative (your preference)\n\n**My Assessment**\nYou're close to the ideal starting point. Once your credit card is paid off (1–3 months away), every dollar that was going to 22.99% interest can work for you in the market instead.\n\n**Your Options on SoFi Invest**\n• **Conservative portfolio:** ~70% bonds, 30% index funds — lower volatility, steady growth (~4–6% historical average)\n• **Moderate portfolio:** ~50/50 split — balanced risk and reward (~6–8% historical average)\n• **Aggressive portfolio:** ~80% stocks, 20% bonds — higher growth potential with more volatility (~8–10% historical average)\n\n**What I'd Suggest**\nGiven your risk-averse preference, start with the Conservative portfolio at $100–200/month after your credit card is paid off. Even $150/month at 5% average return grows to ~$23,000 over 10 years.\n\nAll investing involves risk, and past performance doesn't guarantee future results. Want to explore any of these options in more detail?",
-      suggestions: ['Tell me about conservative portfolios', 'How much should I invest monthly?', 'I\'ll wait until my debt is paid off'],
+      suggestions: ['Explain conservative portfolios', 'How much should I invest monthly?', 'I\'ll wait until my debt is paid off'],
     };
   }
 

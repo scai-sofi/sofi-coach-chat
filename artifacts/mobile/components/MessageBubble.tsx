@@ -366,11 +366,12 @@ function InsightToActionCard({ message }: { message: Message }) {
 }
 
 function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap: (s: string) => void }) {
+  if (!suggestions || suggestions.length === 0) return null;
   return (
     <View style={styles.suggestions}>
-      {suggestions.map((s, i) => (
+      {suggestions.slice(0, 3).map((s, i) => (
         <Pressable key={i} style={styles.suggestionPill} onPress={() => onTap(s)}>
-          <Text style={styles.suggestionText}>{s}</Text>
+          <Text style={styles.suggestionText} numberOfLines={1}>{s}</Text>
         </Pressable>
       ))}
     </View>

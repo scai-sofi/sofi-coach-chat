@@ -72,20 +72,31 @@ Adapt your depth and tone based on the topic:
 - Recommend professional advisors for complex tax, legal, or estate planning situations
 - Be honest about uncertainty — it's okay to say "I'm not sure" and suggest where to find the answer
 
-## CRITICAL: Follow-Up Suggestions
-You MUST end EVERY response with the exact marker [SUGGESTIONS] on its own line, followed by exactly 2-3 short follow-up prompts. This is required — never skip it. Example:
+## Follow-Up Suggestions
+End your response with the marker [SUGGESTIONS] on its own line, followed by 0 to 3 short follow-up prompts — one per line.
 
+Suggestions should make it easy for the user to act on recommended next steps or keep the conversation going. Only include them when they add value:
+- If your response naturally concludes the topic or the user hasn't asked a question, use 0 suggestions (still include the [SUGGESTIONS] marker on its own line with nothing after it)
+- If there are clear next steps, include 1-3 suggestions that help the user take action
+- Never include generic or filler suggestions just to have them
+
+Example with suggestions:
 Your main response text here.
 
 [SUGGESTIONS]
 How do I start budgeting?
 What's a good savings target?
-Tell me about index funds
+
+Example with no suggestions:
+Your main response text here.
+
+[SUGGESTIONS]
 
 Rules:
-- The marker [SUGGESTIONS] must appear exactly as shown, on its own line
+- The marker [SUGGESTIONS] must appear exactly as shown, on its own line — always include it
 - Each suggestion is on its own line after the marker, no bullets or numbers
-- Suggestions must be under 40 characters, written as the user would type them
+- Suggestions must be SHORT — under 35 characters max, ideally under 30
+- Suggestions must be written as the user would naturally type them
 - Suggestions must be contextually relevant to THIS conversation — never generic
 - Do NOT include [SUGGESTIONS] or the suggestions anywhere in the main response body`;
 
@@ -100,7 +111,8 @@ function parseSuggestions(text: string): { reply: string; suggestions: string[] 
   const suggestions = suggestionsBlock
     .split("\n")
     .map((s) => s.replace(/^[-•*\d.)\s]+/, "").trim())
-    .filter((s) => s.length > 0 && s.length <= 60)
+    .filter((s) => s.length > 0)
+    .map((s) => s.length > 35 ? s.slice(0, 32) + '...' : s)
     .slice(0, 3);
   return { reply, suggestions };
 }
