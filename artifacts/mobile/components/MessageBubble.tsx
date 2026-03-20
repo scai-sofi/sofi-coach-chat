@@ -73,7 +73,6 @@ function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRul
 function parseContentBlocks(content: string): ContentBlock[] {
   const lines = content.split('\n');
   const blocks: ContentBlock[] = [];
-  let prevWasHeader = false;
   let prevWasBullet = false;
   let prevWasBlank = false;
   let inCodeBlock = false;
@@ -89,7 +88,6 @@ function parseContentBlocks(content: string): ContentBlock[] {
       const codeLine = rawLine.replace(/\t/g, '  ');
       blocks.push({ type: 'text', text: codeLine, paragraphGap: false });
       prevWasBlank = false;
-      prevWasHeader = false;
       prevWasBullet = false;
       continue;
     }
@@ -98,16 +96,13 @@ function parseContentBlocks(content: string): ContentBlock[] {
 
     if (normalized === '') {
       if (blocks.length > 0) prevWasBlank = true;
-      prevWasHeader = false;
       continue;
     }
 
     const { isHeader, isList, isRule, displayText: classified } = classifyLine(normalized);
 
     if (isRule) {
-      if (blocks.length > 0) blocks.push({ type: 'divider' });
-      prevWasBlank = false;
-      prevWasHeader = false;
+      prevWasBlank = true;
       prevWasBullet = false;
       continue;
     }
@@ -131,9 +126,6 @@ function parseContentBlocks(content: string): ContentBlock[] {
       if (!displayText.startsWith('**')) {
         displayText = `**${displayText}**`;
       }
-      if (blocks.length > 0 && !prevWasHeader) {
-        blocks.push({ type: 'divider' });
-      }
       blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
@@ -141,7 +133,6 @@ function parseContentBlocks(content: string): ContentBlock[] {
       blocks.push({ type: 'text', text: displayText, paragraphGap });
     }
 
-    prevWasHeader = isHeader;
     prevWasBullet = isList;
     prevWasBlank = false;
   }
