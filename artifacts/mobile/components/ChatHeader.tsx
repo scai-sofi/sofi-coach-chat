@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path, Rect } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
@@ -76,29 +76,23 @@ function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number;
 
 function ChatNewIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 21 20" fill="none">
       <Path
-        d="M18 15V12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12V15C20 17.2091 18.2091 19 16 19H8.32812C8.06302 19.0001 7.80856 19.1055 7.62109 19.293L5.51758 21.3965C5.13114 21.7829 4.60702 22 4.06055 22C2.92256 21.9999 2.00006 21.0774 2 19.9395V9C2 6.79086 3.79086 5 6 5H13C13.5523 5 14 5.44772 14 6C14 6.55228 13.5523 7 13 7H6C4.89543 7 4 7.89543 4 9V19.9395C4.00006 19.9729 4.02714 19.9999 4.06055 20C4.07658 20 4.09215 19.9937 4.10352 19.9824L6.20703 17.8789C6.76957 17.3164 7.53258 17.0001 8.32812 17H16C17.1046 17 18 16.1046 18 15ZM18 9V7H16C15.4477 7 15 6.55228 15 6C15 5.44772 15.4477 5 16 5H18V3C18 2.44772 18.4477 2 19 2C19.5523 2 20 2.44772 20 3V5H22C22.5523 5 23 5.44772 23 6C23 6.55228 22.5523 7 22 7H20V9C20 9.55228 19.5523 10 19 10C18.4477 10 18 9.55228 18 9Z"
+        d="M16 13V10C16 9.44772 16.4477 9 17 9C17.5523 9 18 9.44772 18 10V13C18 15.2091 16.2091 17 14 17H6.32812C6.06302 17.0001 5.80856 17.1055 5.62109 17.293L3.51758 19.3965C3.13114 19.7829 2.60702 20 2.06055 20C0.922564 19.9999 6.18439e-05 19.0774 0 17.9395V7C0 4.79086 1.79086 3 4 3H11C11.5523 3 12 3.44772 12 4C12 4.55228 11.5523 5 11 5H4C2.89543 5 2 5.89543 2 7V17.9395C2.00006 17.9729 2.02714 17.9999 2.06055 18C2.07658 18 2.09215 17.9937 2.10352 17.9824L4.20703 15.8789C4.76957 15.3164 5.53258 15.0001 6.32812 15H14C15.1046 15 16 14.1046 16 13ZM16 7V5H14C13.4477 5 13 4.55228 13 4C13 3.44772 13.4477 3 14 3H16V1C16 0.447715 16.4477 0 17 0C17.5523 0 18 0.447715 18 1V3H20C20.5523 3 21 3.44772 21 4C21 4.55228 20.5523 5 20 5H18V7C18 7.55228 17.5523 8 17 8C16.4477 8 16 7.55228 16 7Z"
         fill={color}
       />
     </Svg>
   );
 }
 
-function MemoryIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+function FpoIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
       <Path
-        d="M4 5C4 4.44772 4.44772 4 5 4H7C7.55228 4 8 4.44772 8 5V19C8 19.5523 7.55228 20 7 20H5C4.44772 20 4 19.5523 4 19V5Z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none"
-      />
-      <Path
-        d="M10 7C10 6.44772 10.4477 6 11 6H13C13.5523 6 14 6.44772 14 7V19C14 19.5523 13.5523 20 13 20H11C10.4477 20 10 19.5523 10 19V7Z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none"
-      />
-      <Path
-        d="M16 9C16 8.44772 16.4477 8 17 8H19C19.5523 8 20 8.44772 20 9V19C20 19.5523 19.5523 20 19 20H17C16.4477 20 16 19.5523 16 19V9Z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M0 2.6C0 1.16406 1.16406 0 2.6 0H4.2002C4.75248 0 5.2002 0.447715 5.2002 1C5.2002 1.55228 4.75248 2 4.2002 2H2.6C2.26863 2 2 2.26863 2 2.6V8H9.00059C9.33196 8 9.60059 7.73137 9.60059 7.4V2.6C9.60059 2.26871 9.33194 2 9.00049 2C8.66904 2 8.40039 2.26871 8.40039 2.6V5.8C8.40039 6.35228 7.95268 6.8 7.40039 6.8C6.84811 6.8 6.40039 6.35228 6.40039 5.8V2.6C6.40039 1.16398 7.56463 0 9.00049 0C10.4363 0 11.6006 1.16398 11.6006 2.6V7.4C11.6006 8.83594 10.4365 10 9.00059 10H2V17C2 17.5523 1.55228 18 1 18C0.447715 18 0 17.5523 0 17V2.6ZM15.4004 2C15.0692 2 14.8008 2.26845 14.8008 2.59961V15.4004C14.8008 15.7315 15.0692 16 15.4004 16C15.7315 16 16 15.7315 16 15.4004V2.59961C16 2.26845 15.7315 2 15.4004 2ZM12.8008 2.59961C12.8008 1.16388 13.9647 0 15.4004 0C16.8361 0 18 1.16388 18 2.59961V15.4004C18 16.8361 16.8361 18 15.4004 18C13.9647 18 12.8008 16.8361 12.8008 15.4004V2.59961ZM7.40039 11.2C7.95268 11.2 8.40039 11.6477 8.40039 12.2V17C8.40039 17.5523 7.95268 18 7.40039 18C6.84811 18 6.40039 17.5523 6.40039 17V12.2C6.40039 11.6477 6.84811 11.2 7.40039 11.2Z"
+        fill={color}
       />
     </Svg>
   );
@@ -106,14 +100,12 @@ function MemoryIcon({ size = 24, color = Colors.contentPrimary }: { size?: numbe
 
 function PencilMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
       <Path
-        d="M16.474 5.408l2.118 2.118m-.756-3.982L12.109 9.27a2.118 2.118 0 00-.58.849l-.755 2.647a.353.353 0 00.431.431l2.647-.755a2.118 2.118 0 00.849-.58l5.727-5.727a1.496 1.496 0 10-2.116-2.116z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
-      />
-      <Path
-        d="M19 15v3a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h3"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.0858 1C11.7261 0.35971 12.5945 0 13.5 0C14.4055 0 15.2739 0.359711 15.9142 1L17 2.08579C17.6403 2.72608 18 3.59449 18 4.5C18 5.40551 17.6403 6.27392 17 6.91421L7.61893 16.2953C7.21549 16.6987 6.70536 16.9788 6.1484 17.1025L2.31349 17.9547C2.17808 17.9848 2.03979 18 1.90109 18C0.851145 18 0 17.1489 0 16.0989C0 15.9602 0.0151805 15.8219 0.0452704 15.6865L0.897472 11.8516C1.02124 11.2946 1.30127 10.7845 1.70471 10.3811L9.54257 2.54321L11.0858 1ZM10.25 4.66421L3.11893 11.7953C2.98445 11.9298 2.8911 12.0998 2.84985 12.2855L2.03136 15.9686L5.71454 15.1502C5.90019 15.1089 6.07023 15.0156 6.20471 14.8811L13.3358 7.75L10.25 4.66421ZM14.75 6.33579L11.6642 3.25L12.5 2.41421C12.7652 2.149 13.1249 2 13.5 2C13.8751 2 14.2348 2.149 14.5 2.41421L15.5858 3.5C15.851 3.76522 16 4.12493 16 4.5C16 4.87507 15.851 5.23478 15.5858 5.5L14.75 6.33579Z"
+        fill={color}
       />
     </Svg>
   );
@@ -121,28 +113,11 @@ function PencilMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: n
 
 function DeleteMenuIcon({ size = 24, color = Colors.danger }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 16 20" fill="none">
       <Path
-        d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
-function GoalsMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-        stroke={color} strokeWidth={1.5}
-      />
-      <Path
-        d="M12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12C6 15.3137 8.68629 18 12 18Z"
-        stroke={color} strokeWidth={1.5}
-      />
-      <Path
-        d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4 2C4 0.89543 4.89543 0 6 0H10C11.1046 0 12 0.89543 12 2V3H15C15.5523 3 16 3.44772 16 4C16 4.55228 15.5523 5 15 5H1C0.447715 5 0 4.55228 0 4C0 3.44772 0.447715 3 1 3H4V2ZM6 3H10V2H6V3ZM2 5.99699C2.55228 5.99699 3 6.44471 3 6.99699V16C3 17.1046 3.89543 18 5 18H11C12.1046 18 13 17.1046 13 16V6.99699C13 6.44471 13.4477 5.99699 14 5.99699C14.5523 5.99699 15 6.44471 15 6.99699V16C15 18.2091 13.2091 20 11 20H5C2.79086 20 1 18.2091 1 16V6.99699C1 6.44471 1.44772 5.99699 2 5.99699ZM6 7C6.55228 7 7 7.44772 7 8V15C7 15.5523 6.55228 16 6 16C5.44772 16 5 15.5523 5 15V8C5 7.44772 5.44772 7 6 7ZM10 7C10.5523 7 11 7.44772 11 8V15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15V8C9 7.44772 9.44771 7 10 7Z"
         fill={color}
       />
     </Svg>
@@ -214,11 +189,11 @@ export function ChatHeader() {
               </Pressable>
               <Pressable style={styles.menuItem} onPress={() => { setActivePanel('memory'); setMenuOpen(false); }}>
                 <Text style={styles.menuText}>Chat memory</Text>
-                <MemoryIcon size={24} color={Colors.contentPrimary} />
+                <FpoIcon size={24} color={Colors.contentPrimary} />
               </Pressable>
               <Pressable style={styles.menuItem} onPress={() => { setActivePanel('goals'); setMenuOpen(false); }}>
                 <Text style={styles.menuText}>Goals</Text>
-                <GoalsMenuIcon size={24} color={Colors.contentPrimary} />
+                <FpoIcon size={24} color={Colors.contentPrimary} />
               </Pressable>
               <Pressable style={styles.menuItem} onPress={() => setMenuOpen(false)}>
                 <Text style={styles.menuText}>Rename</Text>
