@@ -8,9 +8,13 @@ import Animated, {
   Easing,
   interpolateColor,
 } from 'react-native-reanimated';
+import { Asset } from 'expo-asset';
 import { Fonts } from '@/constants/fonts';
 
 const orbGif = require('@/assets/images/orb-analyzing.gif');
+
+const orbAsset = Asset.fromModule(orbGif);
+orbAsset.downloadAsync();
 
 function ShimmerText() {
   const sweep = useSharedValue(0);
