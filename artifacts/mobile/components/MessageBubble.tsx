@@ -62,11 +62,11 @@ function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRul
   const isNumbered = /^\d+\.\s/.test(effective);
   const isStandaloneBold = /^\*\*[^*]+\*\*[:\s]*$/.test(effective);
 
-  const isBullet = effective.startsWith('•') || effective.startsWith('- ') || effective === '-';
+  const isBullet = effective.startsWith('•') || effective.startsWith('- ') || effective === '-' || /^\*\s+/.test(effective);
 
   let promotedHeader = false;
   if (!isStandaloneBold && isBullet) {
-    const stripped = effective.replace(/^[•\-]\s*/, '');
+    const stripped = effective.replace(/^[•\-\*]\s*/, '');
     if (/^\*\*[^*]+\*\*[:\s]*$/.test(stripped)) {
       promotedHeader = true;
     }
@@ -77,7 +77,10 @@ function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRul
 
   let displayText = effective;
   if (promotedHeader) {
-    displayText = effective.replace(/^[•\-]\s*/, '');
+    displayText = effective.replace(/^[•\-\*]\s*/, '');
+  }
+  if (isList && /^\*\s+/.test(displayText)) {
+    displayText = '• ' + displayText.replace(/^\*\s+/, '');
   }
 
   return { isHeader, isList, isRule: false, displayText };
@@ -155,6 +158,20 @@ function parseContentBlocks(content: string): ContentBlock[] {
   }
 
   for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    if (b.type === 'bullet' && /^\*\*[^*]+\*\*[:\s]*$/.test(b.text.replace(/^•\s*/, ''))) {
+      const headerText = b.text.replace(/^•\s*/, '');
+      const hasNonHeaderContent = blocks.slice(0, i).some(bl => bl.type !== 'header' && bl.type !== 'divider');
+      if (hasNonHeaderContent) {
+        blocks.splice(i, 1, { type: 'divider' }, { type: 'header', text: headerText });
+        i++;
+      } else {
+        blocks[i] = { type: 'header', text: headerText };
+      }
+    }
+  }
+
+  for (let i = 0; i < blocks.length; i++) {
     if (blocks[i].type !== 'header') continue;
     let next = i + 1;
     while (next < blocks.length && blocks[next].type === 'divider') next++;
@@ -162,7 +179,6 @@ function parseContentBlocks(content: string): ContentBlock[] {
       blocks[i] = { type: 'text', text: blocks[i].text, paragraphGap: false };
       if (next === i + 2 && blocks[i + 1].type === 'divider') {
         blocks.splice(i + 1, 1);
-        next--;
       }
     }
   }
