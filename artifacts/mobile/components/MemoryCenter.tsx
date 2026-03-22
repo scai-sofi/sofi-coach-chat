@@ -8,6 +8,19 @@ import { useCoach } from '@/context/CoachContext';
 import { useToast } from '@/components/Toast';
 import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory } from '@/constants/types';
 
+function GpuIcon({ size = 18, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M6 4H18C18.5523 4 19 4.44772 19 5V19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V5C5 4.44772 5.44772 4 6 4Z"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path d="M9 8H15V16H9V8Z" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M9 1V4M15 1V4M9 20V23M15 20V23M1 9H5M1 15H5M19 9H23M19 15H23" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -266,6 +279,7 @@ export function MemoryCenter() {
             </Pressable>
           </View>
           <View style={styles.titleArea}>
+            <GpuIcon size={18} color={Colors.contentPrimary} />
             <Text style={styles.titleText} numberOfLines={1}>Coach memory</Text>
           </View>
           <View style={styles.rightControls} />
@@ -373,8 +387,10 @@ const styles = StyleSheet.create({
   titleArea: {
     flex: 1,
     height: 44,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
   },
   titleText: {
     fontSize: 16,
