@@ -368,6 +368,17 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    if (sseBuffer.trim()) {
+      const remaining = sseBuffer.trim();
+      if (remaining.startsWith('data: ')) {
+        try {
+          const event = JSON.parse(remaining.slice(6));
+          if (event.type === 'done') donePayload = event;
+          else if (event.type === 'error') donePayload = { error: event.error };
+        } catch {}
+      }
+    }
+
     const finalReply = donePayload?.reply || fullContent;
     const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
     const memoryAction = donePayload?.memoryAction || null;

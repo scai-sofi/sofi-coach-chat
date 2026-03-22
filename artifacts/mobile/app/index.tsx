@@ -267,6 +267,7 @@ export default function ChatScreen() {
           setActivePanel('none');
         }} />
       )}
+
     </View>
   );
 }
