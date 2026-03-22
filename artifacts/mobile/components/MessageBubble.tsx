@@ -139,19 +139,11 @@ function parseContentBlocks(content: string): ContentBlock[] {
       if (!displayText.startsWith('**')) {
         displayText = `**${displayText}**`;
       }
-      const lastBlock = blocks.length > 0 ? blocks[blocks.length - 1] : null;
-      const prevIsHeader = lastBlock?.type === 'header';
-      if (prevIsHeader) {
-        const prevText = lastBlock.text.replace(/\*\*/g, '').replace(/[:\s]+$/, '');
-        const curText = displayText.replace(/\*\*/g, '').replace(/[:\s]+$/, '');
-        blocks[blocks.length - 1] = { type: 'header', text: `**${prevText} — ${curText}:**` };
-      } else {
-        const hasNonHeaderContent = blocks.some(b => b.type !== 'header' && b.type !== 'divider');
-        if (hasNonHeaderContent) {
-          blocks.push({ type: 'divider' });
-        }
-        blocks.push({ type: 'header', text: displayText });
+      const hasNonHeaderContent = blocks.some(b => b.type !== 'header' && b.type !== 'divider');
+      if (hasNonHeaderContent) {
+        blocks.push({ type: 'divider' });
       }
+      blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
     } else {
@@ -160,6 +152,19 @@ function parseContentBlocks(content: string): ContentBlock[] {
 
     prevWasBullet = isList;
     prevWasBlank = false;
+  }
+
+  for (let i = 0; i < blocks.length; i++) {
+    if (blocks[i].type !== 'header') continue;
+    let next = i + 1;
+    while (next < blocks.length && blocks[next].type === 'divider') next++;
+    if (next < blocks.length && blocks[next].type === 'header') {
+      blocks[i] = { type: 'text', text: blocks[i].text, paragraphGap: false };
+      if (next === i + 2 && blocks[i + 1].type === 'divider') {
+        blocks.splice(i + 1, 1);
+        next--;
+      }
+    }
   }
 
   return blocks;
