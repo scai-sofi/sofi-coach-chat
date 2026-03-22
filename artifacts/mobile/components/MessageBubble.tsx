@@ -139,13 +139,19 @@ function parseContentBlocks(content: string): ContentBlock[] {
       if (!displayText.startsWith('**')) {
         displayText = `**${displayText}**`;
       }
-      const lastContentBlock = [...blocks].reverse().find(b => b.type !== 'divider');
-      const prevWasHeader = lastContentBlock?.type === 'header';
-      const hasNonHeaderContent = blocks.some(b => b.type !== 'header' && b.type !== 'divider');
-      if (hasNonHeaderContent && !prevWasHeader) {
-        blocks.push({ type: 'divider' });
+      const lastBlock = blocks.length > 0 ? blocks[blocks.length - 1] : null;
+      const prevIsHeader = lastBlock?.type === 'header';
+      if (prevIsHeader) {
+        const prevText = lastBlock.text.replace(/\*\*/g, '').replace(/[:\s]+$/, '');
+        const curText = displayText.replace(/\*\*/g, '').replace(/[:\s]+$/, '');
+        blocks[blocks.length - 1] = { type: 'header', text: `**${prevText} — ${curText}:**` };
+      } else {
+        const hasNonHeaderContent = blocks.some(b => b.type !== 'header' && b.type !== 'divider');
+        if (hasNonHeaderContent) {
+          blocks.push({ type: 'divider' });
+        }
+        blocks.push({ type: 'header', text: displayText });
       }
-      blocks.push({ type: 'header', text: displayText });
     } else if (isList) {
       blocks.push({ type: 'bullet', text: displayText, paragraphGap });
     } else {
