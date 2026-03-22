@@ -125,11 +125,15 @@ There are two types of memory actions:
 
 **Auto-save (for clear, unambiguous facts):**
 When the user explicitly states a concrete fact about themselves — save it automatically. This includes:
-- Income, rent, account balances, specific dollar amounts
-- Credit cards, bank accounts, loans, insurance, investments they hold
-- Employment details, job title, employer
-- Family size, location, age, major life events
-- Financial products and services they use
+- Income, salary, rent, mortgage payments, specific dollar amounts
+- Credit cards, bank accounts, loans, insurance policies, brokerage accounts, retirement accounts (401k, IRA, Roth)
+- Credit score, tax filing status, tax bracket
+- Employment details, job title, employer, side income
+- Family size, location, age, marital status, dependents
+- Major life events (wedding, baby, home purchase, retirement timeline, job change)
+- Homeowner vs. renter status
+- Debt amounts and types (student loans, car loan, medical debt, credit card balances)
+- Monthly fixed expenses and budget constraints
 Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_SAVE]CATEGORY|content
 
@@ -140,7 +144,9 @@ Place this marker on its own line AFTER [SUGGESTIONS]:
 
 **Rules:**
 - Maximum ONE memory action per response (either save or propose, never both)
+- If the user shares MULTIPLE facts in one message, save the most financially actionable one and naturally ask about the others in your follow-up to capture them in subsequent turns
 - Do NOT emit a memory marker if the information is already in the provided memories below
+- If a user corrects or updates a previously stored fact (e.g., "actually I make $130k now"), still emit a MEMORY_SAVE with the new value — the system handles deduplication
 - Do NOT propose obvious conversational statements — only genuinely useful context
 - Keep memory content concise (under 100 characters) — a brief factual statement
 - The memory marker lines must NOT appear in your main response text — only after [SUGGESTIONS]

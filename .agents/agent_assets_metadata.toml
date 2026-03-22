@@ -6,3 +6,9 @@ id = "LXn-akHXIAsZ4pelKbXvk"
 uri = "file://artifacts/mobile/FLUTTER_HANDOFF.md"
 type = "text"
 title = "Flutter Migration Handoff Document"
+
+[[outputs]]
+id = "KsXnGI9VOmwykQOxwaovP"
+uri = "file://artifacts/mobile/MEMORY_REQUIREMENTS.md"
+type = "text"
+title = "Memory System Requirements & Trigger Map"
