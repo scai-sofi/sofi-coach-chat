@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "LXn-akHXIAsZ4pelKbXvk"
+uri = "file://artifacts/mobile/FLUTTER_HANDOFF.md"
+type = "text"
+title = "Flutter Migration Handoff Document"
