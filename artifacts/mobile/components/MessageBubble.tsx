@@ -79,9 +79,6 @@ function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRul
   if (promotedHeader) {
     displayText = effective.replace(/^[•\-]\s*/, '');
   }
-  if (isHeader) {
-    displayText = displayText.replace(/^\*\*\d+\.\s*/, '**');
-  }
 
   return { isHeader, isList, isRule: false, displayText };
 }
@@ -194,7 +191,7 @@ function BlockDivider() {
 
 function TextBlock({ block }: { block: Extract<ContentBlock, { type: 'text' }> }) {
   return (
-    <Text style={[styles.aiText, block.paragraphGap && { marginTop: 10 }]}>
+    <Text style={[styles.aiText, block.paragraphGap && { marginTop: 8 }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
@@ -202,17 +199,16 @@ function TextBlock({ block }: { block: Extract<ContentBlock, { type: 'text' }> }
 
 function BulletBlock({ block }: { block: Extract<ContentBlock, { type: 'bullet' }> }) {
   return (
-    <Text style={[styles.aiText, styles.bulletText, block.paragraphGap && { marginTop: 10 }]}>
+    <Text style={[styles.aiText, styles.bulletText, block.paragraphGap && { marginTop: 8 }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
 }
 
 function HeaderBlock({ block }: { block: Extract<ContentBlock, { type: 'header' }> }) {
-  const cleanText = block.text.replace(/^\d+\.\s*/, '');
   return (
     <Text style={[styles.aiText, styles.headerText]}>
-      {formatInlineStyles(cleanText)}
+      {formatInlineStyles(block.text)}
     </Text>
   );
 }
@@ -461,7 +457,8 @@ function StreamingContent({ content }: { content: string }) {
     ]).start();
   }, [fadeAnim, slideAnim]);
 
-  const blocks = parseContentBlocks(content);
+  const allBlocks = parseContentBlocks(content);
+  const blocks = allBlocks.filter(b => b.type !== 'divider');
 
   if (blocks.length > prevBlockCount.current) {
     for (let i = prevBlockCount.current; i < blocks.length; i++) {
@@ -480,11 +477,10 @@ function StreamingContent({ content }: { content: string }) {
     <RNAnimated.View style={[styles.aiContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
       {blocks.map((block, i) => {
         const blockOpacity = blockFades.current[i] || new RNAnimated.Value(1);
+        const needsTopMargin = block.type === 'header' && i > 0;
         return (
-          <RNAnimated.View key={i} style={{ opacity: blockOpacity }}>
-            {block.type === 'divider' ? (
-              <BlockDivider />
-            ) : block.type === 'header' ? (
+          <RNAnimated.View key={i} style={[{ opacity: blockOpacity }, needsTopMargin && { marginTop: 12 }]}>
+            {block.type === 'header' ? (
               <HeaderBlock block={block} />
             ) : block.type === 'bullet' ? (
               <BulletBlock block={block} />
@@ -657,14 +653,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
-  aiContent: { gap: 2 },
+  aiContent: { gap: 8 },
   aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20, paddingHorizontal: 4 },
   headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
   bulletText: {},
   divider: {
     height: 0.75,
     backgroundColor: 'rgba(10,10,10,0.1)',
-    marginVertical: 10,
+    marginVertical: 16,
   },
   safetyBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
