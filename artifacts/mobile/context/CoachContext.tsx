@@ -253,9 +253,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const shouldAllowMemoryAction = useCallback((): boolean => {
     if (tempChatRef.current) return false;
     const currentCount = aiResponseCountRef.current;
-    if (currentCount <= 1) return false;
     const lastAction = lastMemoryActionMsgIndexRef.current;
-    if (lastAction >= 0 && (currentCount - lastAction) <= 3) return false;
+    if (lastAction >= 0 && (currentCount - lastAction) <= 2) return false;
     return true;
   }, []);
 
