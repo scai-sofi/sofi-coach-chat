@@ -268,6 +268,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (!isValidMemoryCategory(action.category)) return {};
     const category = action.category;
 
+    const normalizedContent = action.content.toLowerCase().trim();
+    const isDuplicate = memoriesRef.current.some(
+      m => m.status === 'ACTIVE' && m.content.toLowerCase().trim() === normalizedContent
+    );
+    if (isDuplicate) return {};
+
     if (action.type === 'save') {
       const mem: Memory = {
         id: uid(),
