@@ -60,13 +60,30 @@ function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRul
   if (isRule) return { isHeader: false, isList: false, isRule: true, displayText: effective };
 
   const isNumbered = /^\d+\.\s/.test(effective);
-  const isStandaloneBold = /^\*\*[^*]+\*\*\s*$/.test(effective) && !isNumbered;
-  const isHeader = isStandaloneBold;
+  const isStandaloneBold = /^\*\*[^*]+\*\*[:\s]*$/.test(effective);
 
   const isBullet = effective.startsWith('•') || effective.startsWith('- ') || effective === '-';
-  const isList = isBullet || isNumbered;
 
-  return { isHeader, isList, isRule: false, displayText: effective };
+  let promotedHeader = false;
+  if (!isStandaloneBold && isBullet) {
+    const stripped = effective.replace(/^[•\-]\s*/, '');
+    if (/^\*\*[^*]+\*\*[:\s]*$/.test(stripped)) {
+      promotedHeader = true;
+    }
+  }
+
+  const isHeader = isStandaloneBold || promotedHeader;
+  const isList = !isHeader && (isBullet || isNumbered);
+
+  let displayText = effective;
+  if (promotedHeader) {
+    displayText = effective.replace(/^[•\-]\s*/, '');
+  }
+  if (isHeader) {
+    displayText = displayText.replace(/^\*\*\d+\.\s*/, '**');
+  }
+
+  return { isHeader, isList, isRule: false, displayText };
 }
 
 function parseContentBlocks(content: string): ContentBlock[] {
@@ -91,7 +108,7 @@ function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
-    const normalized = normalizeLine(rawLine);
+    const normalized = normalizeLine(rawLine.replace(/^\s+/, ''));
 
     if (normalized === '') {
       if (blocks.length > 0) prevWasBlank = true;
