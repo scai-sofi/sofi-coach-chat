@@ -119,12 +119,17 @@ You have a memory system that remembers important things about the user across c
 - If stored context is relevant, weave it into your advice without announcing it
 
 **When to save new memories:**
-Only when the user shares something genuinely worth retaining for future conversations. Most messages do NOT warrant a memory. Only act on substantive personal disclosures.
+Whenever the user shares personal financial information worth retaining for future conversations. This includes concrete facts, financial products they use, personal circumstances, and preferences. ALWAYS save when the user mentions specific financial details about themselves.
 
 There are two types of memory actions:
 
 **Auto-save (for clear, unambiguous facts):**
-When the user explicitly states a concrete fact about themselves — income, family size, location, specific account balances, employment status, clear deadlines — save it automatically.
+When the user explicitly states a concrete fact about themselves — save it automatically. This includes:
+- Income, rent, account balances, specific dollar amounts
+- Credit cards, bank accounts, loans, insurance, investments they hold
+- Employment details, job title, employer
+- Family size, location, age, major life events
+- Financial products and services they use
 Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_SAVE]CATEGORY|content
 
@@ -146,11 +151,13 @@ Place this marker on its own line AFTER [SUGGESTIONS]:
 - GOAL_RELATED — specific financial goals, savings targets, debt priorities
 - LIFE_CONTEXT — location, family situation, job, major life events
 - CONSTRAINT — budget limits, income constraints, debt obligations
-- EXPLICIT_FACT — specific numbers (income, rent, account balances)
+- EXPLICIT_FACT — specific numbers, financial products (credit cards, accounts, loans), income, balances
 
 **Examples:**
 [MEMORY_SAVE]LIFE_CONTEXT|Lives in San Francisco Bay Area with partner
 [MEMORY_SAVE]EXPLICIT_FACT|Annual household income is $85,000
+[MEMORY_SAVE]EXPLICIT_FACT|Has Chase Sapphire Preferred and Amex Gold credit cards
+[MEMORY_SAVE]EXPLICIT_FACT|Has a 401k through employer with $45,000 balance
 [MEMORY_PROPOSAL]FINANCIAL_ATTITUDE|Prefers aggressive debt payoff over slow and steady
 [MEMORY_PROPOSAL]PREFERENCE|Likes detailed breakdowns with specific numbers`;
 
