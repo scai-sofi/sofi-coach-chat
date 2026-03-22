@@ -6,8 +6,15 @@ const router: IRouter = Router();
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_HISTORY_LENGTH = 20;
 const MAX_HISTORY_CONTENT_LENGTH = 4000;
+const MAX_MEMORIES = 50;
+const MAX_MEMORY_LENGTH = 500;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 20;
+
+const VALID_MEMORY_CATEGORIES = [
+  'PREFERENCE', 'CONSTRAINT', 'LIFE_CONTEXT',
+  'FINANCIAL_ATTITUDE', 'GOAL_RELATED', 'EXPLICIT_FACT',
+] as const;
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -101,6 +108,113 @@ Rules:
 - Suggestions must be contextually relevant to THIS conversation — never generic
 - Do NOT include [SUGGESTIONS] or the suggestions anywhere in the main response body`;
 
+const MEMORY_PROMPT_SECTION = `
+
+## Memory System
+You have a memory system that remembers important things about the user across conversations. Use it wisely.
+
+**How to use stored memories:**
+- Reference what you know naturally — "Since you're in the Bay Area..." or "Given your wedding timeline..."
+- NEVER say "according to my memory" or "I have stored that..." — just use the context like you genuinely know the person
+- If stored context is relevant, weave it into your advice without announcing it
+
+**When to save new memories:**
+Only when the user shares something genuinely worth retaining for future conversations. Most messages do NOT warrant a memory. Only act on substantive personal disclosures.
+
+There are two types of memory actions:
+
+**Auto-save (for clear, unambiguous facts):**
+When the user explicitly states a concrete fact about themselves — income, family size, location, specific account balances, employment status, clear deadlines — save it automatically.
+Place this marker on its own line AFTER [SUGGESTIONS]:
+[MEMORY_SAVE]CATEGORY|content
+
+**Propose (for inferred preferences or attitudes):**
+When you detect a preference, attitude, financial behavior, or life context that the user hasn't explicitly asked you to remember — propose it for their confirmation.
+Place this marker on its own line AFTER [SUGGESTIONS]:
+[MEMORY_PROPOSAL]CATEGORY|content
+
+**Rules:**
+- Maximum ONE memory action per response (either save or propose, never both)
+- Do NOT emit a memory marker if the information is already in the provided memories below
+- Do NOT propose obvious conversational statements — only genuinely useful context
+- Keep memory content concise (under 100 characters) — a brief factual statement
+- The memory marker lines must NOT appear in your main response text — only after [SUGGESTIONS]
+
+**Valid categories:**
+- PREFERENCE — user preferences for communication style, detail level, frequency
+- FINANCIAL_ATTITUDE — risk tolerance, saving vs spending philosophy, financial priorities
+- GOAL_RELATED — specific financial goals, savings targets, debt priorities
+- LIFE_CONTEXT — location, family situation, job, major life events
+- CONSTRAINT — budget limits, income constraints, debt obligations
+- EXPLICIT_FACT — specific numbers (income, rent, account balances)
+
+**Examples:**
+[MEMORY_SAVE]LIFE_CONTEXT|Lives in San Francisco Bay Area with partner
+[MEMORY_SAVE]EXPLICIT_FACT|Annual household income is $85,000
+[MEMORY_PROPOSAL]FINANCIAL_ATTITUDE|Prefers aggressive debt payoff over slow and steady
+[MEMORY_PROPOSAL]PREFERENCE|Likes detailed breakdowns with specific numbers`;
+
+function buildSystemPrompt(memories?: string[]): string {
+  let prompt = SYSTEM_PROMPT + MEMORY_PROMPT_SECTION;
+
+  if (memories && memories.length > 0) {
+    const memoryContext = memories.map(m => `- ${m}`).join('\n');
+    prompt += `
+
+## What You Know About This User
+The following are confirmed facts and preferences from previous conversations. Use this context naturally in your responses:
+${memoryContext}`;
+  } else {
+    prompt += `
+
+## What You Know About This User
+You don't have any stored memories about this user yet. Pay attention to personal facts they share — this is a great opportunity to start building context with a [MEMORY_SAVE] for explicit facts.`;
+  }
+
+  return prompt;
+}
+
+interface MemoryAction {
+  type: 'save' | 'proposal';
+  category: string;
+  content: string;
+}
+
+function parseMemoryMarkers(text: string): { cleanText: string; memoryAction: MemoryAction | null } {
+  const saveRegex = /\n?\[MEMORY_SAVE\](\w+)\|(.+)/;
+  const proposalRegex = /\n?\[MEMORY_PROPOSAL\](\w+)\|(.+)/;
+
+  let cleanText = text;
+  let memoryAction: MemoryAction | null = null;
+
+  const saveMatch = cleanText.match(saveRegex);
+  if (saveMatch) {
+    const category = saveMatch[1].trim();
+    const content = saveMatch[2].trim().slice(0, 200);
+    if (VALID_MEMORY_CATEGORIES.includes(category as any) && content.length > 0) {
+      memoryAction = { type: 'save', category, content };
+    }
+    cleanText = cleanText.replace(saveRegex, '');
+  }
+
+  if (!memoryAction) {
+    const proposalMatch = cleanText.match(proposalRegex);
+    if (proposalMatch) {
+      const category = proposalMatch[1].trim();
+      const content = proposalMatch[2].trim().slice(0, 200);
+      if (VALID_MEMORY_CATEGORIES.includes(category as any) && content.length > 0) {
+        memoryAction = { type: 'proposal', category, content };
+      }
+      cleanText = cleanText.replace(proposalRegex, '');
+    }
+  }
+
+  cleanText = cleanText.replace(/\[MEMORY_SAVE\][^\n]*/g, '');
+  cleanText = cleanText.replace(/\[MEMORY_PROPOSAL\][^\n]*/g, '');
+
+  return { cleanText: cleanText.trim(), memoryAction };
+}
+
 function parseSuggestions(text: string): { reply: string; suggestions: string[] } {
   const marker = "[SUGGESTIONS]";
   const idx = text.lastIndexOf(marker);
@@ -112,7 +226,7 @@ function parseSuggestions(text: string): { reply: string; suggestions: string[] 
   const suggestions = suggestionsBlock
     .split("\n")
     .map((s) => s.replace(/^[-•*\d.)\s]+/, "").trim())
-    .filter((s) => s.length > 0)
+    .filter((s) => s.length > 0 && !s.startsWith('[MEMORY_'))
     .map((s) => s.length > 35 ? s.slice(0, 32) + '...' : s)
     .slice(0, 3);
   return { reply, suggestions };
@@ -126,16 +240,17 @@ interface ChatMessage {
 interface ChatRequest {
   message: string;
   history?: ChatMessage[];
+  memories?: string[];
 }
 
-function validateChatRequest(req: Request, res: any): { message: string; sanitizedHistory: Array<{ role: "user" | "assistant"; content: string }> } | null {
+function validateChatRequest(req: Request, res: any): { message: string; sanitizedHistory: Array<{ role: "user" | "assistant"; content: string }>; sanitizedMemories: string[] } | null {
   const clientIp = getClientIp(req);
   if (!checkRateLimit(clientIp)) {
     res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
     return null;
   }
 
-  const { message, history = [] } = req.body as ChatRequest;
+  const { message, history = [], memories = [] } = req.body as ChatRequest;
 
   if (!message || typeof message !== "string") {
     res.status(400).json({ error: "Message is required" });
@@ -155,7 +270,12 @@ function validateChatRequest(req: Request, res: any): { message: string; sanitiz
       content: m.content.slice(0, MAX_HISTORY_CONTENT_LENGTH),
     }));
 
-  return { message, sanitizedHistory };
+  const sanitizedMemories = (Array.isArray(memories) ? memories : [])
+    .filter((m): m is string => typeof m === "string" && m.trim().length > 0)
+    .slice(0, MAX_MEMORIES)
+    .map((m) => m.slice(0, MAX_MEMORY_LENGTH));
+
+  return { message, sanitizedHistory, sanitizedMemories };
 }
 
 router.post("/chat", async (req, res) => {
@@ -163,8 +283,10 @@ router.post("/chat", async (req, res) => {
     const validated = validateChatRequest(req, res);
     if (!validated) return;
 
+    const systemPrompt = buildSystemPrompt(validated.sanitizedMemories);
+
     const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       ...validated.sanitizedHistory,
       { role: "user", content: validated.message },
     ];
@@ -176,9 +298,10 @@ router.post("/chat", async (req, res) => {
     });
 
     const raw = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
-    const { reply, suggestions } = parseSuggestions(raw);
+    const { cleanText, memoryAction } = parseMemoryMarkers(raw);
+    const { reply, suggestions } = parseSuggestions(cleanText);
 
-    res.json({ reply, suggestions });
+    res.json({ reply, suggestions, memoryAction });
   } catch (error: any) {
     console.error("Chat API error:", error?.message || error);
     if (error?.status === 429) {
@@ -194,8 +317,10 @@ router.post("/chat/stream", async (req, res) => {
     const validated = validateChatRequest(req, res);
     if (!validated) return;
 
+    const systemPrompt = buildSystemPrompt(validated.sanitizedMemories);
+
     const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       ...validated.sanitizedHistory,
       { role: "user", content: validated.message },
     ];
@@ -224,8 +349,9 @@ router.post("/chat/stream", async (req, res) => {
       }
     }
 
-    const { reply, suggestions } = parseSuggestions(fullText);
-    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions })}\n\n`);
+    const { cleanText, memoryAction } = parseMemoryMarkers(fullText);
+    const { reply, suggestions } = parseSuggestions(cleanText);
+    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryAction })}\n\n`);
     res.end();
   } catch (error: any) {
     console.error("Chat stream error:", error?.message || error);

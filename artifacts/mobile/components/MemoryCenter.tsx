@@ -111,7 +111,7 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
   const cardRef = useRef<View>(null);
   const MAX_CHARS = 300;
 
-  const sourceLabel = memory.source === 'EXPLICIT' ? 'You created' : 'AI inferred';
+  const sourceLabel = memory.source === 'EXPLICIT' ? 'You shared' : 'Coach noticed';
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const handleEdit = () => {

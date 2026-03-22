@@ -76,6 +76,18 @@ export function useCoach() {
   return ctx;
 }
 
+interface MemoryAction {
+  type: 'save' | 'proposal';
+  category: string;
+  content: string;
+}
+
+function getActiveMemoryStrings(memories: Memory[]): string[] {
+  return memories
+    .filter(m => m.status === 'ACTIVE')
+    .map(m => `[${m.category}] ${m.content}`);
+}
+
 export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
@@ -104,6 +116,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const abortControllerRef = useRef<AbortController | null>(null);
   const sessionVersionRef = useRef(0);
 
+  const lastMemoryActionMsgIndexRef = useRef(-1);
+  const aiResponseCountRef = useRef(0);
+
   const setActivePanel = useCallback((panel: PanelType) => {
     setActivePanelState(prev => prev === panel ? 'none' : panel);
   }, []);
@@ -125,6 +140,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setShowOnboarding(id === 'cold-start');
     setSessionTitle(scenario.title);
     titleGeneratedRef.current = true;
+    lastMemoryActionMsgIndexRef.current = -1;
+    aiResponseCountRef.current = 0;
   }, []);
 
   const startLiveChat = useCallback(() => {
@@ -142,6 +159,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setShowOnboarding(false);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
+    lastMemoryActionMsgIndexRef.current = -1;
+    aiResponseCountRef.current = 0;
   }, []);
 
   const addGoalFromProposal = useCallback((proposal: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }) => {
@@ -215,14 +234,65 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
+  const shouldAllowMemoryAction = useCallback((): boolean => {
+    if (tempChatRef.current) return false;
+    const currentCount = aiResponseCountRef.current;
+    if (currentCount <= 1) return false;
+    const lastAction = lastMemoryActionMsgIndexRef.current;
+    if (lastAction >= 0 && (currentCount - lastAction) < 3) return false;
+    return true;
+  }, []);
+
+  const applyMemoryAction = useCallback((
+    action: MemoryAction,
+    aiMsgId: string,
+  ): { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } => {
+    if (!shouldAllowMemoryAction()) return {};
+
+    const category = action.category as MemoryCategory;
+
+    if (action.type === 'save') {
+      const mem: Memory = {
+        id: uid(),
+        category,
+        content: action.content,
+        source: 'IMPLICIT_CONFIRMED',
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      setMemories(prev => [...prev, mem]);
+      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
+      return {
+        chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+      };
+    }
+
+    if (action.type === 'proposal') {
+      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
+      return {
+        memoryProposal: {
+          id: uid(),
+          content: action.content,
+          category,
+        },
+      };
+    }
+
+    return {};
+  }, [shouldAllowMemoryAction]);
+
   const attemptStreamRequest = useCallback(async (
     text: string, history: { role: 'user' | 'assistant'; content: string }[],
     controller: AbortController, aiMsgId: string, version: number,
+    memoryStrings: string[],
   ): Promise<boolean> => {
+    const body: Record<string, unknown> = { message: text, history, memories: memoryStrings };
+
     const res = await fetch(`${API_BASE}/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
 
@@ -246,7 +316,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     let sseBuffer = '';
     let fullContent = '';
     const tokenQueue: string[] = [];
-    let donePayload: { reply?: string; suggestions?: string[]; error?: string } | null = null;
+    let donePayload: { reply?: string; suggestions?: string[]; memoryAction?: MemoryAction; error?: string } | null = null;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -278,6 +348,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const finalReply = donePayload?.reply || fullContent;
     const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
+    const memoryAction = donePayload?.memoryAction || null;
 
     if (donePayload?.error) {
       setIsTyping(false);
@@ -289,11 +360,16 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return true;
     }
 
+    let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
+    if (memoryAction) {
+      memoryExtras = applyMemoryAction(memoryAction, aiMsgId);
+    }
+
     if (tokenQueue.length === 0) {
       setIsTyping(false);
       setMessages(prev => prev.map(m =>
         m.id === TYPING_INDICATOR_ID
-          ? { ...m, id: uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions }
+          ? { ...m, id: uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions, ...memoryExtras }
           : m
       ));
       return true;
@@ -332,7 +408,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           clearInterval(timer);
           setMessages(prev => {
             const updated = prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions } : m
+              m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions, ...memoryExtras } : m
             );
             if (!titleGeneratedRef.current) {
               titleGeneratedRef.current = true;
@@ -344,11 +420,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         }
       }, TOKEN_MS);
     });
-  }, [generateTitle]);
+  }, [generateTitle, applyMemoryAction]);
 
   const drainReplyWithAnimation = useCallback((
     reply: string, aiMsgId: string, version: number,
     suggestions?: string[],
+    memoryExtras?: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] },
   ) => {
     const words = reply.split(/(\s+)/);
     const TOKEN_MS = 8;
@@ -382,7 +459,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           clearInterval(timer);
           setMessages(prev => {
             const updated = prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: reply, isStreaming: false, suggestions } : m
+              m.id === aiMsgId ? { ...m, content: reply, isStreaming: false, suggestions, ...(memoryExtras || {}) } : m
             );
             if (!titleGeneratedRef.current) {
               titleGeneratedRef.current = true;
@@ -399,11 +476,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const fallbackNonStreaming = useCallback(async (
     text: string, history: { role: 'user' | 'assistant'; content: string }[],
     controller: AbortController, aiMsgId: string, version: number,
+    memoryStrings: string[],
   ) => {
+    const body: Record<string, unknown> = { message: text, history, memories: memoryStrings };
+
     const res = await fetch(`${API_BASE}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
 
@@ -422,8 +502,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }
 
     const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
-    await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions);
-  }, [drainReplyWithAnimation]);
+
+    let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
+    if (data.memoryAction) {
+      memoryExtras = applyMemoryAction(data.memoryAction, aiMsgId);
+    }
+
+    await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, memoryExtras);
+  }, [drainReplyWithAnimation, applyMemoryAction]);
 
   const supportsStreaming = typeof ReadableStream !== 'undefined';
 
@@ -434,17 +520,23 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const aiMsgId = uid();
 
+    aiResponseCountRef.current += 1;
+
     const currentMessages = [...(messagesRef.current || [])];
     const history = currentMessages
       .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
       .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
 
+    const memoryStrings = tempChatRef.current ? [] : getActiveMemoryStrings(memoriesRef.current);
+
     if (!supportsStreaming) {
       try {
+        const body: Record<string, unknown> = { message: text, history, memories: memoryStrings };
+
         const res = await fetch(`${API_BASE}/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, history }),
+          body: JSON.stringify(body),
           signal: controller.signal,
         });
         if (sessionVersionRef.current !== version) return;
@@ -459,7 +551,13 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
-        await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions);
+
+        let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
+        if (data.memoryAction) {
+          memoryExtras = applyMemoryAction(data.memoryAction, aiMsgId);
+        }
+
+        await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, memoryExtras);
         return;
       } catch (err: any) {
         if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
@@ -476,7 +574,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const MAX_RETRIES = 2;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        await attemptStreamRequest(text, history, controller, aiMsgId, version);
+        await attemptStreamRequest(text, history, controller, aiMsgId, version, memoryStrings);
         return;
       } catch (err: any) {
         if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
@@ -485,7 +583,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           continue;
         }
         try {
-          await fallbackNonStreaming(text, history, controller, aiMsgId, version);
+          await fallbackNonStreaming(text, history, controller, aiMsgId, version, memoryStrings);
           return;
         } catch (fallbackErr: any) {
           if (fallbackErr.name === 'AbortError' || sessionVersionRef.current !== version) return;
@@ -509,7 +607,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       );
     });
     setIsTyping(false);
-  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation]);
+  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation, applyMemoryAction]);
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -749,6 +847,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setCurrentSessionId(null);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
+    lastMemoryActionMsgIndexRef.current = -1;
+    aiResponseCountRef.current = 0;
   }, [currentSessionId]);
 
   const loadSession = useCallback((id: string) => {
@@ -769,6 +869,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setCurrentSessionId(id);
     setSessionTitle(session.title);
     titleGeneratedRef.current = true;
+    lastMemoryActionMsgIndexRef.current = -1;
+    aiResponseCountRef.current = session.messages.filter(m => m.role === 'ai').length;
   }, [chatHistory]);
 
   const deleteSession = useCallback((id: string) => {
@@ -782,6 +884,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages([]);
     setIsTyping(false);
     setShowOnboarding(chatModeRef.current === 'demo');
+    lastMemoryActionMsgIndexRef.current = -1;
+    aiResponseCountRef.current = 0;
   }, []);
 
   return (

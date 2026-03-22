@@ -68,9 +68,29 @@ artifacts/
 ### AI Configuration
 
 - **Model:** GPT-4o-mini via Replit AI Integrations proxy (OpenAI-compatible)
-- **System prompt location:** `artifacts/api-server/src/routes/chat.ts` (SYSTEM_PROMPT constant)
+- **System prompt location:** `artifacts/api-server/src/routes/chat.ts` (SYSTEM_PROMPT + MEMORY_PROMPT_SECTION)
 - **Temperature:** 0.7 for chat, 0.3 for title generation
-- **Max tokens:** 1000 for chat, 20 for titles
+- **Max tokens:** 8192 for chat, 30 for titles
+
+### Live Memory System
+
+The AI can detect and save user context automatically during live chat:
+
+**API Flow:**
+- Client sends `memories` array (formatted as `[CATEGORY] content`) in request body alongside `message` and `history`
+- Server builds dynamic system prompt: base prompt + memory detection instructions + user context section
+- AI may include `[MEMORY_SAVE]CATEGORY|content` (auto-save facts) or `[MEMORY_PROPOSAL]CATEGORY|content` (propose for confirmation) markers after `[SUGGESTIONS]`
+- Server's `parseMemoryMarkers()` extracts and strips markers, returns `memoryAction` in response JSON
+- Both `/chat` and `/chat/stream` endpoints support memory flow
+
+**Client Flow (CoachContext):**
+- `getActiveMemoryStrings()` collects ACTIVE memories (excludes PAUSED/DELETED), always sent to API
+- `applyMemoryAction()` processes response: auto-save creates Memory + shows "Saved to memory" chip; proposal sets `memoryProposal` on message for user confirmation
+- Frequency rules via `shouldAllowMemoryAction()`: no memory on first AI response (`aiResponseCountRef <= 1`), 3-response cooldown between actions (`lastMemoryActionMsgIndexRef`)
+- All memory logic skipped in temporary chat mode
+- Memory source for AI-detected items: `IMPLICIT_CONFIRMED` (displays as "Coach noticed" in MemoryCenter)
+
+**Valid categories:** PREFERENCE, CONSTRAINT, LIFE_CONTEXT, FINANCIAL_ATTITUDE, GOAL_RELATED, EXPLICIT_FACT
 
 ## Streaming Architecture
 
