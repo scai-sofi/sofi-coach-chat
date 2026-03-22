@@ -194,7 +194,7 @@ function BlockDivider() {
 
 function TextBlock({ block }: { block: Extract<ContentBlock, { type: 'text' }> }) {
   return (
-    <Text style={[styles.aiText, block.paragraphGap && { marginTop: 8 }]}>
+    <Text style={[styles.aiText, block.paragraphGap && { marginTop: 10 }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
@@ -202,7 +202,7 @@ function TextBlock({ block }: { block: Extract<ContentBlock, { type: 'text' }> }
 
 function BulletBlock({ block }: { block: Extract<ContentBlock, { type: 'bullet' }> }) {
   return (
-    <Text style={[styles.aiText, styles.bulletText, block.paragraphGap && { marginTop: 8 }]}>
+    <Text style={[styles.aiText, styles.bulletText, block.paragraphGap && { marginTop: 10 }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
@@ -657,14 +657,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
-  aiContent: { gap: 8 },
+  aiContent: { gap: 2 },
   aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20, paddingHorizontal: 4 },
   headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
   bulletText: {},
   divider: {
     height: 0.75,
     backgroundColor: 'rgba(10,10,10,0.1)',
-    marginVertical: 16,
+    marginVertical: 10,
   },
   safetyBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
