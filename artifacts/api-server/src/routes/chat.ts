@@ -11,10 +11,10 @@ const MAX_MEMORY_LENGTH = 500;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 20;
 
-const VALID_MEMORY_CATEGORIES = [
+const VALID_MEMORY_CATEGORIES = new Set([
   'PREFERENCE', 'CONSTRAINT', 'LIFE_CONTEXT',
   'FINANCIAL_ATTITUDE', 'GOAL_RELATED', 'EXPLICIT_FACT',
-] as const;
+]);
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -191,7 +191,7 @@ function parseMemoryMarkers(text: string): { cleanText: string; memoryAction: Me
   if (saveMatch) {
     const category = saveMatch[1].trim();
     const content = saveMatch[2].trim().slice(0, 200);
-    if (VALID_MEMORY_CATEGORIES.includes(category as any) && content.length > 0) {
+    if (VALID_MEMORY_CATEGORIES.has(category) && content.length > 0) {
       memoryAction = { type: 'save', category, content };
     }
     cleanText = cleanText.replace(saveRegex, '');
@@ -202,7 +202,7 @@ function parseMemoryMarkers(text: string): { cleanText: string; memoryAction: Me
     if (proposalMatch) {
       const category = proposalMatch[1].trim();
       const content = proposalMatch[2].trim().slice(0, 200);
-      if (VALID_MEMORY_CATEGORIES.includes(category as any) && content.length > 0) {
+      if (VALID_MEMORY_CATEGORIES.has(category) && content.length > 0) {
         memoryAction = { type: 'proposal', category, content };
       }
       cleanText = cleanText.replace(proposalRegex, '');

@@ -82,6 +82,22 @@ interface MemoryAction {
   content: string;
 }
 
+const VALID_MEMORY_CATEGORIES = new Set<string>([
+  'PREFERENCE', 'CONSTRAINT', 'LIFE_CONTEXT',
+  'FINANCIAL_ATTITUDE', 'GOAL_RELATED', 'EXPLICIT_FACT',
+]);
+
+function isValidMemoryCategory(cat: string): cat is MemoryCategory {
+  return VALID_MEMORY_CATEGORIES.has(cat);
+}
+
+function stripMemoryMarkers(text: string): string {
+  return text
+    .replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '')
+    .replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '')
+    .trimEnd();
+}
+
 function getActiveMemoryStrings(memories: Memory[]): string[] {
   return memories
     .filter(m => m.status === 'ACTIVE')
@@ -239,7 +255,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const currentCount = aiResponseCountRef.current;
     if (currentCount <= 1) return false;
     const lastAction = lastMemoryActionMsgIndexRef.current;
-    if (lastAction >= 0 && (currentCount - lastAction) < 3) return false;
+    if (lastAction >= 0 && (currentCount - lastAction) <= 3) return false;
     return true;
   }, []);
 
@@ -249,7 +265,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   ): { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } => {
     if (!shouldAllowMemoryAction()) return {};
 
-    const category = action.category as MemoryCategory;
+    if (!isValidMemoryCategory(action.category)) return {};
+    const category = action.category;
 
     if (action.type === 'save') {
       const mem: Memory = {
@@ -376,17 +393,18 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }
 
     return new Promise<boolean>((resolve) => {
-      let displayed = '';
+      let rawDisplayed = '';
       let idx = 0;
       const TOKEN_MS = 15;
 
       setIsTyping(false);
       const firstToken = tokenQueue[0];
-      displayed = firstToken;
+      rawDisplayed = firstToken;
       idx = 1;
+      const cleanFirst = stripMemoryMarkers(rawDisplayed);
       setMessages(prev => prev.map(m =>
         m.id === TYPING_INDICATOR_ID
-          ? { ...m, id: aiMsgId, content: displayed, isStreaming: true, isTypingIndicator: false }
+          ? { ...m, id: aiMsgId, content: cleanFirst, isStreaming: true, isTypingIndicator: false }
           : m
       ));
 
@@ -398,9 +416,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (idx < tokenQueue.length) {
-          displayed += tokenQueue[idx];
+          rawDisplayed += tokenQueue[idx];
           idx++;
-          const shown = displayed;
+          const shown = stripMemoryMarkers(rawDisplayed);
           setMessages(prev => prev.map(m =>
             m.id === aiMsgId ? { ...m, content: shown } : m
           ));
