@@ -383,6 +383,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return true;
     }
 
+    aiResponseCountRef.current += 1;
+
     let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
     if (memoryAction) {
       memoryExtras = applyMemoryAction(memoryAction, aiMsgId);
@@ -525,6 +527,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    aiResponseCountRef.current += 1;
+
     const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
     let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
@@ -543,8 +547,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     abortControllerRef.current = controller;
 
     const aiMsgId = uid();
-
-    aiResponseCountRef.current += 1;
 
     const currentMessages = [...(messagesRef.current || [])];
     const history = currentMessages
@@ -574,6 +576,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           setIsTyping(false);
           return;
         }
+        aiResponseCountRef.current += 1;
+
         const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
         let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
