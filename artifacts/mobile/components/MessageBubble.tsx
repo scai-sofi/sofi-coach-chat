@@ -457,8 +457,7 @@ function StreamingContent({ content }: { content: string }) {
     ]).start();
   }, [fadeAnim, slideAnim]);
 
-  const allBlocks = parseContentBlocks(content);
-  const blocks = allBlocks.filter(b => b.type !== 'divider');
+  const blocks = parseContentBlocks(content);
 
   if (blocks.length > prevBlockCount.current) {
     for (let i = prevBlockCount.current; i < blocks.length; i++) {
@@ -477,10 +476,11 @@ function StreamingContent({ content }: { content: string }) {
     <RNAnimated.View style={[styles.aiContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
       {blocks.map((block, i) => {
         const blockOpacity = blockFades.current[i] || new RNAnimated.Value(1);
-        const needsTopMargin = block.type === 'header' && i > 0;
         return (
-          <RNAnimated.View key={i} style={[{ opacity: blockOpacity }, needsTopMargin && { marginTop: 12 }]}>
-            {block.type === 'header' ? (
+          <RNAnimated.View key={i} style={{ opacity: blockOpacity }}>
+            {block.type === 'divider' ? (
+              <BlockDivider />
+            ) : block.type === 'header' ? (
               <HeaderBlock block={block} />
             ) : block.type === 'bullet' ? (
               <BulletBlock block={block} />
