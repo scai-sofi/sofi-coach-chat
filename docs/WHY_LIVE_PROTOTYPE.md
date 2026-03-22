@@ -109,6 +109,22 @@ This prototype isn't throwaway work. It serves as:
 
 ---
 
+## Tradeoffs: Where Figma Still Wins
+
+A live prototype is the right tool for designing AI behavior, but it does come with real costs:
+
+**Sharing is harder.** A Figma link is instantly viewable by anyone — no setup, no accounts, no loading time. A live prototype requires either a deployed URL (with potential auth, cold-start delays, and API costs) or running the app locally. You can't just paste a link into a Slack thread and have 20 people review it simultaneously the way you can with Figma. For broad stakeholder reviews or async feedback rounds, Figma's frictionless sharing is a genuine advantage.
+
+**User testing has more overhead.** In Figma, you can spin up a usability test in minutes with tools like Maze or UserTesting — participants click through screens with zero technical dependencies. With a live prototype, user testing requires a stable deployed environment, active API keys, and enough backend capacity to handle concurrent testers. If the AI service has an outage or the server goes down mid-session, the test is lost. The unpredictability of live AI responses also makes it harder to create controlled, repeatable test conditions — two participants may see completely different responses to the same prompt.
+
+**Iteration speed varies.** Visual changes (colors, spacing, typography) are faster in Figma — drag, adjust, done. In code, even small visual tweaks require editing files, waiting for hot reload, and testing across screen sizes. Figma excels at rapid visual exploration; live prototypes excel at rapid behavioral exploration.
+
+**Cost.** Every AI conversation in the live prototype costs real API tokens. Figma mocks are free to view and interact with indefinitely.
+
+The right approach is to use both: Figma for visual design, component libraries, and broad stakeholder alignment — and a live prototype for the behavioral design problems that only emerge through real interaction.
+
+---
+
 ## Summary: Why This Approach
 
 | Aspect | Figma | Live Prototype |
@@ -122,8 +138,13 @@ This prototype isn't throwaway work. It serves as:
 | Prompt engineering | Cannot test | Iterate in real-time |
 | Stakeholder demos | Click-through | Interactive conversations |
 | Flutter handoff | Visual reference only | Behavioral specification |
+| Sharing & async review | Instant link, zero friction | Requires deployed URL + active backend |
+| User testing | Low overhead, repeatable | Needs stable environment, results vary |
+| Visual iteration speed | Fast (direct manipulation) | Slower (code + reload) |
+| Cost to demo | Free | API token costs per session |
 
 **For traditional UI — buttons, layouts, navigation — Figma is the right tool.**
 **For AI-driven conversational products, a live prototype is the only way to design the actual experience.**
+**For most real projects, use both.**
 
 This prototype exists because the hardest design problems in Coach Chat aren't visual — they're behavioral. And behavioral design requires a running system.
