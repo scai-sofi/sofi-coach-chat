@@ -139,8 +139,10 @@ function parseContentBlocks(content: string): ContentBlock[] {
       if (!displayText.startsWith('**')) {
         displayText = `**${displayText}**`;
       }
+      const lastContentBlock = [...blocks].reverse().find(b => b.type !== 'divider');
+      const prevWasHeader = lastContentBlock?.type === 'header';
       const hasNonHeaderContent = blocks.some(b => b.type !== 'header' && b.type !== 'divider');
-      if (hasNonHeaderContent) {
+      if (hasNonHeaderContent && !prevWasHeader) {
         blocks.push({ type: 'divider' });
       }
       blocks.push({ type: 'header', text: displayText });
