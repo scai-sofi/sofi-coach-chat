@@ -294,12 +294,21 @@ function ChipBadge({ chip }: { chip: MessageChip }) {
 
   const animStyle = { opacity: fadeAnim, transform: [{ translateY: slideAnim }] };
 
+  const chipContent = (
+    <>
+      <Feather name={style.icon} size={11} color={style.color} />
+      <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
+      <Svg width={12} height={12} viewBox="0 0 12 12" fill="none">
+        <Path d="M4.5 1.5L8.5 6L4.5 10.5" stroke={style.color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    </>
+  );
+
   if (hasMemoryIds) {
     return (
       <RNAnimated.View style={animStyle}>
         <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: style.bg }]}>
-          <Feather name={style.icon} size={11} color={style.color} />
-          <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
+          {chipContent}
         </Pressable>
       </RNAnimated.View>
     );
@@ -308,8 +317,7 @@ function ChipBadge({ chip }: { chip: MessageChip }) {
   return (
     <RNAnimated.View style={animStyle}>
       <View style={[styles.chip, { backgroundColor: style.bg }]}>
-        <Feather name={style.icon} size={11} color={style.color} />
-        <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
+        {chipContent}
       </View>
     </RNAnimated.View>
   );
@@ -722,7 +730,7 @@ const styles = StyleSheet.create({
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9999,
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
   aiContent: { gap: 8 },
