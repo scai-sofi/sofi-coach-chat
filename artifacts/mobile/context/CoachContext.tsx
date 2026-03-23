@@ -264,7 +264,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     actions: MemoryAction[],
     aiMsgId: string,
   ): { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } => {
-    if (!shouldAllowMemoryAction()) return {};
+    if (tempChatRef.current) return {};
     if (!actions || actions.length === 0) return {};
 
     const newMemories: Memory[] = [];
@@ -292,7 +292,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-      } else if (action.type === 'proposal' && !proposal) {
+      } else if (action.type === 'proposal' && !proposal && shouldAllowMemoryAction()) {
         proposal = { id: uid(), content: action.content, category };
       }
     }
@@ -301,7 +301,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     if (newMemories.length > 0) {
       setMemories(prev => [...prev, ...newMemories]);
-      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
       const count = newMemories.length;
       result.chips = [{ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory` }];
     }
