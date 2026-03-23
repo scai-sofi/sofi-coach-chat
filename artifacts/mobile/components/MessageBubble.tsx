@@ -413,7 +413,7 @@ function InsightToActionCard({ message }: { message: Message }) {
   if (insight.accepted) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard]}>
-        <Feather name="check-circle" size={14} color={Colors.successDark} />
+        <Feather name="check-circle" size={14} color={Colors.contentPrimary} />
         <Text style={[styles.confirmedText, { color: Colors.contentPrimary }]}>All set — saved to memory & goal created</Text>
       </View>
     );
