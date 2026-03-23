@@ -382,6 +382,7 @@ function GoalProposalCard({ message }: { message: Message }) {
   }
 
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  const showApproval = message.safetyTier === 'actionable';
   return (
     <View style={styles.proposalCard}>
       <View style={styles.proposalHeader}>
@@ -393,7 +394,13 @@ function GoalProposalCard({ message }: { message: Message }) {
           </Text>
         </View>
       </View>
-      <View style={styles.proposalButtons}>
+      {showApproval && (
+        <View style={styles.approvalHint}>
+          <Feather name="shield" size={10} color={Colors.contentSecondary} />
+          <Text style={styles.approvalHintText}>Needs your approval</Text>
+        </View>
+      )}
+      <View style={[styles.proposalButtons, { marginTop: showApproval ? 0 : undefined }]}>
         <Pressable style={styles.confirmBtn} onPress={() => confirmGoal(message.id)}>
           <Text style={styles.confirmBtnText}>Set up goal</Text>
         </Pressable>
@@ -430,6 +437,7 @@ function InsightToActionCard({ message }: { message: Message }) {
 
   const gp = insight.goalProposal;
   const months = Math.ceil(gp.targetAmount / gp.monthlyContribution);
+  const showApproval = message.safetyTier === 'actionable';
   return (
     <View style={styles.proposalCard}>
       <View style={[styles.proposalHeader, { gap: 10 }]}>
@@ -443,7 +451,13 @@ function InsightToActionCard({ message }: { message: Message }) {
           </Text>
         </View>
       </View>
-      <View style={[styles.proposalButtons, { marginTop: 12 }]}>
+      {showApproval && (
+        <View style={styles.approvalHint}>
+          <Feather name="shield" size={10} color={Colors.contentSecondary} />
+          <Text style={styles.approvalHintText}>Needs your approval</Text>
+        </View>
+      )}
+      <View style={[styles.proposalButtons, { marginTop: showApproval ? 8 : 12 }]}>
         <Pressable style={[styles.confirmBtn, { paddingHorizontal: 14, paddingVertical: 7 }]} onPress={() => acceptInsightToAction(message.id)}>
           <Text style={[styles.confirmBtnText, { fontSize: 13 }]}>Set up goal</Text>
         </Pressable>
@@ -629,7 +643,9 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
         ) : null}
       </View>
 
-      {!streaming && message.safetyTier && (
+      {!streaming && message.safetyTier && !(
+        message.safetyTier === 'actionable' && (message.insightToAction || message.goalProposal)
+      ) && (
         animate ? (
           <FadeInView delay={50} duration={250}>
             <SafetyBadge tier={message.safetyTier} />
@@ -751,6 +767,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6,
   },
   dismissBtnText: { color: Colors.contentSecondary, fontSize: 12, fontFamily: Fonts.medium },
+  approvalHint: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    marginTop: 8, marginBottom: 4, paddingLeft: 2,
+  },
+  approvalHintText: {
+    fontSize: 11, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 14,
+  },
   insightIcon: {
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: Colors.contentPrimary,
