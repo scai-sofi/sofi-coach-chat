@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
-import Svg, { Path, Rect } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
@@ -227,27 +227,15 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   );
 }
 
-function PauseAllIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function MoreIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Rect x="2" y="1.5" width="4.5" height="13" rx="1" stroke={color} strokeWidth={1.25} fill="none" />
-      <Rect x="9.5" y="1.5" width="4.5" height="13" rx="1" stroke={color} strokeWidth={1.25} fill="none" />
-    </Svg>
-  );
-}
-
-function ResumeAllIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Path d="M4 2L13 8L4 14V2Z" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </Svg>
-  );
-}
-
-function TrashAllIcon({ size = 16, color = Colors.danger }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Path d="M2 4H14M5.333 4V2.667A1.333 1.333 0 016.667 1.333h2.666A1.333 1.333 0 0110.667 2.667V4M12.667 4V13.333A1.333 1.333 0 0111.333 14.667H4.667A1.333 1.333 0 013.333 13.333V4" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 7C13.1046 7 14 6.10457 14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5C10 6.10457 10.8954 7 12 7ZM12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14ZM14 19C14 20.1046 13.1046 21 12 21C10.8954 21 10 20.1046 10 19C10 17.8954 10.8954 17 12 17C13.1046 17 14 17.8954 14 19Z"
+        fill={color}
+      />
     </Svg>
   );
 }
@@ -259,6 +247,7 @@ export function MemoryCenter() {
   const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffsetRef = useRef(0);
   const { showToast } = useToast();
@@ -318,43 +307,51 @@ export function MemoryCenter() {
           </View>
           <View style={styles.rightControls}>
             {memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' && (
-              <View style={styles.headerActions}>
-                <Pressable
-                  style={styles.headerActionPill}
-                  onPress={() => {
-                    const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
-                    const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
-                    const allPaused = activeCount === 0 && pausedCount > 0;
-                    pauseAllMemories();
-                    showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
-                  }}
-                  hitSlop={4}
-                >
-                  {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0 ? (
-                    <>
-                      <ResumeAllIcon size={14} color={Colors.contentSecondary} />
-                      <Text style={styles.headerActionLabel}>Resume all</Text>
-                    </>
-                  ) : (
-                    <>
-                      <PauseAllIcon size={14} color={Colors.contentSecondary} />
-                      <Text style={styles.headerActionLabel}>Pause all</Text>
-                    </>
-                  )}
-                </Pressable>
-                <Pressable
-                  style={styles.headerActionPill}
-                  onPress={() => setShowDeleteConfirm(true)}
-                  hitSlop={4}
-                >
-                  <TrashAllIcon size={14} color={Colors.danger} />
-                  <Text style={[styles.headerActionLabel, { color: Colors.danger }]}>Delete all</Text>
-                </Pressable>
-              </View>
+              <Pressable style={styles.iconBtn} onPress={() => setShowMoreMenu(!showMoreMenu)} hitSlop={8}>
+                <MoreIcon size={24} color={Colors.contentPrimary} />
+              </Pressable>
             )}
           </View>
         </View>
       </View>
+
+      {showMoreMenu && (
+        <>
+          <Pressable style={styles.menuBackdrop} onPress={() => setShowMoreMenu(false)} />
+          <View style={[styles.moreMenu, { top: insets.top + 44 }]}>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => {
+                const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
+                const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
+                const allPaused = activeCount === 0 && pausedCount > 0;
+                pauseAllMemories();
+                setShowMoreMenu(false);
+                showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
+              }}
+            >
+              <Text style={styles.menuText}>
+                {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
+                  ? 'Resume all'
+                  : 'Pause all'}
+              </Text>
+              {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
+                ? <PlayIcon size={16} color={Colors.contentPrimary} />
+                : <PauseIcon size={16} color={Colors.contentPrimary} />}
+            </Pressable>
+            <Pressable
+              style={styles.menuItemLast}
+              onPress={() => {
+                setShowMoreMenu(false);
+                setShowDeleteConfirm(true);
+              }}
+            >
+              <Text style={[styles.menuText, { color: Colors.danger }]}>Delete all</Text>
+              <DeleteIcon size={16} color={Colors.danger} />
+            </Pressable>
+          </View>
+        </>
+      )}
 
       {showDeleteConfirm && (
         <View style={styles.confirmOverlay}>
@@ -500,31 +497,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rightControls: {
-    minWidth: 100,
+    width: 100,
     height: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingRight: 16,
   },
-  headerActions: {
+  menuBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 149,
+  },
+  moreMenu: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 150,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(10,10,10,0.08)',
+    shadowColor: 'rgba(10,10,10,0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 8,
+    minWidth: 180,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    borderBottomWidth: 0.75,
+    borderBottomColor: 'rgba(10,10,10,0.06)',
   },
-  headerActionPill: {
+  menuItemLast: {
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
-  headerActionLabel: {
-    fontSize: 11,
-    fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
-    lineHeight: 14,
+  menuText: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: Colors.contentPrimary,
+    lineHeight: 20,
   },
   iconBtn: {
     width: 24,
