@@ -5,7 +5,6 @@ const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9
 interface StoreState {
   memories: Memory[];
   goals: Goal[];
-  temporaryChat: boolean;
 }
 
 export function generateAIResponse(userInput: string, store: StoreState): Partial<Message> | null {
@@ -276,8 +275,8 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('how does my memory work') || input.includes('how does memory work')) {
     return {
-      content: "**How Memory Works**\n\nGreat question! Here's the full picture:\n\n**How I Learn**\nI pick up on your preferences, habits, and context as we chat. I'll always ask before saving something new — nothing gets stored without your awareness.\n\n**What I Track**\nI organize memories into three categories:\n• **About me** — your life situation, accounts, financial details, household info\n• **Preferences** — how you like to receive information, risk tolerance, financial approach\n• **Priorities** — what you're working toward, goals, focus areas, key events\n\n**You're Always in Control**\n• **View & edit:** Open the Memory Center (brain icon in the menu) to see, edit, pause, or delete any memory\n• **Temporary mode:** Tap the shield button in the input bar to chat without me remembering anything — useful for sensitive topics or just exploring\n• **Tell me directly:** Say \"remember that...\" to save something specific, or \"forget about...\" to remove it\n\n**Why It Matters**\nThe more context I have, the more personalized and relevant my advice becomes. But your privacy always comes first — you decide what I know.",
-      suggestions: ['Show me my memories', 'Start a temporary chat', 'What do you know about me?'],
+      content: "**How Memory Works**\n\nGreat question! Here's the full picture:\n\n**How I Learn**\nI pick up on your preferences, habits, and context as we chat. I'll always ask before saving something new — nothing gets stored without your awareness.\n\n**What I Track**\nI organize memories into three categories:\n• **About me** — your life situation, accounts, financial details, household info\n• **Preferences** — how you like to receive information, risk tolerance, financial approach\n• **Priorities** — what you're working toward, goals, focus areas, key events\n\n**You're Always in Control**\n• **View & edit:** Open the Memory Center (brain icon in the menu) to see, edit, pause, or delete any memory\n• **Pause memories:** Pause individual memories so they're not used in chat, and resume them anytime\n• **Tell me directly:** Say \"remember that...\" to save something specific, or \"forget about...\" to remove it\n\n**Why It Matters**\nThe more context I have, the more personalized and relevant my advice becomes. But your privacy always comes first — you decide what I know.",
+      suggestions: ['Show me my memories', 'What do you know about me?'],
     };
   }
 

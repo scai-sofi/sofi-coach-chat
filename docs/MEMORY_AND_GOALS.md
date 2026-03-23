@@ -182,7 +182,6 @@ interface Memory {
 | Pause individual | Pause icon on memory card → toggles between ACTIVE/PAUSED → paused memories show "Paused · not used in chat" and render at 50% opacity → play icon to resume | Implemented |
 | Delete individual | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory | Implemented |
 | Chip tap-through | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation | Implemented |
-| Temporary Chat | Toggle in chat header → all memory read/write suppressed for the session | Implemented |
 | Version history | Expandable row showing prior versions with timestamps | Not implemented |
 | Clear all memories | Global "delete all" action in Memory Center | Not implemented |
 | Per-category controls | Toggle per category, set retention window | Not implemented |
@@ -190,7 +189,6 @@ interface Memory {
 ### Frequency & throttling
 
 - **No cooldown**: All memory actions (saves, proposals, updates) fire immediately with no throttling
-- **Temporary chat mode**: All memory actions are disabled — nothing is saved or proposed
 
 ---
 
@@ -377,7 +375,6 @@ When applicable, Coach's response includes one of four patterns:
 | Approval hint | Shield icon + "Needs your approval" label inside actionable cards (replaces standalone badge) |
 | Confirmed state | SVG checkmark + summary text (e.g., "Saved to memory", "Goal created", "All set — saved to memory & goal created") |
 | Action footer | Copy (with SVG checkmark confirmation), thumbs up/down, provenance toggle |
-| Temporary Chat indicator | Shield icon in header, "Temp" chip |
 
 ### Memory Center (implemented)
 
@@ -426,7 +423,7 @@ Accessed via the chat header menu. Full-screen overlay panel.
 ### Client side (`mobile/context/CoachContext.tsx`)
 
 - `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
-- `shouldAllowProposal()` blocks proposals only during temporary chat mode
+- `shouldAllowProposal()` always returns true (no blocking conditions)
 - No cooldown — all memory and goal actions fire immediately
 - `applyMemoryAndGoalActions()` processes both memory and goal actions together:
   - Memory saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
@@ -453,7 +450,7 @@ User message
 
 ### Demo mode behavior
 
-Demo scenarios use pre-loaded canned conversations with pre-set memories and goals baked into the scenario data. The live memory/goal detection pipeline does not run on canned messages — demos are display-only snapshots. When `isTempChat` is true, `goalProposal`, `memoryProposal`, `insightToAction`, `autoSaveMemory`, and `autoCreateGoal` are all cleared from the response.
+Demo scenarios use pre-loaded canned conversations with pre-set memories and goals baked into the scenario data. The live memory/goal detection pipeline does not run on canned messages — demos are display-only snapshots.
 
 ---
 
@@ -462,7 +459,6 @@ Demo scenarios use pre-loaded canned conversations with pre-set memories and goa
 | Level               | Feature | Surface                 | Prototype status | Controls |
 | ------------------- | ------- | ----------------------- | ---------------- | -------- |
 | 3 — Item            | Memory  | Memory Center           | Implemented | Edit, pause/resume, delete with undo, search, category filter |
-| 4 — Session         | Memory  | Chat                    | Implemented | Temporary Chat mode toggle (suppresses all memory + goal actions) |
 
 **Not yet implemented:** Global pause all / delete all toggle, per-category toggle, retention window settings, per-response "Don't use this" flag, global Goals on/off in Settings, proactive notification controls.
 
@@ -514,7 +510,6 @@ Save Up goals do not connect to SoFi Banking Vaults. Production requires linking
 - **Safety tier classification** — Rules-based, LLM-classified, or hybrid? Compliance review pipeline ownership.
 - **Human advisor handoff** — Scheduling mechanics. Context package format for the advisor.
 - **Proactive outreach infrastructure** — FCM delivery. Per-goal-type frequency controls. Member-facing preference UI.
-- **Temporary Chat consent** — First-use consent modal legally required, or toggle sufficient?
 - **Memory edit guardrails** — Free-text edit for all memories, or confirm/deny only for AI-inferred? Gaming prevention.
 - **Sensitive data policy** — Which categories require flagging? Disclosure copy requirements.
 - **Scenario simulation depth** — Linear projection vs. compound/inflation? Frontend-only vs. backend service.

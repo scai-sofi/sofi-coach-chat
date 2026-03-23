@@ -301,7 +301,6 @@ CoachState {
   memories: Memory[]            // Current memory items
   goals: Goal[]                 // Current goals
   isTyping: boolean             // True while waiting for AI response
-  temporaryChat: boolean        // When true, no memories are saved
   activePanel: PanelType        // Which overlay panel is visible
   activeScenario: string        // ID of active demo scenario (empty = live mode)
   showOnboarding: boolean       // Whether to show onboarding UI
@@ -519,9 +518,7 @@ function parseSuggestions(text):
    - Returns pre-written response with optional chips, proposals, etc.
    - If no match found → falls through to live API call
 
-6. If temporary chat mode: strip all memory/goal proposals
-
-7. Process auto-actions:
+6. Process auto-actions:
    - autoSaveMemory → add memory + show "Saved to memory" chip
    - autoCreateGoal → create goal
    - autoUpdateGoal → update existing goal
@@ -1242,14 +1239,6 @@ When `currentAmount` is updated on a goal:
 - If `currentAmount >= targetAmount`: status → COMPLETED, all milestones marked reached
 - If `currentAmount/targetAmount >= 0.7` and not COMPLETED: status → ON_TRACK
 - If `currentAmount/targetAmount < 0.7` and not COMPLETED: status → AT_RISK
-
-### Temporary Chat Mode
-
-When `temporaryChat` is true:
-- Memory proposals stripped from AI responses
-- InsightToAction cards stripped
-- AutoSaveMemory stripped
-- No memories are persisted from the conversation
 
 ### Demo ↔ Live Mode Switching
 

@@ -32,7 +32,6 @@ interface CoachState {
   memories: Memory[];
   goals: Goal[];
   isTyping: boolean;
-  temporaryChat: boolean;
   activePanel: PanelType;
   activeScenario: string;
   showOnboarding: boolean;
@@ -46,7 +45,6 @@ interface CoachState {
 interface CoachContextType extends CoachState {
   sendMessage: (text: string) => void;
   setActivePanel: (panel: PanelType) => void;
-  setTemporaryChat: (val: boolean) => void;
   switchScenario: (id: string) => void;
   startLiveChat: () => void;
   confirmMemory: (messageId: string) => void;
@@ -123,7 +121,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [temporaryChat, setTemporaryChat] = useState(false);
   const [activePanel, setActivePanelState] = useState<PanelType>('none');
   const [activeScenario, setActiveScenario] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -139,8 +136,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   memoriesRef.current = memories;
   const goalsRef = useRef(goals);
   goalsRef.current = goals;
-  const tempChatRef = useRef(temporaryChat);
-  tempChatRef.current = temporaryChat;
   const chatModeRef = useRef(chatMode);
   chatModeRef.current = chatMode;
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -163,7 +158,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories([...scenario.memories]);
     setGoals([...scenario.goals]);
     setIsTyping(false);
-    setTemporaryChat(false);
     setActivePanelState('none');
     setActiveScenario(id);
     setShowOnboarding(id === 'cold-start');
@@ -180,7 +174,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories([]);
     setGoals([]);
     setIsTyping(false);
-    setTemporaryChat(false);
+
     setActivePanelState('none');
     setActiveScenario('');
     setShowOnboarding(false);
@@ -260,7 +254,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const shouldAllowProposal = useCallback((): boolean => {
-    if (tempChatRef.current) return false;
     return true;
   }, []);
 
@@ -276,8 +269,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     goalActs: GoalAction[],
     aiMsgId: string,
   ): LiveExtras => {
-    if (tempChatRef.current) return {};
-
     const newMemories: Memory[] = [];
     const updatedMemoryIds: string[] = [];
     let prioritiesProposal: MemoryProposal | undefined;
@@ -675,7 +666,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
       .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
 
-    const memoryStrings = tempChatRef.current ? [] : getActiveMemoryStrings(memoriesRef.current);
+    const memoryStrings = getActiveMemoryStrings(memoriesRef.current);
 
     if (!supportsStreaming) {
       try {
@@ -795,7 +786,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const currentMemories = memoriesRef.current;
     const currentGoals = goalsRef.current;
-    const isTempChat = tempChatRef.current;
 
     const delay = 800 + Math.random() * 700;
     if (pendingTimerRef.current) clearTimeout(pendingTimerRef.current);
@@ -805,7 +795,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       const response = generateAIResponse(text, {
         memories: currentMemories,
         goals: currentGoals,
-        temporaryChat: isTempChat,
       });
 
       if (!response) {
@@ -813,17 +802,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (isTempChat) {
-        response.memoryProposal = undefined;
-        response.insightToAction = undefined;
-        response.autoSaveMemory = undefined;
-        response.autoCreateGoal = undefined;
-        response.goalProposal = undefined;
-      }
-
       const chips: MessageChip[] = [...(response.chips || [])];
 
-      if (response.autoSaveMemory && !isTempChat) {
+      if (response.autoSaveMemory) {
         const memId = uid();
         chips.push({ type: 'memory-saved', label: 'Saved to memory', memoryIds: [memId] });
         const mem: Memory = {
@@ -838,7 +819,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         setMemories(prev => [...prev, mem]);
       }
 
-      if (response.autoCreateGoal && !isTempChat) {
+      if (response.autoCreateGoal) {
         addGoalFromProposal(response.autoCreateGoal);
       }
 
@@ -1012,7 +993,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories([]);
     setGoals([]);
     setIsTyping(false);
-    setTemporaryChat(false);
+
     setActivePanelState('none');
     setActiveScenario('');
     setShowOnboarding(false);
@@ -1032,7 +1013,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories([...session.memories]);
     setGoals([...session.goals]);
     setIsTyping(false);
-    setTemporaryChat(false);
+
     setActivePanelState('none');
     setActiveScenario('');
     setShowOnboarding(false);
@@ -1056,9 +1037,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CoachContext.Provider value={{
-      messages, memories, goals, isTyping, temporaryChat, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
+      messages, memories, goals, isTyping, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
       chatHistory, currentSessionId, sessionTitle,
-      sendMessage, setActivePanel, setTemporaryChat, switchScenario, startLiveChat,
+      sendMessage, setActivePanel, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
