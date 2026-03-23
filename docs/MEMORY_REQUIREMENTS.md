@@ -14,77 +14,76 @@ This document defines when and how the SoFi Coach Chat memory system should capt
 
 ---
 
-## Trigger Map — When to Capture Memories
+## Trigger Rules — When to Capture Memories
 
 ### Always auto-save (MEMORY_SAVE)
 
-These are unambiguous facts. Save immediately without asking.
+Auto-save when the user shares any unambiguous personal fact. The AI does not ask for confirmation — it saves immediately and tells the user what was stored.
 
-| User says something like... | Category | Example memory content |
-|---|---|---|
-| "I make $120k" / "My salary is..." | `ABOUT_ME` | Annual salary is $120,000 |
-| "I have $30k in student loans" | `ABOUT_ME` | Has $30,000 in student loan debt |
-| "My credit score is 740" | `ABOUT_ME` | Credit score is 740 |
-| "I have a Chase Sapphire card" | `ABOUT_ME` | Has Chase Sapphire Preferred credit card |
-| "I have a 401k with Fidelity" | `ABOUT_ME` | Has 401k with Fidelity |
-| "I have a Roth IRA" / "My brokerage..." | `ABOUT_ME` | Has Roth IRA with $50,000 balance |
-| "I pay $2,200/mo rent" | `ABOUT_ME` | Monthly rent is $2,200 |
-| "My mortgage is $1,800/mo" | `ABOUT_ME` | Monthly mortgage payment is $1,800 |
-| "I have State Farm insurance" | `ABOUT_ME` | Has State Farm auto and home insurance |
-| "I live in Austin" / "We're in NYC" | `ABOUT_ME` | Lives in Austin, TX |
-| "I'm married" / "I have 2 kids" | `ABOUT_ME` | Married with 2 children |
-| "I'm a software engineer at Google" | `ABOUT_ME` | Software engineer at Google |
-| "I'm 34 years old" | `ABOUT_ME` | 34 years old |
-| "We're planning a wedding next year" | `ABOUT_ME` | Planning wedding for next year |
-| "We just had a baby" | `ABOUT_ME` | Recently had a baby |
-| "I'm retiring in 10 years" | `ABOUT_ME` | Plans to retire in approximately 10 years |
-| "I own my home" / "I rent" | `ABOUT_ME` | Homeowner (or: Renter) |
-| "I file taxes jointly" | `ABOUT_ME` | Files taxes married filing jointly |
-| "My budget is $4k/mo after rent" | `ABOUT_ME` | Monthly discretionary budget is $4,000 after rent |
-| "I can only save $500/mo" | `ABOUT_ME` | Can save up to $500 per month |
-| "I have $800/mo in minimum payments" | `ABOUT_ME` | Monthly minimum debt payments total $800 |
-| "I want to save $20k for a down payment" | `PRIORITIES` | Saving $20,000 for home down payment |
-| "I want to pay off my cards by December" | `PRIORITIES` | Goal to pay off credit cards by December |
-| "I'm saving for my kids' college" | `PRIORITIES` | Saving for children's college education |
+**ABOUT_ME auto-save signals:**
+- Financial specifics: income, salary, rent, mortgage, debt amounts, balances, credit score, tax status
+- Financial products: credit cards, bank accounts, loans, insurance, brokerage/retirement accounts (401k, IRA, Roth), pending applications
+- Life details: age, location, household size, marital/family status, employment, homeowner vs renter
+- Life events: wedding, baby, retirement timeline, job change, move, major purchase
+- Budget constraints: monthly fixed expenses, discretionary budget, savings capacity, minimum payments
+
+**PRIORITIES auto-save signals:**
+- Explicit goals: "I want to save $X for Y", "I want to pay off X by Y"
+- Declared focus areas: "My priority right now is...", "I'm focused on..."
 
 ### Propose for confirmation (MEMORY_PROPOSAL)
 
-These are inferences. Ask the user before storing.
+Propose when the AI infers something the user hasn't explicitly stated. The user must confirm before it's stored.
 
-| AI detects... | Category | Example memory content |
-|---|---|---|
-| User consistently asks for detailed breakdowns | `PREFERENCES` | Prefers detailed breakdowns with numbers |
-| User says "just give me the bottom line" | `PREFERENCES` | Prefers concise, bottom-line answers |
-| User shows strong debt-averse behavior | `PREFERENCES` | Debt-averse — prioritizes paying off balances |
-| User prefers index funds over stock picking | `PREFERENCES` | Prefers passive index fund investing |
-| User seems risk-tolerant with investments | `PREFERENCES` | Comfortable with moderate investment risk |
-| User mentions wanting aggressive savings | `PREFERENCES` | Aggressive savings mindset |
-| User hints at a financial priority | `PRIORITIES` | Wants to build 6-month emergency fund |
+**PREFERENCES proposal signals:**
+- Communication style patterns (prefers detail vs. summaries, frequency of check-ins)
+- Financial philosophy (risk tolerance, debt-averse behavior, aggressive vs. conservative approach)
+- Detected investment style (index funds vs. stock picking, active vs. passive)
+
+**PRIORITIES proposal signals:**
+- Inferred goals from behavior patterns (e.g., user keeps asking about emergency funds → infer it's a priority)
+- Emerging focus areas the user hasn't explicitly declared
+
+### Update existing memories (MEMORY_UPDATE)
+
+When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), the AI emits a `[MEMORY_UPDATE]` marker. The system finds the best-matching active memory in the same category and replaces its content.
 
 ---
 
-## Current Limitations & Known Gaps
+## Memory Markers
 
-### L1: One memory per response
-The system only saves ONE memory action per AI response. If a user shares multiple facts in a single message (e.g., "I live in Boston, make 100k, and have 2 kids"), only the most important one gets captured. The others are lost.
+The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped before the response reaches the user.
 
-**Recommendation**: Either allow multiple memory markers per response, or have the AI prioritize the most financially relevant fact and naturally ask a follow-up that re-surfaces the others.
+```
+[MEMORY_SAVE]CATEGORY|content
+[MEMORY_PROPOSAL]CATEGORY|content
+[MEMORY_UPDATE]CATEGORY|new content
+```
 
-### L2: No memory update/correction
-If a user previously said "I make $100k" and later says "I got a raise, I now make $120k," the old memory stays and a new one is added. There is no mechanism to update or replace existing memories from the AI side.
+**Rules:**
+- Multiple markers per response are allowed (one per distinct fact or insight)
+- Related facts can be grouped into a single memory; unrelated facts get separate markers
+- Saves, proposals, and updates can be mixed in the same response
+- No marker if the information is already stored (deduplication)
+- Content must be concise (under 100 characters)
 
-**Recommendation**: Add a `[MEMORY_UPDATE]` marker that references the category and replaces existing content. The prompt should instruct the AI to use update when it detects a change to previously stored information.
+---
 
-### L3: Cooldown between memory actions
-The client enforces a 2-response cooldown between memory actions. If the user shares important facts in rapid succession, some will be silently dropped.
+## Frequency & Throttling
 
-**Recommendation**: Consider reducing cooldown to 1, or exempting auto-saves from the cooldown (only throttle proposals).
+- **Auto-saves (`MEMORY_SAVE`)**: No cooldown — every explicit fact is captured immediately
+- **Proposals (`MEMORY_PROPOSAL`)**: 1-response cooldown between proposals to avoid overwhelming the user
+- **Temporary chat mode**: All memory actions are disabled — nothing is saved or proposed
 
-### L4: Demo/temp sessions block all memory
-When in a demo scenario or temporary chat, all memory saving is disabled. This is correct behavior but worth documenting — users won't see memory features in demo mode.
+---
 
-### L5: No memory persistence
-Memories exist only in the current app session (in-memory state). Closing the app or refreshing loses all memories. This is expected for the prototype but should use server-side storage in production.
+## Known Limitations (Prototype)
+
+### L1: No memory persistence
+Memories exist only in the current app session (in-memory state). Closing the app loses all memories. Production should use server-side storage.
+
+### L2: Demo sessions block all memory
+When in a demo scenario, all memory saving is disabled. Users won't see memory features in demo mode. This is intentional.
 
 ---
 
@@ -92,26 +91,27 @@ Memories exist only in the current app session (in-memory state). Closing the ap
 
 ### Server side (`api-server/src/routes/chat.ts`)
 - `VALID_MEMORY_CATEGORIES` Set validates category strings
-- `parseMemoryMarkers()` extracts `[MEMORY_SAVE]` and `[MEMORY_PROPOSAL]` markers from AI output
-- `memoryAction` is included in the JSON response for both `/chat` and `/chat/stream` endpoints
-- The done event in SSE streaming carries the `memoryAction` payload
+- `parseMemoryMarkers()` extracts `[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, and `[MEMORY_UPDATE]` markers from AI output
+- `memoryActions` array is included in the JSON response for both `/chat` and `/chat/stream` endpoints
+- The done event in SSE streaming carries the `memoryActions` payload
 
 ### Client side (`mobile/context/CoachContext.tsx`)
 - `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
-- `shouldAllowMemoryAction()` enforces frequency rules (cooldown, temp chat block)
-- `applyMemoryAction()` creates Memory objects or MemoryProposal UI
+- `shouldAllowMemoryAction()` enforces proposal cooldown (1-response gap) and temp chat block
+- Auto-saves bypass the cooldown entirely — only proposals are throttled
+- `applyMemoryActions()` creates Memory objects, handles updates, or shows MemoryProposal UI
 - Auto-saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
 - Proposals → user confirms → `EXPLICIT` source → "You created" label in UI
+- Updates → find best match by category + content similarity → replace content
 - Duplicate detection: exact content match (case-insensitive) prevents re-saving
 
 ### Memory flow
 ```
 User message
   → Server builds prompt with existing memories
-  → AI generates response + optional [MEMORY_SAVE] or [MEMORY_PROPOSAL] marker
-  → Server parses marker via parseMemoryMarkers()
-  → Server returns memoryAction in response JSON
-  → Client checks shouldAllowMemoryAction() frequency rules
-  → Client calls applyMemoryAction() to store or propose
-  → UI shows "Saved to memory" chip or proposal card
+  → AI generates response + optional memory markers (save/proposal/update)
+  → Server parses markers via parseMemoryMarkers()
+  → Server returns memoryActions array in response JSON
+  → Client processes all actions: saves immediately, proposals with cooldown check, updates by match
+  → UI shows "Saved to memory" chip, proposal card, or "Memory updated" chip
 ```

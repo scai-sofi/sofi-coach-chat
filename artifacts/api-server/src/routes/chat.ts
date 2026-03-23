@@ -143,13 +143,17 @@ When you detect a preference, attitude, financial behavior, or life context that
 Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_PROPOSAL]CATEGORY|content
 
+**Update existing memories:**
+When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), use the UPDATE marker instead of SAVE. The system will find the best-matching memory in the same category and replace its content.
+[MEMORY_UPDATE]CATEGORY|new content
+
 **Rules:**
 - You may emit MULTIPLE memory markers in a single response — one per distinct fact or insight
 - Group related facts into a single memory when it makes sense (e.g., "Has Chase Sapphire Preferred and Amex Gold credit cards") but separate unrelated facts into their own markers (e.g., credit cards vs 401k balance)
 - Each marker goes on its own line after [SUGGESTIONS]
-- You can mix saves and proposals in the same response
+- You can mix saves, proposals, and updates in the same response
 - Do NOT emit a memory marker if the information is already in the provided memories below
-- If a user corrects or updates a previously stored fact (e.g., "actually I make $130k now"), still emit a MEMORY_SAVE with the new value — the system handles deduplication
+- Use MEMORY_UPDATE (not MEMORY_SAVE) when the user corrects or changes a previously stored fact
 - Do NOT propose obvious conversational statements — only genuinely useful context
 - Keep each memory content concise (under 100 characters) — a brief factual statement
 - The memory marker lines must NOT appear in your main response text — only after [SUGGESTIONS]
@@ -188,18 +192,19 @@ You don't have any stored memories about this user yet. Pay attention to persona
 }
 
 interface MemoryAction {
-  type: 'save' | 'proposal';
+  type: 'save' | 'proposal' | 'update';
   category: string;
   content: string;
 }
 
 function parseMemoryMarkers(text: string): { cleanText: string; memoryActions: MemoryAction[] } {
-  const markerRegex = /\[MEMORY_(SAVE|PROPOSAL)\](\w+)\|(.+)/g;
+  const markerRegex = /\[MEMORY_(SAVE|PROPOSAL|UPDATE)\](\w+)\|(.+)/g;
 
   const memoryActions: MemoryAction[] = [];
   let match;
   while ((match = markerRegex.exec(text)) !== null) {
-    const type = match[1] === 'SAVE' ? 'save' as const : 'proposal' as const;
+    const typeMap: Record<string, MemoryAction['type']> = { SAVE: 'save', PROPOSAL: 'proposal', UPDATE: 'update' };
+    const type = typeMap[match[1]] || 'save';
     const category = match[2].trim();
     const content = match[3].trim().slice(0, 200);
     if (VALID_MEMORY_CATEGORIES.has(category) && content.length > 0) {
@@ -210,6 +215,7 @@ function parseMemoryMarkers(text: string): { cleanText: string; memoryActions: M
   let cleanText = text;
   cleanText = cleanText.replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '');
   cleanText = cleanText.replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '');
+  cleanText = cleanText.replace(/\n?\[MEMORY_UPDATE\][^\n]*/g, '');
 
   return { cleanText: cleanText.trim(), memoryActions };
 }

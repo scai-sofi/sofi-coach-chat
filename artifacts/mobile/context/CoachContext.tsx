@@ -79,7 +79,7 @@ export function useCoach() {
 }
 
 interface MemoryAction {
-  type: 'save' | 'proposal';
+  type: 'save' | 'proposal' | 'update';
   category: string;
   content: string;
 }
@@ -98,6 +98,7 @@ function stripStreamingMarkers(text: string): string {
   if (sugIdx !== -1) clean = clean.slice(0, sugIdx);
   clean = clean.replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '');
   clean = clean.replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '');
+  clean = clean.replace(/\n?\[MEMORY_UPDATE\][^\n]*/g, '');
   return clean.trimEnd();
 }
 
@@ -254,11 +255,11 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
-  const shouldAllowMemoryAction = useCallback((): boolean => {
+  const shouldAllowProposal = useCallback((): boolean => {
     if (tempChatRef.current) return false;
     const currentCount = aiResponseCountRef.current;
     const lastAction = lastMemoryActionMsgIndexRef.current;
-    if (lastAction >= 0 && (currentCount - lastAction) <= 1) return false;
+    if (lastAction >= 0 && (currentCount - lastAction) < 1) return false;
     return true;
   }, []);
 
@@ -270,6 +271,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (!actions || actions.length === 0) return {};
 
     const newMemories: Memory[] = [];
+    const updatedMemoryIds: string[] = [];
     let proposal: { id: string; content: string; category: string } | undefined;
 
     for (const action of actions) {
@@ -284,29 +286,57 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       );
       if (isDuplicate) continue;
 
-      if (action.type === 'save') {
+      if (action.type === 'update') {
+        const sameCategory = memoriesRef.current.filter(
+          m => m.status === 'ACTIVE' && m.category === category
+        );
+        if (sameCategory.length > 0) {
+          const words = normalizedContent.split(/\s+/);
+          let bestMatch = sameCategory[0];
+          let bestScore = 0;
+          for (const mem of sameCategory) {
+            const memWords = mem.content.toLowerCase().trim().split(/\s+/);
+            const overlap = words.filter(w => memWords.includes(w)).length;
+            if (overlap > bestScore) { bestScore = overlap; bestMatch = mem; }
+          }
+          setMemories(prev => prev.map(m =>
+            m.id === bestMatch.id ? { ...m, content: action.content, updatedAt: new Date() } : m
+          ));
+          updatedMemoryIds.push(bestMatch.id);
+        } else {
+          newMemories.push({
+            id: uid(), category, content: action.content,
+            source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
+            createdAt: new Date(), updatedAt: new Date(),
+          });
+        }
+      } else if (action.type === 'save') {
         newMemories.push({
-          id: uid(),
-          category,
-          content: action.content,
-          source: 'IMPLICIT_CONFIRMED',
-          status: 'ACTIVE',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          id: uid(), category, content: action.content,
+          source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
+          createdAt: new Date(), updatedAt: new Date(),
         });
-      } else if (action.type === 'proposal' && !proposal && shouldAllowMemoryAction()) {
+      } else if (action.type === 'proposal' && !proposal && shouldAllowProposal()) {
         proposal = { id: uid(), content: action.content, category };
       }
     }
 
     const result: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
+    const chips: MessageChip[] = [];
 
     if (newMemories.length > 0) {
       setMemories(prev => [...prev, ...newMemories]);
-      const count = newMemories.length;
       const memoryIds = newMemories.map(m => m.id);
-      result.chips = [{ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory`, memoryIds }];
+      const count = newMemories.length;
+      chips.push({ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory`, memoryIds });
     }
+
+    if (updatedMemoryIds.length > 0) {
+      const count = updatedMemoryIds.length;
+      chips.push({ type: 'memory-updated', label: count === 1 ? 'Memory updated' : `${count} memories updated`, memoryIds: updatedMemoryIds });
+    }
+
+    if (chips.length > 0) result.chips = chips;
 
     if (proposal) {
       lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
@@ -314,7 +344,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }
 
     return result;
-  }, [shouldAllowMemoryAction]);
+  }, [shouldAllowProposal]);
 
   const attemptStreamRequest = useCallback(async (
     text: string, history: { role: 'user' | 'assistant'; content: string }[],
