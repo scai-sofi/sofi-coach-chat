@@ -818,6 +818,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         response.insightToAction = undefined;
         response.autoSaveMemory = undefined;
         response.autoCreateGoal = undefined;
+        response.goalProposal = undefined;
       }
 
       const chips: MessageChip[] = [...(response.chips || [])];
