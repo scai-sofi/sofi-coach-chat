@@ -91,11 +91,13 @@ function isValidMemoryCategory(cat: string): cat is MemoryCategory {
   return VALID_MEMORY_CATEGORIES.has(cat);
 }
 
-function stripMemoryMarkers(text: string): string {
-  return text
-    .replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '')
-    .replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '')
-    .trimEnd();
+function stripStreamingMarkers(text: string): string {
+  let clean = text;
+  const sugIdx = clean.indexOf('[SUGGESTIONS]');
+  if (sugIdx !== -1) clean = clean.slice(0, sugIdx);
+  clean = clean.replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '');
+  clean = clean.replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '');
+  return clean.trimEnd();
 }
 
 function getActiveMemoryStrings(memories: Memory[]): string[] {
@@ -427,7 +429,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       const firstToken = tokenQueue[0];
       rawDisplayed = firstToken;
       idx = 1;
-      const cleanFirst = stripMemoryMarkers(rawDisplayed);
+      const cleanFirst = stripStreamingMarkers(rawDisplayed);
       setMessages(prev => prev.map(m =>
         m.id === TYPING_INDICATOR_ID
           ? { ...m, id: aiMsgId, content: cleanFirst, isStreaming: true, isTypingIndicator: false }
@@ -444,7 +446,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         if (idx < tokenQueue.length) {
           rawDisplayed += tokenQueue[idx];
           idx++;
-          const shown = stripMemoryMarkers(rawDisplayed);
+          const shown = stripStreamingMarkers(rawDisplayed);
           setMessages(prev => prev.map(m =>
             m.id === aiMsgId ? { ...m, content: shown } : m
           ));
