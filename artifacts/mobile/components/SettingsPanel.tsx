@@ -40,8 +40,8 @@ function RadioUnselected({ size = 24 }: { size?: number }) {
 
 const MODES: { value: MemoryMode; label: string; description: string }[] = [
   { value: 'full', label: 'Full memory', description: 'Coach automatically remembers details from your conversations.' },
-  { value: 'ask-first', label: 'Ask me first', description: 'Coach will ask before saving any memory from your conversations.' },
-  { value: 'off', label: 'Memory off', description: 'Coach won\'t save or use any memories. Goals are still tracked.' },
+  { value: 'ask-first', label: 'Always ask me first', description: 'Coach will ask before saving any memory from your conversations.' },
+  { value: 'off', label: 'Memory off', description: 'Coach won\u2019t save or use any memories. Goals are still tracked.' },
 ];
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -100,12 +100,12 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 style={[styles.modeRow, idx < MODES.length - 1 && styles.modeRowBorder]}
                 onPress={() => handleSelect(mode.value)}
               >
-                <View style={styles.radioWrap}>
-                  {localMode === mode.value ? <RadioSelected /> : <RadioUnselected />}
-                </View>
                 <View style={styles.modeTextArea}>
                   <Text style={styles.modeLabel}>{mode.label}</Text>
                   <Text style={styles.modeDesc}>{mode.description}</Text>
+                </View>
+                <View style={styles.radioWrap}>
+                  {localMode === mode.value ? <RadioSelected /> : <RadioUnselected />}
                 </View>
               </Pressable>
             ))}
@@ -182,28 +182,24 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.08)',
-    shadowColor: 'rgba(10,10,10,0.06)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
+    paddingHorizontal: 16,
     overflow: 'hidden',
   },
   modeRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    gap: 12,
+    alignItems: 'center',
+    minHeight: 64,
+    paddingVertical: 8,
+    gap: 8,
   },
   modeRowBorder: {
-    borderBottomWidth: 0.75,
-    borderBottomColor: 'rgba(10,10,10,0.08)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(10,10,10,0.06)',
   },
   modeTextArea: {
     flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 8,
     gap: 2,
   },
   modeLabel: {
@@ -213,15 +209,16 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   modeDesc: {
-    fontSize: 13,
-    fontFamily: Fonts.regular,
+    fontSize: 14,
+    fontFamily: Fonts.medium,
     color: Colors.contentSecondary,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   radioWrap: {
     width: 24,
     height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 8,
   },
 });
