@@ -575,6 +575,23 @@ function StreamingContent({ content }: { content: string }) {
   );
 }
 
+function SoftReveal({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
+  const opacity = useRef(new RNAnimated.Value(0)).current;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      RNAnimated.spring(opacity, { toValue: 1, tension: 60, friction: 12, useNativeDriver: true }).start();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [opacity, delay]);
+
+  return (
+    <RNAnimated.View style={{ opacity }}>
+      {children}
+    </RNAnimated.View>
+  );
+}
+
 function FadeInView({ delay = 0, duration = 300, children }: { delay?: number; duration?: number; children: React.ReactNode }) {
   const opacity = useRef(new RNAnimated.Value(0)).current;
   const translateY = useRef(new RNAnimated.Value(8)).current;
@@ -691,9 +708,9 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
 
       {!streaming && (
         animate ? (
-          <FadeInView delay={200} duration={300}>
+          <SoftReveal delay={200}>
             <ActionFooter message={message} />
-          </FadeInView>
+          </SoftReveal>
         ) : (
           <ActionFooter message={message} />
         )
