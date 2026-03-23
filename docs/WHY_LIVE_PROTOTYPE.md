@@ -103,7 +103,7 @@ This prototype isn't throwaway work. It serves as:
 
 1. **A living spec** — every prompt rule, formatting decision, and interaction pattern is documented in working code, not in annotations that get stale
 2. **A Flutter migration reference** — the `FLUTTER_HANDOFF.md` document maps every component, animation, and data flow to what the Flutter team needs to build, grounded in real tested behavior
-3. **A memory requirements doc** — `MEMORY_REQUIREMENTS.md` defines trigger maps, category definitions, and known limitations, all derived from actual testing
+3. **A memory & goals design doc** — `MEMORY_AND_GOALS.md` defines trigger maps, category definitions, goal types, user flows, and known limitations, all derived from actual testing
 4. **A stakeholder demo** — 10 scenarios that anyone can walk through without reading a PRD
 5. **A prompt engineering testbed** — the AI's system prompt has been refined through real conversations, not hypothetical ones
 

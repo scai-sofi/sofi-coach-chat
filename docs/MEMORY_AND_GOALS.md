@@ -1,0 +1,485 @@
+# Coach Memory & Goals — Design Requirements
+
+**Features:** Coach Chat Memory · Goals
+**Feature area:** Memory → Coach Chat only · Goals → Coach Chat + App Settings
+**Designer:** Cloris Cai
+**Status:** Prototype complete — ready for Flutter migration
+
+---
+
+## Overview
+
+This document covers two distinct but tightly interconnected features. They can ship independently, but each makes the other significantly more valuable.
+
+### Feature 1 — Coach Chat Memory
+
+- **What it is:** A persistence layer for SoFi Coach Chat. Coach accumulates context about a member across sessions — preferences, life events, financial attitudes, explicit facts — and uses that knowledge to personalize every subsequent response.
+- **Core value:** "The more we talk, the more helpful I become." Coach stops being a stateless search box and starts behaving like someone who actually knows the member.
+- **Access:** Coach Chat only. Memory is viewed and managed entirely within the chat surface — there is no standalone Settings entry point for memory.
+- **Who it's for:** Any Coach Chat user. The value compounds — passive users benefit from light personalization; engaged users who actively manage their memories get a meaningfully tailored experience.
+
+### Feature 2 — Goals
+
+- **What it is:** A structured goal-tracking system surfaced through Coach Chat and accessible from app Settings. Members set financial goals (save up, pay down, invest toward a target), and Coach tracks progress against real account data, surfaces proactive alerts when goals are at risk, and celebrates milestones.
+- **Core value:** Goals give Coach's responses a persistent target to aim at. Without goals, Coach answers questions. With goals, Coach connects every answer to something the member actually cares about.
+- **Access:** Goals can be created and reviewed from Coach Chat (conversational, contextual) and from app Settings (direct, structured). **Save Up goals are directly linked to SoFi Banking's existing Vault feature** — creating a Save Up goal either connects to an existing Vault or prompts the member to create one.
+- **Who it's for:** Members with a specific financial intention — an emergency fund, a debt payoff plan, a savings target — who want accountability and progress visibility.
+
+### How they connect
+
+- Memory makes Goals personal. When a member has told Coach "I want to retire by 55," that context shapes how Coach frames every goal conversation.
+- Goals generate memories. Creating a goal is itself a high-signal memory event — Coach knows what the member is working toward.
+- Goal-aware responses draw on both. Coach's Next Step / Progress Delta / Risk Alert patterns require both memory (who this person is) and goal state (where they stand).
+- Neither requires the other to launch, but both are significantly weaker in isolation.
+
+### Design principles
+
+- **Cumulative value** — Every conversation should make the next one more useful. The member should feel the difference within three sessions.
+- **Goals as the gravity center** — SoFi's differentiation is that the AI connects responses back to the member's stated goals and real financial state.
+- **Trust through transparency** — In regulated finance, a black-box memory is a liability. The member must always be able to see what the AI knows, why it said what it said, and delete anything instantly.
+
+### Why SoFi wins this
+
+No competitor has combined all three of: **structured goals + conversational memory + real financial data** in a single integrated experience. SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, credit) under one roof — with real-time account data — enabling cross-product goal orchestration that no AI-first competitor can replicate.
+
+---
+
+## Goals & Success Metrics
+
+**User goals:**
+
+- Feel genuinely known by the Coach across sessions — not repeat themselves
+- Understand and control what the AI has learned about them
+- Set meaningful financial goals and track progress against real account data
+- Receive timely, contextual alerts when plans are at risk or milestones are reached
+
+**Business goals:**
+
+- Increase Coach Chat session depth and return rate
+- Drive goal creation and adherence as a cross-product engagement signal
+- Deepen connection across SoFi product lines through in-chat recommendations
+- Differentiate SoFi Coach from generic AI assistants through transparency and persistence
+
+**North Star:** *Goal-Adjusted Financial Improvement Score* — a composite measuring whether members with active goals + memory enabled are making measurable financial progress compared to members without.
+
+**Product metrics:**
+
+| Metric                     | Description                                                         | Target                |
+| -------------------------- | ------------------------------------------------------------------- | --------------------- |
+| Memory adoption            | % of active Coach users with ≥ 3 active memories at 30 days         | > 60%                 |
+| Goal creation rate         | % of Coach users who create ≥ 1 goal within first 3 sessions        | > 40%                 |
+| Goal adherence (30/60/90d) | % of active goals where actual monthly contribution ≥ 80% of target | > 70%                 |
+| Goal completion rate       | % of goals reaching 100% within stated timeframe                    | > 25% at 6 months     |
+| Coach Chat return rate     | % of users returning within 7 days                                  | +15 pp vs. non-memory |
+| Containment rate           | % of conversations resolved without human escalation                | > 65%                 |
+
+**Safety metrics:**
+
+| Metric                                                | Target     |
+| ----------------------------------------------------- | ---------- |
+| Incorrect memory rate (member-flagged)                | < 5%       |
+| Compliance-flagged responses per 10,000 conversations | < 1        |
+| Memory deletion SLA (request → full purge)            | < 24 hours |
+| Sensitive data stored without explicit consent        | 0          |
+
+**Experimentation plan:**
+
+| Experiment                                         | Measure                                             |
+| -------------------------------------------------- | --------------------------------------------------- |
+| Memory on vs. off                                  | Return rate, session depth, CSAT                    |
+| Implicit memory suggestions vs. explicit-only      | Memory adoption rate, incorrect-memory rate         |
+| Goal-contextual responses vs. standard             | Goal adherence, CSAT                                |
+| Proactive alerts vs. passive tracking only         | Goal completion rate, notification unsubscribe rate |
+| Cold-start guided onboarding vs. organic discovery | 30-day memory count, goal creation rate             |
+
+---
+
+## Memory System — Implementation Spec
+
+### Memory categories
+
+The prototype uses three categories. The design doc's six categories (Preferences, Life Context, Financial Attitudes, Goal-Related, Explicit Facts, Other) are collapsed into three for simplicity — production may expand.
+
+| Category      | Label        | What it captures | Save type |
+|---|---|---|---|
+| `ABOUT_ME`    | About me     | Life situation, household, location, accounts, financial products, income, balances, employment, factual details | Auto-save |
+| `PREFERENCES` | Preferences  | Communication style, detail level, risk tolerance, financial approach, saving vs spending philosophy | Propose |
+| `PRIORITIES`  | Priorities   | Current goals, focus areas, debt payoff targets, savings targets, life events being planned around | Auto-save or Propose |
+
+### Trigger rules — when to capture memories
+
+**Always auto-save (`MEMORY_SAVE`):**
+
+Auto-save when the user shares any unambiguous personal fact. The AI does not ask for confirmation — it saves immediately and tells the user what was stored.
+
+- **ABOUT_ME signals:** Financial specifics (income, salary, rent, debt amounts, balances, credit score), financial products (accounts, loans, insurance, retirement accounts), life details (age, location, household, employment), life events (wedding, baby, retirement timeline, job change), budget constraints (fixed expenses, discretionary budget, savings capacity)
+- **PRIORITIES signals:** Explicit goals ("I want to save $X for Y"), declared focus areas ("My priority right now is...")
+
+**Propose for confirmation (`MEMORY_PROPOSAL`):**
+
+Propose when the AI infers something the user hasn't explicitly stated.
+
+- **PREFERENCES signals:** Communication style patterns, financial philosophy, detected investment style
+- **PRIORITIES signals:** Inferred goals from behavior patterns, emerging focus areas
+
+**Update existing memories (`MEMORY_UPDATE`):**
+
+When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), the AI emits a `[MEMORY_UPDATE]` marker. The system finds the best-matching active memory in the same category and replaces its content.
+
+### Memory markers
+
+The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped before the response reaches the user.
+
+```
+[MEMORY_SAVE]CATEGORY|content
+[MEMORY_PROPOSAL]CATEGORY|content
+[MEMORY_UPDATE]CATEGORY|new content
+```
+
+**Rules:**
+- Multiple markers per response are allowed (one per distinct fact or insight)
+- Related facts can be grouped into a single memory; unrelated facts get separate markers
+- Saves, proposals, and updates can be mixed in the same response
+- No marker if the information is already stored (deduplication)
+- Content must be concise (under 100 characters)
+
+### Memory lifecycle (implemented in prototype)
+
+| Action | How it works | Status |
+|---|---|---|
+| Auto-save | AI detects a fact → saves immediately → shows "Memory saved" chip inline | Implemented |
+| Implicit proposal | AI infers a preference → shows proposal card with [Remember] / [Not now] buttons | Implemented |
+| View all memories | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred") and date | Implemented |
+| Delete individual | Member swipes or taps delete on a memory row in Memory Center | Implemented |
+| Delete all | "Clear all" in Memory Center | Implemented |
+| Temporary Chat | Toggle in chat header → all memory read/write suppressed for the session | Implemented |
+| Memory correction / edit | Member taps a memory row, edits inline | Not implemented |
+| Version history | Expandable row showing prior versions with timestamps | Not implemented |
+| Pause individual | Toggle a memory to Paused — Coach stops referencing it but retains it | Not implemented |
+| Per-category controls | Toggle per category, set retention window | Not implemented |
+
+### Frequency & throttling
+
+- **No cooldown**: All memory actions (saves, proposals, updates) fire immediately with no throttling
+- **Temporary chat mode**: All memory actions are disabled — nothing is saved or proposed
+
+---
+
+## Goal System — Implementation Spec
+
+### Goal types
+
+| Type | Purpose | Example |
+|---|---|---|
+| `EMERGENCY_FUND` | Build an emergency savings buffer | "$12,000 Emergency Fund" |
+| `DEBT_PAYOFF` | Pay down a debt | "Pay Off Credit Card — $4,200" |
+| `SAVINGS_TARGET` | Save for a specific purchase or event | "Wedding Fund — $40,000" |
+| `CUSTOM` | Any other financial target | User-defined |
+
+### Goal proposal marker
+
+```
+[GOAL_PROPOSAL]TYPE|title|targetAmount|monthsUntilTarget|monthlyContribution|linkedAccount
+```
+
+- Emitted after `[SUGGESTIONS]`, same as memory markers
+- Max 1 goal proposal per response
+- Numeric fields accept `$`, commas, and decimals (parser strips formatting)
+- `monthsUntilTarget` must be ≥ 1
+- `linkedAccount` is optional (can be empty string)
+
+### Goal + memory bundling
+
+The client determines how to present goal proposals based on what markers accompany them:
+
+| Markers present | UI pattern | Card type |
+|---|---|---|
+| `GOAL_PROPOSAL` + `MEMORY_PROPOSAL PRIORITIES` | Bundled — single card with both the priority memory and goal action | `insightToAction` |
+| `GOAL_PROPOSAL` alone | Standalone goal card | `goalProposal` |
+| `MEMORY_PROPOSAL` alone (no goal) | Memory proposal card | `memoryProposal` |
+
+### Goal data model (implemented)
+
+```typescript
+interface Goal {
+  id: string;
+  type: GoalType;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  monthlyContribution: number;
+  startDate: string;        // ISO date
+  targetDate: string;       // ISO date
+  linkedAccount?: string;
+  status: 'active' | 'paused' | 'completed';
+  milestones: GoalMilestone[];
+  confidenceScore: number;  // 0–100
+  createdAt: string;
+}
+```
+
+### Goal lifecycle (implemented in prototype)
+
+| Action | How it works | Status |
+|---|---|---|
+| Create from conversation | AI detects goal intent → emits `[GOAL_PROPOSAL]` → shows Goal Proposal or InsightToAction card → member taps "Set up goal" | Implemented |
+| Goals Dashboard | Full-screen panel from chat header → progress rings, milestones, confidence scores | Implemented |
+| Goal cards | Circular progress ring, status pill (On Track / At Risk), monthly contribution, target date | Implemented |
+| Milestone tracking | Visual milestone markers (25%/50%/75%/100%) on goal cards | Implemented |
+| Confidence scoring | Numeric score (0–100) with On Track / At Risk status | Implemented (display only — no live data) |
+| Create from Settings | Dedicated Goals section in app Settings | Not implemented |
+| Vault integration | Link Save Up goals to SoFi Banking Vault | Not implemented |
+| Scenario simulation | "What if I increase by $X/month?" projection | Not implemented |
+
+---
+
+## User Flows
+
+### 1. Cold Start — New Member Onboarding
+
+*Prototype status: Demonstrated via demo scenario "Cold Start — First-Time Coach Intro"*
+
+- **Session 1:** Coach introduces itself and its memory capability. Asks lightweight seed questions about financial priorities and communication preferences. Proposes one goal based on the answer. Saves 1–2 memories.
+- **Sessions 2–3:** Coach references prior context without being asked. Proposes additional memories. Suggests linking additional accounts for richer context.
+- **Session 4+:** Full personalization active.
+
+### 2. Memory Lifecycle
+
+*Prototype status: Demonstrated via demo scenario "Memory Lifecycle — Correction Flow"*
+
+- **Explicit save** — Member shares a fact → Coach saves immediately → "Memory saved" chip shown inline
+- **Implicit proposal** — Coach detects a pattern → proposes inline: *"Want me to remember that?"* → [Remember] / [Not now]
+- **Full disclosure** — Memory Center shows all memories grouped by category, each with source label and date
+- **Delete** — Member removes a memory from Memory Center
+
+*Not yet demonstrated: Correction/edit, pause, version history, per-category controls*
+
+### 3. Goal Discovery from Conversation
+
+*Prototype status: Demonstrated via demo scenario "Goal Discovery & Setup" and live AI chat*
+
+- Member mentions a financial intention ("I want to pay off my credit card this year")
+- Coach recognizes the intent and asks structured follow-up: timeline, monthly capacity, current balance
+- Coach presents a Goal Proposal card: goal type, target amount, monthly contribution, estimated completion date, linked account
+- Member taps "Set up goal"; goal appears in Goals Dashboard with progress ring and milestones
+- When a PRIORITIES memory accompanies the goal, Coach bundles both into an Insight-to-Action card
+
+### 4. Goal-Aware Response in Conversation
+
+*Prototype status: Demonstrated via demo scenarios "Proactive Risk Alert" and "Weekly Recap & Next Steps"*
+
+When applicable, Coach's response includes one of four patterns:
+
+- **Next Step** — A concrete action the member can take now
+- **Progress Delta** — How the topic connects to goal progress
+- **Risk Alert** — A warning tied to goal health
+- **None** — Topic is unrelated to any active goal. No forced connection.
+
+### 5. Proactive Risk Alert
+
+*Prototype status: Demonstrated via demo scenario "Proactive Risk Alert — Goal at Risk"*
+
+- Coach detects a goal is at risk (confidence score drops)
+- Alert includes: goal name, root cause, and recovery options
+- Member selects a recovery path; Coach adjusts estimated completion date
+
+*Not yet demonstrated: Push notifications, live account data triggers*
+
+### 6. Milestone Celebration
+
+*Prototype status: Demonstrated via demo scenario "Milestone Celebration — Emergency Fund"*
+
+- Member reaches a goal milestone (25%/50%/75%/100%)
+- Coach shows celebratory message with journey timeline and forward projection
+
+*Not yet demonstrated: Push notifications, in-app animations, share functionality*
+
+### 7. Cross-Product Orchestration
+
+*Prototype status: Demonstrated via demo scenario "Cross-Product Orchestration"*
+
+- Member mentions a windfall or income change ("I just got a $3,000 bonus")
+- Coach identifies relevant products and presents a split-allocation Insight-to-Action card
+- Member reviews and approves; Coach logs the decision as a memory and updates goal progress
+
+---
+
+## Chat Interface Components
+
+### Response safety tiers
+
+| Tier | Type                  | Badge | Guardrail | Prototype status |
+| ---- | --------------------- | ----- | --------- | ---------------- |
+| 1    | Informational         | Grey badge, "Informational" | None — factual answers, balance lookups | Implemented |
+| 2    | Suggestive            | Blue badge, "Suggestive" | Data provenance included | Implemented |
+| 3    | Actionable            | Integrated into card — shield icon + "Needs your approval" | Confidence threshold; disclaimer shown | Implemented |
+| 4    | Complex / high-stakes | Orange badge, "Handoff to advisor" | AI provides framing, explicitly hands off to human | Implemented |
+
+**Actionable tier behavior:** When an InsightToAction or GoalProposal card is present, the standalone actionable badge is suppressed — instead, a subtle "Needs your approval" label with a shield icon is shown inside the card above the action buttons. Other tiers always show as standalone badges.
+
+### Chat components (implemented)
+
+| Component | Description |
+|---|---|
+| User message bubble | Right-aligned, dark background |
+| AI message block | Left-aligned, light background, streaming support |
+| Memory proposal card | Inline card with [Remember] / [Not now] buttons |
+| "Memory saved" chip | Confirmed state — checkmark + "Saved to memory" |
+| Goal proposal card | Goal type, target, monthly contribution, timeline, [Set up goal] / [Dismiss] |
+| Insight-to-Action card | Bundled PRIORITIES memory + goal proposal in single card |
+| Suggestion chips | Horizontally scrollable pills below AI response |
+| Safety tier badge | Color-coded pill above message text |
+| Action footer | Copy (with checkmark confirmation), thumbs up/down, provenance toggle |
+| Temporary Chat indicator | Shield icon in header, "Temp" chip |
+
+### Memory Center (implemented)
+
+Accessed via the chat header menu. Full-screen overlay panel.
+
+| Component | Description |
+|---|---|
+| Panel header | Title + close button |
+| Memory rows | Grouped by category, each showing content, source label ("AI inferred"), date |
+| Category sections | ABOUT_ME, PREFERENCES, PRIORITIES with headers |
+| Delete action | Per-memory delete with confirmation |
+| Clear all | Delete all memories at once |
+| Empty state | Message when no memories exist |
+
+### Goals Dashboard (implemented)
+
+Accessed via the chat header menu. Full-screen overlay panel.
+
+| Component | Description |
+|---|---|
+| Panel header | Title + close button |
+| Goal cards | Circular progress ring, title, status pill (On Track / At Risk / Completed) |
+| Goal metadata | Monthly target, target date, linked account, current vs. target amount |
+| Milestone markers | Visual indicators for 25%/50%/75%/100% milestones |
+| Confidence indicator | Numeric score with status coloring |
+| Empty state | Message when no goals exist |
+
+---
+
+## Architecture — Implementation Details
+
+### Server side (`api-server/src/routes/chat.ts`)
+
+- `VALID_MEMORY_CATEGORIES` Set validates category strings (`ABOUT_ME`, `PREFERENCES`, `PRIORITIES`)
+- `VALID_GOAL_TYPES` Set validates goal type strings (`EMERGENCY_FUND`, `DEBT_PAYOFF`, `SAVINGS_TARGET`, `CUSTOM`)
+- `parseMarkers()` extracts `[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`, and `[GOAL_PROPOSAL]` markers from AI output
+- `memoryActions` and `goalActions` arrays are included in the JSON response for both `/chat` and `/chat/stream` endpoints
+- The done event in SSE streaming carries both `memoryActions` and `goalActions` payloads
+- Goal proposal numeric parser strips `$`, commas; validates `monthsUntilTarget >= 1`
+
+### Client side (`mobile/context/CoachContext.tsx`)
+
+- `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
+- `shouldAllowProposal()` blocks proposals only during temporary chat mode
+- No cooldown — all memory and goal actions fire immediately
+- `applyMemoryAndGoalActions()` processes both memory and goal actions together:
+  - Memory saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
+  - Memory proposals → user confirms → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
+  - Memory updates → find best match by category + content similarity → replace content
+  - Goal proposal + PRIORITIES memory proposal → bundled into `insightToAction` card
+  - Goal proposal alone → standalone `goalProposal` card
+  - Duplicate detection: exact content match (case-insensitive) prevents re-saving
+
+### Memory + goal flow
+
+```
+User message
+  → Server builds prompt with existing memories
+  → AI generates response + optional memory markers + optional goal marker
+  → Server parses all markers via parseMarkers()
+  → Server returns memoryActions + goalActions arrays in response JSON
+  → Client processes all actions via applyMemoryAndGoalActions()
+  → If PRIORITIES proposal + goal action: bundled into InsightToAction card
+  → If goal action alone: standalone GoalProposal card
+  → Memory saves/updates applied immediately
+  → UI shows chips, proposal cards, goal cards, or insight-to-action cards
+```
+
+### Demo mode behavior
+
+Demo scenarios use pre-loaded canned conversations with pre-set memories and goals baked into the scenario data. The live memory/goal detection pipeline does not run on canned messages — demos are display-only snapshots. When `isTempChat` is true, `goalProposal`, `memoryProposal`, `insightToAction`, `autoSaveMemory`, and `autoCreateGoal` are all cleared from the response.
+
+---
+
+## Control Hierarchy
+
+| Level               | Feature | Surface                 | Prototype status | Controls |
+| ------------------- | ------- | ----------------------- | ---------------- | -------- |
+| 1 — Global (Memory) | Memory  | Coach Chat header       | Partial | Temporary Chat mode (no memory read/write) |
+| 3 — Item            | Memory  | Memory Center           | Partial | Delete individual, delete all |
+| 4 — Session         | Memory  | Chat                    | Implemented | Temporary Chat mode toggle |
+
+**Not yet implemented:** Global pause all / delete all toggle, per-category toggle, retention window settings, per-response "Don't use this" flag, global Goals on/off in Settings, proactive notification controls.
+
+---
+
+## Demo Scenario Coverage
+
+The prototype includes 10 demo scenarios that collectively demonstrate every implemented feature:
+
+| # | Scenario | Features demonstrated |
+|---|---|---|
+| 1 | Cold Start — First-Time Coach Intro | Memory cold start, seed questions, first memory save |
+| 2 | Returning Member — Personalized Session | Memory recall, context-aware responses, memory update |
+| 3 | Memory Lifecycle — Correction Flow | Memory save, proposal, update, correction |
+| 4 | Goal Discovery & Setup | Goal proposal from conversation, InsightToAction card |
+| 5 | Proactive Risk Alert — Goal at Risk | Goal-aware response, risk alert pattern, recovery options |
+| 6 | Milestone Celebration — Emergency Fund | Goal milestone, celebratory response, progress tracking |
+| 7 | Weekly Recap & Next Steps | Goal progress delta, next step pattern |
+| 8 | Cross-Product Orchestration | Multi-product allocation, InsightToAction card |
+| 9 | Tiered Safety Responses | All 4 safety tiers, provenance, handoff |
+| 10 | Free Chat — Live AI | Live GPT-4o-mini, real-time memory/goal detection |
+
+---
+
+## Known Limitations (Prototype)
+
+### L1: No memory persistence
+Memories exist only in the current app session (in-memory state). Closing the app loses all memories. Production requires server-side storage with encryption at rest.
+
+### L2: Demo scenarios use pre-loaded memories only
+Demo scenarios showcase what the memory/goal system looks like in action without running the live detection pipeline. This prevents duplicate memories from canned AI responses.
+
+### L3: No real account data
+Goal progress, confidence scores, and account balances are simulated. Production requires Galileo integration for real-time financial data.
+
+### L4: No push notifications
+Proactive alerts and milestone celebrations are demonstrated in-chat only. Production requires FCM integration and notification preference controls.
+
+### L5: No Vault integration
+Save Up goals do not connect to SoFi Banking Vaults. Production requires linking goal progress to Vault balances.
+
+---
+
+## Open Questions for Production
+
+- **Vault integration for Save Up goals** — Link to existing Vault vs. create new? In-chat or hand off to Banking surface? Real-time or periodic sync?
+- **Galileo integration** — API contract for account balances and transaction data. Latency budget. Pre-fetch at session start + cache vs. on-demand.
+- **Goal confidence scoring model** — Rules-based thresholds, ML model, or LLM-evaluated? Who owns iteration?
+- **Safety tier classification** — Rules-based, LLM-classified, or hybrid? Compliance review pipeline ownership.
+- **Human advisor handoff** — Scheduling mechanics. Context package format for the advisor.
+- **Proactive outreach infrastructure** — FCM delivery. Per-goal-type frequency controls. Member-facing preference UI.
+- **Temporary Chat consent** — First-use consent modal legally required, or toggle sufficient?
+- **Memory edit guardrails** — Free-text edit for all memories, or confirm/deny only for AI-inferred? Gaming prevention.
+- **Sensitive data policy** — Which categories require flagging? Disclosure copy requirements.
+- **Scenario simulation depth** — Linear projection vs. compound/inflation? Frontend-only vs. backend service.
+
+---
+
+## References
+
+| Resource                               | Link |
+| -------------------------------------- | ---- |
+| Figma spec                             | File `8c5TuXaL1MvZh2rkkf1e1Y` |
+| Jira epic                              | [RDMEMB-661](https://sofiinc.atlassian.net/browse/RDMEMB-661) |
+| Flutter package (planned)              | `flutter/feature_packages/sofi_ai_chat_memory_goals` |
+| Related package                        | `sofi_coach_dashboard` |
+| Competitive reference — ChatGPT Memory | Explicit + implicit two-layer system, best-in-class controls |
+| Competitive reference — Claude Memory  | Project-scoped, editable summaries, import/export |
+| Competitive reference — Cleo           | SMART goals, gamification, behavioral design ($129M cumulative savings) |
+| Competitive reference — Origin         | SEC-regulated, multi-agent, scenario forecasting |
+| Competitive reference — Monarch        | Cleanest goal-tracking UI, CFP-guided, explicit limitation disclosures |
