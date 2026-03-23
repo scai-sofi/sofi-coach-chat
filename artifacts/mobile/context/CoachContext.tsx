@@ -137,8 +137,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const abortControllerRef = useRef<AbortController | null>(null);
   const sessionVersionRef = useRef(0);
 
-  const lastMemoryActionMsgIndexRef = useRef(-1);
-  const aiResponseCountRef = useRef(0);
 
   const setActivePanel = useCallback((panel: PanelType) => {
     setActivePanelState(prev => prev === panel ? 'none' : panel);
@@ -161,8 +159,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setShowOnboarding(id === 'cold-start');
     setSessionTitle(scenario.title);
     titleGeneratedRef.current = true;
-    lastMemoryActionMsgIndexRef.current = -1;
-    aiResponseCountRef.current = 0;
   }, []);
 
   const startLiveChat = useCallback(() => {
@@ -180,8 +176,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setShowOnboarding(false);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
-    lastMemoryActionMsgIndexRef.current = -1;
-    aiResponseCountRef.current = 0;
   }, []);
 
   const addGoalFromProposal = useCallback((proposal: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }) => {
@@ -257,9 +251,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   const shouldAllowProposal = useCallback((): boolean => {
     if (tempChatRef.current) return false;
-    const currentCount = aiResponseCountRef.current;
-    const lastAction = lastMemoryActionMsgIndexRef.current;
-    if (lastAction >= 0 && (currentCount - lastAction) < 1) return false;
     return true;
   }, []);
 
@@ -339,7 +330,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (chips.length > 0) result.chips = chips;
 
     if (proposal) {
-      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
       result.memoryProposal = proposal;
     }
 
@@ -448,8 +438,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       ));
       return true;
     }
-
-    aiResponseCountRef.current += 1;
 
     let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
     if (memoryActions.length > 0) {
@@ -595,8 +583,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    aiResponseCountRef.current += 1;
-
     const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
     let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
@@ -644,8 +630,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           setIsTyping(false);
           return;
         }
-        aiResponseCountRef.current += 1;
-
         const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
         let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
@@ -964,8 +948,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setCurrentSessionId(null);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
-    lastMemoryActionMsgIndexRef.current = -1;
-    aiResponseCountRef.current = 0;
   }, [currentSessionId]);
 
   const loadSession = useCallback((id: string) => {
@@ -986,8 +968,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setCurrentSessionId(id);
     setSessionTitle(session.title);
     titleGeneratedRef.current = true;
-    lastMemoryActionMsgIndexRef.current = -1;
-    aiResponseCountRef.current = session.messages.filter(m => m.role === 'ai').length;
   }, [chatHistory]);
 
   const deleteSession = useCallback((id: string) => {
@@ -1001,8 +981,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages([]);
     setIsTyping(false);
     setShowOnboarding(chatModeRef.current === 'demo');
-    lastMemoryActionMsgIndexRef.current = -1;
-    aiResponseCountRef.current = 0;
   }, []);
 
   return (

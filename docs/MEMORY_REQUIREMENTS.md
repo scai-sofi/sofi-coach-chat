@@ -71,8 +71,7 @@ The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped
 
 ## Frequency & Throttling
 
-- **Auto-saves (`MEMORY_SAVE`)**: No cooldown — every explicit fact is captured immediately
-- **Proposals (`MEMORY_PROPOSAL`)**: 1-response cooldown between proposals to avoid overwhelming the user
+- **No cooldown**: All memory actions (saves, proposals, updates) fire immediately with no throttling
 - **Temporary chat mode**: All memory actions are disabled — nothing is saved or proposed
 
 ---
@@ -97,8 +96,8 @@ When in a demo scenario, all memory saving is disabled. Users won't see memory f
 
 ### Client side (`mobile/context/CoachContext.tsx`)
 - `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
-- `shouldAllowMemoryAction()` enforces proposal cooldown (1-response gap) and temp chat block
-- Auto-saves bypass the cooldown entirely — only proposals are throttled
+- `shouldAllowProposal()` blocks proposals only during temporary chat mode
+- No cooldown — all memory actions fire immediately
 - `applyMemoryActions()` creates Memory objects, handles updates, or shows MemoryProposal UI
 - Auto-saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
 - Proposals → user confirms → `EXPLICIT` source → "You created" label in UI
