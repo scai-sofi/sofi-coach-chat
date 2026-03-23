@@ -160,7 +160,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   };
 
   return (
-    <RNAnimated.View ref={cardRef} style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }, highlighted && { borderColor: highlightAnim.interpolate({ inputRange: [0, 1], outputRange: ['transparent', Colors.contentBrand] }), borderWidth: 1.5 }]}>
+    <RNAnimated.View ref={cardRef} style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }, highlighted && { borderColor: highlightAnim.interpolate({ inputRange: [0, 1], outputRange: ['transparent', Colors.contentPrimary] }), borderWidth: 1.5 }]}>
       {editing ? (
         <>
           <TextInput

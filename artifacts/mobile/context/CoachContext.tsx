@@ -447,9 +447,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       rawDisplayed = firstToken;
       idx = 1;
       const cleanFirst = stripStreamingMarkers(rawDisplayed);
+      const earlyChips = memoryExtras.chips;
       setMessages(prev => prev.map(m =>
         m.id === TYPING_INDICATOR_ID
-          ? { ...m, id: aiMsgId, content: cleanFirst, isStreaming: true, isTypingIndicator: false }
+          ? { ...m, id: aiMsgId, content: cleanFirst, isStreaming: true, isTypingIndicator: false, chips: earlyChips }
           : m
       ));
 
@@ -498,9 +499,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setIsTyping(false);
     displayed = words[0] || '';
     idx = 1;
+    const earlyChips = memoryExtras?.chips;
     setMessages(prev => prev.map(m =>
       m.id === TYPING_INDICATOR_ID
-        ? { ...m, id: aiMsgId, content: displayed, isStreaming: true, isTypingIndicator: false }
+        ? { ...m, id: aiMsgId, content: displayed, isStreaming: true, isTypingIndicator: false, chips: earlyChips }
         : m
     ));
 

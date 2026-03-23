@@ -268,6 +268,16 @@ function ChipBadge({ chip }: { chip: MessageChip }) {
   const { memories, navigateToMemory } = useCoach();
   const { showToast } = useToast();
 
+  const fadeAnim = useRef(new RNAnimated.Value(0)).current;
+  const slideAnim = useRef(new RNAnimated.Value(6)).current;
+
+  useEffect(() => {
+    RNAnimated.parallel([
+      RNAnimated.timing(fadeAnim, { toValue: 1, duration: 350, delay: 100, useNativeDriver: true }),
+      RNAnimated.spring(slideAnim, { toValue: 0, tension: 120, friction: 8, delay: 100, useNativeDriver: true }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
+
   const isMemoryChip = chip.type === 'memory-saved' || chip.type === 'memory-updated';
   const hasMemoryIds = isMemoryChip && chip.memoryIds && chip.memoryIds.length > 0;
 
@@ -282,20 +292,26 @@ function ChipBadge({ chip }: { chip: MessageChip }) {
     }
   };
 
+  const animStyle = { opacity: fadeAnim, transform: [{ translateY: slideAnim }] };
+
   if (hasMemoryIds) {
     return (
-      <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: style.bg }]}>
-        <Feather name={style.icon} size={11} color={style.color} />
-        <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
-      </Pressable>
+      <RNAnimated.View style={animStyle}>
+        <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: style.bg }]}>
+          <Feather name={style.icon} size={11} color={style.color} />
+          <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
+        </Pressable>
+      </RNAnimated.View>
     );
   }
 
   return (
-    <View style={[styles.chip, { backgroundColor: style.bg }]}>
-      <Feather name={style.icon} size={11} color={style.color} />
-      <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
-    </View>
+    <RNAnimated.View style={animStyle}>
+      <View style={[styles.chip, { backgroundColor: style.bg }]}>
+        <Feather name={style.icon} size={11} color={style.color} />
+        <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
+      </View>
+    </RNAnimated.View>
   );
 }
 
