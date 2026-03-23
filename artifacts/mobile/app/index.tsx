@@ -14,6 +14,7 @@ import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
 import { ScenarioFab } from '@/components/ScenarioFab';
 import { ChatHistory } from '@/components/ChatHistory';
+import { SettingsPanel } from '@/components/SettingsPanel';
 import { ScrollAnchor } from '@/components/ScrollAnchor';
 import { Message } from '@/constants/types';
 
@@ -183,10 +184,14 @@ export default function ChatScreen() {
   }, []);
 
   const [showHistory, setShowHistory] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (activePanel === 'history') {
       setShowHistory(true);
+    }
+    if (activePanel === 'settings') {
+      setShowSettings(true);
     }
   }, [activePanel]);
 
@@ -264,6 +269,13 @@ export default function ChatScreen() {
       {showHistory && (
         <ChatHistory onClose={() => {
           setShowHistory(false);
+          setActivePanel('none');
+        }} />
+      )}
+
+      {showSettings && (
+        <SettingsPanel onClose={() => {
+          setShowSettings(false);
           setActivePanel('none');
         }} />
       )}

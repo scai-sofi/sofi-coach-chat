@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, GoalType, GoalStatus, Milestone } from '@/constants/types';
+import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone } from '@/constants/types';
 import { SCENARIOS } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
 
@@ -32,6 +32,7 @@ interface CoachState {
   memories: Memory[];
   goals: Goal[];
   isTyping: boolean;
+  memoryMode: MemoryMode;
   activePanel: PanelType;
   activeScenario: string;
   showOnboarding: boolean;
@@ -45,6 +46,9 @@ interface CoachState {
 interface CoachContextType extends CoachState {
   sendMessage: (text: string) => void;
   setActivePanel: (panel: PanelType) => void;
+  setMemoryMode: (mode: MemoryMode) => void;
+  pauseAllMemories: () => void;
+  deleteAllMemories: () => void;
   switchScenario: (id: string) => void;
   startLiveChat: () => void;
   confirmMemory: (messageId: string) => void;
@@ -121,6 +125,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [memoryMode, setMemoryMode] = useState<MemoryMode>('full');
   const [activePanel, setActivePanelState] = useState<PanelType>('none');
   const [activeScenario, setActiveScenario] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -138,6 +143,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   goalsRef.current = goals;
   const chatModeRef = useRef(chatMode);
   chatModeRef.current = chatMode;
+  const memoryModeRef = useRef(memoryMode);
+  memoryModeRef.current = memoryMode;
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const sessionVersionRef = useRef(0);
@@ -145,6 +152,22 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   const setActivePanel = useCallback((panel: PanelType) => {
     setActivePanelState(prev => prev === panel ? 'none' : panel);
+  }, []);
+
+  const pauseAllMemories = useCallback(() => {
+    setMemories(prev => {
+      const activeCount = prev.filter(m => m.status === 'ACTIVE').length;
+      const pausedCount = prev.filter(m => m.status === 'PAUSED').length;
+      const allPaused = activeCount === 0 && pausedCount > 0;
+      return prev.map(m => {
+        if (m.status === 'DELETED') return m;
+        return { ...m, status: allPaused ? 'ACTIVE' as const : 'PAUSED' as const, updatedAt: new Date() };
+      });
+    });
+  }, []);
+
+  const deleteAllMemories = useCallback(() => {
+    setMemories([]);
   }, []);
 
   const switchScenario = useCallback((id: string) => {
@@ -254,6 +277,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const shouldAllowProposal = useCallback((): boolean => {
+    if (memoryModeRef.current === 'off') return false;
     return true;
   }, []);
 
@@ -269,12 +293,13 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     goalActs: GoalAction[],
     aiMsgId: string,
   ): LiveExtras => {
+    const currentMode = memoryModeRef.current;
     const newMemories: Memory[] = [];
     const updatedMemoryIds: string[] = [];
     let prioritiesProposal: MemoryProposal | undefined;
     let otherProposal: MemoryProposal | undefined;
 
-    if (memActions && memActions.length > 0) {
+    if (currentMode !== 'off' && memActions && memActions.length > 0) {
       for (const action of memActions) {
         if (!isValidMemoryCategory(action.category)) continue;
         const category = action.category;
@@ -287,7 +312,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         );
         if (isDuplicate) continue;
 
-        if (action.type === 'update') {
+        if (currentMode === 'ask-first') {
+          const p = { id: uid(), content: action.content, category: category as MemoryCategory };
+          if (category === 'PRIORITIES' && !prioritiesProposal) {
+            prioritiesProposal = p;
+          } else if (!otherProposal) {
+            otherProposal = p;
+          }
+        } else if (action.type === 'update') {
           const sameCategory = memoriesRef.current.filter(
             m => m.status === 'ACTIVE' && m.category === category
           );
@@ -666,7 +698,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       .filter(m => (m.role === 'user' || m.role === 'ai') && !m.isTypingIndicator)
       .map(m => ({ role: m.role === 'ai' ? 'assistant' as const : 'user' as const, content: m.content }));
 
-    const memoryStrings = getActiveMemoryStrings(memoriesRef.current);
+    const memoryStrings = memoryModeRef.current === 'off' ? [] : getActiveMemoryStrings(memoriesRef.current);
 
     if (!supportsStreaming) {
       try {
@@ -804,19 +836,27 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
       const chips: MessageChip[] = [...(response.chips || [])];
 
-      if (response.autoSaveMemory) {
-        const memId = uid();
-        chips.push({ type: 'memory-saved', label: 'Saved to memory', memoryIds: [memId] });
-        const mem: Memory = {
-          id: memId,
-          category: response.autoSaveMemory.category,
-          content: response.autoSaveMemory.content,
-          source: 'IMPLICIT_CONFIRMED',
-          status: 'ACTIVE',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        setMemories(prev => [...prev, mem]);
+      if (response.autoSaveMemory && memoryModeRef.current !== 'off') {
+        if (memoryModeRef.current === 'ask-first') {
+          response.memoryProposal = {
+            id: uid(),
+            content: response.autoSaveMemory.content,
+            category: response.autoSaveMemory.category,
+          };
+        } else {
+          const memId = uid();
+          chips.push({ type: 'memory-saved', label: 'Saved to memory', memoryIds: [memId] });
+          const mem: Memory = {
+            id: memId,
+            category: response.autoSaveMemory.category,
+            content: response.autoSaveMemory.content,
+            source: 'IMPLICIT_CONFIRMED',
+            status: 'ACTIVE',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          setMemories(prev => [...prev, mem]);
+        }
       }
 
       if (response.autoCreateGoal) {
@@ -827,13 +867,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         updateGoalSettings(response.autoUpdateGoal);
       }
 
+      const memOff = memoryModeRef.current === 'off';
       const aiMsg: Message = {
         id: uid(),
         role: 'ai',
         content: response.content || '',
         timestamp: new Date(),
         chips: chips.length > 0 ? chips : undefined,
-        memoryProposal: response.memoryProposal,
+        memoryProposal: memOff ? undefined : response.memoryProposal,
         goalProposal: response.goalProposal,
         insightToAction: response.insightToAction,
         suggestions: response.suggestions,
@@ -892,17 +933,20 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.insightToAction) return m;
       const insight = m.insightToAction;
-      const mem: Memory = {
-        id: uid(), category: insight.memory.category, content: insight.memory.content,
-        source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(),
-      };
-      setMemories(prev2 => [...prev2, mem]);
+      if (memoryModeRef.current !== 'off') {
+        const mem: Memory = {
+          id: uid(), category: insight.memory.category, content: insight.memory.content,
+          source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(),
+        };
+        setMemories(prev2 => [...prev2, mem]);
+      }
       addGoalFromProposal(insight.goalProposal);
-      return { ...m, insightToAction: { ...insight, accepted: true, memory: { ...insight.memory, saved: true } } };
+      return { ...m, insightToAction: { ...insight, accepted: true, memory: { ...insight.memory, saved: memoryModeRef.current !== 'off' } } };
     }));
   }, [addGoalFromProposal]);
 
   const saveInsightMemoryOnly = useCallback((messageId: string) => {
+    if (memoryModeRef.current === 'off') return;
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.insightToAction) return m;
       const insight = m.insightToAction;
@@ -1037,9 +1081,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CoachContext.Provider value={{
-      messages, memories, goals, isTyping, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
+      messages, memories, goals, isTyping, memoryMode, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
       chatHistory, currentSessionId, sessionTitle,
-      sendMessage, setActivePanel, switchScenario, startLiveChat,
+      sendMessage, setActivePanel, setMemoryMode, pauseAllMemories, deleteAllMemories,
+      switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,

@@ -227,14 +227,41 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   );
 }
 
+function PauseAllIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <Rect x="2" y="1.5" width="4.5" height="13" rx="1" stroke={color} strokeWidth={1.25} fill="none" />
+      <Rect x="9.5" y="1.5" width="4.5" height="13" rx="1" stroke={color} strokeWidth={1.25} fill="none" />
+    </Svg>
+  );
+}
+
+function ResumeAllIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <Path d="M4 2L13 8L4 14V2Z" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </Svg>
+  );
+}
+
+function TrashAllIcon({ size = 16, color = Colors.danger }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <Path d="M2 4H14M5.333 4V2.667A1.333 1.333 0 016.667 1.333h2.666A1.333 1.333 0 0110.667 2.667V4M12.667 4V13.333A1.333 1.333 0 0111.333 14.667H4.667A1.333 1.333 0 013.333 13.333V4" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </Svg>
+  );
+}
+
 export function MemoryCenter() {
   const insets = useSafeAreaInsets();
-  const { memories, setActivePanel, highlightedMemoryId } = useCoach();
+  const { memories, memoryMode, setActivePanel, pauseAllMemories, deleteAllMemories, highlightedMemoryId } = useCoach();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffsetRef = useRef(0);
+  const { showToast } = useToast();
 
   const visibleMemories = useMemo(() => {
     return memories.filter(m => {
@@ -289,9 +316,59 @@ export function MemoryCenter() {
           <View style={styles.titleArea}>
             <Text style={styles.titleText} numberOfLines={1}>Coach memory</Text>
           </View>
-          <View style={styles.rightControls} />
+          <View style={styles.rightControls}>
+            {memories.filter(m => m.status !== 'DELETED').length > 0 && (
+              <View style={styles.headerActions}>
+                <Pressable
+                  style={styles.headerActionBtn}
+                  onPress={() => {
+                    const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
+                    const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
+                    const allPaused = activeCount === 0 && pausedCount > 0;
+                    pauseAllMemories();
+                    showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
+                  }}
+                  hitSlop={6}
+                >
+                  {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0 ? (
+                    <ResumeAllIcon size={16} color={Colors.contentSecondary} />
+                  ) : (
+                    <PauseAllIcon size={16} color={Colors.contentSecondary} />
+                  )}
+                </Pressable>
+                <Pressable
+                  style={styles.headerActionBtn}
+                  onPress={() => setShowDeleteConfirm(true)}
+                  hitSlop={6}
+                >
+                  <TrashAllIcon size={16} color={Colors.danger} />
+                </Pressable>
+              </View>
+            )}
+          </View>
         </View>
       </View>
+
+      {showDeleteConfirm && (
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmCard}>
+            <Text style={styles.confirmTitle}>Delete all memories?</Text>
+            <Text style={styles.confirmDesc}>This can't be undone. The coach will forget everything it has learned about you.</Text>
+            <View style={styles.confirmActions}>
+              <Pressable style={styles.confirmCancelBtn} onPress={() => setShowDeleteConfirm(false)}>
+                <Text style={styles.confirmCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={styles.confirmDeleteBtn} onPress={() => {
+                deleteAllMemories();
+                setShowDeleteConfirm(false);
+                showToast({ message: 'All memories deleted.' });
+              }}>
+                <Text style={styles.confirmDeleteText}>Delete all</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -344,7 +421,14 @@ export function MemoryCenter() {
           onScroll={(e) => { scrollOffsetRef.current = e.nativeEvent.contentOffset.y; }}
           scrollEventThrottle={16}
         >
-          {visibleMemories.length === 0 ? (
+          {memoryMode === 'off' && visibleMemories.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>Memory is off</Text>
+              <Text style={styles.emptyText}>
+                The coach won't save or use memories while memory is turned off. You can change this in Settings.
+              </Text>
+            </View>
+          ) : visibleMemories.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyText}>
                 {search || filterCat ? 'No memories match your search' : 'No memories yet. The coach will start learning as you chat.'}
@@ -409,6 +493,21 @@ const styles = StyleSheet.create({
   rightControls: {
     width: 100,
     height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingRight: 16,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerActionBtn: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   iconBtn: {
     width: 24,
@@ -574,7 +673,72 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
     lineHeight: 20,
   },
+  confirmOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    zIndex: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  confirmCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    gap: 12,
+    width: '100%',
+    maxWidth: 340,
+  },
+  confirmTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.bold,
+    color: Colors.contentPrimary,
+    lineHeight: 24,
+  },
+  confirmDesc: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.contentSecondary,
+    lineHeight: 20,
+  },
+  confirmActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    paddingTop: 8,
+  },
+  confirmCancelBtn: {
+    borderWidth: 1.5,
+    borderColor: 'rgba(10,10,10,0.2)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  confirmCancelText: {
+    color: Colors.contentPrimary,
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+  },
+  confirmDeleteBtn: {
+    backgroundColor: Colors.danger,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  confirmDeleteText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+  },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
+  emptyTitle: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    color: Colors.contentPrimary,
+    lineHeight: 20,
+  },
   emptyText: {
     fontSize: 14,
     color: Colors.contentSecondary,
