@@ -580,7 +580,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   const sendLiveMessage = useCallback(async (text: string, version: number) => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
-    const controller = new AbortController();
+    let controller = new AbortController();
     abortControllerRef.current = controller;
 
     const aiMsgId = uid();
@@ -636,6 +636,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    let timedOut = false;
     const MAX_RETRIES = 2;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -644,12 +645,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       } catch (err: any) {
         if (sessionVersionRef.current !== version) return;
         if (err.name === 'AbortError' && controller.signal.aborted) {
+          timedOut = true;
           break;
         }
         if (attempt < MAX_RETRIES) {
-          const freshController = new AbortController();
-          abortControllerRef.current = freshController;
-          Object.assign(controller, { signal: freshController.signal });
+          controller = new AbortController();
+          abortControllerRef.current = controller;
           await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
           continue;
         }
@@ -662,7 +663,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const fallback = controller.signal.aborted
+    const fallback = timedOut
       ? 'The response took too long. Please try again.'
       : 'Unable to connect to the server. Please check your connection and try again.';
     setMessages(prev => {
