@@ -143,12 +143,14 @@ Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_PROPOSAL]CATEGORY|content
 
 **Rules:**
-- Maximum ONE memory action per response (either save or propose, never both)
-- If the user shares MULTIPLE facts in one message, save the most financially actionable one and naturally ask about the others in your follow-up to capture them in subsequent turns
+- You may emit MULTIPLE memory markers in a single response — one per distinct fact or insight
+- Group related facts into a single memory when it makes sense (e.g., "Has Chase Sapphire Preferred and Amex Gold credit cards") but separate unrelated facts into their own markers (e.g., credit cards vs 401k balance)
+- Each marker goes on its own line after [SUGGESTIONS]
+- You can mix saves and proposals in the same response
 - Do NOT emit a memory marker if the information is already in the provided memories below
 - If a user corrects or updates a previously stored fact (e.g., "actually I make $130k now"), still emit a MEMORY_SAVE with the new value — the system handles deduplication
 - Do NOT propose obvious conversational statements — only genuinely useful context
-- Keep memory content concise (under 100 characters) — a brief factual statement
+- Keep each memory content concise (under 100 characters) — a brief factual statement
 - The memory marker lines must NOT appear in your main response text — only after [SUGGESTIONS]
 
 **Valid categories:**
@@ -159,13 +161,12 @@ Place this marker on its own line AFTER [SUGGESTIONS]:
 - CONSTRAINT — budget limits, income constraints, debt obligations
 - EXPLICIT_FACT — specific numbers, financial products (credit cards, accounts, loans), income, balances
 
-**Examples:**
-[MEMORY_SAVE]LIFE_CONTEXT|Lives in San Francisco Bay Area with partner
-[MEMORY_SAVE]EXPLICIT_FACT|Annual household income is $85,000
+**Examples (multiple markers in one response):**
 [MEMORY_SAVE]EXPLICIT_FACT|Has Chase Sapphire Preferred and Amex Gold credit cards
-[MEMORY_SAVE]EXPLICIT_FACT|Has a 401k through employer with $45,000 balance
-[MEMORY_PROPOSAL]FINANCIAL_ATTITUDE|Prefers aggressive debt payoff over slow and steady
-[MEMORY_PROPOSAL]PREFERENCE|Likes detailed breakdowns with specific numbers`;
+[MEMORY_SAVE]EXPLICIT_FACT|Robinhood brokerage account with $15,000 balance
+[MEMORY_SAVE]EXPLICIT_FACT|401k through Fidelity with $50,000 balance
+[MEMORY_SAVE]LIFE_CONTEXT|Lives in San Francisco Bay Area with partner
+[MEMORY_PROPOSAL]FINANCIAL_ATTITUDE|Prefers aggressive debt payoff over slow and steady`;
 
 function buildSystemPrompt(memories?: string[]): string {
   let prompt = SYSTEM_PROMPT + MEMORY_PROMPT_SECTION;
@@ -193,39 +194,25 @@ interface MemoryAction {
   content: string;
 }
 
-function parseMemoryMarkers(text: string): { cleanText: string; memoryAction: MemoryAction | null } {
-  const saveRegex = /\n?\[MEMORY_SAVE\](\w+)\|(.+)/;
-  const proposalRegex = /\n?\[MEMORY_PROPOSAL\](\w+)\|(.+)/;
+function parseMemoryMarkers(text: string): { cleanText: string; memoryActions: MemoryAction[] } {
+  const markerRegex = /\[MEMORY_(SAVE|PROPOSAL)\](\w+)\|(.+)/g;
+
+  const memoryActions: MemoryAction[] = [];
+  let match;
+  while ((match = markerRegex.exec(text)) !== null) {
+    const type = match[1] === 'SAVE' ? 'save' as const : 'proposal' as const;
+    const category = match[2].trim();
+    const content = match[3].trim().slice(0, 200);
+    if (VALID_MEMORY_CATEGORIES.has(category) && content.length > 0) {
+      memoryActions.push({ type, category, content });
+    }
+  }
 
   let cleanText = text;
-  let memoryAction: MemoryAction | null = null;
+  cleanText = cleanText.replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '');
+  cleanText = cleanText.replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '');
 
-  const saveMatch = cleanText.match(saveRegex);
-  if (saveMatch) {
-    const category = saveMatch[1].trim();
-    const content = saveMatch[2].trim().slice(0, 200);
-    if (VALID_MEMORY_CATEGORIES.has(category) && content.length > 0) {
-      memoryAction = { type: 'save', category, content };
-    }
-    cleanText = cleanText.replace(saveRegex, '');
-  }
-
-  if (!memoryAction) {
-    const proposalMatch = cleanText.match(proposalRegex);
-    if (proposalMatch) {
-      const category = proposalMatch[1].trim();
-      const content = proposalMatch[2].trim().slice(0, 200);
-      if (VALID_MEMORY_CATEGORIES.has(category) && content.length > 0) {
-        memoryAction = { type: 'proposal', category, content };
-      }
-      cleanText = cleanText.replace(proposalRegex, '');
-    }
-  }
-
-  cleanText = cleanText.replace(/\[MEMORY_SAVE\][^\n]*/g, '');
-  cleanText = cleanText.replace(/\[MEMORY_PROPOSAL\][^\n]*/g, '');
-
-  return { cleanText: cleanText.trim(), memoryAction };
+  return { cleanText: cleanText.trim(), memoryActions };
 }
 
 function parseSuggestions(text: string): { reply: string; suggestions: string[] } {
@@ -311,10 +298,10 @@ router.post("/chat", async (req, res) => {
     });
 
     const raw = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
-    const { cleanText, memoryAction } = parseMemoryMarkers(raw);
+    const { cleanText, memoryActions } = parseMemoryMarkers(raw);
     const { reply, suggestions } = parseSuggestions(cleanText);
 
-    res.json({ reply, suggestions, memoryAction });
+    res.json({ reply, suggestions, memoryActions });
   } catch (error: any) {
     console.error("Chat API error:", error?.message || error);
     if (error?.status === 429) {
@@ -362,9 +349,9 @@ router.post("/chat/stream", async (req, res) => {
       }
     }
 
-    const { cleanText, memoryAction } = parseMemoryMarkers(fullText);
+    const { cleanText, memoryActions } = parseMemoryMarkers(fullText);
     const { reply, suggestions } = parseSuggestions(cleanText);
-    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryAction })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryActions })}\n\n`);
     res.end();
   } catch (error: any) {
     console.error("Chat stream error:", error?.message || error);

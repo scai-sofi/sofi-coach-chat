@@ -258,50 +258,58 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
-  const applyMemoryAction = useCallback((
-    action: MemoryAction,
+  const applyMemoryActions = useCallback((
+    actions: MemoryAction[],
     aiMsgId: string,
   ): { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } => {
     if (!shouldAllowMemoryAction()) return {};
+    if (!actions || actions.length === 0) return {};
 
-    if (!isValidMemoryCategory(action.category)) return {};
-    const category = action.category;
+    const newMemories: Memory[] = [];
+    let proposal: { id: string; content: string; category: string } | undefined;
 
-    const normalizedContent = action.content.toLowerCase().trim();
-    const isDuplicate = memoriesRef.current.some(
-      m => m.status === 'ACTIVE' && m.content.toLowerCase().trim() === normalizedContent
-    );
-    if (isDuplicate) return {};
+    for (const action of actions) {
+      if (!isValidMemoryCategory(action.category)) continue;
+      const category = action.category;
 
-    if (action.type === 'save') {
-      const mem: Memory = {
-        id: uid(),
-        category,
-        content: action.content,
-        source: 'IMPLICIT_CONFIRMED',
-        status: 'ACTIVE',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      setMemories(prev => [...prev, mem]);
-      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
-      return {
-        chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
-      };
-    }
+      const normalizedContent = action.content.toLowerCase().trim();
+      const isDuplicate = memoriesRef.current.some(
+        m => m.status === 'ACTIVE' && m.content.toLowerCase().trim() === normalizedContent
+      ) || newMemories.some(
+        m => m.content.toLowerCase().trim() === normalizedContent
+      );
+      if (isDuplicate) continue;
 
-    if (action.type === 'proposal') {
-      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
-      return {
-        memoryProposal: {
+      if (action.type === 'save') {
+        newMemories.push({
           id: uid(),
-          content: action.content,
           category,
-        },
-      };
+          content: action.content,
+          source: 'IMPLICIT_CONFIRMED',
+          status: 'ACTIVE',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } else if (action.type === 'proposal' && !proposal) {
+        proposal = { id: uid(), content: action.content, category };
+      }
     }
 
-    return {};
+    const result: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
+
+    if (newMemories.length > 0) {
+      setMemories(prev => [...prev, ...newMemories]);
+      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
+      const count = newMemories.length;
+      result.chips = [{ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory` }];
+    }
+
+    if (proposal) {
+      lastMemoryActionMsgIndexRef.current = aiResponseCountRef.current;
+      result.memoryProposal = proposal;
+    }
+
+    return result;
   }, [shouldAllowMemoryAction]);
 
   const attemptStreamRequest = useCallback(async (
@@ -338,7 +346,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     let sseBuffer = '';
     let fullContent = '';
     const tokenQueue: string[] = [];
-    let donePayload: { reply?: string; suggestions?: string[]; memoryAction?: MemoryAction; error?: string } | null = null;
+    let donePayload: { reply?: string; suggestions?: string[]; memoryActions?: MemoryAction[]; error?: string } | null = null;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -381,7 +389,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const finalReply = donePayload?.reply || fullContent;
     const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
-    const memoryAction = donePayload?.memoryAction || null;
+    const memoryActions = donePayload?.memoryActions || [];
 
     if (donePayload?.error) {
       setIsTyping(false);
@@ -396,8 +404,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     aiResponseCountRef.current += 1;
 
     let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
-    if (memoryAction) {
-      memoryExtras = applyMemoryAction(memoryAction, aiMsgId);
+    if (memoryActions.length > 0) {
+      memoryExtras = applyMemoryActions(memoryActions, aiMsgId);
     }
 
     if (tokenQueue.length === 0) {
@@ -456,7 +464,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         }
       }, TOKEN_MS);
     });
-  }, [generateTitle, applyMemoryAction]);
+  }, [generateTitle, applyMemoryActions]);
 
   const drainReplyWithAnimation = useCallback((
     reply: string, aiMsgId: string, version: number,
@@ -542,12 +550,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
     let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
-    if (data.memoryAction) {
-      memoryExtras = applyMemoryAction(data.memoryAction, aiMsgId);
+    if (data.memoryActions && data.memoryActions.length > 0) {
+      memoryExtras = applyMemoryActions(data.memoryActions, aiMsgId);
     }
 
     await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, memoryExtras);
-  }, [drainReplyWithAnimation, applyMemoryAction]);
+  }, [drainReplyWithAnimation, applyMemoryActions]);
 
   const supportsStreaming = typeof ReadableStream !== 'undefined';
 
@@ -591,8 +599,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
         let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
-        if (data.memoryAction) {
-          memoryExtras = applyMemoryAction(data.memoryAction, aiMsgId);
+        if (data.memoryActions && data.memoryActions.length > 0) {
+          memoryExtras = applyMemoryActions(data.memoryActions, aiMsgId);
         }
 
         await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, memoryExtras);
@@ -645,7 +653,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       );
     });
     setIsTyping(false);
-  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation, applyMemoryAction]);
+  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation, applyMemoryActions]);
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
