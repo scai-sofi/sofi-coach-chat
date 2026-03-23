@@ -871,6 +871,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       const filteredChips = memOff
         ? chips.filter(c => c.type !== 'memory-saved' && c.type !== 'memory-updated')
         : chips;
+      let finalGoalProposal = response.goalProposal;
+      let finalInsightToAction = response.insightToAction;
+      if (memOff) {
+        if (finalInsightToAction) {
+          finalGoalProposal = finalGoalProposal || finalInsightToAction.goalProposal;
+          finalInsightToAction = undefined;
+        }
+      }
       const aiMsg: Message = {
         id: uid(),
         role: 'ai',
@@ -878,8 +886,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         timestamp: new Date(),
         chips: filteredChips.length > 0 ? filteredChips : undefined,
         memoryProposal: memOff ? undefined : response.memoryProposal,
-        goalProposal: response.goalProposal,
-        insightToAction: response.insightToAction,
+        goalProposal: finalGoalProposal,
+        insightToAction: finalInsightToAction,
         suggestions: response.suggestions,
         provenance: response.provenance,
         safetyTier: response.safetyTier,
@@ -894,6 +902,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   }, [addGoalFromProposal, updateGoalSettings, sendLiveMessage]);
 
   const confirmMemory = useCallback((messageId: string) => {
+    if (memoryModeRef.current === 'off') return;
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.memoryProposal) return m;
       const mem: Memory = {
