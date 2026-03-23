@@ -66,6 +66,8 @@ interface CoachContextType extends CoachState {
   saveAndClose: () => void;
   loadSession: (id: string) => void;
   deleteSession: (id: string) => void;
+  highlightedMemoryId: string | null;
+  navigateToMemory: (memoryIds: string[]) => void;
 }
 
 const CoachContext = createContext<CoachContextType | null>(null);
@@ -120,6 +122,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [sessionTitle, setSessionTitle] = useState('Coach');
+  const [highlightedMemoryId, setHighlightedMemoryId] = useState<string | null>(null);
   const titleGeneratedRef = useRef(false);
 
   const memoriesRef = useRef(memories);
@@ -302,7 +305,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (newMemories.length > 0) {
       setMemories(prev => [...prev, ...newMemories]);
       const count = newMemories.length;
-      result.chips = [{ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory` }];
+      const memoryIds = newMemories.map(m => m.id);
+      result.chips = [{ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory`, memoryIds }];
     }
 
     if (proposal) {
@@ -733,9 +737,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       const chips: MessageChip[] = [...(response.chips || [])];
 
       if (response.autoSaveMemory && !isTempChat) {
-        chips.push({ type: 'memory-saved', label: 'Saved to memory' });
+        const memId = uid();
+        chips.push({ type: 'memory-saved', label: 'Saved to memory', memoryIds: [memId] });
         const mem: Memory = {
-          id: uid(),
+          id: memId,
           category: response.autoSaveMemory.category,
           content: response.autoSaveMemory.content,
           source: 'IMPLICIT_CONFIRMED',
@@ -873,6 +878,17 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories(prev => prev.map(m => m.id === id ? { ...m, status: 'ACTIVE' } : m));
   }, []);
 
+  const navigateToMemory = useCallback((memoryIds: string[]) => {
+    const activeMemory = memoriesRef.current.find(
+      m => memoryIds.includes(m.id) && m.status !== 'DELETED'
+    );
+    if (activeMemory) {
+      setHighlightedMemoryId(activeMemory.id);
+      setActivePanelState('memory');
+      setTimeout(() => setHighlightedMemoryId(null), 3000);
+    }
+  }, []);
+
   const sessionTitleRef = useRef(sessionTitle);
   sessionTitleRef.current = sessionTitle;
 
@@ -965,7 +981,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
-      saveAndClose, loadSession, deleteSession,
+      saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory,
     }}>
       {children}
     </CoachContext.Provider>

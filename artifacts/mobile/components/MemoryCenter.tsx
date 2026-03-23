@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
@@ -116,13 +116,21 @@ function DeleteIcon({ size = 14.5, color = Colors.danger }: { size?: number; col
   );
 }
 
-function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y: number) => void }) {
+function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEditStart?: (y: number) => void; highlighted?: boolean }) {
   const { editMemory, pauseMemory, deleteMemory, restoreMemory } = useCoach();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(memory.content);
   const cardRef = useRef<View>(null);
+  const highlightAnim = useRef(new RNAnimated.Value(highlighted ? 1 : 0)).current;
   const MAX_CHARS = 300;
+
+  useEffect(() => {
+    if (highlighted) {
+      highlightAnim.setValue(1);
+      RNAnimated.timing(highlightAnim, { toValue: 0, duration: 2000, delay: 800, useNativeDriver: false }).start();
+    }
+  }, [highlighted, highlightAnim]);
 
   const sourceLabel = memory.source === 'EXPLICIT' ? 'You shared' : 'Coach noticed';
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -152,7 +160,7 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
   };
 
   return (
-    <View ref={cardRef} style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }]}>
+    <RNAnimated.View ref={cardRef} style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }, highlighted && { borderColor: highlightAnim.interpolate({ inputRange: [0, 1], outputRange: ['transparent', Colors.contentBrand] }), borderWidth: 1.5 }]}>
       {editing ? (
         <>
           <TextInput
@@ -215,13 +223,13 @@ function MemoryCard({ memory, onEditStart }: { memory: Memory; onEditStart?: (y:
           </View>
         </>
       )}
-    </View>
+    </RNAnimated.View>
   );
 }
 
 export function MemoryCenter() {
   const insets = useSafeAreaInsets();
-  const { memories, setActivePanel } = useCoach();
+  const { memories, setActivePanel, highlightedMemoryId } = useCoach();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
@@ -356,7 +364,7 @@ export function MemoryCenter() {
                   </View>
                 )}
                 <View style={styles.cardGroup}>
-                  {mems.map(m => <MemoryCard key={m.id} memory={m} onEditStart={handleEditStart} />)}
+                  {mems.map(m => <MemoryCard key={m.id} memory={m} onEditStart={handleEditStart} highlighted={m.id === highlightedMemoryId} />)}
                 </View>
               </View>
             ))

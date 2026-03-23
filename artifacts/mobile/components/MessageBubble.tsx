@@ -6,6 +6,7 @@ import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Message, MessageChip, SafetyTier } from '@/constants/types';
 import { useCoach } from '@/context/CoachContext';
+import { useToast } from '@/components/Toast';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
@@ -264,6 +265,32 @@ function renderContent(content: string): React.ReactNode[] {
 
 function ChipBadge({ chip }: { chip: MessageChip }) {
   const style = CHIP_STYLES[chip.type] || CHIP_STYLES['memory-saved'];
+  const { memories, navigateToMemory } = useCoach();
+  const { showToast } = useToast();
+
+  const isMemoryChip = chip.type === 'memory-saved' || chip.type === 'memory-updated';
+  const hasMemoryIds = isMemoryChip && chip.memoryIds && chip.memoryIds.length > 0;
+
+  const handlePress = () => {
+    if (!hasMemoryIds) return;
+    const ids = chip.memoryIds!;
+    const anyAlive = memories.some(m => ids.includes(m.id) && m.status !== 'DELETED');
+    if (anyAlive) {
+      navigateToMemory(ids);
+    } else {
+      showToast({ message: 'This memory has been deleted.' });
+    }
+  };
+
+  if (hasMemoryIds) {
+    return (
+      <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: style.bg }]}>
+        <Feather name={style.icon} size={11} color={style.color} />
+        <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
+      </Pressable>
+    );
+  }
+
   return (
     <View style={[styles.chip, { backgroundColor: style.bg }]}>
       <Feather name={style.icon} size={11} color={style.color} />

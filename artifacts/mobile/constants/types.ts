@@ -10,6 +10,7 @@ export type PanelType = 'none' | 'memory' | 'goals' | 'scenarios' | 'history';
 export interface MessageChip {
   type: ChipType;
   label: string;
+  memoryIds?: string[];
 }
 
 export interface MemoryProposal {
