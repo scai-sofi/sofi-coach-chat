@@ -81,8 +81,10 @@ The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped
 ### L1: No memory persistence
 Memories exist only in the current app session (in-memory state). Closing the app loses all memories. Production should use server-side storage.
 
-### L2: Demo sessions block all memory
-When in a demo scenario, all memory saving is disabled. Users won't see memory features in demo mode. This is intentional.
+### L2: Demo scenarios use pre-loaded memories only
+Demo scenarios are pre-loaded canned conversations. Each scenario comes with its own pre-set memories baked into the scenario data. The memory detection pipeline does not run on these canned messages — if it did, it would create duplicate memories from the AI's pre-written responses every time someone opened a demo. Demos showcase what the memory system *looks like* in action without actually running the detection pipeline. They are display-only snapshots.
+
+This only applies to the canned demo messages themselves. The block on live memory detection is scoped to temporary chat mode (shield icon), not to demo scenarios. If a user starts a live chat, memory detection works normally.
 
 ---
 
