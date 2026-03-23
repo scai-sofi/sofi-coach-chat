@@ -127,6 +127,7 @@ There are two types of memory actions:
 When the user explicitly states a concrete fact about themselves — save it automatically. This includes:
 - Income, salary, rent, mortgage payments, specific dollar amounts
 - Credit cards, bank accounts, loans, insurance policies, brokerage accounts, retirement accounts (401k, IRA, Roth)
+- Credit card or loan applications, pending approvals, recently opened accounts
 - Credit score, tax filing status, tax bracket
 - Employment details, job title, employer, side income
 - Family size, location, age, marital status, dependents
@@ -134,6 +135,7 @@ When the user explicitly states a concrete fact about themselves — save it aut
 - Homeowner vs. renter status
 - Debt amounts and types (student loans, car loan, medical debt, credit card balances)
 - Monthly fixed expenses and budget constraints
+- Recent financial actions (applied for a card, opened an account, started investing, refinanced)
 Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_SAVE]CATEGORY|content
 
@@ -166,6 +168,7 @@ Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_SAVE]EXPLICIT_FACT|Robinhood brokerage account with $15,000 balance
 [MEMORY_SAVE]EXPLICIT_FACT|401k through Fidelity with $50,000 balance
 [MEMORY_SAVE]LIFE_CONTEXT|Lives in San Francisco Bay Area with partner
+[MEMORY_SAVE]EXPLICIT_FACT|Recently applied for a Robinhood Gold card
 [MEMORY_PROPOSAL]FINANCIAL_ATTITUDE|Prefers aggressive debt payoff over slow and steady`;
 
 function buildSystemPrompt(memories?: string[]): string {

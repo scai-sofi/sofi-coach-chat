@@ -279,7 +279,6 @@ export function MemoryCenter() {
             </Pressable>
           </View>
           <View style={styles.titleArea}>
-            <GpuIcon size={18} color={Colors.contentPrimary} />
             <Text style={styles.titleText} numberOfLines={1}>Coach memory</Text>
           </View>
           <View style={styles.rightControls} />
