@@ -129,37 +129,47 @@ function buildScenarios(): Scenario[] {
     {
       id: 'goal-discovery',
       title: 'Goal Discovery & Creation',
-      subtitle: 'AI detects goal intent from natural conversation',
+      subtitle: 'Memory + goal created together from natural conversation',
       icon: 'target',
       messages: [
         { id: uid(), role: 'user', content: 'I really need to pay off my credit card. The balance is about $4,200', timestamp: new Date(now.getTime() - 120000) },
         {
           id: uid(), role: 'ai', content: "**Credit Card Payoff Plan**\n\nLet's get a plan together. Here's your current situation:\n\n**Your Card Details**\n• **Balance:** $4,200\n• **Interest rate:** 22.99% APR\n• **Minimum payment:** $84/month\n• **Daily interest accruing:** ~$2.64\n\n**The Cost of Minimum Payments**\nAt $84/month, you'd be paying for 7+ years and spend over $3,100 in interest — nearly doubling what you owe. Every month you accelerate saves you real money.\n\n**Option A — Aggressive (6 months)**\n• **Monthly payment:** $720\n• **Paid off by:** July\n• **Total interest paid:** ~$400\n• **Interest saved vs. minimum:** ~$2,800\n• **Impact on budget:** Leaves $800/month from your surplus\n\n**Option B — Balanced (12 months)**\n• **Monthly payment:** $380\n• **Paid off by:** January\n• **Total interest paid:** ~$700\n• **Interest saved vs. minimum:** ~$2,400\n• **Impact on budget:** Leaves $1,140/month from your surplus\n\n**My Take**\nOption A saves you $400 more in interest, but Option B gives you significantly more breathing room each month. Given your wedding savings coming up, the balanced approach might be the smarter play.\n\nWhich feels more doable for your monthly budget?",
           timestamp: new Date(now.getTime() - 60000),
-          goalProposal: {
-            id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
-            targetAmount: 4200, targetDate: daysFromNow(180),
-            monthlyContribution: 380, linkedAccount: 'SoFi Credit Card',
+          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+          autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
+          insightToAction: {
+            id: uid(),
+            memory: { content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES', saved: false },
+            goalProposal: {
+              id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
+              targetAmount: 4200, targetDate: daysFromNow(180),
+              monthlyContribution: 380, linkedAccount: 'SoFi Credit Card',
+            },
+            dismissed: false,
           },
           safetyTier: 'actionable',
           safetyMessage: 'Actionable — needs your approval',
           suggestions: ['Set up Option A', 'Set up Option B', 'Help me prioritize my debts'],
         },
       ],
-      memories: [...SHARED_MEMORIES.slice(0, 3)],
+      memories: [
+        ...SHARED_MEMORIES.slice(0, 3),
+        { id: 'mem-gd-1', category: 'ABOUT_ME', content: 'Has $4,200 credit card balance at 22.99% APR', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
+      ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
     },
     {
       id: 'proactive-risk',
       title: 'Proactive Risk Alert',
-      subtitle: 'AI-initiated risk alerts when confidence drops',
+      subtitle: 'Goal setback triggers memory proposal — connects priorities to recovery',
       icon: 'alert-triangle',
       messages: [
         {
           id: uid(), role: 'system', content: 'AI inferred a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "**Credit Card Payoff — Risk Alert**\n\nI wanted to give you a heads-up — your confidence score dropped from 82% to 58% this week. Here's the full picture:\n\n**What Happened**\n• **Last 2 payments:** $380 each (target was $420, shortfall of $80 total)\n• **New charge:** $340 added to the balance\n• **Net impact:** $420 further from your goal than planned\n\n**Where This Puts You**\n• **Current balance:** $1,260 remaining\n• **Original payoff date:** 4 months from now\n• **Projected payoff at current pace:** ~5.5 months (6 weeks late)\n• **Extra interest cost if delayed:** ~$48\n\n**Your Options**\n\n• **Option A — Catch up this month:** Bump payment to $520 (+$140 over your usual). Gets you back to 78% confidence and on track for the original date.\n\n• **Option B — Extend timeline:** Add 2 months to your deadline. Monthly payment drops to $350, giving you $70/month more breathing room. Confidence resets to 72%.\n\nNo need to panic — both paths get you to debt-free. It comes down to whether you'd prefer a short push or a steadier pace.\n\nWhat feels right for your budget this month?",
+          id: uid(), role: 'ai', content: "**Credit Card Payoff — Risk Alert**\n\nI wanted to give you a heads-up — your confidence score dropped from 82% to 58% this week. Here's the full picture:\n\n**What Happened**\n• **Last 2 payments:** $380 each (target was $420, shortfall of $80 total)\n• **New charge:** $340 added to the balance\n• **Net impact:** $420 further from your goal than planned\n\n**Where This Puts You**\n• **Current balance:** $1,260 remaining\n• **Original payoff date:** 4 months from now\n• **Projected payoff at current pace:** ~5.5 months (6 weeks late)\n• **Extra interest cost if delayed:** ~$48\n\n**Why This Matters for Your Priorities**\nI know paying off this card is a priority for you, especially with the wedding in October 2027. Staying on track here frees up $380/month that can flow straight into wedding savings once you're done.\n\n**Your Options**\n\n• **Option A — Catch up this month:** Bump payment to $520 (+$140 over your usual). Gets you back to 78% confidence and on track for the original date.\n\n• **Option B — Extend timeline:** Add 2 months to your deadline. Monthly payment drops to $350, giving you $70/month more breathing room. Confidence resets to 72%.\n\nNo need to panic — both paths get you to debt-free. It comes down to whether you'd prefer a short push or a steadier pace.\n\nWhat feels right for your budget this month?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'goal-risk', label: 'Credit Card at risk' }],
           memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'ABOUT_ME' },

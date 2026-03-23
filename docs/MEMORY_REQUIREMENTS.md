@@ -76,6 +76,38 @@ The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped
 
 ---
 
+## Memory ↔ Goal Interaction
+
+Memories and goals are tightly coupled. The `PRIORITIES` category is the primary bridge between what a user says they care about and the structured goal objects that track progress.
+
+### How memories influence goals
+
+The AI receives all active memories in its system prompt. This context shapes goal recommendations:
+- `ABOUT_ME` memories (e.g., "Household of 2, Bay Area") inform realistic target amounts and timelines
+- `PREFERENCES` memories (e.g., "Risk-averse with investments") steer goal strategies (conservative vs. aggressive plans)
+- `PRIORITIES` memories (e.g., "Saving for a wedding in October 2027") determine which goals the AI recommends and how it ranks competing priorities
+
+### How goals generate memories
+
+Goal-related conversations create memories in three patterns:
+
+1. **Auto-save alongside goal proposals**: When a user mentions a financial fact while discussing goals (e.g., "my credit card balance is $4,200"), the AI auto-saves that as an `ABOUT_ME` memory at the same time it proposes the goal.
+
+2. **Insight-to-Action (memory + goal together)**: The tightest coupling. When the AI detects both a priority and a goalable intent in the same message, it bundles a `PRIORITIES` memory and a goal proposal into a single action the user can accept. Example: user says "I want to build an emergency fund" → AI proposes saving the memory "Building an emergency fund is a top priority" AND creating a $12,000 Emergency Fund goal in one step.
+
+3. **Goal setbacks trigger new memories**: When a goal's confidence drops (risk alert), the AI may propose saving context about the setback (e.g., "Credit card spending increased in recent months" as `ABOUT_ME`) so it can reference the pattern in future conversations.
+
+### Demo coverage
+
+| Demo | What it shows |
+|---|---|
+| Goal Discovery | Insight-to-action: auto-saves a fact (`ABOUT_ME`), proposes a `PRIORITIES` memory + goal together |
+| Proactive Risk | Goal setback triggers memory proposal; AI references existing `PRIORITIES` memories when explaining impact |
+| Cross-Product | AI uses memories to personalize multi-product allocation; proposes new `ABOUT_ME` memory |
+| Milestone Celebration | Goal progress milestone; existing memories provide context for celebration |
+
+---
+
 ## Known Limitations (Prototype)
 
 ### L1: No memory persistence

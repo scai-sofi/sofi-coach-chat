@@ -181,6 +181,10 @@ GoalProposal {
 
 ### InsightToAction (combined memory + goal card)
 
+Bundles a `PRIORITIES` memory and a goal proposal into a single user-facing action. This is the tightest coupling between the memory and goal systems — it fires when the AI detects both a declared priority and a goalable intent in the same message (e.g., "I want to build an emergency fund" → memory "Building an emergency fund is a top priority" + Emergency Fund goal proposal). The user can accept both, accept only the memory, or dismiss.
+
+Note: a single AI response can contain *both* an `autoSaveMemory` (e.g., saving a fact to `ABOUT_ME`) and an `insightToAction` (bundling a `PRIORITIES` memory with a goal). These are independent — the auto-save fires immediately, while the insight-to-action waits for user confirmation.
+
 ```
 InsightToAction {
   id: string
@@ -1111,11 +1115,11 @@ If no pattern matches, the message falls through to the live AI API.
 1. **Cold Start Onboarding** — Coach introduces itself, explains capabilities
 2. **Returning Member** — Spending breakdown with goal progress chips
 3. **Memory Lifecycle** — Explicit save, implicit proposal, memory correction
-4. **Goal Discovery & Creation** — Credit card payoff with goal proposal card
-5. **Proactive Risk Alert** — AI-initiated alert about goal confidence drop
-6. **Milestone Celebration** — 75% emergency fund milestone
-7. **Weekly Financial Recap** — Proactive weekly summary
-8. **Cross-Product Orchestration** — Bonus allocation across products
+4. **Goal Discovery & Creation** — Insight-to-action flow: auto-saves a fact (`ABOUT_ME`), proposes a `PRIORITIES` memory + goal together as a bundle the user can accept
+5. **Proactive Risk Alert** — Goal setback triggers memory proposal; AI references existing `PRIORITIES` memories (wedding timeline) when explaining the impact of a confidence drop
+6. **Milestone Celebration** — 75% emergency fund milestone; existing memories provide context
+7. **Weekly Financial Recap** — Proactive weekly summary with goal progress
+8. **Cross-Product Orchestration** — AI uses memories to personalize multi-product allocation; proposes new `ABOUT_ME` memory
 9. **Recommendation Safety Tiers** — Shows all 4 safety tier badges
 10. **Free Chat** — Empty conversation with some memories/goals pre-loaded
 
