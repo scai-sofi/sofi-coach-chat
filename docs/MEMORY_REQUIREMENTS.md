@@ -103,7 +103,7 @@ Memories exist only in the current app session (in-memory state). Closing the ap
 - `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
 - `shouldAllowMemoryAction()` enforces frequency rules (cooldown, temp chat block)
 - `applyMemoryAction()` creates Memory objects or MemoryProposal UI
-- Auto-saves → `IMPLICIT_CONFIRMED` source → "Coach noticed" label in UI
+- Auto-saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
 - Proposals → user confirms → `EXPLICIT` source → "You shared" label in UI
 - Duplicate detection: exact content match (case-insensitive) prevents re-saving
 
