@@ -177,7 +177,8 @@ function parseContentBlocks(content: string): ContentBlock[] {
     let next = i + 1;
     while (next < blocks.length && blocks[next].type === 'divider') next++;
     if (next < blocks.length && blocks[next].type === 'header') {
-      blocks[i] = { type: 'text', text: blocks[i].text, paragraphGap: false };
+      const headerBlock = blocks[i] as { type: 'header'; text: string };
+      blocks[i] = { type: 'text', text: headerBlock.text, paragraphGap: false };
       if (next === i + 2 && blocks[i + 1].type === 'divider') {
         blocks.splice(i + 1, 1);
       }

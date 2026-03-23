@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, GoalType, GoalStatus, Milestone } from '@/constants/types';
+import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, GoalType, GoalStatus, Milestone } from '@/constants/types';
 import { SCENARIOS } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
 
@@ -280,8 +280,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const newMemories: Memory[] = [];
     const updatedMemoryIds: string[] = [];
-    let prioritiesProposal: { id: string; content: string; category: string } | undefined;
-    let otherProposal: { id: string; content: string; category: string } | undefined;
+    let prioritiesProposal: MemoryProposal | undefined;
+    let otherProposal: MemoryProposal | undefined;
 
     if (memActions && memActions.length > 0) {
       for (const action of memActions) {
@@ -327,7 +327,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
             createdAt: new Date(), updatedAt: new Date(),
           });
         } else if (action.type === 'proposal' && shouldAllowProposal()) {
-          const p = { id: uid(), content: action.content, category };
+          const p = { id: uid(), content: action.content, category: category as MemoryCategory };
           if (category === 'PRIORITIES' && !prioritiesProposal) {
             prioritiesProposal = p;
           } else if (!otherProposal) {

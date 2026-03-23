@@ -1,4 +1,4 @@
-import { Message, Memory, Goal, SafetyTier } from './types';
+import { Message, Memory, Goal, SafetyTier, MemoryCategory, GoalType } from './types';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
@@ -24,10 +24,15 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('help me pay off') || input.includes('pay off credit')) {
     return {
       content: "**Credit Card Payoff Plan**\n\nLet's get a plan together. Here's your current situation:\n\n**Your Card Details**\n• **Balance:** $4,200\n• **Interest rate:** 22.99% APR\n• **Minimum payment:** $84/month\n• **Daily interest accruing:** ~$2.64\n\n**The Cost of Minimum Payments**\nAt $84/month, you'd be paying for 7+ years and spend over $3,100 in interest — nearly doubling what you owe. Every month you accelerate saves you real money.\n\n**Option A — Aggressive (6 months)**\n• **Monthly payment:** $720\n• **Paid off by:** July\n• **Total interest paid:** ~$400\n• **Interest saved vs. minimum:** ~$2,800\n• **Impact on budget:** Leaves $800/month from your surplus\n\n**Option B — Balanced (12 months)**\n• **Monthly payment:** $380\n• **Paid off by:** January\n• **Total interest paid:** ~$700\n• **Interest saved vs. minimum:** ~$2,400\n• **Impact on budget:** Leaves $1,140/month from your surplus\n\n**My Take**\nOption A saves you $400 more in interest, but Option B gives you significantly more breathing room each month. Given your wedding savings coming up, the balanced approach might be the smarter play.\n\nWhich feels more doable for your monthly budget?",
-      goalProposal: {
-        id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
-        targetAmount: 4200, targetDate: new Date(Date.now() + 180 * 86400000),
-        monthlyContribution: 380, linkedAccount: 'SoFi Credit Card',
+      insightToAction: {
+        id: uid(),
+        memory: { content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES' as MemoryCategory, saved: false },
+        goalProposal: {
+          id: uid(), type: 'DEBT_PAYOFF' as GoalType, title: 'Credit Card Payoff',
+          targetAmount: 4200, targetDate: new Date(Date.now() + 365 * 86400000),
+          monthlyContribution: 380, linkedAccount: 'SoFi Credit Card',
+        },
+        dismissed: false,
       },
       safetyTier: 'actionable' as SafetyTier,
       safetyMessage: 'Actionable — needs your approval',
@@ -83,8 +88,18 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
 
   if (input.includes('saving for') || input.includes('big purchase')) {
     return {
-      content: "**Savings Goal Planning**\n\nLove it — having a specific target makes all the difference. Here's how I can help:\n\n**How It Works**\nTell me what you're saving for and when you need it, and I'll reverse-engineer a monthly plan:\n\n• **Calculate the monthly amount** needed to hit your target on time\n• **Set up auto-transfers** so savings happen automatically\n• **Track milestones** (25%, 50%, 75%, 100%) with progress updates\n• **Adjust the plan** if your timeline or income changes\n\n**Common Goals I Help With**\n• Vacations and travel\n• Vehicle purchase or down payment\n• Home down payment\n• Wedding expenses (yours is coming up in October 2027!)\n• Tech purchases or home improvements\n\nWhat are you saving for, and roughly when do you need it by?",
-      memoryProposal: { id: uid(), content: 'Interested in saving for a specific purchase', category: 'PRIORITIES' },
+      content: "**Savings Goal Planning**\n\nLove it — having a specific target makes all the difference. Here's how I can help:\n\n**How It Works**\nTell me what you're saving for and when you need it, and I'll reverse-engineer a monthly plan:\n\n• **Calculate the monthly amount** needed to hit your target on time\n• **Set up auto-transfers** so savings happen automatically\n• **Track milestones** (25%, 50%, 75%, 100%) with progress updates\n• **Adjust the plan** if your timeline or income changes\n\n**Your Wedding in October 2027**\nSince you've mentioned saving for a wedding, I've already put together a starting plan. A typical Bay Area wedding runs $30,000–$50,000. Here's what a $40,000 target looks like:\n\n• **Monthly contribution:** $1,700\n• **Timeline:** ~24 months\n• **Account:** SoFi Savings (4.00% APY)\n• **Interest earned:** ~$800 over the savings period\n\nYou can adjust the target and timeline to fit your vision. Want to set this up, or are you saving for something else?",
+      insightToAction: {
+        id: uid(),
+        memory: { content: 'Saving for wedding in October 2027 is an active priority', category: 'PRIORITIES' as MemoryCategory, saved: false },
+        goalProposal: {
+          id: uid(), type: 'SAVINGS_TARGET' as GoalType, title: 'Wedding Fund',
+          targetAmount: 40000, targetDate: new Date(Date.now() + 730 * 86400000),
+          monthlyContribution: 1700, linkedAccount: 'SoFi Savings',
+        },
+        dismissed: false,
+      },
+      suggestions: ['Set up wedding fund', 'Adjust the target', 'I\'m saving for something else'],
     };
   }
 
