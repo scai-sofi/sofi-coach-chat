@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Circle } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
@@ -21,10 +21,19 @@ function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: 
   );
 }
 
-function CheckIcon({ size = 20, color = Colors.contentBrand }: { size?: number; color?: string }) {
+function RadioSelected({ size = 24 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M20 6L9 17L4 12" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Circle cx={12} cy={12} r={11} stroke={Colors.contentBrand} strokeWidth={2} />
+      <Circle cx={12} cy={12} r={6} fill={Colors.contentBrand} />
+    </Svg>
+  );
+}
+
+function RadioUnselected({ size = 24 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={12} r={11} stroke="#C4C3C2" strokeWidth={2} />
     </Svg>
   );
 }
@@ -91,15 +100,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 style={[styles.modeRow, idx < MODES.length - 1 && styles.modeRowBorder]}
                 onPress={() => handleSelect(mode.value)}
               >
+                <View style={styles.radioWrap}>
+                  {localMode === mode.value ? <RadioSelected /> : <RadioUnselected />}
+                </View>
                 <View style={styles.modeTextArea}>
                   <Text style={styles.modeLabel}>{mode.label}</Text>
                   <Text style={styles.modeDesc}>{mode.description}</Text>
                 </View>
-                {localMode === mode.value && (
-                  <View style={styles.checkWrap}>
-                    <CheckIcon size={20} color={Colors.contentBrand} />
-                  </View>
-                )}
               </Pressable>
             ))}
           </View>
@@ -186,7 +193,7 @@ const styles = StyleSheet.create({
   },
   modeRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: 16,
     paddingHorizontal: 16,
     gap: 12,
@@ -211,7 +218,7 @@ const styles = StyleSheet.create({
     color: Colors.contentSecondary,
     lineHeight: 18,
   },
-  checkWrap: {
+  radioWrap: {
     width: 24,
     height: 24,
     alignItems: 'center',
