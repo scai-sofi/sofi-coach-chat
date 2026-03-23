@@ -366,9 +366,19 @@ The API server is a separate Express application that proxies requests to OpenAI
 ```json
 {
   "reply": "**Your Savings Opportunities**\n\n...",
-  "suggestions": ["Set up auto-transfers", "Show subscriptions"]
+  "suggestions": ["Set up auto-transfers", "Show subscriptions"],
+  "memoryActions": [
+    { "type": "save", "category": "ABOUT_ME", "content": "Has $8,000 credit card balance" }
+  ],
+  "goalActions": [
+    { "type": "SAVINGS_TARGET", "title": "Home Down Payment", "targetAmount": 60000, "monthsUntilTarget": 36, "monthlyContribution": 1667, "linkedAccount": "SoFi Savings" }
+  ]
 }
 ```
+
+**Memory and goal actions** are parsed from AI markers (`[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`, `[GOAL_PROPOSAL]`) that appear after `[SUGGESTIONS]` in the raw AI output. The server strips these markers before returning the cleaned `reply`.
+
+When a `goalActions` entry arrives alongside a PRIORITIES-category `memoryActions` proposal, the client bundles them into an `insightToAction` card. When a goal action arrives alone, it becomes a standalone `goalProposal` card.
 
 **Constraints:**
 - `message` max length: 2000 characters
@@ -383,7 +393,7 @@ Same request format. Response is Server-Sent Events:
 data: {"type":"token","content":"**Your"}
 data: {"type":"token","content":" Savings"}
 ...
-data: {"type":"done","reply":"full cleaned text","suggestions":["..."]}
+data: {"type":"done","reply":"full cleaned text","suggestions":["..."],"memoryActions":[...],"goalActions":[...]}
 ```
 
 Error case:

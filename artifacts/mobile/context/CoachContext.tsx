@@ -84,6 +84,15 @@ interface MemoryAction {
   content: string;
 }
 
+interface GoalAction {
+  type: string;
+  title: string;
+  targetAmount: number;
+  monthsUntilTarget: number;
+  monthlyContribution: number;
+  linkedAccount: string;
+}
+
 const VALID_MEMORY_CATEGORIES = new Set<string>([
   'ABOUT_ME', 'PREFERENCES', 'PRIORITIES',
 ]);
@@ -99,6 +108,7 @@ function stripStreamingMarkers(text: string): string {
   clean = clean.replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '');
   clean = clean.replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '');
   clean = clean.replace(/\n?\[MEMORY_UPDATE\][^\n]*/g, '');
+  clean = clean.replace(/\n?\[GOAL_PROPOSAL\][^\n]*/g, '');
   return clean.trimEnd();
 }
 
@@ -254,65 +264,80 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
-  const applyMemoryActions = useCallback((
-    actions: MemoryAction[],
+  type LiveExtras = {
+    chips?: MessageChip[];
+    memoryProposal?: Message['memoryProposal'];
+    goalProposal?: Message['goalProposal'];
+    insightToAction?: Message['insightToAction'];
+  };
+
+  const applyMemoryAndGoalActions = useCallback((
+    memActions: MemoryAction[],
+    goalActs: GoalAction[],
     aiMsgId: string,
-  ): { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } => {
+  ): LiveExtras => {
     if (tempChatRef.current) return {};
-    if (!actions || actions.length === 0) return {};
 
     const newMemories: Memory[] = [];
     const updatedMemoryIds: string[] = [];
-    let proposal: { id: string; content: string; category: string } | undefined;
+    let prioritiesProposal: { id: string; content: string; category: string } | undefined;
+    let otherProposal: { id: string; content: string; category: string } | undefined;
 
-    for (const action of actions) {
-      if (!isValidMemoryCategory(action.category)) continue;
-      const category = action.category;
+    if (memActions && memActions.length > 0) {
+      for (const action of memActions) {
+        if (!isValidMemoryCategory(action.category)) continue;
+        const category = action.category;
 
-      const normalizedContent = action.content.toLowerCase().trim();
-      const isDuplicate = memoriesRef.current.some(
-        m => m.status === 'ACTIVE' && m.content.toLowerCase().trim() === normalizedContent
-      ) || newMemories.some(
-        m => m.content.toLowerCase().trim() === normalizedContent
-      );
-      if (isDuplicate) continue;
-
-      if (action.type === 'update') {
-        const sameCategory = memoriesRef.current.filter(
-          m => m.status === 'ACTIVE' && m.category === category
+        const normalizedContent = action.content.toLowerCase().trim();
+        const isDuplicate = memoriesRef.current.some(
+          m => m.status === 'ACTIVE' && m.content.toLowerCase().trim() === normalizedContent
+        ) || newMemories.some(
+          m => m.content.toLowerCase().trim() === normalizedContent
         );
-        if (sameCategory.length > 0) {
-          const words = normalizedContent.split(/\s+/);
-          let bestMatch = sameCategory[0];
-          let bestScore = 0;
-          for (const mem of sameCategory) {
-            const memWords = mem.content.toLowerCase().trim().split(/\s+/);
-            const overlap = words.filter(w => memWords.includes(w)).length;
-            if (overlap > bestScore) { bestScore = overlap; bestMatch = mem; }
+        if (isDuplicate) continue;
+
+        if (action.type === 'update') {
+          const sameCategory = memoriesRef.current.filter(
+            m => m.status === 'ACTIVE' && m.category === category
+          );
+          if (sameCategory.length > 0) {
+            const words = normalizedContent.split(/\s+/);
+            let bestMatch = sameCategory[0];
+            let bestScore = 0;
+            for (const mem of sameCategory) {
+              const memWords = mem.content.toLowerCase().trim().split(/\s+/);
+              const overlap = words.filter(w => memWords.includes(w)).length;
+              if (overlap > bestScore) { bestScore = overlap; bestMatch = mem; }
+            }
+            setMemories(prev => prev.map(m =>
+              m.id === bestMatch.id ? { ...m, content: action.content, updatedAt: new Date() } : m
+            ));
+            updatedMemoryIds.push(bestMatch.id);
+          } else {
+            newMemories.push({
+              id: uid(), category, content: action.content,
+              source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
+              createdAt: new Date(), updatedAt: new Date(),
+            });
           }
-          setMemories(prev => prev.map(m =>
-            m.id === bestMatch.id ? { ...m, content: action.content, updatedAt: new Date() } : m
-          ));
-          updatedMemoryIds.push(bestMatch.id);
-        } else {
+        } else if (action.type === 'save') {
           newMemories.push({
             id: uid(), category, content: action.content,
             source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
             createdAt: new Date(), updatedAt: new Date(),
           });
+        } else if (action.type === 'proposal' && shouldAllowProposal()) {
+          const p = { id: uid(), content: action.content, category };
+          if (category === 'PRIORITIES' && !prioritiesProposal) {
+            prioritiesProposal = p;
+          } else if (!otherProposal) {
+            otherProposal = p;
+          }
         }
-      } else if (action.type === 'save') {
-        newMemories.push({
-          id: uid(), category, content: action.content,
-          source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
-          createdAt: new Date(), updatedAt: new Date(),
-        });
-      } else if (action.type === 'proposal' && !proposal && shouldAllowProposal()) {
-        proposal = { id: uid(), content: action.content, category };
       }
     }
 
-    const result: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
+    const result: LiveExtras = {};
     const chips: MessageChip[] = [];
 
     if (newMemories.length > 0) {
@@ -329,8 +354,48 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     if (chips.length > 0) result.chips = chips;
 
-    if (proposal) {
-      result.memoryProposal = proposal;
+    const goalAction = goalActs && goalActs.length > 0 ? goalActs[0] : null;
+
+    if (goalAction && prioritiesProposal) {
+      const targetDate = new Date();
+      targetDate.setMonth(targetDate.getMonth() + goalAction.monthsUntilTarget);
+      result.insightToAction = {
+        id: uid(),
+        memory: { content: prioritiesProposal.content, category: prioritiesProposal.category as MemoryCategory, saved: false },
+        goalProposal: {
+          id: uid(),
+          type: goalAction.type as GoalType,
+          title: goalAction.title,
+          targetAmount: goalAction.targetAmount,
+          targetDate,
+          monthlyContribution: goalAction.monthlyContribution,
+          linkedAccount: goalAction.linkedAccount,
+        },
+        dismissed: false,
+      };
+      if (otherProposal) {
+        result.memoryProposal = otherProposal;
+      }
+    } else if (goalAction) {
+      const targetDate = new Date();
+      targetDate.setMonth(targetDate.getMonth() + goalAction.monthsUntilTarget);
+      result.goalProposal = {
+        id: uid(),
+        type: goalAction.type as GoalType,
+        title: goalAction.title,
+        targetAmount: goalAction.targetAmount,
+        targetDate,
+        monthlyContribution: goalAction.monthlyContribution,
+        linkedAccount: goalAction.linkedAccount,
+      };
+      if (prioritiesProposal || otherProposal) {
+        result.memoryProposal = prioritiesProposal || otherProposal;
+      }
+    } else {
+      const proposal = prioritiesProposal || otherProposal;
+      if (proposal) {
+        result.memoryProposal = proposal;
+      }
     }
 
     return result;
@@ -372,7 +437,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     let sseBuffer = '';
     let fullContent = '';
     const tokenQueue: string[] = [];
-    let donePayload: { reply?: string; suggestions?: string[]; memoryActions?: MemoryAction[]; error?: string } | null = null;
+    let donePayload: { reply?: string; suggestions?: string[]; memoryActions?: MemoryAction[]; goalActions?: GoalAction[]; error?: string } | null = null;
 
     let stallTimer: ReturnType<typeof setTimeout> | null = null;
     const STALL_TIMEOUT = 20_000;
@@ -428,6 +493,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const finalReply = donePayload?.reply || fullContent;
     const suggestions = Array.isArray(donePayload?.suggestions) && donePayload!.suggestions!.length > 0 ? donePayload!.suggestions : undefined;
     const memoryActions = donePayload?.memoryActions || [];
+    const goalActions = donePayload?.goalActions || [];
 
     if (donePayload?.error) {
       setIsTyping(false);
@@ -439,16 +505,16 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       return true;
     }
 
-    let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
-    if (memoryActions.length > 0) {
-      memoryExtras = applyMemoryActions(memoryActions, aiMsgId);
+    let liveExtras: LiveExtras = {};
+    if (memoryActions.length > 0 || goalActions.length > 0) {
+      liveExtras = applyMemoryAndGoalActions(memoryActions, goalActions, aiMsgId);
     }
 
     if (tokenQueue.length === 0) {
       setIsTyping(false);
       setMessages(prev => prev.map(m =>
         m.id === TYPING_INDICATOR_ID
-          ? { ...m, id: uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions, ...memoryExtras }
+          ? { ...m, id: uid(), content: finalReply, isStreaming: false, isTypingIndicator: false, suggestions, ...liveExtras }
           : m
       ));
       return true;
@@ -464,7 +530,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       rawDisplayed = firstToken;
       idx = 1;
       const cleanFirst = stripStreamingMarkers(rawDisplayed);
-      const earlyChips = memoryExtras.chips;
+      const earlyChips = liveExtras.chips;
       setMessages(prev => prev.map(m =>
         m.id === TYPING_INDICATOR_ID
           ? { ...m, id: aiMsgId, content: cleanFirst, isStreaming: true, isTypingIndicator: false, chips: earlyChips }
@@ -489,7 +555,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           clearInterval(timer);
           setMessages(prev => {
             const updated = prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions, ...memoryExtras } : m
+              m.id === aiMsgId ? { ...m, content: finalReply, isStreaming: false, suggestions, ...liveExtras } : m
             );
             if (!titleGeneratedRef.current) {
               titleGeneratedRef.current = true;
@@ -501,12 +567,12 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         }
       }, TOKEN_MS);
     });
-  }, [generateTitle, applyMemoryActions]);
+  }, [generateTitle, applyMemoryAndGoalActions]);
 
   const drainReplyWithAnimation = useCallback((
     reply: string, aiMsgId: string, version: number,
     suggestions?: string[],
-    memoryExtras?: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] },
+    liveExtras?: LiveExtras,
   ) => {
     const words = reply.split(/(\s+)/);
     const TOKEN_MS = 8;
@@ -516,7 +582,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setIsTyping(false);
     displayed = words[0] || '';
     idx = 1;
-    const earlyChips = memoryExtras?.chips;
+    const earlyChips = liveExtras?.chips;
     setMessages(prev => prev.map(m =>
       m.id === TYPING_INDICATOR_ID
         ? { ...m, id: aiMsgId, content: displayed, isStreaming: true, isTypingIndicator: false, chips: earlyChips }
@@ -541,7 +607,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           clearInterval(timer);
           setMessages(prev => {
             const updated = prev.map(m =>
-              m.id === aiMsgId ? { ...m, content: reply, isStreaming: false, suggestions, ...(memoryExtras || {}) } : m
+              m.id === aiMsgId ? { ...m, content: reply, isStreaming: false, suggestions, ...(liveExtras || {}) } : m
             );
             if (!titleGeneratedRef.current) {
               titleGeneratedRef.current = true;
@@ -585,13 +651,15 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
-    let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
-    if (data.memoryActions && data.memoryActions.length > 0) {
-      memoryExtras = applyMemoryActions(data.memoryActions, aiMsgId);
+    let liveExtras: LiveExtras = {};
+    const memActs = data.memoryActions || [];
+    const goalActs = data.goalActions || [];
+    if (memActs.length > 0 || goalActs.length > 0) {
+      liveExtras = applyMemoryAndGoalActions(memActs, goalActs, aiMsgId);
     }
 
-    await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, memoryExtras);
-  }, [drainReplyWithAnimation, applyMemoryActions]);
+    await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, liveExtras);
+  }, [drainReplyWithAnimation, applyMemoryAndGoalActions]);
 
   const supportsStreaming = typeof ReadableStream !== 'undefined';
 
@@ -632,12 +700,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         }
         const suggestions = Array.isArray(data.suggestions) && data.suggestions.length > 0 ? data.suggestions : undefined;
 
-        let memoryExtras: { chips?: MessageChip[]; memoryProposal?: Message['memoryProposal'] } = {};
-        if (data.memoryActions && data.memoryActions.length > 0) {
-          memoryExtras = applyMemoryActions(data.memoryActions, aiMsgId);
+        let liveExtras: LiveExtras = {};
+        const memActs2 = data.memoryActions || [];
+        const goalActs2 = data.goalActions || [];
+        if (memActs2.length > 0 || goalActs2.length > 0) {
+          liveExtras = applyMemoryAndGoalActions(memActs2, goalActs2, aiMsgId);
         }
 
-        await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, memoryExtras);
+        await drainReplyWithAnimation(data.reply, aiMsgId, version, suggestions, liveExtras);
         return;
       } catch (err: any) {
         if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
@@ -696,7 +766,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       );
     });
     setIsTyping(false);
-  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation, applyMemoryActions]);
+  }, [attemptStreamRequest, fallbackNonStreaming, supportsStreaming, drainReplyWithAnimation, applyMemoryAndGoalActions]);
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;

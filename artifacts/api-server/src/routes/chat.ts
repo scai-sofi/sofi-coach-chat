@@ -15,6 +15,10 @@ const VALID_MEMORY_CATEGORIES = new Set([
   'ABOUT_ME', 'PREFERENCES', 'PRIORITIES',
 ]);
 
+const VALID_GOAL_TYPES = new Set([
+  'EMERGENCY_FUND', 'DEBT_PAYOFF', 'SAVINGS_TARGET', 'CUSTOM',
+]);
+
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function getClientIp(req: Request): string {
@@ -171,8 +175,72 @@ When a user corrects or supersedes a previously stored fact (e.g., "actually I m
 [MEMORY_SAVE]ABOUT_ME|Recently applied for a Robinhood Gold card
 [MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive debt payoff over slow and steady`;
 
+const GOAL_PROMPT_SECTION = `
+
+## Goal Proposal System
+You can propose financial goals when a user expresses a clear intent to save, pay off debt, or work toward a financial target.
+
+**When to propose a goal (ALWAYS emit the marker in these cases):**
+- User says they want to save for something (home, car, vacation, wedding, emergency fund)
+- User wants to pay off debt (credit card, student loans, car loan)
+- User mentions a specific financial target with an amount or timeline
+- User asks "how should I work toward" or "help me plan for" a financial goal
+- User expresses any intent to achieve a financial outcome, even vaguely ("I want to buy a home someday")
+
+**When NOT to propose a goal:**
+- User is just asking general questions without expressing a specific goal
+- User is asking about concepts or education (e.g., "what is a Roth IRA?")
+- User already has an active goal for the same thing (check the memories)
+
+**Goal proposal format:**
+Place this marker on its own line AFTER [SUGGESTIONS], after any memory markers:
+[GOAL_PROPOSAL]TYPE|title|targetAmount|monthsUntilTarget|monthlyContribution|linkedAccount
+
+**Fields:**
+- TYPE: One of EMERGENCY_FUND, DEBT_PAYOFF, SAVINGS_TARGET, or CUSTOM
+- title: Short goal name (e.g., "Home Down Payment", "Emergency Fund")
+- targetAmount: Dollar amount as integer (e.g., 60000)
+- monthsUntilTarget: Number of months until target date (e.g., 36)
+- monthlyContribution: Suggested monthly payment as integer (e.g., 1500)
+- linkedAccount: Suggested SoFi account (e.g., "SoFi Savings", "SoFi Credit Card")
+
+**Rules:**
+- ALWAYS emit a [GOAL_PROPOSAL] marker when the user expresses wanting to save, pay off, or work toward any financial target — err on the side of proposing
+- Always emit a [MEMORY_PROPOSAL]PRIORITIES marker alongside the goal proposal to save the user's priority
+- You may emit at most ONE goal proposal per response
+- Make targetAmount, monthlyContribution, and timeline realistic based on what the user told you
+- If the user hasn't given specifics, use reasonable defaults and explain your assumptions in the response text
+- The goal proposal marker must NOT appear in your main response text — only after [SUGGESTIONS]
+
+**Examples:**
+
+User: "I want to buy a home in about 3 years"
+→ Response includes advice about saving for a down payment
+[SUGGESTIONS]
+How much should I save monthly?
+What about closing costs?
+[MEMORY_PROPOSAL]PRIORITIES|Saving for a home purchase in ~3 years
+[GOAL_PROPOSAL]SAVINGS_TARGET|Home Down Payment|60000|36|1667|SoFi Savings
+
+User: "I need to build an emergency fund"
+→ Response includes emergency fund advice
+[SUGGESTIONS]
+How much do I need?
+Where should I keep it?
+[MEMORY_PROPOSAL]PRIORITIES|Building an emergency fund is a top priority
+[GOAL_PROPOSAL]EMERGENCY_FUND|Emergency Fund|12000|12|1000|SoFi Savings
+
+User: "Help me pay off my $8,000 credit card"
+→ Response includes payoff strategy
+[SUGGESTIONS]
+Show me payment options
+What about balance transfer?
+[MEMORY_SAVE]ABOUT_ME|Has $8,000 credit card balance
+[MEMORY_PROPOSAL]PRIORITIES|Paying off credit card debt is a priority
+[GOAL_PROPOSAL]DEBT_PAYOFF|Credit Card Payoff|8000|12|700|SoFi Credit Card`;
+
 function buildSystemPrompt(memories?: string[]): string {
-  let prompt = SYSTEM_PROMPT + MEMORY_PROMPT_SECTION;
+  let prompt = SYSTEM_PROMPT + MEMORY_PROMPT_SECTION + GOAL_PROMPT_SECTION;
 
   if (memories && memories.length > 0) {
     const memoryContext = memories.map(m => `- ${m}`).join('\n');
@@ -197,12 +265,22 @@ interface MemoryAction {
   content: string;
 }
 
-function parseMemoryMarkers(text: string): { cleanText: string; memoryActions: MemoryAction[] } {
-  const markerRegex = /\[MEMORY_(SAVE|PROPOSAL|UPDATE)\](\w+)\|(.+)/g;
+interface GoalAction {
+  type: string;
+  title: string;
+  targetAmount: number;
+  monthsUntilTarget: number;
+  monthlyContribution: number;
+  linkedAccount: string;
+}
+
+function parseMarkers(text: string): { cleanText: string; memoryActions: MemoryAction[]; goalActions: GoalAction[] } {
+  const memoryRegex = /\[MEMORY_(SAVE|PROPOSAL|UPDATE)\](\w+)\|(.+)/g;
+  const goalRegex = /\[GOAL_PROPOSAL\](\w+)\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|(.+)/g;
 
   const memoryActions: MemoryAction[] = [];
   let match;
-  while ((match = markerRegex.exec(text)) !== null) {
+  while ((match = memoryRegex.exec(text)) !== null) {
     const typeMap: Record<string, MemoryAction['type']> = { SAVE: 'save', PROPOSAL: 'proposal', UPDATE: 'update' };
     const type = typeMap[match[1]] || 'save';
     const category = match[2].trim();
@@ -212,12 +290,32 @@ function parseMemoryMarkers(text: string): { cleanText: string; memoryActions: M
     }
   }
 
+  function parseNumeric(raw: string): number {
+    const cleaned = raw.replace(/[$,\s]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : Math.round(num);
+  }
+
+  const goalActions: GoalAction[] = [];
+  while ((match = goalRegex.exec(text)) !== null) {
+    const goalType = match[1].trim();
+    const title = match[2].trim().slice(0, 100);
+    const targetAmount = parseNumeric(match[3]);
+    const monthsUntilTarget = parseNumeric(match[4]);
+    const monthlyContribution = parseNumeric(match[5]);
+    const linkedAccount = match[6].trim().slice(0, 100);
+    if (VALID_GOAL_TYPES.has(goalType) && title.length > 0 && targetAmount > 0 && monthsUntilTarget >= 1 && monthlyContribution > 0 && linkedAccount.length > 0) {
+      goalActions.push({ type: goalType, title, targetAmount, monthsUntilTarget, monthlyContribution, linkedAccount });
+    }
+  }
+
   let cleanText = text;
   cleanText = cleanText.replace(/\n?\[MEMORY_SAVE\][^\n]*/g, '');
   cleanText = cleanText.replace(/\n?\[MEMORY_PROPOSAL\][^\n]*/g, '');
   cleanText = cleanText.replace(/\n?\[MEMORY_UPDATE\][^\n]*/g, '');
+  cleanText = cleanText.replace(/\n?\[GOAL_PROPOSAL\][^\n]*/g, '');
 
-  return { cleanText: cleanText.trim(), memoryActions };
+  return { cleanText: cleanText.trim(), memoryActions, goalActions: goalActions.slice(0, 1) };
 }
 
 function parseSuggestions(text: string): { reply: string; suggestions: string[] } {
@@ -231,7 +329,7 @@ function parseSuggestions(text: string): { reply: string; suggestions: string[] 
   const suggestions = suggestionsBlock
     .split("\n")
     .map((s) => s.replace(/^[-•*\d.)\s]+/, "").trim())
-    .filter((s) => s.length > 0 && !s.startsWith('[MEMORY_'))
+    .filter((s) => s.length > 0 && !s.startsWith('[MEMORY_') && !s.startsWith('[GOAL_'))
     .map((s) => s.length > 35 ? s.slice(0, 32) + '...' : s)
     .slice(0, 3);
   return { reply, suggestions };
@@ -303,10 +401,10 @@ router.post("/chat", async (req, res) => {
     }, { timeout: 45_000 });
 
     const raw = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
-    const { cleanText, memoryActions } = parseMemoryMarkers(raw);
+    const { cleanText, memoryActions, goalActions } = parseMarkers(raw);
     const { reply, suggestions } = parseSuggestions(cleanText);
 
-    res.json({ reply, suggestions, memoryActions });
+    res.json({ reply, suggestions, memoryActions, goalActions });
   } catch (error: any) {
     console.error("Chat API error:", error?.message || error);
     if (error?.status === 429) {
@@ -364,9 +462,9 @@ router.post("/chat/stream", async (req, res) => {
     }
 
     clearTimeout(requestTimeout);
-    const { cleanText, memoryActions } = parseMemoryMarkers(fullText);
+    const { cleanText, memoryActions, goalActions } = parseMarkers(fullText);
     const { reply, suggestions } = parseSuggestions(cleanText);
-    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryActions })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryActions, goalActions })}\n\n`);
     res.end();
   } catch (error: any) {
     console.error("Chat stream error:", error?.message || error);

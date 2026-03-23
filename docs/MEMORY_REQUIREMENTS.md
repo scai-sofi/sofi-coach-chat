@@ -58,7 +58,10 @@ The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped
 [MEMORY_SAVE]CATEGORY|content
 [MEMORY_PROPOSAL]CATEGORY|content
 [MEMORY_UPDATE]CATEGORY|new content
+[GOAL_PROPOSAL]TYPE|title|targetAmount|monthsUntilTarget|monthlyContribution|linkedAccount
 ```
+
+The `[GOAL_PROPOSAL]` marker creates a goal proposal card in the UI. When emitted alongside a `[MEMORY_PROPOSAL]PRIORITIES|...` marker, the client bundles them into an InsightToAction card. Valid goal types: `EMERGENCY_FUND`, `DEBT_PAYOFF`, `SAVINGS_TARGET`, `CUSTOM`.
 
 **Rules:**
 - Multiple markers per response are allowed (one per distinct fact or insight)
@@ -124,27 +127,34 @@ This only applies to the canned demo messages themselves. The block on live memo
 
 ### Server side (`api-server/src/routes/chat.ts`)
 - `VALID_MEMORY_CATEGORIES` Set validates category strings
-- `parseMemoryMarkers()` extracts `[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, and `[MEMORY_UPDATE]` markers from AI output
-- `memoryActions` array is included in the JSON response for both `/chat` and `/chat/stream` endpoints
-- The done event in SSE streaming carries the `memoryActions` payload
+- `VALID_GOAL_TYPES` Set validates goal type strings
+- `parseMarkers()` extracts `[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`, and `[GOAL_PROPOSAL]` markers from AI output
+- `memoryActions` and `goalActions` arrays are included in the JSON response for both `/chat` and `/chat/stream` endpoints
+- The done event in SSE streaming carries both `memoryActions` and `goalActions` payloads
+- Goal proposal marker format: `[GOAL_PROPOSAL]TYPE|title|targetAmount|monthsUntilTarget|monthlyContribution|linkedAccount`
 
 ### Client side (`mobile/context/CoachContext.tsx`)
 - `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
 - `shouldAllowProposal()` blocks proposals only during temporary chat mode
-- No cooldown — all memory actions fire immediately
-- `applyMemoryActions()` creates Memory objects, handles updates, or shows MemoryProposal UI
-- Auto-saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
-- Proposals → user confirms → `EXPLICIT` source → "You created" label in UI
-- Updates → find best match by category + content similarity → replace content
-- Duplicate detection: exact content match (case-insensitive) prevents re-saving
+- No cooldown — all memory and goal actions fire immediately
+- `applyMemoryAndGoalActions()` processes both memory and goal actions together:
+  - Memory saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
+  - Memory proposals → user confirms → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
+  - Memory updates → find best match by category + content similarity → replace content
+  - Goal proposal + PRIORITIES memory proposal → bundled into `insightToAction` card
+  - Goal proposal alone → standalone `goalProposal` card
+  - Duplicate detection: exact content match (case-insensitive) prevents re-saving
 
-### Memory flow
+### Memory + goal flow
 ```
 User message
   → Server builds prompt with existing memories
-  → AI generates response + optional memory markers (save/proposal/update)
-  → Server parses markers via parseMemoryMarkers()
-  → Server returns memoryActions array in response JSON
-  → Client processes all actions: saves immediately, proposals with cooldown check, updates by match
-  → UI shows "Saved to memory" chip, proposal card, or "Memory updated" chip
+  → AI generates response + optional memory markers + optional goal marker
+  → Server parses all markers via parseMarkers()
+  → Server returns memoryActions + goalActions arrays in response JSON
+  → Client processes all actions via applyMemoryAndGoalActions()
+  → If PRIORITIES proposal + goal action: bundled into InsightToAction card
+  → If goal action alone: standalone GoalProposal card
+  → Memory saves/updates applied immediately
+  → UI shows chips, proposal cards, goal cards, or insight-to-action cards
 ```
