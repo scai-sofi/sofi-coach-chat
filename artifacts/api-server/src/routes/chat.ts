@@ -295,7 +295,7 @@ router.post("/chat", async (req, res) => {
       model: "gpt-4o-mini",
       messages,
       max_completion_tokens: 8192,
-    });
+    }, { timeout: 45_000 });
 
     const raw = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
     const { cleanText, memoryActions } = parseMemoryMarkers(raw);
@@ -306,6 +306,10 @@ router.post("/chat", async (req, res) => {
     console.error("Chat API error:", error?.message || error);
     if (error?.status === 429) {
       res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
+      return;
+    }
+    if (error?.code === 'ETIMEDOUT' || error?.message?.includes('timed out') || error?.message?.includes('timeout')) {
+      res.status(504).json({ error: "The response took too long. Please try again." });
       return;
     }
     res.status(500).json({ error: "Something went wrong. Please try again." });
@@ -334,12 +338,17 @@ router.post("/chat/stream", async (req, res) => {
 
     let fullText = "";
 
+    const requestTimeout = setTimeout(() => {
+      res.write(`data: ${JSON.stringify({ type: "error", error: "The response took too long. Please try again." })}\n\n`);
+      res.end();
+    }, 60_000);
+
     const stream = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
       max_completion_tokens: 8192,
       stream: true,
-    });
+    }, { timeout: 45_000 });
 
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta?.content;
@@ -349,17 +358,21 @@ router.post("/chat/stream", async (req, res) => {
       }
     }
 
+    clearTimeout(requestTimeout);
     const { cleanText, memoryActions } = parseMemoryMarkers(fullText);
     const { reply, suggestions } = parseSuggestions(cleanText);
     res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryActions })}\n\n`);
     res.end();
   } catch (error: any) {
     console.error("Chat stream error:", error?.message || error);
-    const errMsg = error?.status === 429
-      ? "Too many requests. Please wait a moment and try again."
-      : "Something went wrong. Please try again.";
-    res.write(`data: ${JSON.stringify({ type: "error", error: errMsg })}\n\n`);
-    res.end();
+    let errMsg = "Something went wrong. Please try again.";
+    if (error?.status === 429) errMsg = "Too many requests. Please wait a moment and try again.";
+    else if (error?.code === 'ETIMEDOUT' || error?.message?.includes('timed out') || error?.message?.includes('timeout'))
+      errMsg = "The response took too long. Please try again.";
+    try {
+      res.write(`data: ${JSON.stringify({ type: "error", error: errMsg })}\n\n`);
+      res.end();
+    } catch {}
   }
 });
 

@@ -321,6 +321,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   ): Promise<boolean> => {
     const body: Record<string, unknown> = { message: text, history, memories: memoryStrings };
 
+    const overallTimer = setTimeout(() => controller.abort(), 60_000);
+
     const res = await fetch(`${API_BASE}/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -343,18 +345,27 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }
 
     const reader = res.body?.getReader();
-    if (!reader) throw new Error('No reader');
+    if (!reader) { clearTimeout(overallTimer); throw new Error('No reader'); }
     const decoder = new TextDecoder();
     let sseBuffer = '';
     let fullContent = '';
     const tokenQueue: string[] = [];
     let donePayload: { reply?: string; suggestions?: string[]; memoryActions?: MemoryAction[]; error?: string } | null = null;
 
+    let stallTimer: ReturnType<typeof setTimeout> | null = null;
+    const STALL_TIMEOUT = 20_000;
+    const resetStallTimer = () => {
+      if (stallTimer) clearTimeout(stallTimer);
+      stallTimer = setTimeout(() => { controller.abort(); }, STALL_TIMEOUT);
+    };
+    resetStallTimer();
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      if (sessionVersionRef.current !== version) { reader.cancel(); return true; }
+      if (sessionVersionRef.current !== version) { reader.cancel(); clearTimeout(overallTimer); if (stallTimer) clearTimeout(stallTimer); return true; }
 
+      resetStallTimer();
       sseBuffer += decoder.decode(value, { stream: true });
       const lines = sseBuffer.split('\n');
       sseBuffer = lines.pop() || '';
@@ -377,6 +388,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       }
     }
+
+    if (stallTimer) clearTimeout(stallTimer);
+    clearTimeout(overallTimer);
 
     if (sseBuffer.trim()) {
       const remaining = sseBuffer.trim();
@@ -625,8 +639,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         await attemptStreamRequest(text, history, controller, aiMsgId, version, memoryStrings);
         return;
       } catch (err: any) {
-        if (err.name === 'AbortError' || sessionVersionRef.current !== version) return;
+        if (sessionVersionRef.current !== version) return;
+        if (err.name === 'AbortError' && controller.signal.aborted) {
+          break;
+        }
         if (attempt < MAX_RETRIES) {
+          const freshController = new AbortController();
+          abortControllerRef.current = freshController;
+          Object.assign(controller, { signal: freshController.signal });
           await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
           continue;
         }
@@ -634,12 +654,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           await fallbackNonStreaming(text, history, controller, aiMsgId, version, memoryStrings);
           return;
         } catch (fallbackErr: any) {
-          if (fallbackErr.name === 'AbortError' || sessionVersionRef.current !== version) return;
+          if (sessionVersionRef.current !== version) return;
         }
       }
     }
 
-    const fallback = 'Unable to connect to the server. Please check your connection and try again.';
+    const fallback = controller.signal.aborted
+      ? 'The response took too long. Please try again.'
+      : 'Unable to connect to the server. Please check your connection and try again.';
     setMessages(prev => {
       const hasStreamMsg = prev.some(m => m.id === aiMsgId);
       if (hasStreamMsg) {
