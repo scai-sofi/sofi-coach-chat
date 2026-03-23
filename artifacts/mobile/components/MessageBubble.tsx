@@ -520,57 +520,19 @@ function ActionFooter({ message }: { message: Message }) {
 function StreamingContent({ content }: { content: string }) {
   const fadeAnim = useRef(new RNAnimated.Value(0)).current;
   const slideAnim = useRef(new RNAnimated.Value(6)).current;
-  const prevBlockCount = useRef(0);
-  const blockFades = useRef<RNAnimated.Value[]>([]);
 
   useEffect(() => {
     RNAnimated.parallel([
-      RNAnimated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      RNAnimated.timing(slideAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
+      RNAnimated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      RNAnimated.timing(slideAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
     ]).start();
   }, [fadeAnim, slideAnim]);
 
   const blocks = parseContentBlocks(content);
 
-  if (blocks.length > prevBlockCount.current) {
-    for (let i = prevBlockCount.current; i < blocks.length; i++) {
-      const val = new RNAnimated.Value(0);
-      blockFades.current.push(val);
-      RNAnimated.timing(val, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-    prevBlockCount.current = blocks.length;
-  }
-
   return (
     <RNAnimated.View style={[styles.aiContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-      {blocks.map((block, i) => {
-        const blockOpacity = blockFades.current[i] || new RNAnimated.Value(1);
-        return (
-          <RNAnimated.View key={i} style={{ opacity: blockOpacity }}>
-            {block.type === 'divider' ? (
-              <BlockDivider />
-            ) : block.type === 'header' ? (
-              <HeaderBlock block={block} />
-            ) : block.type === 'bullet' ? (
-              <BulletBlock block={block} />
-            ) : (
-              <TextBlock block={block} />
-            )}
-          </RNAnimated.View>
-        );
-      })}
+      {blocks.map((block, i) => renderBlock(block, i))}
     </RNAnimated.View>
   );
 }
