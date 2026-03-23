@@ -143,19 +143,48 @@ The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped
 - No marker if the information is already stored (deduplication)
 - Content must be concise (under 100 characters)
 
+### Memory data model (implemented)
+
+```typescript
+type MemoryCategory = 'ABOUT_ME' | 'PREFERENCES' | 'PRIORITIES';
+type MemorySource = 'EXPLICIT' | 'IMPLICIT_CONFIRMED';
+type MemoryStatus = 'ACTIVE' | 'PAUSED' | 'DELETED';
+
+interface Memory {
+  id: string;
+  category: MemoryCategory;
+  content: string;
+  source: MemorySource;
+  status: MemoryStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Memory source types
+
+| Source | Label in UI | When it's set |
+|---|---|---|
+| `IMPLICIT_CONFIRMED` | "AI inferred" | Auto-saved by AI, or proposal confirmed by user |
+| `EXPLICIT` | "You created" | Manually added by the member |
+
 ### Memory lifecycle (implemented in prototype)
 
 | Action | How it works | Status |
 |---|---|---|
-| Auto-save | AI detects a fact → saves immediately → shows "Memory saved" chip inline | Implemented |
+| Auto-save | AI detects a fact → saves immediately → shows "Saved to memory" chip inline → chip is tappable to navigate to Memory Center | Implemented |
+| Memory update | AI detects a correction → finds best-matching active memory by category + word overlap → replaces content → shows "Memory updated" chip | Implemented |
 | Implicit proposal | AI infers a preference → shows proposal card with [Remember] / [Not now] buttons | Implemented |
-| View all memories | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred") and date | Implemented |
-| Delete individual | Member swipes or taps delete on a memory row in Memory Center | Implemented |
-| Delete all | "Clear all" in Memory Center | Implemented |
+| View all memories | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred" or "You created") and date | Implemented |
+| Search | Text search bar in Memory Center filters memories by content | Implemented |
+| Category filter | Filter chips with per-category counts; toggle to show only one category | Implemented |
+| Edit individual | Pencil icon on memory card → inline TextInput with Save/Cancel buttons and character counter (300 max) | Implemented |
+| Pause individual | Pause icon on memory card → toggles between ACTIVE/PAUSED → paused memories show "Paused · not used in chat" and render at 50% opacity → play icon to resume | Implemented |
+| Delete individual | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory | Implemented |
+| Chip tap-through | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation | Implemented |
 | Temporary Chat | Toggle in chat header → all memory read/write suppressed for the session | Implemented |
-| Memory correction / edit | Member taps a memory row, edits inline | Not implemented |
 | Version history | Expandable row showing prior versions with timestamps | Not implemented |
-| Pause individual | Toggle a memory to Paused — Coach stops referencing it but retains it | Not implemented |
+| Clear all memories | Global "delete all" action in Memory Center | Not implemented |
 | Per-category controls | Toggle per category, set retention window | Not implemented |
 
 ### Frequency & throttling
@@ -201,20 +230,31 @@ The client determines how to present goal proposals based on what markers accomp
 ### Goal data model (implemented)
 
 ```typescript
+type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CUSTOM';
+type GoalStatus = 'DRAFT' | 'ACTIVE' | 'ON_TRACK' | 'AT_RISK' | 'PAUSED' | 'COMPLETED';
+
 interface Goal {
   id: string;
   type: GoalType;
   title: string;
   targetAmount: number;
   currentAmount: number;
-  monthlyContribution: number;
-  startDate: string;        // ISO date
-  targetDate: string;       // ISO date
-  linkedAccount?: string;
-  status: 'active' | 'paused' | 'completed';
-  milestones: GoalMilestone[];
+  targetDate: Date;
+  monthlyContributionTarget: number;
+  actualMonthlyContribution: number;
+  status: GoalStatus;
   confidenceScore: number;  // 0–100
-  createdAt: string;
+  milestones: Milestone[];
+  linkedAccount: string;
+  createdAt: Date;
+}
+
+interface Milestone {
+  id: string;
+  label: string;
+  targetPct: number;       // e.g., 25, 50, 75, 100
+  reached: boolean;
+  reachedAt?: Date;
 }
 ```
 
@@ -247,12 +287,16 @@ interface Goal {
 
 *Prototype status: Demonstrated via demo scenario "Memory Lifecycle — Correction Flow"*
 
-- **Explicit save** — Member shares a fact → Coach saves immediately → "Memory saved" chip shown inline
+- **Explicit save** — Member shares a fact → Coach saves immediately → "Saved to memory" chip shown inline → tapping the chip opens Memory Center and highlights the saved memory
+- **Memory update** — Member corrects a fact → Coach finds the best-matching memory and replaces its content → "Memory updated" chip shown inline with tap-through navigation
 - **Implicit proposal** — Coach detects a pattern → proposes inline: *"Want me to remember that?"* → [Remember] / [Not now]
-- **Full disclosure** — Memory Center shows all memories grouped by category, each with source label and date
-- **Delete** — Member removes a memory from Memory Center
+- **Full disclosure** — Memory Center shows all memories grouped by category, each with source label ("AI inferred" or "You created") and date
+- **Edit** — Member taps pencil icon on a memory card → inline edit with Save/Cancel and character counter
+- **Pause** — Member taps pause icon → memory is retained but excluded from Coach context → "Paused · not used in chat" label with 50% opacity → tap play icon to resume
+- **Delete** — Member taps trash icon → memory marked as deleted → toast with "Undo" to restore
+- **Search & filter** — Text search bar and category filter chips with counts for finding specific memories
 
-*Not yet demonstrated: Correction/edit, pause, version history, per-category controls*
+*Not yet demonstrated: Version history, clear all, per-category retention controls*
 
 ### 3. Goal Discovery from Conversation
 
@@ -324,12 +368,15 @@ When applicable, Coach's response includes one of four patterns:
 | User message bubble | Right-aligned, dark background |
 | AI message block | Left-aligned, light background, streaming support |
 | Memory proposal card | Inline card with [Remember] / [Not now] buttons |
-| "Memory saved" chip | Confirmed state — checkmark + "Saved to memory" |
+| "Saved to memory" chip | Tappable chip below AI message — navigates to Memory Center and highlights the memory |
+| "Memory updated" chip | Tappable chip — same navigation behavior as "Saved to memory" |
 | Goal proposal card | Goal type, target, monthly contribution, timeline, [Set up goal] / [Dismiss] |
-| Insight-to-Action card | Bundled PRIORITIES memory + goal proposal in single card |
+| Insight-to-Action card | Bundled PRIORITIES memory + goal proposal in single card, with [Set up goal] / [Just remember] / [Dismiss] |
 | Suggestion chips | Horizontally scrollable pills below AI response |
 | Safety tier badge | Color-coded pill above message text |
-| Action footer | Copy (with checkmark confirmation), thumbs up/down, provenance toggle |
+| Approval hint | Shield icon + "Needs your approval" label inside actionable cards (replaces standalone badge) |
+| Confirmed state | SVG checkmark + summary text (e.g., "Saved to memory", "Goal created", "All set — saved to memory & goal created") |
+| Action footer | Copy (with SVG checkmark confirmation), thumbs up/down, provenance toggle |
 | Temporary Chat indicator | Shield icon in header, "Temp" chip |
 
 ### Memory Center (implemented)
@@ -338,12 +385,17 @@ Accessed via the chat header menu. Full-screen overlay panel.
 
 | Component | Description |
 |---|---|
-| Panel header | Title + close button |
-| Memory rows | Grouped by category, each showing content, source label ("AI inferred"), date |
-| Category sections | ABOUT_ME, PREFERENCES, PRIORITIES with headers |
-| Delete action | Per-memory delete with confirmation |
-| Clear all | Delete all memories at once |
-| Empty state | Message when no memories exist |
+| Panel header | Title ("Coach memory") + back chevron |
+| Search bar | Text search with search icon; filters memories by content match |
+| Category filter | Filter button toggles filter chips; each chip shows category name + count; tap to filter by category |
+| Memory cards | Rounded cards showing content text, source label ("AI inferred" or "You created"), and date |
+| Card actions | Three icon buttons per card: pencil (edit), pause/play (toggle), trash (delete) |
+| Inline edit mode | TextInput with Save/Cancel buttons and character counter (300 max) |
+| Paused state | Card renders at 50% opacity with "Paused · not used in chat" label |
+| Delete + undo | Delete sets status to DELETED; toast with "Undo" action restores immediately |
+| Category sections | Grouped by ABOUT_ME, PREFERENCES, PRIORITIES with section headers |
+| Highlight animation | When navigated from a chat chip, the target memory card briefly shows a border highlight that fades over 2 seconds |
+| Empty state | Message when no memories exist; "Clear filters" link when search/filter yields no results |
 
 ### Goals Dashboard (implemented)
 
@@ -409,9 +461,8 @@ Demo scenarios use pre-loaded canned conversations with pre-set memories and goa
 
 | Level               | Feature | Surface                 | Prototype status | Controls |
 | ------------------- | ------- | ----------------------- | ---------------- | -------- |
-| 1 — Global (Memory) | Memory  | Coach Chat header       | Partial | Temporary Chat mode (no memory read/write) |
-| 3 — Item            | Memory  | Memory Center           | Partial | Delete individual, delete all |
-| 4 — Session         | Memory  | Chat                    | Implemented | Temporary Chat mode toggle |
+| 3 — Item            | Memory  | Memory Center           | Implemented | Edit, pause/resume, delete with undo, search, category filter |
+| 4 — Session         | Memory  | Chat                    | Implemented | Temporary Chat mode toggle (suppresses all memory + goal actions) |
 
 **Not yet implemented:** Global pause all / delete all toggle, per-category toggle, retention window settings, per-response "Don't use this" flag, global Goals on/off in Settings, proactive notification controls.
 
