@@ -263,20 +263,21 @@ function renderContent(content: string): React.ReactNode[] {
   return blocks.map((block, i) => renderBlock(block, i));
 }
 
-function ChipBadge({ chip }: { chip: MessageChip }) {
+function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: boolean }) {
   const style = CHIP_STYLES[chip.type] || CHIP_STYLES['memory-saved'];
   const { memories, navigateToMemory } = useCoach();
   const { showToast } = useToast();
 
-  const fadeAnim = useRef(new RNAnimated.Value(0)).current;
-  const slideAnim = useRef(new RNAnimated.Value(6)).current;
+  const fadeAnim = useRef(new RNAnimated.Value(animate ? 0 : 1)).current;
+  const slideAnim = useRef(new RNAnimated.Value(animate ? 6 : 0)).current;
 
   useEffect(() => {
+    if (!animate) return;
     RNAnimated.parallel([
       RNAnimated.timing(fadeAnim, { toValue: 1, duration: 350, delay: 100, useNativeDriver: true }),
       RNAnimated.spring(slideAnim, { toValue: 0, tension: 120, friction: 8, delay: 100, useNativeDriver: true }),
     ]).start();
-  }, [fadeAnim, slideAnim]);
+  }, [fadeAnim, slideAnim, animate]);
 
   const isMemoryChip = chip.type === 'memory-saved' || chip.type === 'memory-updated';
   const hasMemoryIds = isMemoryChip && chip.memoryIds && chip.memoryIds.length > 0;
@@ -632,12 +633,13 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
 
   const streaming = message.isStreaming === true;
   const animate = justFinished;
+  const chipAnimate = streaming || justFinished;
 
   return (
     <View style={styles.aiRow}>
       {message.chips && message.chips.length > 0 && (
         <View style={styles.chipsRow}>
-          {message.chips.map((chip, i) => <ChipBadge key={i} chip={chip} />)}
+          {message.chips.map((chip, i) => <ChipBadge key={i} chip={chip} animate={chipAnimate} />)}
         </View>
       )}
 
