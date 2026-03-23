@@ -825,7 +825,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       pendingTimerRef.current = null;
       if (sessionVersionRef.current !== version) return;
       const response = generateAIResponse(text, {
-        memories: currentMemories,
+        memories: memoryModeRef.current === 'off' ? [] : currentMemories,
         goals: currentGoals,
       });
 
@@ -868,12 +868,15 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       }
 
       const memOff = memoryModeRef.current === 'off';
+      const filteredChips = memOff
+        ? chips.filter(c => c.type !== 'memory-saved' && c.type !== 'memory-updated')
+        : chips;
       const aiMsg: Message = {
         id: uid(),
         role: 'ai',
         content: response.content || '',
         timestamp: new Date(),
-        chips: chips.length > 0 ? chips : undefined,
+        chips: filteredChips.length > 0 ? filteredChips : undefined,
         memoryProposal: memOff ? undefined : response.memoryProposal,
         goalProposal: response.goalProposal,
         insightToAction: response.insightToAction,

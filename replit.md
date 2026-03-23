@@ -50,7 +50,8 @@ The system is designed to defensively handle varied AI output while guiding the 
 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
-- **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory) managed via a `PanelType` enum.
+- **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory, SettingsPanel) managed via a `PanelType` enum.
+- **Memory Privacy Mode:** 3-mode picker (`full` | `ask-first` | `off`) accessible from Settings panel. Controls whether AI receives memories, how saves are handled (auto vs proposal vs suppressed), and Memory Center display state. Goals are unaffected by memory mode.
 - **Chat Sessions:** In-memory management of sessions, each with `id`, `title`, `messages`, `memories`, `goals`. Includes auto-generation of titles and a `sessionVersionRef` for concurrency.
 - **Demo vs Live Mode:** Supports switching between pre-built demo scenarios and live AI interactions.
 

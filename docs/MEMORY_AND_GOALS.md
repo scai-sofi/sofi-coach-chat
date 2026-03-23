@@ -161,6 +161,33 @@ interface Memory {
 }
 ```
 
+### Memory privacy mode (implemented)
+
+```typescript
+type MemoryMode = 'full' | 'ask-first' | 'off';
+```
+
+Three user-configurable memory modes, set via Settings panel:
+
+| Mode | Memory reads | Memory writes | Behavior |
+|---|---|---|---|
+| `full` (default) | AI receives all active memories | Auto-save and proposals enabled | Normal personalized behavior |
+| `ask-first` | AI receives all active memories | All saves converted to proposals | User must explicitly confirm before any memory is persisted |
+| `off` | AI receives empty memory array | All saves/proposals/chips suppressed | No personalization; goals still tracked normally |
+
+**Settings panel:** Accessible from the overflow menu ("Settings" item with gear icon). Slide-in panel matching ChatHistory pattern. Three radio-style rows with label + description + checkmark for selected mode.
+
+**Memory Center behavior in off mode:** Shows dedicated "Memory is off" empty state regardless of existing memories. Pause all / Delete all buttons hidden.
+
+**Memory Center global actions:**
+- **Pause all / Resume all:** Toggle button in header; pauses or resumes all non-deleted memories. Toast confirmation.
+- **Delete all:** Button with confirmation dialog showing dynamic count ("This will permanently delete N memories..."). Clears entire memory store.
+
+**Pipeline enforcement:**
+- Demo mode: `generateAIResponse` receives empty memories when off; `autoSaveMemory` suppressed in off, converted to proposal in ask-first; memory chips filtered in off.
+- Live mode: `applyMemoryAndGoalActions` blocks entire memory block when off; converts all actions to proposals in ask-first. Memory strings sent as empty array when off.
+- Insight-to-action: `acceptInsightToAction` skips memory save but still creates goal when off; `saveInsightMemoryOnly` is no-op when off.
+
 ### Memory source types
 
 | Source | Label in UI | When it's set |

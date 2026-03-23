@@ -790,7 +790,30 @@ Font: 16px medium, lineHeight 20.
 
 **Toast notifications:** Triggered on delete ("Memory deleted." + Undo) and pause/resume ("Memory paused."/"Memory resumed." + Undo). The Undo action for delete calls `restoreMemory(id)` which sets status back to ACTIVE.
 
-### 8.8 GoalsDashboard (Full-Screen Panel)
+**Global actions (header area):** Visible only when memories exist and memoryMode !== 'off':
+- **Pause all / Resume all:** Labeled pill button with icon. Toggles all non-deleted memories between ACTIVE and PAUSED. Toast: "All memories paused." / "All memories resumed."
+- **Delete all:** Labeled pill button (danger color). Opens confirmation dialog with dynamic count ("This will permanently delete N memories. The coach will forget everything it has learned about you."). Cancel + Delete all buttons.
+
+**Memory-off state:** When `memoryMode === 'off'`, shows a dedicated empty state regardless of existing memory count. Title: "Memory is off". Description: "The coach won't save or use memories while memory is turned off. You can change this in Settings."
+
+### 8.9 SettingsPanel (Slide-in Panel)
+
+Slide-in from right (same animation pattern as ChatHistory). Accessible from overflow menu "Settings" item.
+
+**Header:** "Settings" title, back chevron, standard panel header layout.
+
+**Memory section:**
+- Section label: "Memory", 14px medium, secondary color
+- Card: white bg, 20px radius, 1px border, shadow. Contains 3 radio-style rows:
+  - **Full memory** — "Coach automatically remembers details from your conversations."
+  - **Ask first** — "Coach will ask before saving any memory from your conversations."
+  - **Memory off** — "Coach won't save or use any memories. Goals are still tracked."
+- Selected row shows checkmark (stroke icon, contentBrand color)
+- Rows separated by 0.75px border
+
+**Memory mode type:** `'full' | 'ask-first' | 'off'` — defaults to `'full'`. Stored in `CoachContext.memoryMode`.
+
+### 8.10 GoalsDashboard (Full-Screen Panel)
 
 **Header:** "My goals" title, back chevron
 

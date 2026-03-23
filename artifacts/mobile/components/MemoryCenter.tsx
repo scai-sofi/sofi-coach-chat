@@ -317,10 +317,10 @@ export function MemoryCenter() {
             <Text style={styles.titleText} numberOfLines={1}>Coach memory</Text>
           </View>
           <View style={styles.rightControls}>
-            {memories.filter(m => m.status !== 'DELETED').length > 0 && (
+            {memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' && (
               <View style={styles.headerActions}>
                 <Pressable
-                  style={styles.headerActionBtn}
+                  style={styles.headerActionPill}
                   onPress={() => {
                     const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
                     const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
@@ -328,20 +328,27 @@ export function MemoryCenter() {
                     pauseAllMemories();
                     showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
                   }}
-                  hitSlop={6}
+                  hitSlop={4}
                 >
                   {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0 ? (
-                    <ResumeAllIcon size={16} color={Colors.contentSecondary} />
+                    <>
+                      <ResumeAllIcon size={14} color={Colors.contentSecondary} />
+                      <Text style={styles.headerActionLabel}>Resume all</Text>
+                    </>
                   ) : (
-                    <PauseAllIcon size={16} color={Colors.contentSecondary} />
+                    <>
+                      <PauseAllIcon size={14} color={Colors.contentSecondary} />
+                      <Text style={styles.headerActionLabel}>Pause all</Text>
+                    </>
                   )}
                 </Pressable>
                 <Pressable
-                  style={styles.headerActionBtn}
+                  style={styles.headerActionPill}
                   onPress={() => setShowDeleteConfirm(true)}
-                  hitSlop={6}
+                  hitSlop={4}
                 >
-                  <TrashAllIcon size={16} color={Colors.danger} />
+                  <TrashAllIcon size={14} color={Colors.danger} />
+                  <Text style={[styles.headerActionLabel, { color: Colors.danger }]}>Delete all</Text>
                 </Pressable>
               </View>
             )}
@@ -353,7 +360,9 @@ export function MemoryCenter() {
         <View style={styles.confirmOverlay}>
           <View style={styles.confirmCard}>
             <Text style={styles.confirmTitle}>Delete all memories?</Text>
-            <Text style={styles.confirmDesc}>This can't be undone. The coach will forget everything it has learned about you.</Text>
+            <Text style={styles.confirmDesc}>
+              {`This will permanently delete ${memories.filter(m => m.status !== 'DELETED').length} ${memories.filter(m => m.status !== 'DELETED').length === 1 ? 'memory' : 'memories'}. The coach will forget everything it has learned about you.`}
+            </Text>
             <View style={styles.confirmActions}>
               <Pressable style={styles.confirmCancelBtn} onPress={() => setShowDeleteConfirm(false)}>
                 <Text style={styles.confirmCancelText}>Cancel</Text>
@@ -421,7 +430,7 @@ export function MemoryCenter() {
           onScroll={(e) => { scrollOffsetRef.current = e.nativeEvent.contentOffset.y; }}
           scrollEventThrottle={16}
         >
-          {memoryMode === 'off' && visibleMemories.length === 0 ? (
+          {memoryMode === 'off' ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>Memory is off</Text>
               <Text style={styles.emptyText}>
@@ -491,7 +500,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rightControls: {
-    width: 100,
+    minWidth: 100,
     height: 44,
     flexDirection: 'row',
     alignItems: 'center',
@@ -501,13 +510,21 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 8,
   },
-  headerActionBtn: {
-    width: 24,
-    height: 24,
+  headerActionPill: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  headerActionLabel: {
+    fontSize: 11,
+    fontFamily: Fonts.medium,
+    color: Colors.contentSecondary,
+    lineHeight: 14,
   },
   iconBtn: {
     width: 24,
