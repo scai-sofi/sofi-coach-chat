@@ -241,7 +241,7 @@ interface Goal {
   monthlyContributionTarget: number;
   actualMonthlyContribution: number;
   status: GoalStatus;
-  confidenceScore: number;  // 0–100
+  confidenceScore: number;  // 0.0–1.0 (displayed as Math.round(value * 100)%)
   milestones: Milestone[];
   linkedAccount: string;
   createdAt: Date;
