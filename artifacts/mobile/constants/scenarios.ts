@@ -16,11 +16,11 @@ function makeMilestones(reached: number[], daysAgoArr: number[]): Milestone[] {
 }
 
 export const SHARED_MEMORIES: Memory[] = [
-  { id: 'mem-1', category: 'PREFERENCE', content: 'Prefers detailed breakdowns with numbers', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(14), updatedAt: daysAgo(14) },
-  { id: 'mem-2', category: 'FINANCIAL_ATTITUDE', content: 'Dining out is a focus area for spending reduction', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(7), updatedAt: daysAgo(7) },
-  { id: 'mem-3', category: 'LIFE_CONTEXT', content: 'Household of 2, living in San Francisco Bay Area', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(21), updatedAt: daysAgo(21) },
-  { id: 'mem-4', category: 'CONSTRAINT', content: 'Saving for a wedding in October 2027', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(10), updatedAt: daysAgo(10) },
-  { id: 'mem-5', category: 'PREFERENCE', content: 'Prefers weekly check-ins over daily notifications', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(5), updatedAt: daysAgo(5) },
+  { id: 'mem-1', category: 'PREFERENCES', content: 'Prefers detailed breakdowns with numbers', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(14), updatedAt: daysAgo(14) },
+  { id: 'mem-2', category: 'PRIORITIES', content: 'Dining out is a focus area for spending reduction', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(7), updatedAt: daysAgo(7) },
+  { id: 'mem-3', category: 'ABOUT_ME', content: 'Household of 2, living in San Francisco Bay Area', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(21), updatedAt: daysAgo(21) },
+  { id: 'mem-4', category: 'PRIORITIES', content: 'Saving for a wedding in October 2027', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(10), updatedAt: daysAgo(10) },
+  { id: 'mem-5', category: 'PREFERENCES', content: 'Prefers weekly check-ins over daily notifications', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(5), updatedAt: daysAgo(5) },
 ];
 
 export const EMERGENCY_FUND_GOAL: Goal = {
@@ -105,7 +105,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'ai', content: "**Saved to Memory**\n\nGot it — I've saved: \"Risk-averse with investments\"\n\n**How I'll Use This**\nGoing forward, I'll focus on lower-risk strategies when we discuss your portfolio — things like index funds, bonds, and conservative allocations. I won't recommend high-volatility plays or aggressive growth strategies unless you tell me your comfort level has changed.\n\n**Your Control**\nYou can update this anytime in the Memory Center (brain icon in the menu). Risk tolerance often evolves over time, and I'll adjust right along with you.",
           timestamp: new Date(now.getTime() - 290000),
           chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
-          autoSaveMemory: { content: 'Risk-averse with investments', category: 'FINANCIAL_ATTITUDE' },
+          autoSaveMemory: { content: 'Risk-averse with investments', category: 'PREFERENCES' },
         },
         { id: uid(), role: 'user', content: 'What do you know about me?', timestamp: new Date(now.getTime() - 240000) },
         {
@@ -117,12 +117,12 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and credit card payoff.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority? That way I can factor it into future spending advice and recipe-vs-restaurant decisions.",
           timestamp: new Date(now.getTime() - 170000),
           chips: [{ type: 'memory-updated', label: 'Memory updated' }],
-          memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PREFERENCE' },
+          memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PRIORITIES' },
         },
       ],
       memories: [
         ...SHARED_MEMORIES,
-        { id: 'mem-6', category: 'FINANCIAL_ATTITUDE', content: 'Risk-averse with investments', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
+        { id: 'mem-6', category: 'PREFERENCES', content: 'Risk-averse with investments', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
       ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
     },
@@ -162,7 +162,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'ai', content: "**Credit Card Payoff — Risk Alert**\n\nI wanted to give you a heads-up — your confidence score dropped from 82% to 58% this week. Here's the full picture:\n\n**What Happened**\n• **Last 2 payments:** $380 each (target was $420, shortfall of $80 total)\n• **New charge:** $340 added to the balance\n• **Net impact:** $420 further from your goal than planned\n\n**Where This Puts You**\n• **Current balance:** $1,260 remaining\n• **Original payoff date:** 4 months from now\n• **Projected payoff at current pace:** ~5.5 months (6 weeks late)\n• **Extra interest cost if delayed:** ~$48\n\n**Your Options**\n\n• **Option A — Catch up this month:** Bump payment to $520 (+$140 over your usual). Gets you back to 78% confidence and on track for the original date.\n\n• **Option B — Extend timeline:** Add 2 months to your deadline. Monthly payment drops to $350, giving you $70/month more breathing room. Confidence resets to 72%.\n\nNo need to panic — both paths get you to debt-free. It comes down to whether you'd prefer a short push or a steadier pace.\n\nWhat feels right for your budget this month?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'goal-risk', label: 'Credit Card at risk' }],
-          memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'FINANCIAL_ATTITUDE' },
+          memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'ABOUT_ME' },
           suggestions: ['Increase this month\'s payment', 'Extend my deadline', 'Show me the full picture'],
         },
       ],
@@ -226,7 +226,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'ai', content: "**Your $3,000 Bonus — Optimized Allocation**\n\nCongrats! Here's how I'd split this based on your goals, interest rates, and financial picture:\n\n**1. Credit Card Payoff — $1,260**\n• **Impact:** Clears your entire remaining balance\n• **Why:** Eliminates 22.99% APR — every dollar here is a guaranteed 23% return. This is mathematically your best move.\n• **After:** $0 debt, freeing up $380/month from your payoff plan\n\n**2. Emergency Fund — $1,200**\n• **Impact:** Brings you from $8,400 → $9,600 (80% of goal)\n• **Why:** Jumps you 6 weeks ahead of schedule. At this pace, you'd hit $12,000 about 2 months early.\n• **Earning:** This $1,200 earns ~$48/year at 4.00% APY\n\n**3. SoFi Invest — $540**\n• **Impact:** Starts building your investment portfolio\n• **Why:** With debt eliminated and a strong emergency fund, this is the right time to start growing wealth long-term\n• **Suggested allocation:** Conservative portfolio (70% bonds, 30% index funds) — matches your risk preference\n\n**The Big Picture**\nThis single allocation eliminates your most expensive debt, fast-tracks your safety net, and starts your investment journey — all in one move. Plus, the $380/month freed from debt payments gives you ongoing firepower.\n\nWant me to set up all three transfers?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'handoff', label: 'Cross-product recommendation' }],
-          memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'FINANCIAL_ATTITUDE' },
+          memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'ABOUT_ME' },
           suggestions: ['Set up all three transfers', 'Adjust the split', 'Tell me more about the invest option'],
         },
       ],

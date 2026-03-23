@@ -17,7 +17,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
     return {
       content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and credit card payoff.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority? That way I can factor it into future spending advice and recipe-vs-restaurant decisions.",
       chips: [{ type: 'memory-updated', label: 'Memory updated' }],
-      memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PREFERENCE' },
+      memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PRIORITIES' },
     };
   }
 
@@ -54,7 +54,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
       content: "Smart first move — an emergency fund is the foundation everything else builds on.\n\n**Recommended Target**\nFor your situation — household of two in the Bay Area — I'd recommend 3 to 6 months of essential expenses. Based on your monthly spending:\n\n• **Essential expenses:** ~$4,000/month (housing, groceries, transport, utilities)\n• **3-month target:** $12,000 (minimum safety net)\n• **6-month target:** $24,000 (full protection)\n\n**Your Plan**\nLet's start with $12,000. Here's what that looks like:\n\n• **Monthly contribution:** $450 via auto-transfer\n• **Timeline:** ~8 months to full target\n• **Account:** SoFi Savings (currently earning 4.00% APY)\n• **Interest earned:** ~$180 over the savings period\n\n**Why This Amount?**\nThe Bay Area has higher-than-average costs, so a 3-month cushion gives you real runway if anything unexpected happens — job change, medical expense, or car repair.\n\nWant me to create this goal and set up the automatic transfers?",
       insightToAction: {
         id: uid(),
-        memory: { content: 'Building an emergency fund is a top priority', category: 'GOAL_RELATED', saved: false },
+        memory: { content: 'Building an emergency fund is a top priority', category: 'PRIORITIES', saved: false },
         goalProposal: {
           id: uid(), type: 'EMERGENCY_FUND', title: 'Emergency Fund',
           targetAmount: 12000, targetDate: new Date(Date.now() + 240 * 86400000),
@@ -70,7 +70,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
       content: "**Debt Payoff Planning**\n\nGreat call — getting rid of debt frees up both mental and financial space. Let me help you build a strategy.\n\n**Two Proven Approaches**\n\n• **Avalanche method:** Pay off highest interest rate first. Saves the most money mathematically — best if you're motivated by efficiency.\n\n• **Snowball method:** Pay off smallest balance first. Creates quick wins and momentum — best if you're motivated by progress.\n\n**What I Can Do**\nTell me about what you're working with, or I can pull the details from your SoFi accounts. I'll calculate the optimal payoff order, timeline, and monthly amounts for both methods so you can compare.\n\n**Quick Stat**\nThe average American carries $6,365 in credit card debt. Getting ahead of this now — especially before your wedding in October 2027 — puts you in a much stronger position.\n\nWhat debts are you looking to tackle?",
       insightToAction: {
         id: uid(),
-        memory: { content: 'Paying off debt is a financial priority', category: 'GOAL_RELATED', saved: false },
+        memory: { content: 'Paying off debt is a financial priority', category: 'PRIORITIES', saved: false },
         goalProposal: {
           id: uid(), type: 'DEBT_PAYOFF', title: 'Debt Payoff Plan',
           targetAmount: 4200, targetDate: new Date(Date.now() + 365 * 86400000),
@@ -84,7 +84,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('saving for') || input.includes('big purchase')) {
     return {
       content: "**Savings Goal Planning**\n\nLove it — having a specific target makes all the difference. Here's how I can help:\n\n**How It Works**\nTell me what you're saving for and when you need it, and I'll reverse-engineer a monthly plan:\n\n• **Calculate the monthly amount** needed to hit your target on time\n• **Set up auto-transfers** so savings happen automatically\n• **Track milestones** (25%, 50%, 75%, 100%) with progress updates\n• **Adjust the plan** if your timeline or income changes\n\n**Common Goals I Help With**\n• Vacations and travel\n• Vehicle purchase or down payment\n• Home down payment\n• Wedding expenses (yours is coming up in October 2027!)\n• Tech purchases or home improvements\n\nWhat are you saving for, and roughly when do you need it by?",
-      memoryProposal: { id: uid(), content: 'Interested in saving for a specific purchase', category: 'GOAL_RELATED' },
+      memoryProposal: { id: uid(), content: 'Interested in saving for a specific purchase', category: 'PRIORITIES' },
     };
   }
 
@@ -98,14 +98,14 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('quick summary')) {
     return {
       content: "**Weekly Pulse — This Week**\n\nGot it — I'll keep things concise and actionable. Here's your quick take:\n\n• **Total spent:** $892 (↓5% vs. your weekly average of $938)\n• **Top category:** Shopping at $580 (one-time monitor purchase)\n• **Baseline spend:** $312 (excluding the monitor) — well below your typical $380\n\n**One Quick Win**\nYour dining came in at $95 this week — your best in a month. The cooking-at-home habit is saving you roughly $30/week compared to your average.\n\nI'll send you a quick pulse like this every week. You can always ask me to go deeper on anything.",
-      autoSaveMemory: { content: 'Prefers quick financial summaries over detailed breakdowns', category: 'PREFERENCE' },
+      autoSaveMemory: { content: 'Prefers quick financial summaries over detailed breakdowns', category: 'PREFERENCES' },
     };
   }
 
   if (input.includes('detailed breakdown')) {
     return {
       content: "**Detailed Weekly Breakdown**\n\nMy kind of person — let's dig into the numbers.\n\n**This Week's Spending: $892** (↓5% vs. weekly average)\n\n• **Groceries:** $165 (18.5%) — on budget, consistent with last 4 weeks\n• **Dining:** $95 (10.7%) — down 18% from last week, your best week this month\n• **Transport:** $52 (5.8%) — stable, right at your $50–55 weekly norm\n• **Shopping:** $580 (65%) — one-time monitor purchase\n\n**Adjusted Baseline (Excluding One-Time Purchases)**\n• **Baseline spend:** $312 — well below your typical $380\n• **Savings vs. average:** $68 this week ($3,536 annualized at this pace)\n\n**Trend Analysis**\n• **Dining:** ↓21% over 3 months (from $610 → $485/month avg)\n• **Groceries:** ↑9% as you shift from restaurants — net savings still positive\n• **Overall trajectory:** Improving week over week\n\nI'll send you this detailed breakdown every week. Want me to flag anything specific to watch?",
-      autoSaveMemory: { content: 'Prefers detailed financial breakdowns with numbers and trends', category: 'PREFERENCE' },
+      autoSaveMemory: { content: 'Prefers detailed financial breakdowns with numbers and trends', category: 'PREFERENCES' },
     };
   }
 
@@ -238,9 +238,8 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
       .filter(m => m.status === 'ACTIVE')
       .forEach(m => {
         const labels: Record<string, string> = {
-          PREFERENCE: 'Preferences', FINANCIAL_ATTITUDE: 'Financial Attitudes',
-          LIFE_CONTEXT: 'Life Context', CONSTRAINT: 'Constraints',
-          GOAL_RELATED: 'Goals', EXPLICIT_FACT: 'Facts',
+          ABOUT_ME: 'About me', PREFERENCES: 'Preferences',
+          PRIORITIES: 'Priorities',
         };
         const cat = labels[m.category] || m.category;
         if (!grouped[cat]) grouped[cat] = [];
@@ -270,7 +269,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   if (input.includes('cancel') && input.includes('subscription')) {
     return {
       content: "**Subscription Review**\n\nI can help you think through this. Here's what I found:\n\n**Service Details**\n• **Service:** StreamMax Premium\n• **Monthly cost:** $14.99\n• **Annual cost:** $179.88\n• **Last used:** 6 weeks ago\n• **Usage trend:** Declining — used 3 times in the last 3 months\n\n**Financial Impact**\n• **Annual savings if cancelled:** $179.88\n• **What that could fund:** Almost half a month of emergency fund contributions, or ~2.5% of your remaining credit card balance\n\n**Your Options**\n• **Cancel now** — save the full $180/year starting immediately. The actual cancellation needs to happen on StreamMax's end (I can walk you through it)\n• **Downgrade** — some services offer cheaper tiers. Worth checking if you still want occasional access\n• **Flag for review** — I'll remind you in 30 days so you can decide with more usage data\n\n**My Take**\n6 weeks of no usage is a strong signal. That $15/month is small individually, but subscription creep adds up — it's often the #1 source of \"invisible\" spending.\n\nWhat would you like to do?",
-      memoryProposal: { id: uid(), content: 'Reviewing unused subscriptions for potential cancellation', category: 'FINANCIAL_ATTITUDE' },
+      memoryProposal: { id: uid(), content: 'Reviewing unused subscriptions for potential cancellation', category: 'PRIORITIES' },
     };
   }
 
@@ -287,7 +286,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
       return {
         content: `**Saved to Memory**\n\nGot it — I've saved: "${factContent}"\n\n**How I'll Use This**\nI'll factor this into future advice, suggestions, and insights. For example, if this relates to a spending preference, I'll reference it when analyzing your budget. If it's a life event, I'll consider it when recommending timelines and priorities.\n\n**Your Control**\nYou can view, edit, or remove this anytime in the Memory Center (brain icon in the menu). Just say "forget about..." if you want me to remove something specific.`,
         chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
-        autoSaveMemory: { content: factContent, category: 'EXPLICIT_FACT' },
+        autoSaveMemory: { content: factContent, category: 'ABOUT_ME' },
       };
     }
   }

@@ -12,8 +12,7 @@ const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 20;
 
 const VALID_MEMORY_CATEGORIES = new Set([
-  'PREFERENCE', 'CONSTRAINT', 'LIFE_CONTEXT',
-  'FINANCIAL_ATTITUDE', 'GOAL_RELATED', 'EXPLICIT_FACT',
+  'ABOUT_ME', 'PREFERENCES', 'PRIORITIES',
 ]);
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -156,20 +155,17 @@ Place this marker on its own line AFTER [SUGGESTIONS]:
 - The memory marker lines must NOT appear in your main response text — only after [SUGGESTIONS]
 
 **Valid categories:**
-- PREFERENCE — user preferences for communication style, detail level, frequency
-- FINANCIAL_ATTITUDE — risk tolerance, saving vs spending philosophy, financial priorities
-- GOAL_RELATED — specific financial goals, savings targets, debt priorities
-- LIFE_CONTEXT — location, family situation, job, major life events
-- CONSTRAINT — budget limits, income constraints, debt obligations
-- EXPLICIT_FACT — specific numbers, financial products (credit cards, accounts, loans), income, balances
+- ABOUT_ME — life situation, household, location, accounts, financial products, income, balances, recent financial actions, employment, factual details about the user
+- PREFERENCES — communication style, detail level, risk tolerance, financial approach, how they want things done, saving vs spending philosophy
+- PRIORITIES — current goals, focus areas, things they're working toward, life events they're planning around, debt payoff targets, savings targets
 
 **Examples (multiple markers in one response):**
-[MEMORY_SAVE]EXPLICIT_FACT|Has Chase Sapphire Preferred and Amex Gold credit cards
-[MEMORY_SAVE]EXPLICIT_FACT|Robinhood brokerage account with $15,000 balance
-[MEMORY_SAVE]EXPLICIT_FACT|401k through Fidelity with $50,000 balance
-[MEMORY_SAVE]LIFE_CONTEXT|Lives in San Francisco Bay Area with partner
-[MEMORY_SAVE]EXPLICIT_FACT|Recently applied for a Robinhood Gold card
-[MEMORY_PROPOSAL]FINANCIAL_ATTITUDE|Prefers aggressive debt payoff over slow and steady`;
+[MEMORY_SAVE]ABOUT_ME|Has Chase Sapphire Preferred and Amex Gold credit cards
+[MEMORY_SAVE]ABOUT_ME|Robinhood brokerage account with $15,000 balance
+[MEMORY_SAVE]ABOUT_ME|401k through Fidelity with $50,000 balance
+[MEMORY_SAVE]ABOUT_ME|Lives in San Francisco Bay Area with partner
+[MEMORY_SAVE]ABOUT_ME|Recently applied for a Robinhood Gold card
+[MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive debt payoff over slow and steady`;
 
 function buildSystemPrompt(memories?: string[]): string {
   let prompt = SYSTEM_PROMPT + MEMORY_PROMPT_SECTION;

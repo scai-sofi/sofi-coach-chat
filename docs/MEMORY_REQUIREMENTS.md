@@ -8,12 +8,9 @@ This document defines when and how the SoFi Coach Chat memory system should capt
 
 | Category | Label | What it captures | Save type |
 |---|---|---|---|
-| `EXPLICIT_FACT` | Facts | Concrete numbers: income, balances, debt amounts, credit scores, tax brackets, net worth | Auto-save |
-| `LIFE_CONTEXT` | Life Context | Location, family, age, career, homeowner/renter, marital status, major life events (wedding, new baby, retirement timeline) | Auto-save |
-| `CONSTRAINT` | Constraints | Budget limits, debt obligations, income caps, time constraints, minimum payments, fixed expenses | Auto-save |
-| `FINANCIAL_ATTITUDE` | Attitudes | Risk tolerance, saving vs. spending philosophy, investment style, debt payoff strategy preference | Propose |
-| `GOAL_RELATED` | Goals | Savings targets, debt payoff priorities, retirement timelines, purchase plans (house, car), education funding | Auto-save or Propose |
-| `PREFERENCE` | Preferences | Communication style, detail level, how often they want check-ins, preferred advice format | Propose |
+| `ABOUT_ME` | About me | Life situation, household, location, accounts, financial products, income, balances, recent financial actions, employment, factual details | Auto-save |
+| `PREFERENCES` | Preferences | Communication style, detail level, risk tolerance, financial approach, how they want things done, saving vs spending philosophy | Propose |
+| `PRIORITIES` | Priorities | Current goals, focus areas, things they're working toward, life events they're planning around, debt payoff targets, savings targets | Auto-save or Propose |
 
 ---
 
@@ -25,30 +22,30 @@ These are unambiguous facts. Save immediately without asking.
 
 | User says something like... | Category | Example memory content |
 |---|---|---|
-| "I make $120k" / "My salary is..." | `EXPLICIT_FACT` | Annual salary is $120,000 |
-| "I have $30k in student loans" | `EXPLICIT_FACT` | Has $30,000 in student loan debt |
-| "My credit score is 740" | `EXPLICIT_FACT` | Credit score is 740 |
-| "I have a Chase Sapphire card" | `EXPLICIT_FACT` | Has Chase Sapphire Preferred credit card |
-| "I have a 401k with Fidelity" | `EXPLICIT_FACT` | Has 401k with Fidelity |
-| "I have a Roth IRA" / "My brokerage..." | `EXPLICIT_FACT` | Has Roth IRA with $50,000 balance |
-| "I pay $2,200/mo rent" | `EXPLICIT_FACT` | Monthly rent is $2,200 |
-| "My mortgage is $1,800/mo" | `EXPLICIT_FACT` | Monthly mortgage payment is $1,800 |
-| "I have State Farm insurance" | `EXPLICIT_FACT` | Has State Farm auto and home insurance |
-| "I live in Austin" / "We're in NYC" | `LIFE_CONTEXT` | Lives in Austin, TX |
-| "I'm married" / "I have 2 kids" | `LIFE_CONTEXT` | Married with 2 children |
-| "I'm a software engineer at Google" | `LIFE_CONTEXT` | Software engineer at Google |
-| "I'm 34 years old" | `LIFE_CONTEXT` | 34 years old |
-| "We're planning a wedding next year" | `LIFE_CONTEXT` | Planning wedding for next year |
-| "We just had a baby" | `LIFE_CONTEXT` | Recently had a baby |
-| "I'm retiring in 10 years" | `LIFE_CONTEXT` | Plans to retire in approximately 10 years |
-| "I own my home" / "I rent" | `LIFE_CONTEXT` | Homeowner (or: Renter) |
-| "I file taxes jointly" | `LIFE_CONTEXT` | Files taxes married filing jointly |
-| "My budget is $4k/mo after rent" | `CONSTRAINT` | Monthly discretionary budget is $4,000 after rent |
-| "I can only save $500/mo" | `CONSTRAINT` | Can save up to $500 per month |
-| "I have $800/mo in minimum payments" | `CONSTRAINT` | Monthly minimum debt payments total $800 |
-| "I want to save $20k for a down payment" | `GOAL_RELATED` | Saving $20,000 for home down payment |
-| "I want to pay off my cards by December" | `GOAL_RELATED` | Goal to pay off credit cards by December |
-| "I'm saving for my kids' college" | `GOAL_RELATED` | Saving for children's college education |
+| "I make $120k" / "My salary is..." | `ABOUT_ME` | Annual salary is $120,000 |
+| "I have $30k in student loans" | `ABOUT_ME` | Has $30,000 in student loan debt |
+| "My credit score is 740" | `ABOUT_ME` | Credit score is 740 |
+| "I have a Chase Sapphire card" | `ABOUT_ME` | Has Chase Sapphire Preferred credit card |
+| "I have a 401k with Fidelity" | `ABOUT_ME` | Has 401k with Fidelity |
+| "I have a Roth IRA" / "My brokerage..." | `ABOUT_ME` | Has Roth IRA with $50,000 balance |
+| "I pay $2,200/mo rent" | `ABOUT_ME` | Monthly rent is $2,200 |
+| "My mortgage is $1,800/mo" | `ABOUT_ME` | Monthly mortgage payment is $1,800 |
+| "I have State Farm insurance" | `ABOUT_ME` | Has State Farm auto and home insurance |
+| "I live in Austin" / "We're in NYC" | `ABOUT_ME` | Lives in Austin, TX |
+| "I'm married" / "I have 2 kids" | `ABOUT_ME` | Married with 2 children |
+| "I'm a software engineer at Google" | `ABOUT_ME` | Software engineer at Google |
+| "I'm 34 years old" | `ABOUT_ME` | 34 years old |
+| "We're planning a wedding next year" | `ABOUT_ME` | Planning wedding for next year |
+| "We just had a baby" | `ABOUT_ME` | Recently had a baby |
+| "I'm retiring in 10 years" | `ABOUT_ME` | Plans to retire in approximately 10 years |
+| "I own my home" / "I rent" | `ABOUT_ME` | Homeowner (or: Renter) |
+| "I file taxes jointly" | `ABOUT_ME` | Files taxes married filing jointly |
+| "My budget is $4k/mo after rent" | `ABOUT_ME` | Monthly discretionary budget is $4,000 after rent |
+| "I can only save $500/mo" | `ABOUT_ME` | Can save up to $500 per month |
+| "I have $800/mo in minimum payments" | `ABOUT_ME` | Monthly minimum debt payments total $800 |
+| "I want to save $20k for a down payment" | `PRIORITIES` | Saving $20,000 for home down payment |
+| "I want to pay off my cards by December" | `PRIORITIES` | Goal to pay off credit cards by December |
+| "I'm saving for my kids' college" | `PRIORITIES` | Saving for children's college education |
 
 ### Propose for confirmation (MEMORY_PROPOSAL)
 
@@ -56,13 +53,13 @@ These are inferences. Ask the user before storing.
 
 | AI detects... | Category | Example memory content |
 |---|---|---|
-| User consistently asks for detailed breakdowns | `PREFERENCE` | Prefers detailed breakdowns with numbers |
-| User says "just give me the bottom line" | `PREFERENCE` | Prefers concise, bottom-line answers |
-| User shows strong debt-averse behavior | `FINANCIAL_ATTITUDE` | Debt-averse — prioritizes paying off balances |
-| User prefers index funds over stock picking | `FINANCIAL_ATTITUDE` | Prefers passive index fund investing |
-| User seems risk-tolerant with investments | `FINANCIAL_ATTITUDE` | Comfortable with moderate investment risk |
-| User mentions wanting aggressive savings | `FINANCIAL_ATTITUDE` | Aggressive savings mindset |
-| User hints at a financial priority | `GOAL_RELATED` | Wants to build 6-month emergency fund |
+| User consistently asks for detailed breakdowns | `PREFERENCES` | Prefers detailed breakdowns with numbers |
+| User says "just give me the bottom line" | `PREFERENCES` | Prefers concise, bottom-line answers |
+| User shows strong debt-averse behavior | `PREFERENCES` | Debt-averse — prioritizes paying off balances |
+| User prefers index funds over stock picking | `PREFERENCES` | Prefers passive index fund investing |
+| User seems risk-tolerant with investments | `PREFERENCES` | Comfortable with moderate investment risk |
+| User mentions wanting aggressive savings | `PREFERENCES` | Aggressive savings mindset |
+| User hints at a financial priority | `PRIORITIES` | Wants to build 6-month emergency fund |
 
 ---
 

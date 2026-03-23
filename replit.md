@@ -24,7 +24,7 @@ The project is organized as a pnpm monorepo with an `api-server` (Express 5) and
 ### AI Configuration
 - **Model:** GPT-4o-mini via Replit AI Integrations proxy.
 - **System Prompt:** Dynamically constructed, including a base prompt, memory detection instructions, and user context.
-- **Memory System:** Live AI detection and saving of user context, with markers for auto-save (`[MEMORY_SAVE]`) and proposals (`[MEMORY_PROPOSAL]`). Memories are categorized (e.g., PREFERENCE, GOAL_RELATED) and can be confirmed or implicitly saved.
+- **Memory System:** Live AI detection and saving of user context, with markers for auto-save (`[MEMORY_SAVE]`) and proposals (`[MEMORY_PROPOSAL]`). Memories are categorized into 3 categories: `ABOUT_ME` (life facts, accounts, situation), `PREFERENCES` (communication style, risk tolerance), `PRIORITIES` (goals, focus areas). Memories can be confirmed or implicitly saved.
 
 ### Streaming Architecture
 A dual-path streaming approach ensures compatibility across web (SSE) and native mobile (full response then word-by-word reveal). Both paths aim for a progressive text reveal with a shared drain animation.

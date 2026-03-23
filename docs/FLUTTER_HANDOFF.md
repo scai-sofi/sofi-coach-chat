@@ -197,7 +197,7 @@ InsightToAction {
 ```
 Memory {
   id: string
-  category: MemoryCategory   // 'PREFERENCE' | 'CONSTRAINT' | 'LIFE_CONTEXT' | 'FINANCIAL_ATTITUDE' | 'GOAL_RELATED' | 'EXPLICIT_FACT'
+  category: MemoryCategory   // 'ABOUT_ME' | 'PREFERENCES' | 'PRIORITIES'
   content: string
   source: MemorySource        // 'EXPLICIT' | 'IMPLICIT_CONFIRMED'
   status: MemoryStatus        // 'ACTIVE' | 'PAUSED' | 'DELETED'
@@ -256,14 +256,11 @@ Each tier has a badge with specific styling:
 PanelType: 'none' | 'memory' | 'goals' | 'scenarios' | 'history'
 
 MemoryCategory labels:
-  PREFERENCE → "Preferences"
-  FINANCIAL_ATTITUDE → "Attitudes"
-  GOAL_RELATED → "Goals"
-  LIFE_CONTEXT → "Life Context"
-  CONSTRAINT → "Constraints"
-  EXPLICIT_FACT → "Facts"
+  ABOUT_ME → "About me"
+  PREFERENCES → "Preferences"
+  PRIORITIES → "Priorities"
 
-MemoryCategory display order: PREFERENCE, FINANCIAL_ATTITUDE, GOAL_RELATED, LIFE_CONTEXT, CONSTRAINT, EXPLICIT_FACT
+MemoryCategory display order: ABOUT_ME, PREFERENCES, PRIORITIES
 
 GoalType labels:
   EMERGENCY_FUND → "Save Up"
@@ -1086,11 +1083,11 @@ Scenario {
 ### Shared Test Data
 
 5 shared memories used across most scenarios:
-- "Prefers detailed breakdowns with numbers" (PREFERENCE)
-- "Dining out is a focus area for spending reduction" (FINANCIAL_ATTITUDE)
-- "Household of 2, living in San Francisco Bay Area" (LIFE_CONTEXT)
-- "Saving for a wedding in October 2027" (CONSTRAINT)
-- "Prefers weekly check-ins over daily notifications" (PREFERENCE)
+- "Prefers detailed breakdowns with numbers" (PREFERENCES)
+- "Dining out is a focus area for spending reduction" (PRIORITIES)
+- "Household of 2, living in San Francisco Bay Area" (ABOUT_ME)
+- "Saving for a wedding in October 2027" (PRIORITIES)
+- "Prefers weekly check-ins over daily notifications" (PREFERENCES)
 
 2 shared goals:
 - Emergency Fund: $8,400 of $12,000 (70%), ON_TRACK, 0.82 confidence

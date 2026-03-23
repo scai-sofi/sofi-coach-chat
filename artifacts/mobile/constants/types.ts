@@ -1,4 +1,4 @@
-export type MemoryCategory = 'PREFERENCE' | 'CONSTRAINT' | 'LIFE_CONTEXT' | 'FINANCIAL_ATTITUDE' | 'GOAL_RELATED' | 'EXPLICIT_FACT';
+export type MemoryCategory = 'ABOUT_ME' | 'PREFERENCES' | 'PRIORITIES';
 export type MemorySource = 'EXPLICIT' | 'IMPLICIT_CONFIRMED';
 export type MemoryStatus = 'ACTIVE' | 'PAUSED' | 'DELETED';
 export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CUSTOM';
@@ -131,21 +131,15 @@ export interface Scenario {
 }
 
 export const MEMORY_CATEGORY_LABELS: Record<MemoryCategory, string> = {
-  PREFERENCE: 'Preferences',
-  FINANCIAL_ATTITUDE: 'Attitudes',
-  GOAL_RELATED: 'Goals',
-  LIFE_CONTEXT: 'Life Context',
-  CONSTRAINT: 'Constraints',
-  EXPLICIT_FACT: 'Facts',
+  ABOUT_ME: 'About me',
+  PREFERENCES: 'Preferences',
+  PRIORITIES: 'Priorities',
 };
 
 export const MEMORY_CATEGORY_ORDER: MemoryCategory[] = [
-  'PREFERENCE',
-  'FINANCIAL_ATTITUDE',
-  'GOAL_RELATED',
-  'LIFE_CONTEXT',
-  'CONSTRAINT',
-  'EXPLICIT_FACT',
+  'ABOUT_ME',
+  'PREFERENCES',
+  'PRIORITIES',
 ];
 
 export const GOAL_TYPE_LABELS: Record<GoalType, string> = {

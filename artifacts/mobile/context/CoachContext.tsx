@@ -85,8 +85,7 @@ interface MemoryAction {
 }
 
 const VALID_MEMORY_CATEGORIES = new Set<string>([
-  'PREFERENCE', 'CONSTRAINT', 'LIFE_CONTEXT',
-  'FINANCIAL_ATTITUDE', 'GOAL_RELATED', 'EXPLICIT_FACT',
+  'ABOUT_ME', 'PREFERENCES', 'PRIORITIES',
 ]);
 
 function isValidMemoryCategory(cat: string): cat is MemoryCategory {
