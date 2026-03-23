@@ -341,7 +341,9 @@ function MemoryProposalCard({ message }: { message: Message }) {
   if (proposal.confirmed) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard]}>
-        <Feather name="check-circle" size={14} color={Colors.successDark} />
+        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+          <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
         <Text style={styles.confirmedText}>Saved to memory</Text>
       </View>
     );
@@ -375,7 +377,9 @@ function GoalProposalCard({ message }: { message: Message }) {
   if (proposal.confirmed) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard]}>
-        <Feather name="check-circle" size={14} color={Colors.successDark} />
+        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+          <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
         <Text style={[styles.confirmedText, { color: Colors.contentPrimary }]}>Goal created — check your goals panel</Text>
       </View>
     );
@@ -420,7 +424,9 @@ function InsightToActionCard({ message }: { message: Message }) {
   if (insight.accepted) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard]}>
-        <Feather name="check-circle" size={14} color={Colors.contentPrimary} />
+        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+          <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
         <Text style={[styles.confirmedText, { color: Colors.contentPrimary }]}>All set — saved to memory & goal created</Text>
       </View>
     );
