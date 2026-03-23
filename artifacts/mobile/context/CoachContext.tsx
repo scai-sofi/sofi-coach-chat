@@ -254,7 +254,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (tempChatRef.current) return false;
     const currentCount = aiResponseCountRef.current;
     const lastAction = lastMemoryActionMsgIndexRef.current;
-    if (lastAction >= 0 && (currentCount - lastAction) <= 2) return false;
+    if (lastAction >= 0 && (currentCount - lastAction) <= 1) return false;
     return true;
   }, []);
 
