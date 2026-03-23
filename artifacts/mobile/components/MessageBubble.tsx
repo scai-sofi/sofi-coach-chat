@@ -299,9 +299,7 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
     <>
       <Feather name={style.icon} size={11} color={style.color} />
       <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
-      <Svg width={12} height={12} viewBox="0 0 12 12" fill="none">
-        <Path d="M4.5 1.5L8.5 6L4.5 10.5" stroke={style.color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-      </Svg>
+      <Feather name="chevron-right" size={12} color={style.color} />
     </>
   );
 
