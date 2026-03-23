@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
@@ -31,7 +31,7 @@ function CheckIcon({ size = 20, color = Colors.contentBrand }: { size?: number; 
 
 const MODES: { value: MemoryMode; label: string; description: string }[] = [
   { value: 'full', label: 'Full memory', description: 'Coach automatically remembers details from your conversations.' },
-  { value: 'ask-first', label: 'Ask first', description: 'Coach will ask before saving any memory from your conversations.' },
+  { value: 'ask-first', label: 'Ask me first', description: 'Coach will ask before saving any memory from your conversations.' },
   { value: 'off', label: 'Memory off', description: 'Coach won\'t save or use any memories. Goals are still tracked.' },
 ];
 
@@ -81,7 +81,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </View>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Memory</Text>
           <View style={styles.card}>
@@ -104,7 +104,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             ))}
           </View>
         </View>
-      </View>
+      </ScrollView>
     </Animated.View>
   );
 }
@@ -156,8 +156,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentInner: {
     paddingHorizontal: 16,
     paddingTop: 24,
+    paddingBottom: 40,
   },
   section: {
     gap: 12,

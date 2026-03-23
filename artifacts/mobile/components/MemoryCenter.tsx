@@ -361,7 +361,7 @@ export function MemoryCenter() {
           <View style={styles.confirmCard}>
             <Text style={styles.confirmTitle}>Delete all memories?</Text>
             <Text style={styles.confirmDesc}>
-              {`This will permanently delete ${memories.filter(m => m.status !== 'DELETED').length} ${memories.filter(m => m.status !== 'DELETED').length === 1 ? 'memory' : 'memories'}. The coach will forget everything it has learned about you.`}
+              {`This can't be undone. ${memories.filter(m => m.status !== 'DELETED').length} ${memories.filter(m => m.status !== 'DELETED').length === 1 ? 'memory' : 'memories'} will be permanently deleted.`}
             </Text>
             <View style={styles.confirmActions}>
               <Pressable style={styles.confirmCancelBtn} onPress={() => setShowDeleteConfirm(false)}>
