@@ -47,7 +47,7 @@ Neither feature requires the other to launch, but both are significantly weaker 
 | Memory mode | Memory behavior | Goal behavior |
 |---|---|---|
 | `full` | Auto-save + proposals enabled | Goals track normally; AI references goals in responses |
-| `ask-first` | All saves converted to proposals | Goals track normally; memory proposals require confirmation |
+| `ask-first` | All memory actions converted to proposals | Goals track normally; memory proposals require confirmation |
 | `off` | No memory reads or writes | Goals still tracked — `acceptDraftGoal` works regardless of memory mode |
 
 **Where each feature surfaces in the UI:**
@@ -150,7 +150,7 @@ Three user-configurable memory modes, set via Settings panel:
 | Mode | Memory reads | Memory writes | Behavior |
 |---|---|---|---|
 | `full` (default) | AI receives all active memories | Auto-save and proposals enabled | Normal personalized behavior |
-| `ask-first` | AI receives all active memories | All saves converted to proposals | User must explicitly confirm before any memory is persisted |
+| `ask-first` | AI receives all active memories | All memory actions (saves, updates, proposals) converted to proposals | User must explicitly confirm before any memory is persisted |
 | `off` | AI receives empty memory array | All saves/proposals/chips suppressed | No personalization; goals still tracked normally |
 
 **Settings panel:** Accessible from the overflow menu ("Settings" item with gear icon). Slide-in panel matching ChatHistory pattern. Three radio-style rows with label + description + radio button for selected mode.
@@ -163,7 +163,7 @@ Three user-configurable memory modes, set via Settings panel:
 
 **Pipeline enforcement:**
 - Demo mode: `generateAIResponse` receives empty memories when off; `autoSaveMemory` suppressed in off, converted to proposal in ask-first; memory chips filtered in off.
-- Live mode: `applyMemoryAndGoalActions` blocks entire memory block when off; converts all actions to proposals in ask-first. Memory strings sent as empty array when off.
+- Live mode: `applyMemoryAndGoalActions` blocks entire memory block when off; converts all memory actions (saves, updates, proposals) to proposals in ask-first. Memory strings sent as empty array when off.
 - Draft goals: `acceptDraftGoal` activates a DRAFT goal regardless of memory mode; `dismissDraftGoal` removes it.
 
 ### Memory source types
@@ -308,7 +308,7 @@ interface Milestone {
 - Coach recognizes the intent and asks structured follow-up: timeline, monthly capacity, current balance
 - Coach presents a Goal Proposal card: goal type, target amount, monthly contribution, estimated completion date, linked account
 - Member taps "Set up goal"; goal appears in Goals Dashboard with progress ring and milestones
-- A PRIORITIES memory is auto-saved alongside goal creation (e.g., "Wants to pay off credit card debt by year-end")
+- A PRIORITIES memory is proposed alongside the goal (e.g., "Paying off credit card debt is a priority") — member can confirm or dismiss independently
 
 ### 4. Goal-Aware Response in Conversation
 
@@ -358,8 +358,8 @@ When applicable, Coach's response includes one of four patterns:
 | ---- | --------------------- | ----- | --------- | ---------------- |
 | 1    | Informational         | Grey badge, "Informational" | None — factual answers, balance lookups | Implemented |
 | 2    | Suggestive            | Grey badge, "Suggestion" | Data provenance included | Implemented |
-| 3    | Actionable            | Integrated into card — shield icon + "Needs your approval" | Confidence threshold; disclaimer shown | Implemented |
-| 4    | Complex / high-stakes | Orange badge, "Handoff to advisor" | AI provides framing, explicitly hands off to human | Implemented |
+| 3    | Actionable            | Amber badge, "Actionable — needs your approval" | Confidence threshold; disclaimer shown | Implemented |
+| 4    | Complex / high-stakes | Blue badge, "Complex — human advisor recommended" | AI provides framing, explicitly hands off to human | Implemented |
 
 **Actionable tier behavior:** When a GoalProposal card is present, the standalone actionable badge is suppressed — instead, a subtle "Needs your approval" label with a shield icon is shown inside the card above the action buttons. DRAFT goals in the Goals Center also carry the actionable tier. Other tiers always show as standalone badges.
 
@@ -372,7 +372,7 @@ When applicable, Coach's response includes one of four patterns:
 | Memory proposal card | Inline card with [Remember] / [Not now] buttons |
 | "Saved to memory" chip | Tappable chip below AI message — navigates to Memory Center and highlights the memory |
 | "Memory updated" chip | Tappable chip — same navigation behavior as "Saved to memory" |
-| Goal proposal card | Goal type, target, monthly contribution, timeline, [Set up goal] / [Dismiss] |
+| Goal proposal card | Goal type, target, monthly contribution, timeline, [Set up goal] / [Just chatting] |
 | Goal nudge (system pill) | System message notifying the user a DRAFT goal has been added to Goals Center |
 | Suggestion chips | Horizontally scrollable pills below AI response |
 | Safety tier badge | Color-coded pill above message text |
