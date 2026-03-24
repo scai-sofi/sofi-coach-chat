@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
@@ -8,6 +7,7 @@ import { useCoach } from '@/context/CoachContext';
 import { ChatSession } from '@/context/CoachContext';
 import { AppBar } from '@/components/AppBar';
 import { ChatNewIcon } from '@/components/icons';
+import { SearchBar } from '@/components/SearchBar';
 
 function groupByMonth(sessions: ChatSession[]): { label: string; sessions: ChatSession[] }[] {
   const groups: Record<string, ChatSession[]> = {};
@@ -88,20 +88,7 @@ export function ChatHistory({ onClose }: { onClose: () => void }) {
         }}
       />
 
-      <View style={styles.searchRow}>
-        <View style={styles.searchPill}>
-          <Feather name="search" size={16} color={Colors.contentSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            placeholderTextColor={Colors.contentSecondary}
-            value={search}
-            onChangeText={setSearch}
-            cursorColor={Colors.contentBone600}
-            selectionColor="rgba(92,91,90,0.3)"
-          />
-        </View>
-      </View>
+      <SearchBar value={search} onChangeText={setSearch} />
 
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
         {groups.length === 0 ? (
@@ -137,29 +124,6 @@ const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: Colors.surfaceBase,
-  },
-  searchRow: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  searchPill: {
-    height: 48,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 24,
-    borderWidth: 0.75,
-    borderColor: Colors.surfaceEdge,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.contentPrimary,
-    fontFamily: Fonts.regular,
-    lineHeight: 20,
-    paddingVertical: 0,
   },
   scrollArea: {
     flex: 1,

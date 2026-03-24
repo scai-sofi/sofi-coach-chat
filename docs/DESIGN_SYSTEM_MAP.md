@@ -275,19 +275,39 @@ Global notification system via `ToastProvider`.
 
 ### 2.8 Search Bar
 
-Used in MemoryCenter and ChatHistory. Same visual pattern.
+Shared `SearchBar` component (`components/SearchBar.tsx`) used in MemoryCenter and ChatHistory.
 
-| Property | MemoryCenter | ChatHistory |
-|---|---|---|
-| Height | 48px | 48px |
-| Background | white | white |
-| Border radius | 24px | 24px |
-| Border | 1px rgba(10,10,10,0.1) | 0.75px rgba(10,10,10,0.1) |
-| Layout | Row: SearchIcon 16px + TextInput | Row: Feather search 16 + TextInput |
-| Input font | 16px Regular, contentPrimary | 16px Regular, contentPrimary |
-| Surrounding padding | horizontal 16, vertical 12 | horizontal 16, vertical 12 |
+**Variants:** `search` (default) and `search-filter` (includes filter toggle button).
 
-**Inconsistency note:** MemoryCenter uses a custom SearchIcon SVG (16×16, viewBox 0 0 16 16, strokeWidth 1.25); ChatHistory uses `Feather name="search"`. Border width differs (1 vs 0.75).
+| Property | Value |
+|---|---|
+| Height | 48px |
+| Background | `Colors.surfaceElevated` (white, from token) |
+| Border | 1px `rgba(10,10,10,0.1)` |
+| Border radius | 24px |
+| Icon | Feather `search` size 16, `Colors.contentSecondary` |
+| Input font | 16px Regular, `Colors.contentPrimary`, lineHeight 20 |
+| Placeholder | "Search", `Colors.contentSecondary` |
+| Cursor color | `#5C5B5A` (contentBone600) |
+| Selection color | `rgba(92,91,90,0.3)` |
+| Internal gap | 8px (between icon and input) |
+| Pill padding | horizontal 16 |
+| Wrapper padding | horizontal 16, vertical 12 |
+
+**Filter variant additions (`search-filter`):**
+
+| Property | Value |
+|---|---|
+| Filter button size | 32×32 |
+| Filter button radius | 12px |
+| Filter button icon | Custom FilterIcon SVG 16×16 (3 horizontal lines, strokeWidth 1.25) |
+| Filter inactive | transparent bg, `Colors.contentSecondary` icon |
+| Filter active | `Colors.contentPrimary` bg, white icon |
+| Gap between pill and filter button | 12px |
+
+**Props:** `value`, `onChangeText`, `placeholder?`, `variant?` (`'search'` | `'search-filter'`), `filterActive?`, `onFilterPress?`
+
+**Usage:** MemoryCenter uses `variant="search-filter"`, ChatHistory uses default `variant="search"`.
 
 ### 2.9 Scroll Anchor (Scroll-to-Bottom)
 
@@ -532,8 +552,8 @@ When a goal suggestion is queued, a system pill message appears: "I've added a g
 | Icon | Size | ViewBox | Style | Color | Notes |
 |---|---|---|---|---|---|
 | ChevronLeftIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Shared across panels |
-| SearchIcon | 16×16 | 0 0 16 16 | Stroked (1.25) | contentSecondary | Custom magnifying glass |
-| FilterIcon | 16×16 | 0 0 16 16 | Stroked (1.25) | contentSecondary | 3 horizontal lines |
+| Feather search | 16 | — | Feather | contentSecondary | SearchBar component (replaced custom SearchIcon SVG) |
+| FilterIcon | 16×16 | 0 0 16 16 | Stroked (1.25) | contentSecondary | 3 horizontal lines (in SearchBar component) |
 | MoreIcon (MemoryCenter) | 20×20 | 0 0 20 20 | Filled | contentPrimary | Same SVG as ChatHeader |
 | PencilIcon (card action) | 13×13 | 0 0 13 13 | Filled | contentSecondary | Small pencil |
 | PauseIcon (card action) | ~8.6×13 | 0 0 9.83 12.17 | Stroked (1.5) | contentSecondary | Two bars |

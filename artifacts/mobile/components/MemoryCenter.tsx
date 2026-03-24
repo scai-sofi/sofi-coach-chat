@@ -9,25 +9,7 @@ import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory }
 import { AppBar, useAppBarHeight } from '@/components/AppBar';
 import { OverflowMenu } from '@/components/OverflowMenu';
 import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
-
-function SearchIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Path
-        d="M7.333 12.667A5.333 5.333 0 107.333 2a5.333 5.333 0 000 10.667zM14 14l-2.9-2.9"
-        stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
-function FilterIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Path d="M2 4h12M4 8h8M6 12h4" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
+import { SearchBar } from '@/components/SearchBar';
 
 function PencilIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
   return (
@@ -331,24 +313,13 @@ export function MemoryCenter() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={0}
       >
-        <View style={styles.searchSection}>
-          <View style={styles.searchInputWrap}>
-            <SearchIcon size={16} color={Colors.contentSecondary} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search"
-              placeholderTextColor={Colors.contentSecondary}
-              value={search}
-              onChangeText={setSearch}
-            />
-          </View>
-          <Pressable
-            style={[styles.filterBtn, (showFilters || filterCat) && styles.filterBtnActive]}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <FilterIcon size={16} color={(showFilters || filterCat) ? '#fff' : Colors.contentSecondary} />
-          </Pressable>
-        </View>
+        <SearchBar
+          value={search}
+          onChangeText={setSearch}
+          variant="search-filter"
+          filterActive={showFilters || !!filterCat}
+          onFilterPress={() => setShowFilters(!showFilters)}
+        />
 
         {(showFilters || filterCat) && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
@@ -417,41 +388,6 @@ export function MemoryCenter() {
 
 const styles = StyleSheet.create({
   panel: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.surfaceBase, zIndex: 100 },
-  searchSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingTop: 12,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-  },
-  searchInputWrap: {
-    flex: 1,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.1)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.contentPrimary,
-    fontFamily: Fonts.regular,
-    lineHeight: 20,
-  },
-  filterBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterBtnActive: { backgroundColor: Colors.contentPrimary },
   filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 40 },
   filterRowContent: { flexDirection: 'row', gap: 6 },
   filterChip: {
