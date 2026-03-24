@@ -354,7 +354,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={14} color={Colors.contentSecondary} style={{ marginTop: 2 }} />
         <Text style={styles.proposalText}>
-          Want me to remember: "{proposal.content}"?
+          Want me to remember: <Text style={{ fontFamily: Fonts.regular }}>"{proposal.content}"</Text>?
         </Text>
       </View>
       <View style={[styles.proposalButtons, { marginLeft: 16 }]}>
@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
   },
   confirmedText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 10 },
-  proposalText: { fontSize: 13, fontFamily: Fonts.regular, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
+  proposalText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
   proposalDetail: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
   proposalButtons: { flexDirection: 'row', gap: 8 },
   confirmBtn: {
