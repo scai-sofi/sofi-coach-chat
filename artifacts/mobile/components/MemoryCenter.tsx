@@ -254,7 +254,7 @@ function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number;
 
 function PauseMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="-3 -2 16 16" fill="none">
+    <Svg width={size} height={size} viewBox="-4.5 -3 19 19" fill="none">
       <Path
         d="M8.41667 0.75H7.08333C6.71514 0.75 6.41667 1.04848 6.41667 1.41667V10.75C6.41667 11.1182 6.71514 11.4167 7.08333 11.4167H8.41667C8.78486 11.4167 9.08333 11.1182 9.08333 10.75V1.41667C9.08333 1.04848 8.78486 0.75 8.41667 0.75Z"
         stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
