@@ -24,8 +24,8 @@ function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: 
 function RadioSelected({ size = 24 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={11} stroke={Colors.contentPrimary} strokeWidth={2} />
-      <Circle cx={12} cy={12} r={7} fill={Colors.contentPrimary} />
+      <Circle cx={12} cy={12} r={9.5} stroke={Colors.contentPrimary} strokeWidth={1} />
+      <Circle cx={12} cy={12} r={6} fill={Colors.contentPrimary} />
     </Svg>
   );
 }
@@ -33,7 +33,7 @@ function RadioSelected({ size = 24 }: { size?: number }) {
 function RadioUnselected({ size = 24 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={11.25} stroke="rgba(10,10,10,0.4)" strokeWidth={1.5} />
+      <Circle cx={12} cy={12} r={9.5} stroke={Colors.contentSecondary} strokeWidth={1} />
     </Svg>
   );
 }
