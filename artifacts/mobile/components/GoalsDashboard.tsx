@@ -127,18 +127,61 @@ function GoalCard({ goal }: { goal: Goal }) {
   );
 }
 
+function SuggestedGoalCard({ goal }: { goal: Goal }) {
+  const { acceptDraftGoal, dismissDraftGoal } = useCoach();
+  const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
+
+  return (
+    <View style={styles.suggestedCard}>
+      <View style={styles.suggestedLabelRow}>
+        <View style={styles.suggestedBadge}>
+          <Text style={styles.suggestedBadgeText}>Suggested</Text>
+        </View>
+      </View>
+      <View style={styles.goalTop}>
+        <View style={styles.goalInfo}>
+          <View style={styles.goalTitleRow}>
+            <Text style={styles.goalTitle}>{goal.title}</Text>
+            <View style={styles.typeBadge}>
+              <Text style={styles.typeBadgeText}>{GOAL_TYPE_LABELS[goal.type]}</Text>
+            </View>
+          </View>
+          <Text style={styles.goalAmount}>
+            ${goal.targetAmount.toLocaleString()} · ${goal.monthlyContributionTarget}/mo · ~{monthsRemaining} months
+          </Text>
+          <Text style={[styles.goalAmount, { marginTop: 2 }]}>
+            Linked: {goal.linkedAccount}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.suggestedButtons}>
+        <Pressable style={styles.suggestedConfirmBtn} onPress={() => acceptDraftGoal(goal.id)}>
+          <Text style={styles.suggestedConfirmText}>Set up goal</Text>
+        </Pressable>
+        <Pressable style={styles.suggestedDismissBtn} onPress={() => dismissDraftGoal(goal.id)}>
+          <Text style={styles.suggestedDismissText}>Dismiss</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 export function GoalsDashboard() {
   const { goals, setActivePanel } = useCoach();
 
-  const activeGoals = goals.filter(g => !['COMPLETED', 'PAUSED'].includes(g.status));
+  const draftGoals = goals.filter(g => g.status === 'DRAFT');
+  const activeGoals = goals.filter(g => !['COMPLETED', 'PAUSED', 'DRAFT'].includes(g.status));
   const completedGoals = goals.filter(g => g.status === 'COMPLETED');
+
+  const hasAny = draftGoals.length > 0 || activeGoals.length > 0 || completedGoals.length > 0;
 
   return (
     <View style={styles.panel}>
       <AppBar variant="back" title="My goals" onBack={() => setActivePanel('none')} />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
-        {activeGoals.length === 0 && completedGoals.length === 0 ? (
+        {!hasAny ? (
           <View style={styles.empty}>
             <Feather name="target" size={32} color={Colors.contentMuted} />
             <Text style={styles.emptyText}>
@@ -147,8 +190,24 @@ export function GoalsDashboard() {
           </View>
         ) : (
           <>
+            {draftGoals.length > 0 && (
+              <>
+                <View style={styles.sectionHeader}>
+                  <Feather name="star" size={13} color={Colors.contentBrand} />
+                  <Text style={styles.sectionHeaderText}>Suggested</Text>
+                </View>
+                {draftGoals.map(g => <SuggestedGoalCard key={g.id} goal={g} />)}
+                {activeGoals.length > 0 && (
+                  <View style={styles.divider}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>ACTIVE</Text>
+                    <View style={styles.dividerLine} />
+                  </View>
+                )}
+              </>
+            )}
             {activeGoals.map(g => <GoalCard key={g.id} goal={g} />)}
-            {activeGoals.length > 0 && completedGoals.length > 0 && (
+            {(activeGoals.length > 0 || draftGoals.length > 0) && completedGoals.length > 0 && (
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>COMPLETED</Text>
@@ -162,7 +221,7 @@ export function GoalsDashboard() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          {activeGoals.length} active{completedGoals.length > 0 ? ` · ${completedGoals.length} completed` : ''} · Auto-updated from your accounts
+          {activeGoals.length} active{draftGoals.length > 0 ? ` · ${draftGoals.length} suggested` : ''}{completedGoals.length > 0 ? ` · ${completedGoals.length} completed` : ''} · Auto-updated from your accounts
         </Text>
       </View>
     </View>
@@ -234,6 +293,54 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)',
   },
   askBtnText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary },
+  sectionHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 4,
+  },
+  sectionHeaderText: {
+    fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentBrand, lineHeight: 18,
+  },
+  suggestedCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 16,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: Colors.contentBrand,
+    borderStyle: 'dashed',
+    shadowColor: 'rgba(10,10,10,0.16)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  suggestedLabelRow: {
+    flexDirection: 'row', alignItems: 'center',
+  },
+  suggestedBadge: {
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4,
+    backgroundColor: Colors.surfaceTint,
+  },
+  suggestedBadgeText: {
+    fontSize: 10, fontFamily: Fonts.medium, color: Colors.contentBrand,
+    textTransform: 'uppercase', letterSpacing: 0.6,
+  },
+  suggestedButtons: {
+    flexDirection: 'row', gap: 8,
+  },
+  suggestedConfirmBtn: {
+    backgroundColor: Colors.contentPrimary, borderRadius: 9999,
+    paddingHorizontal: 12, paddingVertical: 6,
+  },
+  suggestedConfirmText: {
+    color: '#fff', fontSize: 12, fontFamily: Fonts.medium,
+  },
+  suggestedDismissBtn: {
+    borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 9999,
+    paddingHorizontal: 12, paddingVertical: 6,
+  },
+  suggestedDismissText: {
+    color: Colors.contentSecondary, fontSize: 12, fontFamily: Fonts.medium,
+  },
   divider: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8,
   },

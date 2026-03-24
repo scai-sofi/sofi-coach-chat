@@ -8,6 +8,7 @@ export interface OverflowMenuItem {
   icon: React.ReactNode;
   onPress: () => void;
   danger?: boolean;
+  badge?: React.ReactNode;
 }
 
 interface OverflowMenuProps {
@@ -33,6 +34,7 @@ export function OverflowMenu({ items, topOffset, onClose, zIndex = 50 }: Overflo
                   onPress={item.onPress}
                 >
                   <Text style={[styles.menuText, item.danger && { color: Colors.danger }]}>{item.label}</Text>
+                  {item.badge}
                   {item.icon}
                 </Pressable>
               );

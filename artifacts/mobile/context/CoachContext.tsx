@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone } from '@/constants/types';
+import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone, GoalProposal } from '@/constants/types';
 import { SCENARIOS } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
 
@@ -55,9 +55,8 @@ interface CoachContextType extends CoachState {
   dismissMemoryProposal: (messageId: string) => void;
   confirmGoal: (messageId: string) => void;
   dismissGoalProposal: (messageId: string) => void;
-  acceptInsightToAction: (messageId: string) => void;
-  saveInsightMemoryOnly: (messageId: string) => void;
-  dismissInsightToAction: (messageId: string) => void;
+  acceptDraftGoal: (goalId: string) => void;
+  dismissDraftGoal: (goalId: string) => void;
   addMemory: (content: string, category: MemoryCategory) => void;
   editMemory: (id: string, content: string) => void;
   pauseMemory: (id: string) => void;
@@ -285,7 +284,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     chips?: MessageChip[];
     memoryProposal?: Message['memoryProposal'];
     goalProposal?: Message['goalProposal'];
-    insightToAction?: Message['insightToAction'];
   };
 
   const applyMemoryAndGoalActions = useCallback((
@@ -379,40 +377,49 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     const goalAction = goalActs && goalActs.length > 0 ? goalActs[0] : null;
 
-    if (goalAction && prioritiesProposal) {
+    if (goalAction) {
       const targetDate = new Date();
       targetDate.setMonth(targetDate.getMonth() + goalAction.monthsUntilTarget);
-      result.insightToAction = {
-        id: uid(),
-        memory: { content: prioritiesProposal.content, category: prioritiesProposal.category as MemoryCategory, saved: false },
-        goalProposal: {
-          id: uid(),
-          type: goalAction.type as GoalType,
-          title: goalAction.title,
-          targetAmount: goalAction.targetAmount,
-          targetDate,
-          monthlyContribution: goalAction.monthlyContribution,
-          linkedAccount: goalAction.linkedAccount,
-        },
-        dismissed: false,
-      };
-      if (otherProposal) {
-        result.memoryProposal = otherProposal;
-      }
-    } else if (goalAction) {
-      const targetDate = new Date();
-      targetDate.setMonth(targetDate.getMonth() + goalAction.monthsUntilTarget);
-      result.goalProposal = {
+      const milestones: Milestone[] = [25, 50, 75, 100].map(pct => ({
+        id: uid(), label: `${pct}%`, targetPct: pct, reached: false,
+      }));
+      const draftGoal: Goal = {
         id: uid(),
         type: goalAction.type as GoalType,
         title: goalAction.title,
         targetAmount: goalAction.targetAmount,
+        currentAmount: 0,
         targetDate,
-        monthlyContribution: goalAction.monthlyContribution,
+        monthlyContributionTarget: goalAction.monthlyContribution,
+        actualMonthlyContribution: goalAction.monthlyContribution,
+        status: 'DRAFT',
+        confidenceScore: 0.88,
+        milestones,
         linkedAccount: goalAction.linkedAccount,
+        createdAt: new Date(),
       };
-      if (prioritiesProposal || otherProposal) {
-        result.memoryProposal = prioritiesProposal || otherProposal;
+      let goalWasQueued = false;
+      setGoals(prev => {
+        const exists = prev.some(g => g.title === draftGoal.title && g.type === draftGoal.type && g.status !== 'COMPLETED');
+        if (exists) return prev;
+        goalWasQueued = true;
+        return [...prev, draftGoal];
+      });
+
+      if (goalWasQueued) {
+        const nudgeMsg: Message = {
+          id: uid(),
+          role: 'system',
+          content: "I've added a goal suggestion to your Goals panel — check it when you're ready.",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, nudgeMsg]);
+      }
+
+      if (prioritiesProposal) {
+        result.memoryProposal = prioritiesProposal;
+      } else if (otherProposal) {
+        result.memoryProposal = otherProposal;
       }
     } else {
       const proposal = prioritiesProposal || otherProposal;
@@ -867,18 +874,39 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         updateGoalSettings(response.autoUpdateGoal);
       }
 
+      let demoGoalQueued = false;
+      if (response.goalProposal) {
+        const gp = response.goalProposal;
+        const milestones: Milestone[] = [25, 50, 75, 100].map(pct => ({
+          id: uid(), label: `${pct}%`, targetPct: pct, reached: false,
+        }));
+        const draftGoal: Goal = {
+          id: uid(),
+          type: gp.type,
+          title: gp.title,
+          targetAmount: gp.targetAmount,
+          currentAmount: 0,
+          targetDate: gp.targetDate,
+          monthlyContributionTarget: gp.monthlyContribution,
+          actualMonthlyContribution: gp.monthlyContribution,
+          status: 'DRAFT',
+          confidenceScore: 0.88,
+          milestones,
+          linkedAccount: gp.linkedAccount,
+          createdAt: new Date(),
+        };
+        setGoals(prev => {
+          const exists = prev.some(g => g.title === draftGoal.title && g.type === draftGoal.type && g.status !== 'COMPLETED');
+          if (exists) return prev;
+          demoGoalQueued = true;
+          return [...prev, draftGoal];
+        });
+      }
+
       const memOff = memoryModeRef.current === 'off';
       const filteredChips = memOff
         ? chips.filter(c => c.type !== 'memory-saved' && c.type !== 'memory-updated')
         : chips;
-      let finalGoalProposal = response.goalProposal;
-      let finalInsightToAction = response.insightToAction;
-      if (memOff) {
-        if (finalInsightToAction) {
-          finalGoalProposal = finalGoalProposal || finalInsightToAction.goalProposal;
-          finalInsightToAction = undefined;
-        }
-      }
       const aiMsg: Message = {
         id: uid(),
         role: 'ai',
@@ -886,17 +914,24 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         timestamp: new Date(),
         chips: filteredChips.length > 0 ? filteredChips : undefined,
         memoryProposal: memOff ? undefined : response.memoryProposal,
-        goalProposal: finalGoalProposal,
-        insightToAction: finalInsightToAction,
         suggestions: response.suggestions,
         provenance: response.provenance,
         safetyTier: response.safetyTier,
         safetyMessage: response.safetyMessage,
       };
 
-      setMessages(prev => prev.map(m =>
-        m.id === TYPING_INDICATOR_ID ? aiMsg : m
-      ));
+      setMessages(prev => {
+        const updated = prev.map(m => m.id === TYPING_INDICATOR_ID ? aiMsg : m);
+        if (demoGoalQueued) {
+          return [...updated, {
+            id: uid(),
+            role: 'system' as const,
+            content: "I've added a goal suggestion to your Goals panel — check it when you're ready.",
+            timestamp: new Date(),
+          }];
+        }
+        return updated;
+      });
       setIsTyping(false);
     }, delay);
   }, [addGoalFromProposal, updateGoalSettings, sendLiveMessage]);
@@ -941,41 +976,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
-  const acceptInsightToAction = useCallback((messageId: string) => {
-    setMessages(prev => prev.map(m => {
-      if (m.id !== messageId || !m.insightToAction) return m;
-      const insight = m.insightToAction;
-      if (memoryModeRef.current !== 'off') {
-        const mem: Memory = {
-          id: uid(), category: insight.memory.category, content: insight.memory.content,
-          source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(),
-        };
-        setMemories(prev2 => [...prev2, mem]);
-      }
-      addGoalFromProposal(insight.goalProposal);
-      return { ...m, insightToAction: { ...insight, accepted: true, memory: { ...insight.memory, saved: memoryModeRef.current !== 'off' } } };
-    }));
-  }, [addGoalFromProposal]);
-
-  const saveInsightMemoryOnly = useCallback((messageId: string) => {
-    if (memoryModeRef.current === 'off') return;
-    setMessages(prev => prev.map(m => {
-      if (m.id !== messageId || !m.insightToAction) return m;
-      const insight = m.insightToAction;
-      const mem: Memory = {
-        id: uid(), category: insight.memory.category, content: insight.memory.content,
-        source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(),
-      };
-      setMemories(prev2 => [...prev2, mem]);
-      return { ...m, insightToAction: { ...insight, memoryOnly: true, memory: { ...insight.memory, saved: true } } };
-    }));
+  const acceptDraftGoal = useCallback((goalId: string) => {
+    setGoals(prev => prev.map(g =>
+      g.id === goalId && g.status === 'DRAFT' ? { ...g, status: 'ACTIVE' as GoalStatus } : g
+    ));
   }, []);
 
-  const dismissInsightToAction = useCallback((messageId: string) => {
-    setMessages(prev => prev.map(m => {
-      if (m.id !== messageId || !m.insightToAction) return m;
-      return { ...m, insightToAction: { ...m.insightToAction, dismissed: true } };
-    }));
+  const dismissDraftGoal = useCallback((goalId: string) => {
+    setGoals(prev => prev.filter(g => g.id !== goalId || g.status !== 'DRAFT'));
   }, []);
 
   const addMemory = useCallback((content: string, category: MemoryCategory) => {
@@ -1098,7 +1106,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       sendMessage, setActivePanel, setMemoryMode, pauseAllMemories, deleteAllMemories,
       switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
-      acceptInsightToAction, saveInsightMemoryOnly, dismissInsightToAction,
+      acceptDraftGoal, dismissDraftGoal,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
       saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory,
     }}>

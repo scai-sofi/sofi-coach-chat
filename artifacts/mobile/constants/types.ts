@@ -34,15 +34,6 @@ export interface GoalProposal {
   dismissed?: boolean;
 }
 
-export interface InsightToAction {
-  id: string;
-  memory: { content: string; category: MemoryCategory; saved: boolean };
-  goalProposal: GoalProposal;
-  dismissed: boolean;
-  accepted?: boolean;
-  memoryOnly?: boolean;
-}
-
 export interface AutoSaveMemory {
   content: string;
   category: MemoryCategory;
@@ -74,7 +65,6 @@ export interface Message {
   chips?: MessageChip[];
   memoryProposal?: MemoryProposal;
   goalProposal?: GoalProposal;
-  insightToAction?: InsightToAction;
   autoSaveMemory?: AutoSaveMemory;
   autoCreateGoal?: AutoCreateGoal;
   autoUpdateGoal?: AutoUpdateGoal;

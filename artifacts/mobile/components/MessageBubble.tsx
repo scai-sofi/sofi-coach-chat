@@ -416,63 +416,6 @@ function GoalProposalCard({ message }: { message: Message }) {
   );
 }
 
-function InsightToActionCard({ message }: { message: Message }) {
-  const { acceptInsightToAction, saveInsightMemoryOnly } = useCoach();
-  const insight = message.insightToAction;
-  if (!insight || insight.dismissed) return null;
-
-  if (insight.accepted) {
-    return (
-      <View style={[styles.proposalCard, styles.confirmedCard]}>
-        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-          <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-        <Text style={styles.confirmedTextPrimary}>All set — saved to memory & goal created</Text>
-      </View>
-    );
-  }
-
-  if (insight.memoryOnly) {
-    return (
-      <View style={[styles.proposalCard, styles.confirmedCard]}>
-        <Feather name="cpu" size={14} color={Colors.contentSecondary} />
-        <Text style={styles.confirmedText}>Saved to memory</Text>
-      </View>
-    );
-  }
-
-  const gp = insight.goalProposal;
-  const months = Math.ceil(gp.targetAmount / gp.monthlyContribution);
-  const showApproval = message.safetyTier === 'actionable';
-  return (
-    <View style={styles.proposalCard}>
-      <View style={styles.proposalHeader}>
-        <Feather name="target" size={14} color={Colors.contentSecondary} style={styles.proposalIcon} />
-        <View style={styles.proposalContentWrap}>
-          <Text style={styles.proposalText}>{gp.title}</Text>
-          <Text style={styles.proposalDetail}>
-            ${gp.targetAmount.toLocaleString()} · ${gp.monthlyContribution}/mo · ~{months} months
-          </Text>
-        </View>
-      </View>
-      {showApproval && (
-        <View style={styles.approvalHint}>
-          <Feather name="shield" size={10} color={Colors.contentSecondary} />
-          <Text style={styles.approvalHintText}>Needs your approval</Text>
-        </View>
-      )}
-      <View style={styles.proposalButtons}>
-        <Pressable style={styles.confirmBtn} onPress={() => acceptInsightToAction(message.id)}>
-          <Text style={styles.confirmBtnText}>Set up goal</Text>
-        </Pressable>
-        <Pressable style={styles.dismissBtn} onPress={() => saveInsightMemoryOnly(message.id)}>
-          <Text style={styles.dismissBtnText}>Just remember</Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
 function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap: (s: string) => void }) {
   if (!suggestions || suggestions.length === 0) return null;
   return (
@@ -648,7 +591,7 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       </View>
 
       {!streaming && message.safetyTier && !(
-        message.safetyTier === 'actionable' && (message.insightToAction || message.goalProposal)
+        message.safetyTier === 'actionable' && message.goalProposal
       ) && (
         animate ? (
           <FadeInView delay={50} duration={250}>
@@ -677,16 +620,6 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
           <GoalProposalCard message={message} />
         )
       )}
-      {!streaming && message.insightToAction && (
-        animate ? (
-          <FadeInView delay={100} duration={300}>
-            <InsightToActionCard message={message} />
-          </FadeInView>
-        ) : (
-          <InsightToActionCard message={message} />
-        )
-      )}
-
       {!streaming && (
         animate ? (
           <SoftReveal delay={200}>

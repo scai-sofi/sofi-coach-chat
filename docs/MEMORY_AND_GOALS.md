@@ -186,7 +186,7 @@ Three user-configurable memory modes, set via Settings panel:
 **Pipeline enforcement:**
 - Demo mode: `generateAIResponse` receives empty memories when off; `autoSaveMemory` suppressed in off, converted to proposal in ask-first; memory chips filtered in off.
 - Live mode: `applyMemoryAndGoalActions` blocks entire memory block when off; converts all actions to proposals in ask-first. Memory strings sent as empty array when off.
-- Insight-to-action: `acceptInsightToAction` skips memory save but still creates goal when off; `saveInsightMemoryOnly` is no-op when off.
+- Draft goals: `acceptDraftGoal` activates a DRAFT goal regardless of memory mode; `dismissDraftGoal` removes it.
 
 ### Memory source types
 
@@ -248,8 +248,7 @@ The client determines how to present goal proposals based on what markers accomp
 
 | Markers present | UI pattern | Card type |
 |---|---|---|
-| `GOAL_PROPOSAL` + `MEMORY_PROPOSAL PRIORITIES` | Bundled — single card with both the priority memory and goal action | `insightToAction` |
-| `GOAL_PROPOSAL` alone | Standalone goal card | `goalProposal` |
+| `GOAL_PROPOSAL` (with or without `MEMORY_PROPOSAL PRIORITIES`) | DRAFT goal created in Goals Center; chat nudge sent | DRAFT goal in Goals Center |
 | `MEMORY_PROPOSAL` alone (no goal) | Memory proposal card | `memoryProposal` |
 
 ### Goal data model (implemented)
@@ -287,7 +286,7 @@ interface Milestone {
 
 | Action | How it works | Status |
 |---|---|---|
-| Create from conversation | AI detects goal intent → emits `[GOAL_PROPOSAL]` → shows Goal Proposal or InsightToAction card → member taps "Set up goal" | Implemented |
+| Create from conversation | AI detects goal intent → emits `[GOAL_PROPOSAL]` → creates DRAFT goal in Goals Center → member taps "Set up goal" in Suggested section | Implemented |
 | Goals Dashboard | Full-screen panel from chat header → progress rings, milestones, confidence scores | Implemented |
 | Goal cards | Circular progress ring, status pill (On Track / At Risk), monthly contribution, target date | Implemented |
 | Milestone tracking | Visual milestone markers (25%/50%/75%/100%) on goal cards | Implemented |
@@ -384,7 +383,7 @@ When applicable, Coach's response includes one of four patterns:
 | 3    | Actionable            | Integrated into card — shield icon + "Needs your approval" | Confidence threshold; disclaimer shown | Implemented |
 | 4    | Complex / high-stakes | Orange badge, "Handoff to advisor" | AI provides framing, explicitly hands off to human | Implemented |
 
-**Actionable tier behavior:** When an InsightToAction or GoalProposal card is present, the standalone actionable badge is suppressed — instead, a subtle "Needs your approval" label with a shield icon is shown inside the card above the action buttons. Other tiers always show as standalone badges.
+**Actionable tier behavior:** When a GoalProposal card is present, the standalone actionable badge is suppressed — instead, a subtle "Needs your approval" label with a shield icon is shown inside the card above the action buttons. DRAFT goals in the Goals Center also carry the actionable tier. Other tiers always show as standalone badges.
 
 ### Chat components (implemented)
 
@@ -456,8 +455,7 @@ Accessed via the chat header menu. Full-screen overlay panel.
   - Memory saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
   - Memory proposals → user confirms → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
   - Memory updates → find best match by category + content similarity → replace content
-  - Goal proposal + PRIORITIES memory proposal → bundled into `insightToAction` card
-  - Goal proposal alone → standalone `goalProposal` card
+  - Goal proposal (with or without PRIORITIES memory) → DRAFT goal in Goals Center + chat nudge
   - Duplicate detection: exact content match (case-insensitive) prevents re-saving
 
 ### Memory + goal flow
@@ -469,10 +467,9 @@ User message
   → Server parses all markers via parseMarkers()
   → Server returns memoryActions + goalActions arrays in response JSON
   → Client processes all actions via applyMemoryAndGoalActions()
-  → If PRIORITIES proposal + goal action: bundled into InsightToAction card
-  → If goal action alone: standalone GoalProposal card
+  → If goal action present: DRAFT goal created in Goals Center + chat nudge sent
   → Memory saves/updates applied immediately
-  → UI shows chips, proposal cards, goal cards, or insight-to-action cards
+  → UI shows chips, proposal cards, goal cards in Goals Center
 ```
 
 ### Demo mode behavior
@@ -500,11 +497,11 @@ The prototype includes 10 demo scenarios that collectively demonstrate every imp
 | 1 | Cold Start — First-Time Coach Intro | Memory cold start, seed questions, first memory save |
 | 2 | Returning Member — Personalized Session | Memory recall, context-aware responses, memory update |
 | 3 | Memory Lifecycle — Correction Flow | Memory save, proposal, update, correction |
-| 4 | Goal Discovery & Setup | Goal proposal from conversation, InsightToAction card |
+| 4 | Goal Discovery & Setup | Goal proposal from conversation, DRAFT goal in Goals Center |
 | 5 | Proactive Risk Alert — Goal at Risk | Goal-aware response, risk alert pattern, recovery options |
 | 6 | Milestone Celebration — Emergency Fund | Goal milestone, celebratory response, progress tracking |
 | 7 | Weekly Recap & Next Steps | Goal progress delta, next step pattern |
-| 8 | Cross-Product Orchestration | Multi-product allocation, InsightToAction card |
+| 8 | Cross-Product Orchestration | Multi-product allocation, DRAFT goal in Goals Center |
 | 9 | Tiered Safety Responses | All 4 safety tiers, provenance, handoff |
 | 10 | Free Chat — Live AI | Live GPT-4o-mini, real-time memory/goal detection |
 

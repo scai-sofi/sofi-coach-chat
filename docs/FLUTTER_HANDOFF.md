@@ -128,7 +128,7 @@ Message {
   chips?: MessageChip[]          // Status badges above AI content
   memoryProposal?: MemoryProposal
   goalProposal?: GoalProposal
-  insightToAction?: InsightToAction
+  // insightToAction — RETIRED in Task #12; goal proposals now create DRAFT goals in Goals Center
   autoSaveMemory?: AutoSaveMemory     // Auto-saved (no user prompt)
   autoCreateGoal?: AutoCreateGoal     // Auto-created goal
   autoUpdateGoal?: AutoUpdateGoal     // Auto-updated existing goal
@@ -179,22 +179,9 @@ GoalProposal {
 }
 ```
 
-### InsightToAction (combined memory + goal card)
+### InsightToAction — RETIRED (Task #12)
 
-Bundles a `PRIORITIES` memory and a goal proposal into a single user-facing action. This is the tightest coupling between the memory and goal systems — it fires when the AI detects both a declared priority and a goalable intent in the same message (e.g., "I want to build an emergency fund" → memory "Building an emergency fund is a top priority" + Emergency Fund goal proposal). The user can accept both, accept only the memory, or dismiss.
-
-Note: a single AI response can contain *both* an `autoSaveMemory` (e.g., saving a fact to `ABOUT_ME`) and an `insightToAction` (bundling a `PRIORITIES` memory with a goal). These are independent — the auto-save fires immediately, while the insight-to-action waits for user confirmation.
-
-```
-InsightToAction {
-  id: string
-  memory: { content: string, category: MemoryCategory, saved: boolean }
-  goalProposal: GoalProposal
-  dismissed: boolean
-  accepted?: boolean     // Both memory saved + goal created
-  memoryOnly?: boolean   // Only memory saved, goal declined
-}
-```
+> **Retired.** Goal proposals no longer bundle with inline cards in chat. Instead, the AI creates DRAFT goals directly in the Goals Center. A chat system nudge ("I've added a goal suggestion to your Goals panel") notifies the user. The user confirms or dismisses from the "Suggested" section in Goals Center. Memory proposals continue to work independently as `memoryProposal` on the message.
 
 ### Memory
 
@@ -326,8 +313,8 @@ CoachState {
 | `dismissMemoryProposal(msgId)` | Dismiss a memory proposal |
 | `confirmGoal(msgId)` | Accept a goal proposal inline card |
 | `dismissGoalProposal(msgId)` | Dismiss a goal proposal |
-| `acceptInsightToAction(msgId)` | Accept both memory + goal from insight card |
-| `saveInsightMemoryOnly(msgId)` | Save only the memory from insight card |
+| `acceptDraftGoal(goalId)` | Accept a DRAFT goal from Goals Center Suggested section |
+| `dismissDraftGoal(goalId)` | Dismiss a DRAFT goal from Goals Center |
 | `editMemory(id, content)` | Edit a memory's text |
 | `pauseMemory(id)` | Toggle memory between ACTIVE ↔ PAUSED |
 | `deleteMemory(id)` | Soft-delete a memory (status → DELETED) |
@@ -377,7 +364,7 @@ The API server is a separate Express application that proxies requests to OpenAI
 
 **Memory and goal actions** are parsed from AI markers (`[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`, `[GOAL_PROPOSAL]`) that appear after `[SUGGESTIONS]` in the raw AI output. The server strips these markers before returning the cleaned `reply`.
 
-When a `goalActions` entry arrives alongside a PRIORITIES-category `memoryActions` proposal, the client bundles them into an `insightToAction` card. When a goal action arrives alone, it becomes a standalone `goalProposal` card.
+When a `goalActions` entry arrives (with or without a PRIORITIES-category `memoryActions` proposal), the client creates a DRAFT goal in the Goals Center and sends a system nudge in chat. The InsightToAction inline card pattern has been retired (Task #12).
 
 **Constraints:**
 - `message` max length: 2000 characters

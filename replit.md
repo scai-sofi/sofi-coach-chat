@@ -26,7 +26,7 @@ The project is organized as a pnpm monorepo with an `api-server` (Express 5) and
 - **Model:** GPT-4o-mini via Replit AI Integrations proxy.
 - **System Prompt:** Dynamically constructed, including a base prompt, memory detection instructions, and user context.
 - **Memory System:** Live AI detection and saving of user context, with markers for auto-save (`[MEMORY_SAVE]`), proposals (`[MEMORY_PROPOSAL]`), and updates (`[MEMORY_UPDATE]`). Memories are categorized into 3 categories: `ABOUT_ME` (life facts, accounts, situation), `PREFERENCES` (communication style, risk tolerance), `PRIORITIES` (goals, focus areas). Memories can be confirmed or implicitly saved.
-- **Goal Proposal System:** Live AI-generated goal proposals via `[GOAL_PROPOSAL]` markers. When a PRIORITIES memory proposal and goal proposal arrive together, the client bundles them into an InsightToAction card. Goals can be `EMERGENCY_FUND`, `DEBT_PAYOFF`, `SAVINGS_TARGET`, or `CUSTOM`.
+- **Goal Proposal System:** Live AI-generated goal proposals via `[GOAL_PROPOSAL]` markers. Goal proposals create DRAFT goals in the Goals Center and send a system nudge in chat. Users confirm or dismiss from the "Suggested" section in Goals Center. Goals can be `EMERGENCY_FUND`, `DEBT_PAYOFF`, `SAVINGS_TARGET`, or `CUSTOM`.
 
 ### Streaming Architecture
 A dual-path streaming approach ensures compatibility across web (SSE) and native mobile (full response then word-by-word reveal). Both paths aim for a progressive text reveal with a shared drain animation.

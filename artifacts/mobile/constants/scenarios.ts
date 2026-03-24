@@ -129,7 +129,7 @@ function buildScenarios(): Scenario[] {
     {
       id: 'goal-discovery',
       title: 'Goal Discovery & Creation',
-      subtitle: 'Memory + goal created together from natural conversation',
+      subtitle: 'Suggested goal surfaces in Goals Center from natural conversation',
       icon: 'target',
       messages: [
         { id: uid(), role: 'user', content: 'I really need to pay off my credit card. The balance is about $4,200', timestamp: new Date(now.getTime() - 120000) },
@@ -138,26 +138,21 @@ function buildScenarios(): Scenario[] {
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
           autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
-          insightToAction: {
-            id: uid(),
-            memory: { content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES', saved: false },
-            goalProposal: {
-              id: uid(), type: 'DEBT_PAYOFF', title: 'Credit Card Payoff',
-              targetAmount: 4200, targetDate: daysFromNow(180),
-              monthlyContribution: 380, linkedAccount: 'SoFi Credit Card',
-            },
-            dismissed: false,
-          },
+          memoryProposal: { id: uid(), content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES' },
           safetyTier: 'actionable',
           safetyMessage: 'Actionable — needs your approval',
           suggestions: ['Set up Option A', 'Set up Option B', 'Help me prioritize my debts'],
         },
+        { id: uid(), role: 'system', content: "I've added a goal suggestion to your Goals panel — check it when you're ready.", timestamp: new Date(now.getTime() - 59000) },
       ],
       memories: [
         ...SHARED_MEMORIES.slice(0, 3),
         { id: 'mem-gd-1', category: 'ABOUT_ME', content: 'Has $4,200 credit card balance at 22.99% APR', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
       ],
-      goals: [{ ...EMERGENCY_FUND_GOAL }],
+      goals: [
+        { ...EMERGENCY_FUND_GOAL },
+        { id: 'draft-cc-payoff', type: 'DEBT_PAYOFF', title: 'Credit Card Payoff', targetAmount: 4200, currentAmount: 0, targetDate: daysFromNow(180), monthlyContributionTarget: 380, actualMonthlyContribution: 380, status: 'DRAFT', confidenceScore: 0.88, milestones: [{ id: 'dm1', label: '25%', targetPct: 25, reached: false }, { id: 'dm2', label: '50%', targetPct: 50, reached: false }, { id: 'dm3', label: '75%', targetPct: 75, reached: false }, { id: 'dm4', label: '100%', targetPct: 100, reached: false }], linkedAccount: 'SoFi Credit Card', createdAt: daysAgo(0) },
+      ],
     },
     {
       id: 'proactive-risk',

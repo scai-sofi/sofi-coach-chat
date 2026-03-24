@@ -19,7 +19,8 @@ import {
 } from '@/components/icons';
 
 export function ChatHeader() {
-  const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle } = useCoach();
+  const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle, goals } = useCoach();
+  const draftGoalCount = goals.filter(g => g.status === 'DRAFT').length;
   const [menuOpen, setMenuOpen] = useState(false);
   const headerHeight = useAppBarHeight();
 
@@ -58,6 +59,11 @@ export function ChatHeader() {
       label: 'Goals',
       icon: <GoalsMenuIcon size={24} color={Colors.contentPrimary} />,
       onPress: () => { setActivePanel('goals'); setMenuOpen(false); },
+      badge: draftGoalCount > 0 ? (
+        <View style={styles.goalsBadge}>
+          <Text style={styles.goalsBadgeText}>{draftGoalCount}</Text>
+        </View>
+      ) : undefined,
     },
     {
       label: 'Settings',
@@ -127,5 +133,21 @@ const styles = StyleSheet.create({
     color: Colors.contentBrand,
     lineHeight: 16,
     letterSpacing: 0.1,
+  },
+  goalsBadge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: Colors.contentBrand,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+    marginRight: 8,
+  },
+  goalsBadgeText: {
+    fontSize: 11,
+    fontFamily: Fonts.medium,
+    color: '#fff',
+    lineHeight: 14,
   },
 });

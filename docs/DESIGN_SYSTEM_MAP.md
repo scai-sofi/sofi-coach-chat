@@ -355,9 +355,9 @@ All proposal cards now share a unified visual language (normalized in Task #10).
 |---|---|---|---|---|---|---|---|
 | MemoryProposalCard | surfaceTint | 1px edgeLight | 16 | Feather `cpu` 14, secondary, bare | 13px Medium | — | Remember / Not now |
 | GoalProposalCard | surfaceTint | 1px edgeLight | 16 | Feather `target` 14, secondary, bare | 13px Medium | 12px Regular secondary | Set up goal / Just chatting |
-| InsightToActionCard | surfaceTint | 1px edgeLight | 16 | Feather `target` 14, secondary, bare | 13px Medium | 12px Regular secondary | Set up goal / Just remember |
 | Confirmed (check) | surfaceTint | 1px edgeLight | 16 | SVG checkmark 14×14, bone600 | 13px Medium (secondary or primary) | — | — |
-| Confirmed (memory only) | surfaceTint | 1px edgeLight | 16 | Feather `cpu` 14, secondary | 13px Medium secondary | — | — |
+
+> **Note:** InsightToActionCard has been retired (Task #12). Goal suggestions now surface as DRAFT goals in the Goals Center instead of inline cards in chat. The "Confirmed (memory only)" state is no longer used.
 
 **Shared proposal card spec:**
 
@@ -462,6 +462,51 @@ All proposal cards now share a unified visual language (normalized in Task #10).
 | Padding | horizontal 12, vertical 10 |
 | Margin top | 4px |
 | Text | 12px Regular, contentSecondary, lineHeight 16 |
+
+### 3.8 Suggested Goals Section (Goals Center)
+
+Added in Task #12. When the AI detects a goal opportunity, it creates a DRAFT goal in state and sends a chat nudge. DRAFT goals appear in the Goals Center's "Suggested" section above active goals.
+
+**Section Header:**
+
+| Property | Value |
+|---|---|
+| Layout | Row, gap 6, marginTop 4, marginBottom 4 |
+| Icon | Feather `star` 13, contentBrand |
+| Label | 13px Medium, contentBrand, lineHeight 18 |
+
+**Suggested Goal Card:**
+
+| Property | Value |
+|---|---|
+| Background | white (#fff) |
+| Border | 1px dashed, contentBrand |
+| Border radius | 20px |
+| Padding | 16px |
+| Gap | 12px |
+| Shadow | card-standard (same as GoalCard) |
+| Suggested badge | surfaceTint bg, radius 4, padding h8/v2, 10px Medium contentBrand uppercase, letterSpacing 0.6 |
+| Title | 15px Medium, contentPrimary (same as GoalCard) |
+| Type badge | Same as GoalCard typeBadge |
+| Detail text | 13px Regular, contentSecondary |
+| Confirm button | Black pill — bg contentPrimary, radius 9999, padding h12/v6, text 12px Medium white |
+| Dismiss button | Outlined pill — border 1px rgba(10,10,10,0.1), radius 9999, padding h12/v6, text 12px Medium contentSecondary |
+| Button row | Row, gap 8 |
+
+**Goals Menu Badge (ChatHeader):**
+
+| Property | Value |
+|---|---|
+| Size | min-width 18, height 18 |
+| Background | contentBrand |
+| Border radius | 9 (circle) |
+| Text | 11px Medium, white, lineHeight 14 |
+| Position | Between menu text and GoalsMenuIcon, marginRight 8 |
+| Visibility | Only shown when DRAFT goals exist |
+
+**Chat Nudge:**
+
+When a goal suggestion is queued, a system pill message appears: "I've added a goal suggestion to your Goals panel — check it when you're ready." Uses standard system pill pattern (surfaceTint bg, 13px Medium contentSecondary).
 
 ---
 
