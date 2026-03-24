@@ -121,7 +121,7 @@ The AI emits markers after `[SUGGESTIONS]` in its response. Markers are stripped
 - No marker if the information is already stored (deduplication)
 - Content must be concise (under 100 characters)
 
-### Memory data model (implemented)
+### Memory data model
 
 ```typescript
 type MemoryCategory = 'ABOUT_ME' | 'PREFERENCES' | 'PRIORITIES';
@@ -139,7 +139,7 @@ interface Memory {
 }
 ```
 
-### Memory privacy mode (implemented)
+### Memory privacy mode
 
 ```typescript
 type MemoryMode = 'full' | 'ask-first' | 'off';
@@ -173,23 +173,23 @@ Three user-configurable memory modes, set via Settings panel:
 | `IMPLICIT_CONFIRMED` | "AI inferred" | Auto-saved by AI, or proposal confirmed by user |
 | `EXPLICIT` | "You created" | Manually added by the member |
 
-### Memory lifecycle (implemented in prototype)
+### Memory lifecycle
 
-| Action | How it works | Status |
-|---|---|---|
-| Auto-save | AI detects a fact → saves immediately → shows "Saved to memory" chip inline → chip is tappable to navigate to Memory Center | Implemented |
-| Memory update | AI detects a correction → finds best-matching active memory by category + word overlap → replaces content → shows "Memory updated" chip | Implemented |
-| Implicit proposal | AI infers a preference → shows proposal card with [Remember] / [Not now] buttons | Implemented |
-| View all memories | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred" or "You created") and date | Implemented |
-| Search | Text search bar in Memory Center filters memories by content | Implemented |
-| Category filter | Filter chips with per-category counts; toggle to show only one category | Implemented |
-| Edit individual | Pencil icon on memory card → inline TextInput with Save/Cancel buttons and character counter (300 max) | Implemented |
-| Pause individual | Pause icon on memory card → toggles between ACTIVE/PAUSED → paused memories show "Paused · not used in chat" and render at 50% opacity → play icon to resume | Implemented |
-| Delete individual | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory | Implemented |
-| Chip tap-through | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation | Implemented |
-| Version history | Expandable row showing prior versions with timestamps | Not implemented |
-| Clear all memories | Global "Delete all" with confirmation dialog (dynamic count) in Memory Center | Implemented |
-| Per-category controls | Toggle per category, set retention window | Not implemented |
+| Action | How it works |
+|---|---|
+| Auto-save | AI detects a fact → saves immediately → shows "Saved to memory" chip inline → chip is tappable to navigate to Memory Center |
+| Memory update | AI detects a correction → finds best-matching active memory by category + word overlap → replaces content → shows "Memory updated" chip |
+| Implicit proposal | AI infers a preference → shows proposal card with [Remember] / [Not now] buttons |
+| View all memories | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred" or "You created") and date |
+| Search | Text search bar in Memory Center filters memories by content |
+| Category filter | Filter chips with per-category counts; toggle to show only one category |
+| Edit individual | Pencil icon on memory card → inline TextInput with Save/Cancel buttons and character counter (300 max) |
+| Pause individual | Pause icon on memory card → toggles between ACTIVE/PAUSED → paused memories show "Paused · not used in chat" and render at 50% opacity → play icon to resume |
+| Delete individual | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory |
+| Chip tap-through | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation |
+| Clear all memories | Global "Delete all" with confirmation dialog (dynamic count) in Memory Center |
+
+**Not yet implemented:** Version history (expandable row showing prior versions with timestamps), per-category controls (toggle per category, set retention window).
 
 ### Frequency & throttling
 
@@ -229,7 +229,7 @@ The client determines how to present goal proposals based on what markers accomp
 | `GOAL_PROPOSAL` (with or without `MEMORY_PROPOSAL PRIORITIES`) | DRAFT goal created in Goals Center; chat nudge sent | DRAFT goal in Goals Center |
 | `MEMORY_PROPOSAL` alone (no goal) | Memory proposal card | `memoryProposal` |
 
-### Goal data model (implemented)
+### Goal data model
 
 ```typescript
 type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CUSTOM';
@@ -260,18 +260,17 @@ interface Milestone {
 }
 ```
 
-### Goal lifecycle (implemented in prototype)
+### Goal lifecycle
 
-| Action | How it works | Status |
-|---|---|---|
-| Create from conversation | AI detects goal intent → emits `[GOAL_PROPOSAL]` → creates DRAFT goal in Goals Center → member taps "Set up goal" in Suggested section | Implemented |
-| Goals Dashboard | Full-screen panel from chat header → progress rings, milestones, confidence scores | Implemented |
-| Goal cards | Circular progress ring, status pill (On Track / At Risk), monthly contribution, target date | Implemented |
-| Milestone tracking | Visual milestone markers (25%/50%/75%/100%) on goal cards | Implemented |
-| Confidence scoring | Numeric score (0–100) with On Track / At Risk status | Implemented (display only — no live data) |
-| Create from Settings | Dedicated Goals section in app Settings | Not implemented |
-| Vault integration | Link Save Up goals to SoFi Banking Vault | Not implemented |
-| Scenario simulation | "What if I increase by $X/month?" projection | Not implemented |
+| Action | How it works |
+|---|---|
+| Create from conversation | AI detects goal intent → emits `[GOAL_PROPOSAL]` → creates DRAFT goal in Goals Center → member taps "Set up goal" in Suggested section |
+| Goals Dashboard | Full-screen panel from chat header → progress rings, milestones, confidence scores |
+| Goal cards | Circular progress ring, status pill (On Track / At Risk), monthly contribution, target date |
+| Milestone tracking | Visual milestone markers (25%/50%/75%/100%) on goal cards |
+| Confidence scoring | Numeric score (0–100) with On Track / At Risk status (display only — no live data) |
+
+**Not yet implemented:** Create from Settings (dedicated Goals section in app Settings), Vault integration (link Save Up goals to SoFi Banking Vault), scenario simulation ("What if I increase by $X/month?" projection).
 
 ---
 
@@ -354,16 +353,16 @@ When applicable, Coach's response includes one of four patterns:
 
 ### Response safety tiers
 
-| Tier | Type                  | Badge | Guardrail | Prototype status |
-| ---- | --------------------- | ----- | --------- | ---------------- |
-| 1    | Informational         | Grey badge, "Informational" | None — factual answers, balance lookups | Implemented |
-| 2    | Suggestive            | Grey badge, "Suggestion" | Data provenance included | Implemented |
-| 3    | Actionable            | Amber badge, "Actionable — needs your approval" | Confidence threshold; disclaimer shown | Implemented |
-| 4    | Complex / high-stakes | Blue badge, "Complex — human advisor recommended" | AI provides framing, explicitly hands off to human | Implemented |
+| Tier | Type                  | Badge | Guardrail |
+| ---- | --------------------- | ----- | --------- |
+| 1    | Informational         | Grey badge, "Informational" | None — factual answers, balance lookups |
+| 2    | Suggestive            | Grey badge, "Suggestion" | Data provenance included |
+| 3    | Actionable            | Amber badge, "Actionable — needs your approval" | Confidence threshold; disclaimer shown |
+| 4    | Complex / high-stakes | Blue badge, "Complex — human advisor recommended" | AI provides framing, explicitly hands off to human |
 
 **Actionable tier behavior:** When a GoalProposal card is present, the standalone actionable badge is suppressed — instead, a subtle "Needs your approval" label with a shield icon is shown inside the card above the action buttons. DRAFT goals in the Goals Center also carry the actionable tier. Other tiers always show as standalone badges.
 
-### Chat components (implemented)
+### Chat components
 
 | Component | Description |
 |---|---|
@@ -380,7 +379,7 @@ When applicable, Coach's response includes one of four patterns:
 | Confirmed state | SVG checkmark + summary text (e.g., "Saved to memory", "Goal created", "All set — saved to memory & goal created") |
 | Action footer | Copy (with SVG checkmark confirmation), thumbs up/down (PNG icons with `tintColor: contentBone600`), provenance toggle |
 
-### Memory Center (implemented)
+### Memory Center
 
 Accessed via the chat header menu. Full-screen overlay panel.
 
@@ -398,7 +397,7 @@ Accessed via the chat header menu. Full-screen overlay panel.
 | Highlight animation | When navigated from a chat chip, the target memory card briefly shows a border highlight that fades over 2 seconds |
 | Empty state | Message when no memories exist; "Clear filters" link when search/filter yields no results |
 
-### Goals Dashboard (implemented)
+### Goals Dashboard
 
 Accessed via the chat header menu. Full-screen overlay panel.
 
