@@ -24,8 +24,8 @@ function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: 
 function RadioSelected({ size = 24 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={11} stroke={Colors.contentBrand} strokeWidth={2} />
-      <Circle cx={12} cy={12} r={6} fill={Colors.contentBrand} />
+      <Circle cx={12} cy={12} r={11} stroke={Colors.contentPrimary} strokeWidth={2} />
+      <Circle cx={12} cy={12} r={6} fill={Colors.contentPrimary} />
     </Svg>
   );
 }
@@ -33,7 +33,7 @@ function RadioSelected({ size = 24 }: { size?: number }) {
 function RadioUnselected({ size = 24 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={11} stroke="#C4C3C2" strokeWidth={2} />
+      <Circle cx={12} cy={12} r={11} stroke="rgba(10,10,10,0.4)" strokeWidth={2} />
     </Svg>
   );
 }
@@ -183,7 +183,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     paddingHorizontal: 16,
-    overflow: 'hidden',
+    shadowColor: '#0A0A0A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(10,10,10,0.16)',
   },
   modeRow: {
     flexDirection: 'row',
@@ -194,7 +200,7 @@ const styles = StyleSheet.create({
   },
   modeRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(10,10,10,0.06)',
+    borderBottomColor: 'rgba(10,10,10,0.1)',
   },
   modeTextArea: {
     flex: 1,
