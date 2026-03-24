@@ -153,7 +153,7 @@ Three user-configurable memory modes, set via Settings panel:
 | `ask-first` | AI receives all active memories | All saves converted to proposals | User must explicitly confirm before any memory is persisted |
 | `off` | AI receives empty memory array | All saves/proposals/chips suppressed | No personalization; goals still tracked normally |
 
-**Settings panel:** Accessible from the overflow menu ("Settings" item with gear icon). Slide-in panel matching ChatHistory pattern. Three radio-style rows with label + description + checkmark for selected mode.
+**Settings panel:** Accessible from the overflow menu ("Settings" item with gear icon). Slide-in panel matching ChatHistory pattern. Three radio-style rows with label + description + radio button for selected mode.
 
 **Memory Center behavior in off mode:** Shows dedicated "Memory is off" empty state regardless of existing memories. Pause all / Delete all buttons hidden.
 
@@ -218,7 +218,7 @@ Three user-configurable memory modes, set via Settings panel:
 - Max 1 goal proposal per response
 - Numeric fields accept `$`, commas, and decimals (parser strips formatting)
 - `monthsUntilTarget` must be ≥ 1
-- `linkedAccount` is optional (can be empty string)
+- `linkedAccount` is required (server parser rejects proposals where `linkedAccount` is empty)
 
 ### Goal + memory bundling
 
@@ -357,7 +357,7 @@ When applicable, Coach's response includes one of four patterns:
 | Tier | Type                  | Badge | Guardrail | Prototype status |
 | ---- | --------------------- | ----- | --------- | ---------------- |
 | 1    | Informational         | Grey badge, "Informational" | None — factual answers, balance lookups | Implemented |
-| 2    | Suggestive            | Blue badge, "Suggestive" | Data provenance included | Implemented |
+| 2    | Suggestive            | Grey badge, "Suggestion" | Data provenance included | Implemented |
 | 3    | Actionable            | Integrated into card — shield icon + "Needs your approval" | Confidence threshold; disclaimer shown | Implemented |
 | 4    | Complex / high-stakes | Orange badge, "Handoff to advisor" | AI provides framing, explicitly hands off to human | Implemented |
 
@@ -458,7 +458,7 @@ Components follow a consistent theming pattern:
 ### Client side (`mobile/context/CoachContext.tsx`)
 
 - `VALID_MEMORY_CATEGORIES` Set mirrors the server-side validation
-- `shouldAllowProposal()` always returns true (no blocking conditions)
+- `shouldAllowProposal()` returns true unless memory mode is `off` (blocks all proposals when memory is disabled)
 - No cooldown — all memory and goal actions fire immediately
 - `applyMemoryAndGoalActions()` processes both memory and goal actions together:
   - Memory saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI

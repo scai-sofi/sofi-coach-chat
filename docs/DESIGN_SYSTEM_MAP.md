@@ -94,17 +94,17 @@ All previously hardcoded `rgba()` and hex values have been migrated to named tok
 
 | Token | Light Value | Dark Value | Pacific Ref | Usage |
 |---|---|---|---|---|
-| `surfaceToast` | `#0F0F0F` | `#2a2929` | `surfaceToast` / `bone950` | Toast background |
-| `toastAction` | `#32B7D9` | `#32B7D9` | — | Toast undo action text |
-| `shimmerBase` | `#c4a882` | `#8a7a65` | — | Typing shimmer base color |
-| `scrimBackdrop` | `rgba(0,0,0,0.35)` | `rgba(0,0,0,0.5)` | `surfaceScrim` | ScenarioSwitcher backdrop |
-| `scrimHeavy` | `rgba(0,0,0,0.4)` | `rgba(0,0,0,0.55)` | `surfaceScrim` | Delete-all overlay |
-| `shadowEdge` | `rgba(10,10,10,0.06)` | `rgba(250,248,245,0.06)` | — | Card border (ChatHistory) |
+| `surfaceToast` | `#0F0F0F` | `#3d3d3c` | `surfaceToast` / `bone950` | Toast background |
+| `toastAction` | `#32B7D9` | `#32b7d9` | — | Toast undo action text |
+| `shimmerBase` | `#c4a882` | `#8c6914` | — | Typing shimmer base color |
+| `scrimBackdrop` | `rgba(0,0,0,0.35)` | `rgba(0,0,0,0.55)` | `surfaceScrim` | ScenarioSwitcher backdrop |
+| `scrimHeavy` | `rgba(0,0,0,0.4)` | `rgba(0,0,0,0.65)` | `surfaceScrim` | Delete-all overlay |
+| `shadowEdge` | `rgba(10,10,10,0.06)` | `rgba(0,0,0,0.20)` | — | Card border (ChatHistory) |
 | `borderSubtle` | `rgba(10,10,10,0.08)` | `rgba(250,248,245,0.08)` | — | Memory card border |
-| `shadowColor` | `rgba(10,10,10,0.16)` | `rgba(0,0,0,0.3)` | `surfaceEdge` | Menu shadow, card shadow |
-| `borderMedium` | `rgba(10,10,10,0.2)` | `rgba(250,248,245,0.15)` | — | Edit cancel button border |
-| `inverseAlpha20` | `rgba(255,255,255,0.2)` | `rgba(255,255,255,0.2)` | — | Active scenario icon bg |
-| `inverseAlpha60` | `rgba(255,255,255,0.6)` | `rgba(255,255,255,0.6)` | — | Active scenario subtitle |
+| `shadowColor` | `rgba(10,10,10,0.16)` | `rgba(0,0,0,0.40)` | `surfaceEdge` | Menu shadow, card shadow |
+| `borderMedium` | `rgba(10,10,10,0.2)` | `rgba(250,248,245,0.20)` | — | Edit cancel button border |
+| `inverseAlpha20` | `rgba(255,255,255,0.2)` | `rgba(0,0,0,0.2)` | — | Active scenario icon bg |
+| `inverseAlpha60` | `rgba(255,255,255,0.6)` | `rgba(0,0,0,0.6)` | — | Active scenario subtitle |
 | `whiteOnDark` | `#ffffff` | `#ffffff` | — | Text on dark backgrounds |
 
 #### Alpha / Opacity Primitives
