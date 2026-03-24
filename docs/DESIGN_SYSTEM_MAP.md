@@ -34,7 +34,7 @@
 |---|---|---|---|---|
 | `contentPrimary` | `#1A1919` | `contentPrimaryDefault` | `bone850` | Primary text, active UI, dark fills |
 | `contentSecondary` | `#706F6E` | `contentSecondary` | `bone550` | Secondary text, inactive icons, meta text |
-| `contentBone600` | `#adacaa` | — (intentional one-off) | `bone400` (both modes) | User bubble bg, send button bg, cursor, action icon tint, suggestion pill border |
+| `contentBone600` | `#5c5b5a` / `#adacaa` | — (coach-chat-specific) | Light: `bone600`, Dark: `bone400` | User bubble bg, send button bg, cursor, action icon tint, suggestion pill border |
 | `contentStatusbar` | `#0A0A0A` | `contentStatusBar` | `bone1000` | Status bar tint |
 | `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` (`#dbdad7`, ❌ Δ25) | Empty state placeholder icons, drag handle |
 | `contentDimmed` | `#BDBBB9` | `contentDisabled2` | `bone350` ✓ | Edit character count, muted more-icon |
@@ -357,9 +357,9 @@ Global notification system via `ToastProvider`.
 | Pill padding | left 20, right 8, vertical 8 |
 | Input font | 16px Regular, contentPrimary, lineHeight 20 |
 | Placeholder | "Message", contentSecondary |
-| Cursor color | `contentBone600` (bone400 `#adacaa`) |
+| Cursor color | `contentBone600` (light: bone600 `#5c5b5a`, dark: bone400 `#adacaa`) |
 | Selection color | `rgba(92,91,90,0.3)` |
-| Send button | 32×32 circle, bg `contentBone600` (bone400 `#adacaa`), white arrow SVG 11.5×14.5 |
+| Send button | 32×32 circle, bg `contentBone600` (light: bone600 `#5c5b5a`, dark: bone400 `#adacaa`), white arrow SVG 11.5×14.5 |
 | Disclaimer | 11px Regular, contentSecondary, centered |
 
 ### 2.8 Search Bar
@@ -377,7 +377,7 @@ Shared `SearchBar` component (`components/SearchBar.tsx`) used in MemoryCenter a
 | Icon | Feather `search` size 16, `Colors.contentSecondary` |
 | Input font | 16px Regular, `Colors.contentPrimary`, lineHeight 20 |
 | Placeholder | "Search", `Colors.contentSecondary` |
-| Cursor color | `contentBone600` (bone400 `#adacaa`) |
+| Cursor color | `contentBone600` (light: bone600 `#5c5b5a`, dark: bone400 `#adacaa`) |
 | Selection color | `rgba(92,91,90,0.3)` |
 | Internal gap | 8px (between icon and input) |
 | Pill padding | horizontal 16 |
