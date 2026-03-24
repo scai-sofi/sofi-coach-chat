@@ -490,24 +490,55 @@ These are elements rendered inside AI message bubbles.
 | PNG icon-thumbs-up | 20×20 | — | Image | — | Action footer |
 | PNG icon-thumbs-down | 20×20 | — | Image | — | Action footer |
 
-### 4.4 Other Component Icons
+### 4.4 SettingsPanel Icons
+
+| Icon | Size | ViewBox | Style | Color | Usage |
+|---|---|---|---|---|---|
+| RadioSelected | 24×24 | 0 0 24 24 | Stroked (outer) + Filled (inner) | contentPrimary | Selected radio — outer ring r=9.5 sw=1, inner dot r=6 |
+| RadioUnselected | 24×24 | 0 0 24 24 | Stroked | contentSecondary | Unselected radio — outer ring r=9.5 sw=1 only |
+| ChevronLeftIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Back navigation |
+
+### 4.5 GoalsDashboard Icons
+
+| Icon | Size | ViewBox | Style | Color | Usage |
+|---|---|---|---|---|---|
+| ChevronLeftIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Back navigation |
+| ProgressRing | 72×72 (default) | SVG Circle | Stroked (sw=4) | varies by status | Goal progress ring (track: progressTrack) |
+| Feather check-circle | 10-12 | — | Feather | successDark / white | Milestone reached, completed status |
+| Feather trending-up | 12 | — | Feather | contentPrimary | On-track status |
+| Feather alert-triangle | 12 | — | Feather | dangerLight | At-risk status |
+| Feather target | 32 | — | Feather | contentMuted | Empty state |
+| Feather message-square | 13 | — | Feather | contentPrimary | "Ask about this goal" button |
+
+### 4.6 Other Component Icons
 
 | Icon | Size | Component | Style | Color |
 |---|---|---|---|---|
-| ChevronLeftIcon | 24×24 | GoalsDashboard, ChatHistory, SettingsPanel | Filled | contentPrimary |
+| ChevronLeftIcon | 24×24 | ChatHistory, SettingsPanel | Filled | contentPrimary |
 | NewChatIcon | 24×24 | ChatHistory | Filled | contentPrimary |
 | Arrow-left (scroll) | 14.5×11.5 | ScrollAnchor | Filled | `#1A1919` |
 | Arrow-up (send) | 11.5×14.5 | InputBar | Filled | white |
 | Feather search | 16 | ChatHistory | Feather | contentSecondary |
 | Feather x | 16 | ScenarioSwitcher | Feather | contentSecondary |
 | Feather check | 16 | ScenarioSwitcher | Feather | white |
-| Feather target | 32 | GoalsDashboard empty | Feather | contentMuted |
-| Feather check-circle | 10-12 | GoalsDashboard | Feather | varies |
-| Feather trending-up | 12 | GoalsDashboard | Feather | varies |
-| Feather alert-triangle | 12 | GoalsDashboard | Feather | varies |
-| Feather message-square | 13 | GoalsDashboard | Feather | contentPrimary |
+| Feather (scenario icons) | 14 | ScenarioSwitcher | Feather | contentPrimary / white |
 
-**Icon duplication note:** `ChevronLeftIcon` is defined independently in ChatHistory, GoalsDashboard, SettingsPanel, and MemoryCenter — all with the same SVG path. Should be extracted to a shared icon module.
+### 4.7 SVG Definition Location Index
+
+Every custom SVG icon definition and the file where it lives:
+
+| File | SVG Components Defined |
+|---|---|
+| `ChatHeader.tsx` | DemoIcon, CloseIcon, ClockIcon, MoreIcon, ChatNewIcon, MemoryMenuIcon, GoalsMenuIcon, PencilMenuIcon, SettingsMenuIcon, DeleteMenuIcon |
+| `MemoryCenter.tsx` | ChevronLeftIcon, SearchIcon, FilterIcon, PencilIcon, PauseIcon, PlayIcon, DeleteIcon, MoreIcon, PauseMenuIcon, PlayMenuIcon, DeleteMenuIcon |
+| `SettingsPanel.tsx` | ChevronLeftIcon, RadioSelected, RadioUnselected |
+| `GoalsDashboard.tsx` | ChevronLeftIcon, ProgressRing |
+| `ChatHistory.tsx` | ChevronLeftIcon, NewChatIcon |
+| `ScrollAnchor.tsx` | Arrow-left (inline) |
+| `InputBar.tsx` | Arrow-up (inline) |
+| `MessageBubble.tsx` | Checkmark (inline, 2 sizes) |
+
+**Icon duplication note:** `ChevronLeftIcon` is defined independently in 4 files (ChatHistory, GoalsDashboard, SettingsPanel, MemoryCenter) — all with identical SVG paths. `MoreIcon` is duplicated in ChatHeader and MemoryCenter. `DeleteMenuIcon` is duplicated in ChatHeader and MemoryCenter. All should be extracted to a shared icon module before Flutter migration.
 
 ---
 
@@ -633,3 +664,7 @@ View (overlay: absoluteFill, zIndex 100, justifyContent flex-end)
 
 ### Inline Component Inconsistencies
 - See Section 3.1 for the full list of inconsistencies between MemoryProposalCard, GoalProposalCard, and InsightToActionCard. These will be normalized in Task #10.
+
+---
+
+*Last updated: 2026-03-24. Derived from Expo prototype source code inspection. Update this document when components are modified or new patterns are introduced.*
