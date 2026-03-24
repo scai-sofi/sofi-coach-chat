@@ -217,7 +217,9 @@ Three user-configurable memory modes, set via Settings panel:
 - Emitted after `[SUGGESTIONS]`, same as memory markers
 - Max 1 goal proposal per response
 - Numeric fields accept `$`, commas, and decimals (parser strips formatting)
+- `targetAmount` must be > 0
 - `monthsUntilTarget` must be ≥ 1
+- `monthlyContribution` must be > 0
 - `linkedAccount` is required (server parser rejects proposals where `linkedAccount` is empty)
 
 ### Goal + memory bundling
@@ -488,10 +490,10 @@ Demo scenarios use pre-loaded canned conversations with pre-set memories and goa
 
 ## Control Hierarchy
 
-| Level               | Feature | Surface                 | Prototype status | Controls |
-| ------------------- | ------- | ----------------------- | ---------------- | -------- |
-| 3 — Item            | Memory  | Memory Center           | Implemented | Edit, pause/resume, delete with undo, search, category filter |
-| 2 — Global          | Memory  | Memory Center header    | Implemented | Pause all / resume all toggle, delete all with confirmation dialog |
+| Level               | Feature | Surface                 | Controls |
+| ------------------- | ------- | ----------------------- | -------- |
+| 3 — Item            | Memory  | Memory Center           | Edit, pause/resume, delete with undo, search, category filter |
+| 2 — Global          | Memory  | Memory Center header    | Pause all / resume all toggle, delete all with confirmation dialog |
 
 **Not yet implemented:** Per-category toggle, retention window settings, per-response "Don't use this" flag, global Goals on/off in Settings, proactive notification controls.
 
