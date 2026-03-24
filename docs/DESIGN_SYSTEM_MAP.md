@@ -633,7 +633,7 @@ When a goal suggestion is queued, a system pill message appears: "I've added a g
 | MemoryMenuIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | CPU/chip |
 | GoalsMenuIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Concentric circles (target) |
 | PencilMenuIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Pencil |
-| SettingsMenuIcon | 24×24 | 0 0 24 24 | Stroked (strokeWidth 2) | contentPrimary | Gear |
+| SettingsMenuIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Gear (6-tooth cog) |
 | DeleteMenuIcon (ChatHeader) | 24×24 | 0 0 24 24 | Filled | danger | Trash can |
 
 ### 4.2 MemoryCenter Icons
@@ -642,13 +642,13 @@ When a goal suggestion is queued, a system pill message appears: "I've added a g
 |---|---|---|---|---|---|
 | ChevronLeftIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Shared across panels |
 | Feather search | 16 | — | Feather | contentSecondary | SearchBar component (replaced custom SearchIcon SVG) |
-| FilterIcon | 16×16 | 0 0 16 16 | Stroked (1.25) | contentSecondary | 3 horizontal lines (in SearchBar component) |
+| FilterIcon | 16×16 | 0 0 16 16 | Filled | contentSecondary | 3 horizontal lines as filled rects (in SearchBar component) |
 | MoreIcon (MemoryCenter) | 20×20 | 0 0 20 20 | Filled | contentPrimary | Same SVG as ChatHeader |
 | PencilIcon (card action) | 13×13 | 0 0 13 13 | Filled | contentSecondary | Small pencil |
-| PauseIcon (card action) | ~8.6×13 | 0 0 9.83 12.17 | Stroked (1.5) | contentSecondary | Two bars |
-| PlayIcon (card action) | ~11×13 | 0 0 11 13 | Stroked (1.5) | contentSecondary | Triangle, 1.5px left offset |
+| PauseIcon (card action) | ~10×13 | 0 0 10 13 | Filled | contentSecondary | Two filled bars with rounded corners |
+| PlayIcon (card action) | ~11×13 | 0 0 11 13 | Filled | contentSecondary | Filled triangle, 1.5px left offset |
 | DeleteIcon (card action) | ~9.1×14.5 | 0 0 11.5 14.5 | Filled | danger | Small trash |
-| PauseMenuIcon | 24×24 | -4.5 -3 19 19 | Stroked (1.5) | contentPrimary | Same paths as PauseIcon, centered in 24×24 |
+| PauseMenuIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Two filled bars with rounded corners, centered in 24×24 |
 | PlayMenuIcon | 24×24 | 0 0 24 24 | Filled | contentPrimary | Solid triangle |
 | DeleteMenuIcon (MemoryCenter) | 24×24 | 0 0 24 24 | Filled | danger | Same SVG as ChatHeader DeleteMenuIcon |
 
@@ -837,7 +837,7 @@ View (overlay: absoluteFill, zIndex 100, justifyContent flex-end)
 
 ### Component Gaps
 - Search bar implementation differs slightly between MemoryCenter (1px border) and ChatHistory (0.75px border).
-- SettingsMenuIcon uses stroke style while all other menu icons use filled style.
+- All custom SVG icons now use filled style consistently, aligned with Pacific's icon conventions. Stroked SVGs are used only for component-level elements (radio buttons, progress rings, checkmarks) where stroked rendering is the standard pattern.
 
 ### Inline Component Inconsistencies
 - Resolved in Task #10. All proposal cards now share unified icon treatment (bare Feather), text sizes (13px body, 12px detail), button patterns (confirm pill + dismiss outlined pill), and spacing (gap 8, padding 12). See Section 3.1 for the normalized spec.
