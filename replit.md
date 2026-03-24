@@ -9,6 +9,7 @@ This project is a mobile app prototype for an AI financial coach, built with Rea
 - Approval required before major architectural changes or new external dependencies
 - Well-documented code for Flutter conversion (UI components, state management, styling)
 - Standard APIs only — cross-platform compatibility is critical
+- Skip Playwright e2e testing — do not run automated browser tests
 
 ## System Architecture
 
