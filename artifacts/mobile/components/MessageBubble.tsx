@@ -354,7 +354,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={14} color={Colors.contentSecondary} style={{ marginTop: 2 }} />
         <Text style={styles.proposalText}>
-          Want me to remember: <Text style={{ fontFamily: Fonts.italic }}>"{proposal.content}"</Text>?
+          Want me to remember: "{proposal.content}"?
         </Text>
       </View>
       <View style={[styles.proposalButtons, { marginLeft: 16 }]}>
