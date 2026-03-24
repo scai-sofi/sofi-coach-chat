@@ -32,6 +32,57 @@ This document covers two distinct but tightly interconnected features. They can 
 - Goal-aware responses draw on both. Coach's Next Step / Progress Delta / Risk Alert patterns require both memory (who this person is) and goal state (where they stand).
 - Neither requires the other to launch, but both are significantly weaker in isolation.
 
+### Memory + Goals integration — how it actually works
+
+The memory and goal systems share a single processing pipeline but serve distinct roles. Here's the concrete integration:
+
+**1. Shared marker pipeline**
+
+Every AI response passes through `parseMarkers()` on the server, which extracts both memory markers (`[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`) and goal markers (`[GOAL_PROPOSAL]`) in a single pass. The client receives both `memoryActions` and `goalActions` arrays in the same response payload and processes them together via `applyMemoryAndGoalActions()`.
+
+**2. Goals create PRIORITIES memories**
+
+When the AI proposes a goal, it typically also emits a `[MEMORY_SAVE]PRIORITIES|...` marker. This means accepting a goal also stores a PRIORITIES memory — giving Coach persistent knowledge of what the member is working toward. Example: a goal proposal for "Pay Off Credit Card — $4,200" also saves "Wants to pay off credit card debt by year-end" as a PRIORITIES memory.
+
+**3. Memories inform goal-aware responses**
+
+When the AI generates a response, the prompt includes both:
+- All active memories (who this person is, what they value, their financial situation)
+- All active goals (what they're working toward, current progress, confidence)
+
+This combination enables the four goal-aware response patterns:
+- **Next Step** — uses memory (financial context) + goal (specific target) to suggest an action
+- **Progress Delta** — uses goal state to show how a topic affects goal progress
+- **Risk Alert** — uses goal state + memory (spending patterns, income) to flag risks
+- **None** — topic is unrelated to any goal; no forced connection
+
+**4. Memory mode affects goals differently**
+
+| Memory mode | Memory behavior | Goal behavior |
+|---|---|---|
+| `full` | Auto-save + proposals enabled | Goals track normally; AI references goals in responses |
+| `ask-first` | All saves converted to proposals | Goals track normally; memory proposals require confirmation |
+| `off` | No memory reads or writes | Goals still tracked — `acceptDraftGoal` works regardless of memory mode |
+
+This asymmetry is intentional: a member might want goal tracking without broader personalization.
+
+**5. Lifecycle independence**
+
+Memories and goals have independent lifecycles:
+- Memories can be paused, edited, or deleted without affecting linked goals
+- Goals can be completed, paused, or dismissed without removing related memories
+- Deleting all memories does not delete goals (and vice versa)
+
+**6. UI surfaces**
+
+| Surface | Memory | Goals | Both |
+|---|---|---|---|
+| Chat inline | Proposal cards, saved/updated chips | Goal nudge (system pill) | AI responses draw on both |
+| Memory Center | Full CRUD for memories | — | PRIORITIES category shows goal-related memories |
+| Goals Dashboard | — | Full goal cards, milestones, progress | — |
+| Settings | Memory mode toggle | — | — |
+| Chat header menu | Memory Center entry | Goals Dashboard entry (with DRAFT badge) | — |
+
 ### Design principles
 
 - **Cumulative value** — Every conversation should make the next one more useful. The member should feel the difference within three sessions.
@@ -330,7 +381,7 @@ interface Milestone {
 - Coach recognizes the intent and asks structured follow-up: timeline, monthly capacity, current balance
 - Coach presents a Goal Proposal card: goal type, target amount, monthly contribution, estimated completion date, linked account
 - Member taps "Set up goal"; goal appears in Goals Dashboard with progress ring and milestones
-- When a PRIORITIES memory accompanies the goal, Coach bundles both into an Insight-to-Action card
+- A PRIORITIES memory is auto-saved alongside goal creation (e.g., "Wants to pay off credit card debt by year-end")
 
 ### 4. Goal-Aware Response in Conversation
 
@@ -367,7 +418,7 @@ When applicable, Coach's response includes one of four patterns:
 *Prototype status: Demonstrated via demo scenario "Cross-Product Orchestration"*
 
 - Member mentions a windfall or income change ("I just got a $3,000 bonus")
-- Coach identifies relevant products and presents a split-allocation Insight-to-Action card
+- Coach identifies relevant products and presents allocation recommendations
 - Member reviews and approves; Coach logs the decision as a memory and updates goal progress
 
 ---
@@ -395,7 +446,7 @@ When applicable, Coach's response includes one of four patterns:
 | "Saved to memory" chip | Tappable chip below AI message — navigates to Memory Center and highlights the memory |
 | "Memory updated" chip | Tappable chip — same navigation behavior as "Saved to memory" |
 | Goal proposal card | Goal type, target, monthly contribution, timeline, [Set up goal] / [Dismiss] |
-| Insight-to-Action card | Bundled PRIORITIES memory + goal proposal in single card, with [Set up goal] / [Just remember] / [Dismiss] |
+| Goal nudge (system pill) | System message notifying the user a DRAFT goal has been added to Goals Center |
 | Suggestion chips | Horizontally scrollable pills below AI response |
 | Safety tier badge | Color-coded pill above message text |
 | Approval hint | Shield icon + "Needs your approval" label inside actionable cards (replaces standalone badge) |
