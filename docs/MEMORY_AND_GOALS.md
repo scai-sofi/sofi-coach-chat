@@ -29,7 +29,7 @@ This document covers two distinct but tightly interconnected features. They can 
 
 Neither feature requires the other to launch, but both are significantly weaker in isolation. They share a single processing pipeline and reinforce each other at every layer:
 
-**Shared pipeline** — Every AI response passes through `parseMarkers()` on the server, which extracts both memory markers (`[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`) and goal markers (`[GOAL_PROPOSAL]`) in a single pass. The client receives `memoryActions` and `goalActions` in the same response payload and processes them together via `applyMemoryAndGoalActions()`.
+**Shared pipeline** — Memory and goal signals are detected and processed together in a single pass. Every AI response is scanned for both memory and goal markers at the same time, and the results are delivered to the client as one combined payload. This means a single Coach response can save a memory, propose a goal, and update an existing memory — all in one shot.
 
 **Goals create memories** — When the AI proposes a goal, it typically also emits a `[MEMORY_SAVE]PRIORITIES|...` marker. Accepting a goal stores a PRIORITIES memory alongside it — so Coach retains persistent knowledge of what the member is working toward. Example: a goal proposal for "Pay Off Credit Card — $4,200" also saves "Wants to pay off credit card debt by year-end" as a PRIORITIES memory.
 
