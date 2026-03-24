@@ -8,7 +8,7 @@
 
 ### 1.1 Color Palette
 
-> Source of truth: `pacific-color-mapper` skill (`.agents/skills/pacific-color-mapper/SKILL.md`). For alpha/opacity primitives (`rgba()` values), see `docs/PACIFIC_COLOR_TOKENS.md`. All mappings below are for the **Light** theme.
+> Source of truth: `pacific-color-mapper` skill (`.agents/skills/pacific-color-mapper/SKILL.md`). All mappings below are for the **Light** theme.
 
 #### Core Surface Tokens
 
@@ -105,7 +105,25 @@
 | `rgba(255,255,255,0.2)` | — (custom) | — | Active scenario icon bg |
 | `rgba(255,255,255,0.6)` | — (custom) | — | Active scenario subtitle |
 
-**Migration note:** Prototype hex values marked ❌ are Tailwind CSS colors, NOT Pacific primitives — they must be replaced with the Pacific hex values shown in parentheses during Flutter migration. Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens. See `docs/PACIFIC_COLOR_TOKENS.md` for alpha/opacity primitives (`rgba()` values).
+#### Alpha / Opacity Primitives
+
+These appear as `rgba()` in code. Pacific names them with suffixes like `010Pct`, `016Pct`, `050Pct`, etc.
+
+| Primitive | CSS Value | Common Semantic Tokens (Light) |
+|-----------|-----------|-------------------------------|
+| `bone100010Pct` | `rgba(10,10,10, 0.10)` | `strokeDividePrimary`, `strokeDivideSecondary`, `strokeEdge`, `strokeIndicatorDisabled`, `surfaceScrollHandle` |
+| `bone100016Pct` | `rgba(10,10,10, 0.16)` | `surfaceEdge`, `surfaceGhostDefaultEmphasized` |
+| `bone100020Pct` | `rgba(10,10,10, 0.20)` | `buttonNeutralDefaultDiminish` |
+| `bone100040Pct` | `rgba(10,10,10, 0.40)` | `strokeIndicatorUnselectedEmphasized` |
+| `bone100050Pct` | `rgba(10,10,10, 0.50)` | `surfaceScrim` |
+| `bone10004Pct` | `rgba(10,10,10, 0.04)` | `surfaceElevatedHover`, `surfaceIndicatorHover` |
+| `bone10007Pct` | `rgba(10,10,10, 0.07)` | `surfaceGhostDefault`, `buttonNeutralPressedDiminish` |
+| `bone10008Pct` | `rgba(10,10,10, 0.08)` | `surfaceElevatedPressed`, `surfaceIndicatorPressed` |
+| `bone030Pct` | `rgba(~bone, 0.03)` | `strokeIndicatorGhost` |
+
+**Key distinction — surfaceEdge:** Our prototype `surfaceEdge` = `rgba(10,10,10, 0.10)` → maps to `strokeDividePrimary` (`bone100010Pct`). Pacific's `surfaceEdge` = `rgba(10,10,10, 0.16)` → `bone100016Pct` (heavier). Flutter must use the correct Pacific semantic token based on intent, not our prototype name.
+
+**Migration note:** Prototype hex values marked ❌ are Tailwind CSS colors, NOT Pacific primitives — they must be replaced with the Pacific hex values shown in parentheses during Flutter migration. Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens.
 
 ### 1.2 Typography
 

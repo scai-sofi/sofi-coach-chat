@@ -50,7 +50,7 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **Animations:** GPU-accelerated animations for streaming entrance, block fade-in, typing indicator shimmer, and dropdowns.
 - **Design System Map:** `docs/DESIGN_SYSTEM_MAP.md` — comprehensive inventory of all tokens, components, icons, and patterns, mapped to Pacific design system equivalents for Flutter migration.
 - **Pacific Color Mapper Skill:** `.agents/skills/pacific-color-mapper/SKILL.md` — authoritative hex lookup for all 181 Pacific semantic tokens, full primitive hex scales, CSS/TypeScript bootstrap, Figma MCP workflow. Source of truth for all Pacific color lookups.
-- **Migration Guide:** `docs/PACIFIC_COLOR_TOKENS.md` — maps every `colors.ts` prototype value to the correct Pacific token with delta scores and Tailwind flags. Also documents alpha/opacity tokens not in the mapper. Several prototype colors (success/warning/info) used Tailwind CSS hex values, NOT Pacific — see migration map.
+- **Color Migration:** All prototype→Pacific mappings (with Tailwind flags), alpha/opacity primitives, and the surfaceEdge distinction are in `docs/DESIGN_SYSTEM_MAP.md` §1.1. Several prototype colors (success/warning/info) used Tailwind CSS hex values, NOT Pacific.
 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.

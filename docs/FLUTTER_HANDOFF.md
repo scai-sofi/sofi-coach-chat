@@ -887,7 +887,7 @@ Slide-in from right (same animation pattern as ChatHistory). Accessible from ove
 
 ### Color Palette
 
-**Full Pacific reference:** `.agents/skills/pacific-color-mapper/SKILL.md` — all 181 semantic tokens, primitive hex scales, hex reverse-lookup. **Alpha/opacity tokens:** `docs/PACIFIC_COLOR_TOKENS.md`. **Component-level usage context:** `docs/DESIGN_SYSTEM_MAP.md` §1.1.
+**Full Pacific reference:** `.agents/skills/pacific-color-mapper/SKILL.md` — all 181 semantic tokens, primitive hex scales, hex reverse-lookup. **Component-level usage context + alpha/opacity primitives:** `docs/DESIGN_SYSTEM_MAP.md` §1.1.
 
 **⚠ Several prototype hex values below are Tailwind CSS approximations, NOT Pacific primitives.** The Pacific column shows the correct production value.
 
