@@ -8,7 +8,7 @@
 
 ### 1.1 Color Palette
 
-> Source of truth: `pacific-color-mapper` skill (`.agents/skills/pacific-color-mapper/SKILL.md`). For the complete migration map with delta scores, see `docs/PACIFIC_COLOR_TOKENS.md`. All mappings below are for the **Light** theme.
+> Source of truth: `pacific-color-mapper` skill (`.agents/skills/pacific-color-mapper/SKILL.md`). For alpha/opacity primitives (`rgba()` values), see `docs/PACIFIC_COLOR_TOKENS.md`. All mappings below are for the **Light** theme.
 
 #### Core Surface Tokens
 
@@ -105,7 +105,7 @@
 | `rgba(255,255,255,0.2)` | — (custom) | — | Active scenario icon bg |
 | `rgba(255,255,255,0.6)` | — (custom) | — | Active scenario subtitle |
 
-**Migration note:** Prototype hex values marked ❌ are Tailwind CSS colors, NOT Pacific primitives — they must be replaced with the Pacific hex values shown in parentheses during Flutter migration. Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens. See `docs/PACIFIC_COLOR_TOKENS.md` for the full delta-scored migration map and alpha/opacity token reference.
+**Migration note:** Prototype hex values marked ❌ are Tailwind CSS colors, NOT Pacific primitives — they must be replaced with the Pacific hex values shown in parentheses during Flutter migration. Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens. See `docs/PACIFIC_COLOR_TOKENS.md` for alpha/opacity primitives (`rgba()` values).
 
 ### 1.2 Typography
 
