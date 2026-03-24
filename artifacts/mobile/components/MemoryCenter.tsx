@@ -1,38 +1,14 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { useToast } from '@/components/Toast';
 import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory } from '@/constants/types';
-
-function GpuIcon({ size = 18, color = Colors.contentPrimary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M9 2C9 1.44772 9.44772 1 10 1C10.5523 1 11 1.44772 11 2V4H13V2C13 1.44772 13.4477 1 14 1C14.5523 1 15 1.44772 15 2V4H18C19.1046 4 20 4.89543 20 6V9H22C22.5523 9 23 9.44772 23 10C23 10.5523 22.5523 11 22 11H20V13H22C22.5523 13 23 13.4477 23 14C23 14.5523 22.5523 15 22 15H20V18C20 19.1046 19.1046 20 18 20H15V22C15 22.5523 14.5523 23 14 23C13.4477 23 13 22.5523 13 22V20H11V22C11 22.5523 10.5523 23 10 23C9.44772 23 9 22.5523 9 22V20H6C4.89543 20 4 19.1046 4 18V15H2C1.44772 15 1 14.5523 1 14C1 13.4477 1.44772 13 2 13H4V11H2C1.44772 11 1 10.5523 1 10C1 9.44772 1.44772 9 2 9H4V6C4 4.89543 4.89543 4 6 4H9V2ZM6 6H18V18H6V6ZM9 9H15V15H9V9ZM11 11V13H13V11H11Z"
-        fill={color}
-      />
-    </Svg>
-  );
-}
-
-function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M16.7071 3.29289C17.0976 3.68342 17.0976 4.31658 16.7071 4.70711L9.41421 12L16.7071 19.2929C17.0976 19.6834 17.0976 20.3166 16.7071 20.7071C16.3166 21.0976 15.6834 21.0976 15.2929 20.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L15.2929 3.29289C15.6834 2.90237 16.3166 2.90237 16.7071 3.29289Z"
-        fill={color}
-      />
-    </Svg>
-  );
-}
+import { AppBar, useAppBarHeight } from '@/components/AppBar';
+import { OverflowMenu } from '@/components/OverflowMenu';
+import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
 
 function SearchIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
   return (
@@ -227,73 +203,9 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   );
 }
 
-function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
-      <Path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10Z"
-        fill={color}
-      />
-      <Path
-        d="M7 10C7 10.6904 6.44036 11.25 5.75 11.25C5.05964 11.25 4.5 10.6904 4.5 10C4.5 9.30964 5.05964 8.75 5.75 8.75C6.44036 8.75 7 9.30964 7 10Z"
-        fill={color}
-      />
-      <Path
-        d="M11.25 10C11.25 10.6904 10.6904 11.25 10 11.25C9.30964 11.25 8.75 10.6904 8.75 10C8.75 9.30964 9.30964 8.75 10 8.75C10.6904 8.75 11.25 9.30964 11.25 10Z"
-        fill={color}
-      />
-      <Path
-        d="M15.5 10C15.5 10.6904 14.9404 11.25 14.25 11.25C13.5596 11.25 13 10.6904 13 10C13 9.30964 13.5596 8.75 14.25 8.75C14.9404 8.75 15.5 9.30964 15.5 10Z"
-        fill={color}
-      />
-    </Svg>
-  );
-}
-
-function PauseMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="-4.5 -3 19 19" fill="none">
-      <Path
-        d="M8.41667 0.75H7.08333C6.71514 0.75 6.41667 1.04848 6.41667 1.41667V10.75C6.41667 11.1182 6.71514 11.4167 7.08333 11.4167H8.41667C8.78486 11.4167 9.08333 11.1182 9.08333 10.75V1.41667C9.08333 1.04848 8.78486 0.75 8.41667 0.75Z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
-      />
-      <Path
-        d="M2.75 0.75H1.41667C1.04848 0.75 0.75 1.04848 0.75 1.41667V10.75C0.75 11.1182 1.04848 11.4167 1.41667 11.4167H2.75C3.11819 11.4167 3.41667 11.1182 3.41667 10.75V1.41667C3.41667 1.04848 3.11819 0.75 2.75 0.75Z"
-        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
-function PlayMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M6 4.83167C6 3.94839 6.96725 3.40832 7.72111 3.89137L19.0711 11.0597C19.7889 11.5196 19.7889 12.5804 19.0711 13.0403L7.72111 20.2086C6.96725 20.6917 6 20.1516 6 19.2683V4.83167Z"
-        fill={color}
-      />
-    </Svg>
-  );
-}
-
-function DeleteMenuIcon({ size = 24, color = Colors.danger }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8 4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V5H19C19.5523 5 20 5.44772 20 6C20 6.55228 19.5523 7 19 7H5C4.44772 7 4 6.55228 4 6C4 5.44772 4.44772 5 5 5H8V4ZM10 5H14V4H10V5ZM6 7.99699C6.55228 7.99699 7 8.44471 7 8.99699V18C7 19.1046 7.89543 20 9 20H15C16.1046 20 17 19.1046 17 18V8.99699C17 8.44471 17.4477 7.99699 18 7.99699C18.5523 7.99699 19 8.44471 19 8.99699V18C19 20.2091 17.2091 22 15 22H9C6.79086 22 5 20.2091 5 18V8.99699C5 8.44471 5.44772 7.99699 6 7.99699ZM10 9C10.5523 9 11 9.44772 11 10V17C11 17.5523 10.5523 18 10 18C9.44772 18 9 17.5523 9 17V10C9 9.44772 9.44772 9 10 9ZM14 9C14.5523 9 15 9.44772 15 10V17C15 17.5523 14.5523 18 14 18C13.4477 18 13 17.5523 13 17V10C13 9.44772 13.4477 9 14 9Z"
-        fill={color}
-      />
-    </Svg>
-  );
-}
-
 export function MemoryCenter() {
-  const insets = useSafeAreaInsets();
   const { memories, memoryMode, setActivePanel, pauseAllMemories, deleteAllMemories, highlightedMemoryId } = useCoach();
+  const headerHeight = useAppBarHeight();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
@@ -346,67 +258,50 @@ export function MemoryCenter() {
 
   return (
     <View style={styles.panel}>
-      <View style={[styles.appBar, { paddingTop: insets.top }]}>
-        <View style={styles.titleBar}>
-          <View style={styles.leftControls}>
-            <Pressable style={styles.iconBtn} onPress={() => setActivePanel('none')} hitSlop={8}>
-              <ChevronLeftIcon size={24} color={Colors.contentPrimary} />
-            </Pressable>
-          </View>
-          <View style={styles.titleArea}>
-            <Text style={styles.titleText} numberOfLines={1}>Coach memory</Text>
-          </View>
-          <View style={styles.rightControls}>
-            {memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' && (
-              <Pressable style={styles.iconBtn} onPress={() => setShowMoreMenu(!showMoreMenu)} hitSlop={8}>
-                <MoreIcon size={20} color={showMoreMenu ? '#BDBBB9' : Colors.contentPrimary} />
-              </Pressable>
-            )}
-          </View>
-        </View>
-      </View>
+      <AppBar
+        variant="back"
+        title="Coach memory"
+        onBack={() => setActivePanel('none')}
+        rightAction={memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' ? {
+          icon: <MoreIcon size={20} color={showMoreMenu ? Colors.contentDimmed : Colors.contentPrimary} />,
+          onPress: () => setShowMoreMenu(!showMoreMenu),
+        } : undefined}
+      />
 
-      {showMoreMenu && (
-        <View style={styles.menuOverlay}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMoreMenu(false)} />
-          <View style={[styles.menuPositioner, { paddingTop: insets.top + 44 }]}>
-            <View style={styles.menuShadow}>
-              <View style={styles.menuInner}>
-                <Pressable
-                  style={styles.menuItem}
-                  onPress={() => {
-                    const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
-                    const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
-                    const allPaused = activeCount === 0 && pausedCount > 0;
-                    pauseAllMemories();
-                    setShowMoreMenu(false);
-                    showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
-                  }}
-                >
-                  <Text style={styles.menuText}>
-                    {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
-                      ? 'Resume all'
-                      : 'Pause all'}
-                  </Text>
-                  {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
-                    ? <PlayMenuIcon size={24} color={Colors.contentPrimary} />
-                    : <PauseMenuIcon size={24} color={Colors.contentPrimary} />}
-                </Pressable>
-                <Pressable
-                  style={styles.menuItemLast}
-                  onPress={() => {
-                    setShowMoreMenu(false);
-                    setShowDeleteConfirm(true);
-                  }}
-                >
-                  <Text style={[styles.menuText, { color: Colors.danger }]}>Delete all</Text>
-                  <DeleteMenuIcon size={24} color={Colors.danger} />
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </View>
-      )}
+      {showMoreMenu && (() => {
+        const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
+        const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
+        const allPaused = activeCount === 0 && pausedCount > 0;
+        return (
+          <OverflowMenu
+            items={[
+              {
+                label: allPaused ? 'Resume all' : 'Pause all',
+                icon: allPaused
+                  ? <PlayMenuIcon size={24} color={Colors.contentPrimary} />
+                  : <PauseMenuIcon size={24} color={Colors.contentPrimary} />,
+                onPress: () => {
+                  pauseAllMemories();
+                  setShowMoreMenu(false);
+                  showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
+                },
+              },
+              {
+                label: 'Delete all',
+                icon: <DeleteMenuIcon size={24} color={Colors.danger} />,
+                onPress: () => {
+                  setShowMoreMenu(false);
+                  setShowDeleteConfirm(true);
+                },
+                danger: true,
+              },
+            ]}
+            topOffset={headerHeight}
+            onClose={() => setShowMoreMenu(false)}
+            zIndex={150}
+          />
+        );
+      })()}
 
       {showDeleteConfirm && (
         <View style={styles.confirmOverlay}>
@@ -522,98 +417,6 @@ export function MemoryCenter() {
 
 const styles = StyleSheet.create({
   panel: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.surfaceBase, zIndex: 100 },
-  appBar: { backgroundColor: Colors.surfaceBase },
-  titleBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 44,
-  },
-  leftControls: {
-    width: 100,
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 16,
-    paddingRight: 4,
-  },
-  titleArea: {
-    flex: 1,
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  titleText: {
-    fontSize: 16,
-    fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  rightControls: {
-    width: 100,
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingRight: 16,
-  },
-  menuOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 150,
-  },
-  menuPositioner: {
-    alignItems: 'flex-end',
-    paddingRight: 16,
-  },
-  menuShadow: {
-    width: 212,
-    borderRadius: 20,
-    shadowColor: 'rgba(10,10,10,0.16)',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  menuInner: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingVertical: 2,
-    paddingHorizontal: 16,
-    overflow: 'hidden',
-  },
-  menuItem: {
-    height: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 0.75,
-    borderBottomColor: 'rgba(10,10,10,0.1)',
-  },
-  menuItemLast: {
-    height: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  menuText: {
-    fontSize: 16,
-    fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
-    lineHeight: 20,
-    flex: 1,
-  },
-  iconBtn: {
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   searchSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -739,7 +542,7 @@ const styles = StyleSheet.create({
   editCharCount: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: '#BDBBB9',
+    color: Colors.contentDimmed,
     lineHeight: 20,
   },
   editButtonGroup: {
@@ -748,13 +551,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   editSaveBtn: {
-    backgroundColor: '#00A2C7',
+    backgroundColor: Colors.contentBrand,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   editSaveText: {
-    color: '#FFFFFF',
+    color: Colors.surfaceElevated,
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
@@ -781,7 +584,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   confirmCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     padding: 24,
     gap: 12,
@@ -826,7 +629,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   confirmDeleteText: {
-    color: '#FFFFFF',
+    color: Colors.surfaceElevated,
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,

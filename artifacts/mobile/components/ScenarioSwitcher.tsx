@@ -8,6 +8,7 @@ import Colors from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
+import { AppBar } from '@/components/AppBar';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
@@ -76,12 +77,14 @@ export function ScenarioSwitcher() {
             <View style={styles.handle} />
           </View>
 
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Experience Demos</Text>
-            <Pressable style={styles.closeBtn} onPress={dismiss} hitSlop={8}>
-              <Feather name="x" size={16} color={Colors.contentSecondary} />
-            </Pressable>
-          </View>
+          <AppBar
+            variant="sheet"
+            title="Experience Demos"
+            rightAction={{
+              icon: <Feather name="x" size={16} color={Colors.contentSecondary} />,
+              onPress: dismiss,
+            }}
+          />
 
           <ScrollView
             style={styles.content}
@@ -154,23 +157,6 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: Colors.contentMuted,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
-    lineHeight: 20,
-  },
-  closeBtn: {
-    padding: 4,
-    borderRadius: 9999,
   },
   content: {
     flexGrow: 0,

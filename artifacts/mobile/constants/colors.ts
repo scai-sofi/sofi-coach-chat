@@ -10,6 +10,7 @@ export default {
   contentBone600: '#5C5B5A',
   contentStatusbar: '#0a0a0a',
   contentMuted: '#d0ccc5',
+  contentDimmed: '#BDBBB9',
   danger: '#fa2d25',
   dangerLight: '#ef4444',
   dangerChipText: '#dc2626',
