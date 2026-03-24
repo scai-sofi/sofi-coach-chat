@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { View, FlatList, StyleSheet, Keyboard, Pressable, Platform, UIManager, NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { useCoach } from '@/context/CoachContext';
 import { ChatHeader } from '@/components/ChatHeader';
 import { MessageBubble } from '@/components/MessageBubble';
@@ -25,6 +25,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const SCROLL_THRESHOLD = 120;
 
 export default function ChatScreen() {
+  const { colors } = useTheme();
   const { messages, isTyping, activePanel, activeScenario, setActivePanel } = useCoach();
   const listRef = useRef<FlatList>(null);
   const prevMsgCount = useRef(messages.length);
@@ -206,7 +207,7 @@ export default function ChatScreen() {
   ), [messages.length, isTyping]);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.surfaceBase }]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior="padding"
@@ -287,7 +288,6 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: Colors.surfaceBase,
   },
   flex: { flex: 1 },
   chatContent: {

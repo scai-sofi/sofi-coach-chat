@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 
 export interface OverflowMenuItem {
@@ -19,21 +19,22 @@ interface OverflowMenuProps {
 }
 
 export function OverflowMenu({ items, topOffset, onClose, zIndex = 50 }: OverflowMenuProps) {
+  const { colors } = useTheme();
   return (
     <View style={[styles.menuOverlay, { zIndex }]}>
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       <View style={[styles.menuPositioner, { paddingTop: topOffset }]}>
-        <View style={styles.menuShadow}>
-          <View style={styles.menuInner}>
+        <View style={[styles.menuShadow, { shadowColor: colors.shadowColor }]}>
+          <View style={[styles.menuInner, { backgroundColor: colors.surfaceElevated }]}>
             {items.map((item, index) => {
               const isLast = index === items.length - 1;
               return (
                 <Pressable
                   key={index}
-                  style={isLast ? styles.menuItemLast : styles.menuItem}
+                  style={isLast ? styles.menuItemLast : [styles.menuItem, { borderBottomColor: colors.surfaceEdge }]}
                   onPress={item.onPress}
                 >
-                  <Text style={[styles.menuText, item.danger && { color: Colors.danger }]}>{item.label}</Text>
+                  <Text style={[styles.menuText, { color: colors.contentPrimary }, item.danger && { color: colors.danger }]}>{item.label}</Text>
                   {item.badge}
                   {item.icon}
                 </Pressable>
@@ -61,14 +62,12 @@ const styles = StyleSheet.create({
   menuShadow: {
     width: 212,
     borderRadius: 20,
-    shadowColor: 'rgba(10,10,10,0.16)',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 1,
     shadowRadius: 16,
     elevation: 8,
   },
   menuInner: {
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     paddingVertical: 2,
     paddingHorizontal: 16,
@@ -80,7 +79,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 0.75,
-    borderBottomColor: Colors.surfaceEdge,
   },
   menuItemLast: {
     height: 48,
@@ -91,7 +89,6 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     lineHeight: 20,
     flex: 1,
   },

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { ChatSession } from '@/context/CoachContext';
@@ -35,6 +35,7 @@ const SLIDE_DURATION = 300;
 const SLIDE_EASING = Easing.bezier(0.4, 0, 0.2, 1);
 
 export function ChatHistory({ onClose }: { onClose: () => void }) {
+  const { colors } = useTheme();
   const { chatHistory, loadSession, saveAndClose } = useCoach();
   const [search, setSearch] = useState('');
 
@@ -77,13 +78,13 @@ export function ChatHistory({ onClose }: { onClose: () => void }) {
   const groups = useMemo(() => groupByMonth(filtered), [filtered]);
 
   return (
-    <Animated.View style={[styles.container, animStyle]}>
+    <Animated.View style={[styles.container, { backgroundColor: colors.surfaceBase }, animStyle]}>
       <AppBar
         variant="back"
         title="Chat history"
         onBack={handleClose}
         rightAction={{
-          icon: <ChatNewIcon size={24} color={Colors.contentPrimary} />,
+          icon: <ChatNewIcon size={24} color={colors.contentPrimary} />,
           onPress: handleNewChat,
         }}
       />
@@ -93,21 +94,21 @@ export function ChatHistory({ onClose }: { onClose: () => void }) {
       <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
         {groups.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No chat history yet</Text>
+            <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>No chat history yet</Text>
           </View>
         ) : (
           groups.map(group => (
             <View key={group.label} style={styles.group}>
-              <Text style={styles.groupLabel}>{group.label}</Text>
-              <View style={styles.card}>
+              <Text style={[styles.groupLabel, { color: colors.contentSecondary }]}>{group.label}</Text>
+              <View style={[styles.card, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdgeLight }]}>
                 {group.sessions.map((session, idx) => (
                   <View key={session.id}>
-                    {idx > 0 && <View style={styles.divider} />}
+                    {idx > 0 && <View style={[styles.divider, { backgroundColor: colors.surfaceEdgeLight }]} />}
                     <Pressable
                       style={styles.sessionRow}
                       onPress={() => handleLoadSession(session.id)}
                     >
-                      <Text style={styles.sessionTitle} numberOfLines={1}>{session.title}</Text>
+                      <Text style={[styles.sessionTitle, { color: colors.contentPrimary }]} numberOfLines={1}>{session.title}</Text>
                     </Pressable>
                   </View>
                 ))}
@@ -123,7 +124,6 @@ export function ChatHistory({ onClose }: { onClose: () => void }) {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.surfaceBase,
   },
   scrollArea: {
     flex: 1,
@@ -138,16 +138,13 @@ const styles = StyleSheet.create({
   groupLabel: {
     fontSize: 13,
     fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
     lineHeight: 18,
     marginBottom: 8,
     marginTop: 8,
   },
   card: {
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 16,
     borderWidth: 0.75,
-    borderColor: Colors.surfaceEdgeLight,
   },
   sessionRow: {
     paddingHorizontal: 16,
@@ -158,13 +155,11 @@ const styles = StyleSheet.create({
   sessionTitle: {
     fontSize: 16,
     fontFamily: Fonts.regular,
-    color: Colors.contentPrimary,
     lineHeight: 20,
     flex: 1,
   },
   divider: {
     height: 0.75,
-    backgroundColor: Colors.surfaceEdgeLight,
     marginHorizontal: 16,
   },
   emptyState: {
@@ -174,7 +169,6 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontFamily: Fonts.regular,
-    color: Colors.contentSecondary,
     lineHeight: 20,
   },
 });

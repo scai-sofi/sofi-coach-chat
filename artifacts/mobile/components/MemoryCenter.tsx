@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { useToast } from '@/components/Toast';
@@ -11,7 +11,7 @@ import { OverflowMenu } from '@/components/OverflowMenu';
 import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
 import { SearchBar } from '@/components/SearchBar';
 
-function PencilIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PencilIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 13 13" fill="none">
       <Path
@@ -24,7 +24,7 @@ function PencilIcon({ size = 13, color = Colors.contentSecondary }: { size?: num
   );
 }
 
-function PauseIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PauseIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
   const w = size * (9.83333 / 12.1667);
   return (
     <Svg width={w} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
@@ -40,7 +40,7 @@ function PauseIcon({ size = 13, color = Colors.contentSecondary }: { size?: numb
   );
 }
 
-function PlayIcon({ size = 13, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function PlayIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
   const w = size * (11 / 13);
   return (
     <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingLeft: 1.5 }}>
@@ -54,7 +54,7 @@ function PlayIcon({ size = 13, color = Colors.contentSecondary }: { size?: numbe
   );
 }
 
-function DeleteIcon({ size = 14.5, color = Colors.danger }: { size?: number; color?: string }) {
+function DeleteIcon({ size = 14.5, color = '#fa2d25' }: { size?: number; color?: string }) {
   const aspect = 11.5 / 14.5;
   return (
     <Svg width={size * aspect} height={size} viewBox="0 0 11.5 14.5" fill="none">
@@ -75,6 +75,7 @@ function DeleteIcon({ size = 14.5, color = Colors.danger }: { size?: number; col
 }
 
 function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEditStart?: (y: number) => void; highlighted?: boolean }) {
+  const { colors } = useTheme();
   const { editMemory, pauseMemory, deleteMemory, restoreMemory } = useCoach();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
@@ -118,11 +119,16 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   };
 
   return (
-    <RNAnimated.View ref={cardRef} style={[styles.memCard, memory.status === 'PAUSED' && { opacity: 0.5 }, highlighted && { borderColor: highlightAnim.interpolate({ inputRange: [0, 1], outputRange: ['transparent', Colors.contentPrimary] }), borderWidth: 1.5 }]}>
+    <RNAnimated.View ref={cardRef} style={[
+      styles.memCard,
+      { backgroundColor: colors.surfaceElevated, borderColor: colors.borderSubtle, shadowColor: colors.shadowEdge },
+      memory.status === 'PAUSED' && { opacity: 0.5 },
+      highlighted && { borderColor: highlightAnim.interpolate({ inputRange: [0, 1], outputRange: ['transparent', colors.contentPrimary] }), borderWidth: 1.5 },
+    ]}>
       {editing ? (
         <>
           <TextInput
-            style={styles.editInput}
+            style={[styles.editInput, { color: colors.contentPrimary }]}
             value={editText}
             onChangeText={(t) => { if (t.length <= MAX_CHARS) setEditText(t); }}
             multiline
@@ -132,27 +138,27 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
             scrollEnabled={false}
           />
           <View style={styles.editToolRow}>
-            <Text style={styles.editCharCount}>{editText.length}/{MAX_CHARS}</Text>
+            <Text style={[styles.editCharCount, { color: colors.contentDimmed }]}>{editText.length}/{MAX_CHARS}</Text>
             <View style={styles.editButtonGroup}>
-              <Pressable style={styles.editSaveBtn} onPress={handleSave}>
-                <Text style={styles.editSaveText}>Save</Text>
+              <Pressable style={[styles.editSaveBtn, { backgroundColor: colors.contentBrand }]} onPress={handleSave}>
+                <Text style={[styles.editSaveText, { color: colors.whiteOnDark }]}>Save</Text>
               </Pressable>
-              <Pressable style={styles.editCancelBtn} onPress={handleCancel}>
-                <Text style={styles.editCancelText}>Cancel</Text>
+              <Pressable style={[styles.editCancelBtn, { borderColor: colors.borderMedium }]} onPress={handleCancel}>
+                <Text style={[styles.editCancelText, { color: colors.contentPrimary }]}>Cancel</Text>
               </Pressable>
             </View>
           </View>
         </>
       ) : (
         <>
-          <Text style={styles.memContent}>{memory.content}</Text>
+          <Text style={[styles.memContent, { color: colors.contentPrimary }]}>{memory.content}</Text>
           <View style={styles.memMeta}>
-            <Text style={styles.memMetaText}>
+            <Text style={[styles.memMetaText, { color: colors.contentSecondary }]}>
               {memory.status === 'PAUSED' ? 'Paused · not used in chat' : `${sourceLabel} · ${dateLabel}`}
             </Text>
             <View style={styles.memActions}>
               <Pressable style={styles.memActionBtn} onPress={handleEdit}>
-                <PencilIcon />
+                <PencilIcon color={colors.contentSecondary} />
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => {
                 const wasPaused = memory.status === 'PAUSED';
@@ -163,9 +169,9 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
                 });
               }}>
                 {memory.status === 'PAUSED' ? (
-                  <PlayIcon />
+                  <PlayIcon color={colors.contentSecondary} />
                 ) : (
-                  <PauseIcon />
+                  <PauseIcon color={colors.contentSecondary} />
                 )}
               </Pressable>
               <Pressable style={styles.memActionBtn} onPress={() => {
@@ -175,7 +181,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
                   action: { label: 'Undo', onPress: () => restoreMemory(memory.id) },
                 });
               }}>
-                <DeleteIcon />
+                <DeleteIcon color={colors.danger} />
               </Pressable>
             </View>
           </View>
@@ -186,6 +192,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
 }
 
 export function MemoryCenter() {
+  const { colors } = useTheme();
   const { memories, memoryMode, setActivePanel, pauseAllMemories, deleteAllMemories, highlightedMemoryId } = useCoach();
   const headerHeight = useAppBarHeight();
   const [search, setSearch] = useState('');
@@ -239,13 +246,13 @@ export function MemoryCenter() {
   }, []);
 
   return (
-    <View style={styles.panel}>
+    <View style={[styles.panel, { backgroundColor: colors.surfaceBase }]}>
       <AppBar
         variant="back"
         title="Coach memory"
         onBack={() => setActivePanel('none')}
         rightAction={memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' ? {
-          icon: <MoreIcon size={20} color={showMoreMenu ? Colors.contentDimmed : Colors.contentPrimary} />,
+          icon: <MoreIcon size={20} color={showMoreMenu ? colors.contentDimmed : colors.contentPrimary} />,
           onPress: () => setShowMoreMenu(!showMoreMenu),
         } : undefined}
       />
@@ -260,8 +267,8 @@ export function MemoryCenter() {
               {
                 label: allPaused ? 'Resume all' : 'Pause all',
                 icon: allPaused
-                  ? <PlayMenuIcon size={24} color={Colors.contentPrimary} />
-                  : <PauseMenuIcon size={24} color={Colors.contentPrimary} />,
+                  ? <PlayMenuIcon size={24} color={colors.contentPrimary} />
+                  : <PauseMenuIcon size={24} color={colors.contentPrimary} />,
                 onPress: () => {
                   pauseAllMemories();
                   setShowMoreMenu(false);
@@ -270,7 +277,7 @@ export function MemoryCenter() {
               },
               {
                 label: 'Delete all',
-                icon: <DeleteMenuIcon size={24} color={Colors.danger} />,
+                icon: <DeleteMenuIcon size={24} color={colors.danger} />,
                 onPress: () => {
                   setShowMoreMenu(false);
                   setShowDeleteConfirm(true);
@@ -286,22 +293,22 @@ export function MemoryCenter() {
       })()}
 
       {showDeleteConfirm && (
-        <View style={styles.confirmOverlay}>
-          <View style={styles.confirmCard}>
-            <Text style={styles.confirmTitle}>Delete all memories?</Text>
-            <Text style={styles.confirmDesc}>
+        <View style={[styles.confirmOverlay, { backgroundColor: colors.scrimHeavy }]}>
+          <View style={[styles.confirmCard, { backgroundColor: colors.surfaceElevated }]}>
+            <Text style={[styles.confirmTitle, { color: colors.contentPrimary }]}>Delete all memories?</Text>
+            <Text style={[styles.confirmDesc, { color: colors.contentSecondary }]}>
               {`This can't be undone. ${memories.filter(m => m.status !== 'DELETED').length} ${memories.filter(m => m.status !== 'DELETED').length === 1 ? 'memory' : 'memories'} will be permanently deleted.`}
             </Text>
             <View style={styles.confirmActions}>
-              <Pressable style={styles.confirmCancelBtn} onPress={() => setShowDeleteConfirm(false)}>
-                <Text style={styles.confirmCancelText}>Cancel</Text>
+              <Pressable style={[styles.confirmCancelBtn, { borderColor: colors.borderMedium }]} onPress={() => setShowDeleteConfirm(false)}>
+                <Text style={[styles.confirmCancelText, { color: colors.contentPrimary }]}>Cancel</Text>
               </Pressable>
-              <Pressable style={styles.confirmDeleteBtn} onPress={() => {
+              <Pressable style={[styles.confirmDeleteBtn, { backgroundColor: colors.danger }]} onPress={() => {
                 deleteAllMemories();
                 setShowDeleteConfirm(false);
                 showToast({ message: 'All memories deleted.' });
               }}>
-                <Text style={styles.confirmDeleteText}>Delete all</Text>
+                <Text style={[styles.confirmDeleteText, { color: colors.whiteOnDark }]}>Delete all</Text>
               </Pressable>
             </View>
           </View>
@@ -326,13 +333,13 @@ export function MemoryCenter() {
             {MEMORY_CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => (
               <Pressable
                 key={cat}
-                style={[styles.filterChip, filterCat === cat && styles.filterChipActive]}
+                style={[styles.filterChip, { backgroundColor: colors.surfaceTint }, filterCat === cat && { backgroundColor: colors.contentPrimary }]}
                 onPress={() => setFilterCat(filterCat === cat ? null : cat)}
               >
-                <Text style={[styles.filterChipText, filterCat === cat && { color: '#fff' }]}>
+                <Text style={[styles.filterChipText, { color: colors.contentSecondary }, filterCat === cat && { color: colors.contentPrimaryInverse }]}>
                   {MEMORY_CATEGORY_LABELS[cat]}
                 </Text>
-                <Text style={[styles.filterCount, filterCat === cat && { color: 'rgba(255,255,255,0.6)' }]}>
+                <Text style={[styles.filterCount, { color: colors.contentSecondary }, filterCat === cat && { color: colors.inverseAlpha60 }]}>
                   {catCounts[cat] || 0}
                 </Text>
               </Pressable>
@@ -350,19 +357,19 @@ export function MemoryCenter() {
         >
           {memoryMode === 'off' ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyTitle}>Memory is off</Text>
-              <Text style={styles.emptyText}>
+              <Text style={[styles.emptyTitle, { color: colors.contentPrimary }]}>Memory is off</Text>
+              <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
                 The coach won't save or use memories while memory is turned off. You can change this in Settings.
               </Text>
             </View>
           ) : visibleMemories.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyText}>
+              <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
                 {search || filterCat ? 'No memories match your search' : 'No memories yet. The coach will start learning as you chat.'}
               </Text>
               {(search || filterCat) && (
                 <Pressable onPress={() => { setSearch(''); setFilterCat(null); }}>
-                  <Text style={styles.clearFilters}>Clear filters</Text>
+                  <Text style={[styles.clearFilters, { color: colors.contentPrimary }]}>Clear filters</Text>
                 </Pressable>
               )}
             </View>
@@ -371,7 +378,7 @@ export function MemoryCenter() {
               <View key={cat}>
                 {!filterCat && (
                   <View style={[styles.subHeader, idx === 0 && { paddingTop: 12 }]}>
-                    <Text style={styles.subHeaderText}>{MEMORY_CATEGORY_LABELS[cat as MemoryCategory]}</Text>
+                    <Text style={[styles.subHeaderText, { color: colors.contentSecondary }]}>{MEMORY_CATEGORY_LABELS[cat as MemoryCategory]}</Text>
                   </View>
                 )}
                 <View style={styles.cardGroup}>
@@ -387,7 +394,7 @@ export function MemoryCenter() {
 }
 
 const styles = StyleSheet.create({
-  panel: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.surfaceBase, zIndex: 100 },
+  panel: { ...StyleSheet.absoluteFillObject, zIndex: 100 },
   filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 40 },
   filterRowContent: { flexDirection: 'row', gap: 6 },
   filterChip: {
@@ -397,11 +404,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 9999,
-    backgroundColor: Colors.surfaceTint,
   },
-  filterChipActive: { backgroundColor: Colors.contentPrimary },
-  filterChipText: { fontSize: 12, fontFamily: Fonts.medium, color: Colors.contentSecondary },
-  filterCount: { fontSize: 11, color: 'rgba(112,111,110,0.6)' },
+  filterChipText: { fontSize: 12, fontFamily: Fonts.medium },
+  filterCount: { fontSize: 11 },
   content: { flex: 1 },
   contentInner: { paddingHorizontal: 16, paddingBottom: 40 },
   subHeader: {
@@ -412,20 +417,16 @@ const styles = StyleSheet.create({
   subHeaderText: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
     lineHeight: 20,
   },
   cardGroup: {
     gap: 12,
   },
   memCard: {
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     padding: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.08)',
-    shadowColor: 'rgba(10,10,10,0.06)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
     shadowRadius: 8,
@@ -433,7 +434,6 @@ const styles = StyleSheet.create({
   },
   memContent: {
     fontSize: 16,
-    color: Colors.contentPrimary,
     fontFamily: Fonts.regular,
     lineHeight: 20,
   },
@@ -445,7 +445,6 @@ const styles = StyleSheet.create({
   memMetaText: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
     lineHeight: 20,
   },
   memActions: {
@@ -461,7 +460,6 @@ const styles = StyleSheet.create({
   },
   editInput: {
     fontSize: 16,
-    color: Colors.contentPrimary,
     fontFamily: Fonts.regular,
     lineHeight: 20,
     padding: 0,
@@ -478,7 +476,6 @@ const styles = StyleSheet.create({
   editCharCount: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.contentDimmed,
     lineHeight: 20,
   },
   editButtonGroup: {
@@ -487,40 +484,34 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   editSaveBtn: {
-    backgroundColor: Colors.contentBrand,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   editSaveText: {
-    color: Colors.surfaceElevated,
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
   },
   editCancelBtn: {
     borderWidth: 1.5,
-    borderColor: 'rgba(10,10,10,0.2)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   editCancelText: {
-    color: Colors.contentPrimary,
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
   },
   confirmOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     zIndex: 200,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
   },
   confirmCard: {
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     padding: 24,
     gap: 12,
@@ -530,13 +521,11 @@ const styles = StyleSheet.create({
   confirmTitle: {
     fontSize: 18,
     fontFamily: Fonts.bold,
-    color: Colors.contentPrimary,
     lineHeight: 24,
   },
   confirmDesc: {
     fontSize: 14,
     fontFamily: Fonts.regular,
-    color: Colors.contentSecondary,
     lineHeight: 20,
   },
   confirmActions: {
@@ -547,25 +536,21 @@ const styles = StyleSheet.create({
   },
   confirmCancelBtn: {
     borderWidth: 1.5,
-    borderColor: 'rgba(10,10,10,0.2)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   confirmCancelText: {
-    color: Colors.contentPrimary,
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
   },
   confirmDeleteBtn: {
-    backgroundColor: Colors.danger,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   confirmDeleteText: {
-    color: Colors.surfaceElevated,
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
@@ -574,15 +559,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     lineHeight: 20,
   },
   emptyText: {
     fontSize: 14,
-    color: Colors.contentSecondary,
     fontFamily: Fonts.regular,
     textAlign: 'center',
     maxWidth: 260,
   },
-  clearFilters: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary },
+  clearFilters: { fontSize: 13, fontFamily: Fonts.medium },
 });

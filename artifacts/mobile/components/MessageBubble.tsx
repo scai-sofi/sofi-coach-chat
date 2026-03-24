@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, ComponentProps } from 'react';
 import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
+import type { AppTheme } from '@/constants/theme';
 import { Fonts } from '@/constants/fonts';
 import { Message, MessageChip, SafetyTier } from '@/constants/types';
 import { useCoach } from '@/context/CoachContext';
@@ -10,22 +11,26 @@ import { useToast } from '@/components/Toast';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
-const CHIP_STYLES: Record<string, { bg: string; color: string; icon: FeatherIconName }> = {
-  'memory-saved': { bg: Colors.surfaceTint, color: Colors.contentPrimary, icon: 'cpu' },
-  'memory-updated': { bg: Colors.surfaceTint, color: Colors.contentPrimary, icon: 'cpu' },
-  'goal-progress': { bg: Colors.surfaceTint, color: Colors.contentPrimary, icon: 'target' },
-  'goal-risk': { bg: Colors.dangerChipBg, color: Colors.dangerChipText, icon: 'alert-triangle' },
-  'milestone': { bg: Colors.successBg, color: Colors.successDark, icon: 'star' },
-  'handoff': { bg: Colors.infoBg, color: Colors.info, icon: 'arrow-up-right' },
-  'alert': { bg: Colors.dangerChipBg, color: Colors.dangerChipText, icon: 'alert-triangle' },
-};
+function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string; icon: FeatherIconName }> {
+  return {
+    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
+    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
+    'goal-progress': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
+    'goal-risk': { bg: c.dangerChipBg, color: c.dangerChipText, icon: 'alert-triangle' },
+    'milestone': { bg: c.successBg, color: c.successDark, icon: 'star' },
+    'handoff': { bg: c.infoBg, color: c.info, icon: 'arrow-up-right' },
+    'alert': { bg: c.dangerChipBg, color: c.dangerChipText, icon: 'alert-triangle' },
+  };
+}
 
-const SAFETY_STYLES: Record<SafetyTier, { bg: string; color: string; icon: FeatherIconName; text: string }> = {
-  informational: { bg: Colors.surfaceMuted, color: Colors.contentSecondary, icon: 'shield', text: 'Informational' },
-  suggestive: { bg: Colors.surfaceMuted, color: Colors.contentSecondary, icon: 'shield', text: 'Suggestion' },
-  actionable: { bg: Colors.warningBg, color: Colors.warning, icon: 'shield', text: 'Actionable — needs your approval' },
-  handoff: { bg: Colors.infoBg, color: Colors.info, icon: 'arrow-up-right', text: 'Complex — human advisor recommended' },
-};
+function getSafetyStyles(c: AppTheme): Record<SafetyTier, { bg: string; color: string; icon: FeatherIconName; text: string }> {
+  return {
+    informational: { bg: c.surfaceMuted, color: c.contentSecondary, icon: 'shield', text: 'Informational' },
+    suggestive: { bg: c.surfaceMuted, color: c.contentSecondary, icon: 'shield', text: 'Suggestion' },
+    actionable: { bg: c.warningBg, color: c.warning, icon: 'shield', text: 'Actionable — needs your approval' },
+    handoff: { bg: c.infoBg, color: c.info, icon: 'arrow-up-right', text: 'Complex — human advisor recommended' },
+  };
+}
 
 type ContentBlock =
   | { type: 'text'; text: string; paragraphGap: boolean }
@@ -217,28 +222,32 @@ function formatInlineStyles(text: string): React.ReactNode[] {
 }
 
 function BlockDivider() {
-  return <View style={styles.divider} />;
+  const { colors } = useTheme();
+  return <View style={[styles.divider, { backgroundColor: colors.surfaceEdge }]} />;
 }
 
 function TextBlock({ block }: { block: Extract<ContentBlock, { type: 'text' }> }) {
+  const { colors } = useTheme();
   return (
-    <Text style={[styles.aiText, block.paragraphGap && { marginTop: 8 }]}>
+    <Text style={[styles.aiText, { color: colors.contentPrimary }, block.paragraphGap && { marginTop: 8 }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
 }
 
 function BulletBlock({ block }: { block: Extract<ContentBlock, { type: 'bullet' }> }) {
+  const { colors } = useTheme();
   return (
-    <Text style={[styles.aiText, styles.bulletText, block.paragraphGap && { marginTop: 8 }]}>
+    <Text style={[styles.aiText, styles.bulletText, { color: colors.contentPrimary }, block.paragraphGap && { marginTop: 8 }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
 }
 
 function HeaderBlock({ block }: { block: Extract<ContentBlock, { type: 'header' }> }) {
+  const { colors } = useTheme();
   return (
-    <Text style={[styles.aiText, styles.headerText]}>
+    <Text style={[styles.aiText, styles.headerText, { color: colors.contentPrimary }]}>
       {formatInlineStyles(block.text)}
     </Text>
   );
@@ -265,7 +274,9 @@ function renderContent(content: string): React.ReactNode[] {
 }
 
 function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: boolean }) {
-  const style = CHIP_STYLES[chip.type] || CHIP_STYLES['memory-saved'];
+  const { colors } = useTheme();
+  const chipStyles = getChipStyles(colors);
+  const style = chipStyles[chip.type] || chipStyles['memory-saved'];
   const { memories, navigateToMemory } = useCoach();
   const { showToast } = useToast();
 
@@ -324,7 +335,9 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
 }
 
 function SafetyBadge({ tier }: { tier: SafetyTier }) {
-  const style = SAFETY_STYLES[tier];
+  const { colors } = useTheme();
+  const safetyStyles = getSafetyStyles(colors);
+  const style = safetyStyles[tier];
   return (
     <View style={[styles.safetyBadge, { backgroundColor: style.bg }]}>
       <Feather name={style.icon} size={10} color={style.color} />
@@ -334,35 +347,36 @@ function SafetyBadge({ tier }: { tier: SafetyTier }) {
 }
 
 function MemoryProposalCard({ message }: { message: Message }) {
+  const { colors } = useTheme();
   const { confirmMemory, dismissMemoryProposal } = useCoach();
   const proposal = message.memoryProposal;
   if (!proposal) return null;
 
   if (proposal.confirmed) {
     return (
-      <View style={[styles.proposalCard, styles.confirmedCard]}>
+      <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
         <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-          <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
-        <Text style={styles.confirmedText}>Saved to memory</Text>
+        <Text style={[styles.confirmedText, { color: colors.contentSecondary }]}>Saved to memory</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.proposalCard}>
+    <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={14} color={Colors.contentSecondary} style={styles.proposalIcon} />
-        <Text style={styles.proposalText}>
+        <Feather name="cpu" size={14} color={colors.contentSecondary} style={styles.proposalIcon} />
+        <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
       </View>
       <View style={styles.proposalButtonsIndented}>
-        <Pressable style={styles.confirmBtn} onPress={() => confirmMemory(message.id)}>
-          <Text style={styles.confirmBtnText}>Remember</Text>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemory(message.id)}>
+          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Remember</Text>
         </Pressable>
-        <Pressable style={styles.dismissBtn} onPress={() => dismissMemoryProposal(message.id)}>
-          <Text style={styles.dismissBtnText}>Not now</Text>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryProposal(message.id)}>
+          <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
     </View>
@@ -370,17 +384,18 @@ function MemoryProposalCard({ message }: { message: Message }) {
 }
 
 function GoalProposalCard({ message }: { message: Message }) {
+  const { colors } = useTheme();
   const { confirmGoal, dismissGoalProposal } = useCoach();
   const proposal = message.goalProposal;
   if (!proposal) return null;
 
   if (proposal.confirmed) {
     return (
-      <View style={[styles.proposalCard, styles.confirmedCard]}>
+      <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
         <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-          <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
-        <Text style={styles.confirmedTextPrimary}>Goal created — check your goals panel</Text>
+        <Text style={[styles.confirmedTextPrimary, { color: colors.contentPrimary }]}>Goal created — check your goals panel</Text>
       </View>
     );
   }
@@ -388,28 +403,28 @@ function GoalProposalCard({ message }: { message: Message }) {
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const showApproval = message.safetyTier === 'actionable';
   return (
-    <View style={styles.proposalCard}>
+    <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="target" size={14} color={Colors.contentSecondary} style={styles.proposalIcon} />
+        <Feather name="target" size={14} color={colors.contentSecondary} style={styles.proposalIcon} />
         <View style={styles.proposalContentWrap}>
-          <Text style={styles.proposalText}>{proposal.title}</Text>
-          <Text style={styles.proposalDetail}>
+          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>{proposal.title}</Text>
+          <Text style={[styles.proposalDetail, { color: colors.contentSecondary }]}>
             Target: ${proposal.targetAmount.toLocaleString()} · ${proposal.monthlyContribution}/mo · {monthStr} · Linked: {proposal.linkedAccount}
           </Text>
         </View>
       </View>
       {showApproval && (
         <View style={styles.approvalHint}>
-          <Feather name="shield" size={10} color={Colors.contentSecondary} />
-          <Text style={styles.approvalHintText}>Needs your approval</Text>
+          <Feather name="shield" size={10} color={colors.contentSecondary} />
+          <Text style={[styles.approvalHintText, { color: colors.contentSecondary }]}>Needs your approval</Text>
         </View>
       )}
       <View style={styles.proposalButtons}>
-        <Pressable style={styles.confirmBtn} onPress={() => confirmGoal(message.id)}>
-          <Text style={styles.confirmBtnText}>Set up goal</Text>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmGoal(message.id)}>
+          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
         </Pressable>
-        <Pressable style={styles.dismissBtn} onPress={() => dismissGoalProposal(message.id)}>
-          <Text style={styles.dismissBtnText}>Just chatting</Text>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissGoalProposal(message.id)}>
+          <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Just chatting</Text>
         </Pressable>
       </View>
     </View>
@@ -417,12 +432,13 @@ function GoalProposalCard({ message }: { message: Message }) {
 }
 
 function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap: (s: string) => void }) {
+  const { colors } = useTheme();
   if (!suggestions || suggestions.length === 0) return null;
   return (
     <View style={styles.suggestions}>
       {suggestions.slice(0, 3).map((s, i) => (
-        <Pressable key={i} style={styles.suggestionPill} onPress={() => { Keyboard.dismiss(); onTap(s); }}>
-          <Text style={styles.suggestionText} numberOfLines={1}>{s}</Text>
+        <Pressable key={i} style={[styles.suggestionPill, { borderColor: colors.contentBone600 }]} onPress={() => { Keyboard.dismiss(); onTap(s); }}>
+          <Text style={[styles.suggestionText, { color: colors.contentPrimary }]} numberOfLines={1}>{s}</Text>
         </Pressable>
       ))}
     </View>
@@ -436,6 +452,7 @@ const iconThumbsDown = require('@/assets/images/icon-thumbs-down.png');
 const iconThumbsDownFilled = require('@/assets/images/icon-thumbs-down-filled.png');
 
 function ActionFooter({ message }: { message: Message }) {
+  const { colors } = useTheme();
   const [copied, setCopied] = useState(false);
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
@@ -448,7 +465,7 @@ function ActionFooter({ message }: { message: Message }) {
           {copied ? (
             <View style={styles.actionIconWrap}>
               <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
+                <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
               </Svg>
             </View>
           ) : (
@@ -463,14 +480,14 @@ function ActionFooter({ message }: { message: Message }) {
         </Pressable>
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
-            <Text style={{ fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
-            <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={Colors.contentSecondary} />
+            <Text style={{ fontSize: 12, color: colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
+            <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={colors.contentSecondary} />
           </Pressable>
         )}
       </View>
       {showProvenance && message.provenance && (
-        <View style={styles.provenanceCard}>
-          <Text style={styles.provenanceText}>{message.provenance}</Text>
+        <View style={[styles.provenanceCard, { backgroundColor: colors.surfaceTint }]}>
+          <Text style={[styles.provenanceText, { color: colors.contentSecondary }]}>{message.provenance}</Text>
         </View>
       )}
     </View>
@@ -536,6 +553,7 @@ function FadeInView({ delay = 0, duration = 300, children }: { delay?: number; d
 }
 
 export function MessageBubble({ message, isLatest }: { message: Message; isLatest: boolean }) {
+  const { colors } = useTheme();
   const { sendMessage } = useCoach();
   const wasStreamingRef = useRef(message.isStreaming === true);
   const [justFinished, setJustFinished] = useState(false);
@@ -550,9 +568,9 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   if (message.role === 'system') {
     return (
       <View style={styles.systemRow}>
-        <View style={[styles.systemPill, message.isProactive && styles.systemProactive]}>
-          {message.isProactive && <Feather name="star" size={13} color="#fff" />}
-          <Text style={[styles.systemText, message.isProactive && { color: '#fff' }]}>
+        <View style={[styles.systemPill, { backgroundColor: colors.surfaceTint }, message.isProactive && { backgroundColor: colors.contentPrimary }]}>
+          {message.isProactive && <Feather name="star" size={13} color={colors.contentPrimaryInverse} />}
+          <Text style={[styles.systemText, { color: colors.contentSecondary }, message.isProactive && { color: colors.contentPrimaryInverse }]}>
             {message.content}
           </Text>
         </View>
@@ -563,8 +581,8 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   if (message.role === 'user') {
     return (
       <View style={styles.userRow}>
-        <View style={styles.userBubble}>
-          <Text style={styles.userText}>{message.content}</Text>
+        <View style={[styles.userBubble, { backgroundColor: colors.contentBone600 }]}>
+          <Text style={[styles.userText, { color: colors.whiteOnDark }]}>{message.content}</Text>
         </View>
       </View>
     );
@@ -648,17 +666,14 @@ const styles = StyleSheet.create({
   systemPill: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 9999,
-    backgroundColor: Colors.surfaceTint,
   },
-  systemProactive: { backgroundColor: Colors.contentPrimary },
-  systemText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
+  systemText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18 },
   userRow: { alignItems: 'flex-end', paddingLeft: 60 },
   userBubble: {
-    backgroundColor: Colors.contentBone600,
     borderRadius: 24, paddingTop: 11, paddingBottom: 12,
     paddingHorizontal: 16, maxWidth: 298,
   },
-  userText: { fontSize: 16, color: '#fff', fontFamily: Fonts.regular, lineHeight: 20 },
+  userText: { fontSize: 16, fontFamily: Fonts.regular, lineHeight: 20 },
   aiRow: { gap: 16 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
@@ -667,12 +682,11 @@ const styles = StyleSheet.create({
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
   aiContent: { gap: 8 },
-  aiText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20, paddingHorizontal: 4 },
+  aiText: { fontSize: 16, fontFamily: Fonts.regular, lineHeight: 20, paddingHorizontal: 4 },
   headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
   bulletText: {},
   divider: {
     height: 0.75,
-    backgroundColor: Colors.surfaceEdge,
     marginVertical: 16,
   },
   safetyBadge: {
@@ -682,39 +696,37 @@ const styles = StyleSheet.create({
   },
   safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
-    backgroundColor: Colors.surfaceTint,
-    borderWidth: 1, borderColor: Colors.surfaceEdgeLight,
-    borderRadius: 16, padding: 12,
+    borderWidth: 1, borderRadius: 16, padding: 12,
   },
   confirmedCard: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
   },
-  confirmedText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
-  confirmedTextPrimary: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18 },
+  confirmedText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18 },
+  confirmedTextPrimary: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 10 },
   proposalIcon: { marginTop: 2 },
   proposalContentWrap: { flex: 1 },
-  proposalText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
+  proposalText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18, flex: 1 },
   proposalQuote: { fontFamily: Fonts.regular },
-  proposalDetail: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
+  proposalDetail: { fontSize: 12, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
   proposalButtons: { flexDirection: 'row', gap: 8 },
   proposalButtonsIndented: { flexDirection: 'row', gap: 8, marginLeft: 22 },
   confirmBtn: {
-    backgroundColor: Colors.contentPrimary, borderRadius: 9999,
+    borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  confirmBtnText: { color: '#fff', fontSize: 12, fontFamily: Fonts.medium },
+  confirmBtnText: { fontSize: 12, fontFamily: Fonts.medium },
   dismissBtn: {
-    borderWidth: 1, borderColor: Colors.surfaceEdge, borderRadius: 9999,
+    borderWidth: 1, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  dismissBtnText: { color: Colors.contentSecondary, fontSize: 12, fontFamily: Fonts.medium },
+  dismissBtnText: { fontSize: 12, fontFamily: Fonts.medium },
   approvalHint: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
     marginTop: 8, marginBottom: 4, paddingLeft: 2,
   },
   approvalHintText: {
-    fontSize: 11, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 14,
+    fontSize: 11, fontFamily: Fonts.medium, lineHeight: 14,
   },
   actionRow: {
     flexDirection: 'row', alignItems: 'center', gap: 16,
@@ -724,15 +736,15 @@ const styles = StyleSheet.create({
   actionIconWrap: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
   provenanceCard: {
     paddingHorizontal: 12, paddingVertical: 10,
-    borderRadius: 16, backgroundColor: Colors.surfaceTint, marginTop: 4,
+    borderRadius: 16, marginTop: 4,
   },
-  provenanceText: { fontSize: 12, color: Colors.contentSecondary, lineHeight: 16, fontFamily: Fonts.regular },
+  provenanceText: { fontSize: 12, lineHeight: 16, fontFamily: Fonts.regular },
   suggestions: {
     alignItems: 'flex-end', gap: 8,
   },
   suggestionPill: {
-    borderWidth: 0.75, borderColor: Colors.contentBone600,
+    borderWidth: 0.75,
     borderRadius: 24, paddingTop: 11, paddingBottom: 12, paddingHorizontal: 16,
   },
-  suggestionText: { fontSize: 16, color: Colors.contentPrimary, fontFamily: Fonts.regular, lineHeight: 20 },
+  suggestionText: { fontSize: 16, fontFamily: Fonts.regular, lineHeight: 20 },
 });

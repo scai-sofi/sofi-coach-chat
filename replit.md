@@ -43,8 +43,11 @@ AI responses are processed through a pipeline in `MessageBubble.tsx` to ensure c
 5. **Rendering:** Maps blocks to React Native components.
 The system is designed to defensively handle varied AI output while guiding the AI to use specific formatting (e.g., bold for headers, bullet points only).
 
-### Design Tokens
-- **Color Palette:** Defines `surfaceBase`, `contentPrimary`, `contentBrand`, etc., for consistent theming.
+### Design Tokens & Theming
+- **Dynamic Theme System:** `constants/theme.ts` defines `AppTheme` interface with `lightTheme` and `darkTheme` palettes using Pacific design system tokens. `context/ThemeContext.tsx` provides `ThemeProvider` (wraps `useColorScheme`) and `useTheme()` hook. All 18+ components use `useTheme()` — zero static `Colors` imports remain.
+- **Theme Architecture:** Module-level style objects converted to factory functions (`getChipStyles(c)`, `getSafetyStyles(c)`) for theme-dependent lookup tables. Static layout styles remain in `StyleSheet.create`; color values applied as inline overrides `[styles.x, { color: colors.xxx }]`.
+- **Key Dark Pacific Values:** `surfaceBase=#0a0a0a`, `surfaceElevated=#1a1919`, `contentPrimary=#faf8f5`, `contentBrand=#32b7d9`, `surfaceToast=#3d3d3c`.
+- **Special Tokens:** `contentPrimaryInverse` (white in light / `#0a0a0a` in dark) for text on `contentPrimary` backgrounds. `borderSubtle` (rgba 8% opacity), `borderMedium` (rgba 20% opacity). `whiteOnDark` always white. Shadow/scrim values use `shadowColor`/`scrimHeavy`.
 - **Typography:** Uses TT Norms font family (Regular, Medium, Bold) with defined sizes and line heights for body, headers, and labels.
 - **Spacing & Layout:** Standardized padding, gaps, border-radii, and header heights.
 - **Animations:** GPU-accelerated animations for streaming entrance, block fade-in, typing indicator shimmer, and dropdowns.

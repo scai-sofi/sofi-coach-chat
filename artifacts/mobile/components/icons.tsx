@@ -1,8 +1,7 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
-import Colors from '@/constants/colors';
 
-export function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function ChevronLeftIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -15,7 +14,7 @@ export function ChevronLeftIcon({ size = 24, color = Colors.contentPrimary }: { 
   );
 }
 
-export function CloseIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function CloseIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -28,7 +27,7 @@ export function CloseIcon({ size = 24, color = Colors.contentPrimary }: { size?:
   );
 }
 
-export function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function MoreIcon({ size = 20, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
       <Path
@@ -53,7 +52,7 @@ export function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: 
   );
 }
 
-export function DemoIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function DemoIcon({ size = 20, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
       <Path
@@ -70,7 +69,7 @@ export function DemoIcon({ size = 20, color = Colors.contentPrimary }: { size?: 
   );
 }
 
-export function ClockIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function ClockIcon({ size = 20, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
       <Path
@@ -83,7 +82,7 @@ export function ClockIcon({ size = 20, color = Colors.contentPrimary }: { size?:
   );
 }
 
-export function ChatNewIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function ChatNewIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -94,7 +93,7 @@ export function ChatNewIcon({ size = 24, color = Colors.contentPrimary }: { size
   );
 }
 
-export function MemoryMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function MemoryMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -107,7 +106,7 @@ export function MemoryMenuIcon({ size = 24, color = Colors.contentPrimary }: { s
   );
 }
 
-export function GoalsMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function GoalsMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -130,7 +129,7 @@ export function GoalsMenuIcon({ size = 24, color = Colors.contentPrimary }: { si
   );
 }
 
-export function PencilMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function PencilMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -143,7 +142,7 @@ export function PencilMenuIcon({ size = 24, color = Colors.contentPrimary }: { s
   );
 }
 
-export function SettingsMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function SettingsMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -158,7 +157,7 @@ export function SettingsMenuIcon({ size = 24, color = Colors.contentPrimary }: {
   );
 }
 
-export function DeleteMenuIcon({ size = 24, color = Colors.danger }: { size?: number; color?: string }) {
+export function DeleteMenuIcon({ size = 24, color = '#fa2d25' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -171,7 +170,7 @@ export function DeleteMenuIcon({ size = 24, color = Colors.danger }: { size?: nu
   );
 }
 
-export function PauseMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function PauseMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="-4.5 -3 19 19" fill="none">
       <Path
@@ -186,7 +185,7 @@ export function PauseMenuIcon({ size = 24, color = Colors.contentPrimary }: { si
   );
 }
 
-export function PlayMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+export function PlayMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path

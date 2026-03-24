@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { ChevronLeftIcon } from '@/components/icons';
 
@@ -40,8 +40,9 @@ interface SheetAppBarProps extends AppBarBaseProps {
 export type AppBarProps = StandardAppBarProps | BackAppBarProps | SheetAppBarProps;
 
 export function AppBar(props: AppBarProps) {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const bgColor = props.backgroundColor ?? Colors.surfaceBase;
+  const bgColor = props.backgroundColor ?? colors.surfaceBase;
 
   if (props.variant === 'sheet') {
     return <SheetHeader {...props} />;
@@ -54,11 +55,11 @@ export function AppBar(props: AppBarProps) {
         <View style={styles.titleBar}>
           <View style={styles.leftZone}>
             <Pressable style={styles.iconBtn} onPress={props.onBack} hitSlop={8}>
-              <ChevronLeftIcon size={24} color={Colors.contentPrimary} />
+              <ChevronLeftIcon size={24} color={colors.contentPrimary} />
             </Pressable>
           </View>
           <View style={styles.centerZone}>
-            <Text style={styles.title} numberOfLines={1}>{props.title}</Text>
+            <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>{props.title}</Text>
           </View>
           <View style={styles.rightZone}>
             {actions.map((action, i) => (
@@ -84,7 +85,7 @@ export function AppBar(props: AppBarProps) {
           )}
         </View>
         <View style={styles.centerZone}>
-          <Text style={styles.title} numberOfLines={1}>{standardProps.title}</Text>
+          <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>{standardProps.title}</Text>
           {standardProps.subtitle}
         </View>
         <View style={styles.rightZone}>
@@ -100,9 +101,10 @@ export function AppBar(props: AppBarProps) {
 }
 
 function SheetHeader(props: SheetAppBarProps) {
+  const { colors } = useTheme();
   return (
     <View style={styles.sheetHeader}>
-      <Text style={styles.sheetTitle}>{props.title}</Text>
+      <Text style={[styles.sheetTitle, { color: colors.contentPrimary }]}>{props.title}</Text>
       {props.rightAction && (
         <Pressable style={styles.sheetCloseBtn} onPress={props.rightAction.onPress} hitSlop={8}>
           {props.rightAction.icon}
@@ -119,7 +121,6 @@ export function useAppBarHeight() {
 
 const styles = StyleSheet.create({
   headerWrap: {
-    backgroundColor: Colors.surfaceBase,
     zIndex: 40,
   },
   titleBar: {
@@ -157,7 +158,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     lineHeight: 20,
     textAlign: 'center',
   },
@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     lineHeight: 20,
   },
   sheetCloseBtn: {

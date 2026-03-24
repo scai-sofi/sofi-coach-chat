@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated as RNAnimated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 
 interface ToastAction {
@@ -28,6 +28,7 @@ export function useToast() {
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const { colors } = useTheme();
   const [toast, setToast] = useState<ToastData | null>(null);
   const translateY = useRef(new RNAnimated.Value(100)).current;
   const opacity = useRef(new RNAnimated.Value(0)).current;
@@ -68,9 +69,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             { bottom: Math.max(insets.bottom, 16) + 16, transform: [{ translateY }], opacity },
           ]}
         >
-          <View style={styles.toast}>
+          <View style={[styles.toast, { backgroundColor: colors.surfaceToast, shadowColor: colors.shadowColor }]}>
             <View style={styles.messageWrap}>
-              <Text style={styles.messageText}>{toast.message}</Text>
+              <Text style={[styles.messageText, { color: colors.toastText }]}>{toast.message}</Text>
             </View>
             {toast.action && (
               <Pressable
@@ -80,7 +81,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   dismiss();
                 }}
               >
-                <Text style={styles.actionText}>{toast.action.label}</Text>
+                <Text style={[styles.actionText, { color: colors.toastAction }]}>{toast.action.label}</Text>
               </Pressable>
             )}
           </View>
@@ -98,13 +99,11 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toast: {
-    backgroundColor: '#0f0f0f',
     borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    shadowColor: 'rgba(10,10,10,0.16)',
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 1,
     shadowOpacity: 1,
@@ -120,13 +119,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.surfaceElevated,
     lineHeight: 20,
   },
   actionText: {
     fontSize: 14,
     fontFamily: Fonts.bold,
-    color: '#32b7d9',
     lineHeight: 20,
   },
 });

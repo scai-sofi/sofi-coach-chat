@@ -2,10 +2,10 @@ import React from 'react';
 import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 
-function FilterIcon({ size = 16, color = Colors.contentSecondary }: { size?: number; color?: string }) {
+function FilterIcon({ size = 16, color = '#706f6e' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
       <Path d="M2 4h12M4 8h8M6 12h4" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
@@ -30,26 +30,27 @@ export function SearchBar({
   filterActive = false,
   onFilterPress,
 }: SearchBarProps) {
+  const { colors } = useTheme();
   return (
     <View style={styles.wrapper}>
-      <View style={styles.pill}>
-        <Feather name="search" size={16} color={Colors.contentSecondary} />
+      <View style={[styles.pill, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+        <Feather name="search" size={16} color={colors.contentSecondary} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: colors.contentPrimary }]}
           placeholder={placeholder}
-          placeholderTextColor={Colors.contentSecondary}
+          placeholderTextColor={colors.contentSecondary}
           value={value}
           onChangeText={onChangeText}
-          cursorColor={Colors.contentBone600}
-          selectionColor="rgba(92,91,90,0.3)"
+          cursorColor={colors.contentBone600}
+          selectionColor={colors.selectionColor}
         />
       </View>
       {variant === 'search-filter' && onFilterPress && (
         <Pressable
-          style={[styles.filterBtn, filterActive && styles.filterBtnActive]}
+          style={[styles.filterBtn, filterActive && { backgroundColor: colors.contentPrimary }]}
           onPress={onFilterPress}
         >
-          <FilterIcon size={16} color={filterActive ? '#fff' : Colors.contentSecondary} />
+          <FilterIcon size={16} color={filterActive ? colors.contentPrimaryInverse : colors.contentSecondary} />
         </Pressable>
       )}
     </View>
@@ -68,9 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: Colors.surfaceEdge,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -79,7 +78,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: Colors.contentPrimary,
     fontFamily: Fonts.regular,
     lineHeight: 20,
     paddingVertical: 0,
@@ -90,8 +88,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  filterBtnActive: {
-    backgroundColor: Colors.contentPrimary,
   },
 });

@@ -8,12 +8,13 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 export function ScenarioFab() {
   return null;
+  const { colors } = useTheme();
   const { setActivePanel, activePanel, messages } = useCoach();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -59,9 +60,9 @@ export function ScenarioFab() {
 
   return (
     <GestureDetector gesture={composed}>
-      <Animated.View style={[styles.fab, animatedStyle]}>
-        <Feather name="play-circle" size={20} color="#fff" />
-        <Animated.Text style={styles.fabText}>Demos</Animated.Text>
+      <Animated.View style={[styles.fab, { backgroundColor: colors.contentPrimary }, animatedStyle]}>
+        <Feather name="play-circle" size={20} color={colors.contentPrimaryInverse} />
+        <Animated.Text style={[styles.fabText, { color: colors.contentPrimaryInverse }]}>Demos</Animated.Text>
       </Animated.View>
     </GestureDetector>
   );
@@ -75,7 +76,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: Colors.contentPrimary,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 9999,
@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
     zIndex: 30,
   },
   fabText: {
-    color: '#fff',
     fontSize: 14,
     fontFamily: Fonts.medium,
   },

@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { SCENARIOS, SCENARIO_ORDER } from '@/constants/scenarios';
@@ -28,6 +28,7 @@ const ICON_MAP: Record<string, FeatherIconName> = {
 const DISMISS_THRESHOLD = 120;
 
 export function ScenarioSwitcher() {
+  const { colors } = useTheme();
   const { activeScenario, switchScenario, setActivePanel } = useCoach();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
@@ -67,21 +68,21 @@ export function ScenarioSwitcher() {
 
   return (
     <View style={styles.overlay}>
-      <Animated.View style={[styles.backdrop, backdropStyle]}>
+      <Animated.View style={[styles.backdrop, { backgroundColor: colors.scrimBackdrop }, backdropStyle]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
       </Animated.View>
 
       <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.sheet, { paddingBottom: bottomPad }, sheetStyle]}>
+        <Animated.View style={[styles.sheet, { backgroundColor: colors.surfaceBase, shadowColor: colors.contentStatusbar, paddingBottom: bottomPad }, sheetStyle]}>
           <View style={styles.handleRow}>
-            <View style={styles.handle} />
+            <View style={[styles.handle, { backgroundColor: colors.contentMuted }]} />
           </View>
 
           <AppBar
             variant="sheet"
             title="Experience Demos"
             rightAction={{
-              icon: <Feather name="x" size={16} color={Colors.contentSecondary} />,
+              icon: <Feather name="x" size={16} color={colors.contentSecondary} />,
               onPress: dismiss,
             }}
           />
@@ -99,26 +100,26 @@ export function ScenarioSwitcher() {
               return (
                 <Pressable
                   key={scenario.id}
-                  style={[styles.row, isActive && styles.rowActive]}
+                  style={[styles.row, isActive && { backgroundColor: colors.contentPrimary }]}
                   onPress={() => { switchScenario(scenario.id); setActivePanel('none'); }}
                 >
-                  <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
-                    <Feather name={iconName} size={14} color={isActive ? '#fff' : Colors.contentPrimary} />
+                  <View style={[styles.iconWrap, { backgroundColor: colors.surfaceTint }, isActive && { backgroundColor: colors.inverseAlpha20 }]}>
+                    <Feather name={iconName} size={14} color={isActive ? colors.contentPrimaryInverse : colors.contentPrimary} />
                   </View>
                   <View style={styles.rowContent}>
-                    <Text style={[styles.rowTitle, isActive && { color: '#fff' }]} numberOfLines={1}>{scenario.title}</Text>
-                    <Text style={[styles.rowSubtitle, isActive && { color: 'rgba(255,255,255,0.6)' }]} numberOfLines={1}>
+                    <Text style={[styles.rowTitle, { color: colors.contentPrimary }, isActive && { color: colors.contentPrimaryInverse }]} numberOfLines={1}>{scenario.title}</Text>
+                    <Text style={[styles.rowSubtitle, { color: colors.contentSecondary }, isActive && { color: colors.inverseAlpha60 }]} numberOfLines={1}>
                       {scenario.subtitle}
                     </Text>
                   </View>
-                  {isActive && <Feather name="check" size={16} color="#fff" />}
+                  {isActive && <Feather name="check" size={16} color={colors.contentPrimaryInverse} />}
                 </Pressable>
               );
             })}
           </ScrollView>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>All data is simulated</Text>
+            <Text style={[styles.footerText, { color: colors.contentSecondary }]}>All data is simulated</Text>
           </View>
         </Animated.View>
       </GestureDetector>
@@ -134,14 +135,11 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   sheet: {
-    backgroundColor: Colors.surfaceBase,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '70%',
-    shadowColor: Colors.contentStatusbar,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 16,
@@ -156,7 +154,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.contentMuted,
   },
   content: {
     flexGrow: 0,
@@ -174,19 +171,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 12,
   },
-  rowActive: {
-    backgroundColor: Colors.contentPrimary,
-  },
   iconWrap: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Colors.surfaceTint,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconWrapActive: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   rowContent: {
     flex: 1,
@@ -194,12 +184,10 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     lineHeight: 18,
   },
   rowSubtitle: {
     fontSize: 12,
-    color: Colors.contentSecondary,
     fontFamily: Fonts.regular,
     lineHeight: 16,
   },
@@ -211,7 +199,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: Colors.contentSecondary,
     fontFamily: Fonts.regular,
     lineHeight: 14,
   },

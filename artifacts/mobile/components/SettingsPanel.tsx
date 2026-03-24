@@ -2,25 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { MemoryMode } from '@/constants/types';
 import { AppBar } from '@/components/AppBar';
 
 function RadioSelected({ size = 24 }: { size?: number }) {
+  const { colors } = useTheme();
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={9.5} stroke={Colors.contentPrimary} strokeWidth={1} />
-      <Circle cx={12} cy={12} r={6} fill={Colors.contentPrimary} />
+      <Circle cx={12} cy={12} r={9.5} stroke={colors.contentPrimary} strokeWidth={1} />
+      <Circle cx={12} cy={12} r={6} fill={colors.contentPrimary} />
     </Svg>
   );
 }
 
 function RadioUnselected({ size = 24 }: { size?: number }) {
+  const { colors } = useTheme();
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={9.5} stroke={Colors.contentSecondary} strokeWidth={1} />
+      <Circle cx={12} cy={12} r={9.5} stroke={colors.contentSecondary} strokeWidth={1} />
     </Svg>
   );
 }
@@ -36,6 +38,7 @@ const SLIDE_DURATION = 300;
 const SLIDE_EASING = Easing.bezier(0.4, 0, 0.2, 1);
 
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
+  const { colors } = useTheme();
   const { memoryMode, setMemoryMode } = useCoach();
   const [localMode, setLocalMode] = useState<MemoryMode>(memoryMode);
 
@@ -61,22 +64,22 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   }));
 
   return (
-    <Animated.View style={[styles.panel, animStyle]}>
+    <Animated.View style={[styles.panel, { backgroundColor: colors.surfaceBase }, animStyle]}>
       <AppBar variant="back" title="Settings" onBack={handleClose} />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Memory</Text>
-          <View style={styles.card}>
+          <Text style={[styles.sectionLabel, { color: colors.contentSecondary }]}>Memory</Text>
+          <View style={[styles.card, { backgroundColor: colors.surfaceElevated, shadowColor: colors.contentStatusbar }]}>
             {MODES.map((mode, idx) => (
               <Pressable
                 key={mode.value}
-                style={[styles.modeRow, idx < MODES.length - 1 && styles.modeRowBorder]}
+                style={[styles.modeRow, idx < MODES.length - 1 && [styles.modeRowBorder, { borderBottomColor: colors.surfaceEdge }]]}
                 onPress={() => handleSelect(mode.value)}
               >
                 <View style={styles.modeTextArea}>
-                  <Text style={styles.modeLabel}>{mode.label}</Text>
-                  <Text style={styles.modeDesc}>{mode.description}</Text>
+                  <Text style={[styles.modeLabel, { color: colors.contentPrimary }]}>{mode.label}</Text>
+                  <Text style={[styles.modeDesc, { color: colors.contentSecondary }]}>{mode.description}</Text>
                 </View>
                 <View style={styles.radioWrap}>
                   {localMode === mode.value ? <RadioSelected /> : <RadioUnselected />}
@@ -93,7 +96,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 const styles = StyleSheet.create({
   panel: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.surfaceBase,
     zIndex: 100,
   },
   content: {
@@ -110,15 +112,12 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
     lineHeight: 20,
     paddingHorizontal: 4,
   },
   card: {
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     paddingHorizontal: 16,
-    shadowColor: Colors.contentStatusbar,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -133,7 +132,6 @@ const styles = StyleSheet.create({
   },
   modeRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: Colors.surfaceEdge,
   },
   modeTextArea: {
     flex: 1,
@@ -144,13 +142,11 @@ const styles = StyleSheet.create({
   modeLabel: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     lineHeight: 20,
   },
   modeDesc: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
     lineHeight: 20,
   },
   radioWrap: {

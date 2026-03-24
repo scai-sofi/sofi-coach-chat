@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Asset } from 'expo-asset';
 import { Fonts } from '@/constants/fonts';
+import { useTheme } from '@/context/ThemeContext';
 
 const orbGif = require('@/assets/images/orb-analyzing.gif');
 
@@ -17,6 +18,7 @@ const orbAsset = Asset.fromModule(orbGif);
 orbAsset.downloadAsync();
 
 function ShimmerText() {
+  const { colors } = useTheme();
   const sweep = useSharedValue(0);
 
   useEffect(() => {
@@ -27,16 +29,19 @@ function ShimmerText() {
     );
   }, []);
 
+  const base = colors.shimmerBase;
+  const target = colors.shimmerTarget;
+
   const char0 = useAnimatedStyle(() => {
-    const color = interpolateColor(sweep.value, [0, 0.3, 0.5, 0.8, 1], ['#c4a882', '#00a2c7', '#00a2c7', '#00a2c7', '#c4a882']);
+    const color = interpolateColor(sweep.value, [0, 0.3, 0.5, 0.8, 1], [base, target, target, target, base]);
     return { color };
   });
   const char1 = useAnimatedStyle(() => {
-    const color = interpolateColor(sweep.value, [0, 0.15, 0.4, 0.7, 1], ['#c4a882', '#c4a882', '#00a2c7', '#00a2c7', '#c4a882']);
+    const color = interpolateColor(sweep.value, [0, 0.15, 0.4, 0.7, 1], [base, base, target, target, base]);
     return { color };
   });
   const char2 = useAnimatedStyle(() => {
-    const color = interpolateColor(sweep.value, [0, 0.3, 0.55, 0.85, 1], ['#c4a882', '#c4a882', '#c4a882', '#00a2c7', '#c4a882']);
+    const color = interpolateColor(sweep.value, [0, 0.3, 0.55, 0.85, 1], [base, base, base, target, base]);
     return { color };
   });
 

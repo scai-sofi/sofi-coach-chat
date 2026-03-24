@@ -9,7 +9,7 @@ import Animated, {
   interpolate,
   Easing,
 } from 'react-native-reanimated';
-import Colors from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
@@ -35,6 +35,7 @@ const SUGGESTIONS = [
 ];
 
 export function EmptyChat() {
+  const { colors } = useTheme();
   const { sendMessage, inputFocused } = useCoach();
 
   const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
@@ -89,7 +90,7 @@ export function EmptyChat() {
             resizeMode="contain"
           />
         </View>
-        <Text style={styles.greeting}>
+        <Text style={[styles.greeting, { color: colors.contentPrimary }]}>
           {"I'm Coach.\nHow can I help?"}
         </Text>
       </Animated.View>
@@ -97,11 +98,11 @@ export function EmptyChat() {
       <View style={styles.suggestionsSection}>
         <Animated.View style={fullCardAnimStyle}>
           <Pressable
-            style={styles.fullCard}
+            style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
             onPress={() => sendMessage(fullCard.text)}
           >
-            <Text style={styles.cardLabel}>{fullCard.label.toUpperCase()}</Text>
-            <Text style={styles.cardText}>{fullCard.text}</Text>
+            <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
+            <Text style={[styles.cardText, { color: colors.contentPrimary }]}>{fullCard.text}</Text>
           </Pressable>
         </Animated.View>
 
@@ -109,11 +110,11 @@ export function EmptyChat() {
           {halfCards.map((card, i) => (
             <Pressable
               key={i}
-              style={styles.halfCard}
+              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
               onPress={() => sendMessage(card.text)}
             >
-              <Text style={styles.cardLabel}>{card.label.toUpperCase()}</Text>
-              <Text style={styles.halfCardText} numberOfLines={2}>
+              <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
+              <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
                 {card.text}
               </Text>
             </Pressable>
@@ -123,14 +124,6 @@ export function EmptyChat() {
     </View>
   );
 }
-
-const cardShadow = {
-  shadowColor: 'rgba(10,10,10,0.16)',
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 1,
-  shadowRadius: 4,
-  elevation: 2,
-};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -154,7 +147,6 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontFamily: Fonts.medium,
-    color: Colors.contentPrimary,
     textAlign: 'center',
     lineHeight: 28,
     letterSpacing: -0.5,
@@ -165,11 +157,13 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   fullCard: {
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 16,
     padding: 16,
     gap: 4,
-    ...cardShadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   halfRow: {
     flexDirection: 'row',
@@ -177,29 +171,28 @@ const styles = StyleSheet.create({
   },
   halfCard: {
     flex: 1,
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: 16,
     padding: 16,
     height: 92,
-    ...cardShadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   cardLabel: {
     fontSize: 12,
     fontFamily: Fonts.medium,
-    color: Colors.contentSecondary,
     lineHeight: 16,
     letterSpacing: 0.6,
   },
   cardText: {
     fontSize: 16,
     fontFamily: Fonts.regular,
-    color: Colors.contentPrimary,
     lineHeight: 20,
   },
   halfCardText: {
     fontSize: 16,
     fontFamily: Fonts.regular,
-    color: Colors.contentPrimary,
     lineHeight: 20,
     marginTop: 4,
   },
