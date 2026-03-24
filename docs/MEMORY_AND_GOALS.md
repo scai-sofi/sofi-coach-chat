@@ -3,7 +3,7 @@
 **Features:** Coach Chat Memory · Goals
 **Feature area:** Memory → Coach Chat only · Goals → Coach Chat + App Settings
 **Designer:** Cloris Cai
-**Status:** Prototype complete — ready for Flutter migration
+**Status:** Design in-progress
 
 ---
 
