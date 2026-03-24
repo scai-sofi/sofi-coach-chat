@@ -581,8 +581,8 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   if (message.role === 'user') {
     return (
       <View style={styles.userRow}>
-        <View style={[styles.userBubble, { backgroundColor: colors.userBubbleBg }]}>
-          <Text style={[styles.userText, { color: colors.whiteOnDark }]}>{message.content}</Text>
+        <View style={[styles.userBubble, { backgroundColor: colors.contentBone600 }]}>
+          <Text style={[styles.userText, { color: colors.contentPrimaryInverse }]}>{message.content}</Text>
         </View>
       </View>
     );
