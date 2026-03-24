@@ -49,6 +49,7 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **Spacing & Layout:** Standardized padding, gaps, border-radii, and header heights.
 - **Animations:** GPU-accelerated animations for streaming entrance, block fade-in, typing indicator shimmer, and dropdowns.
 - **Design System Map:** `docs/DESIGN_SYSTEM_MAP.md` — comprehensive inventory of all tokens, components, icons, and patterns, mapped to Pacific design system equivalents for Flutter migration.
+- **Pacific Color Tokens:** `docs/PACIFIC_COLOR_TOKENS.md` — source of truth extracted from Pacific v1.40.0 (`pacific_color_token_themes.dart`). Bone600 = `#5C5B5A`.
 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.

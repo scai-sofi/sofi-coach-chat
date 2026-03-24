@@ -8,53 +8,104 @@
 
 ### 1.1 Color Palette
 
-| Prototype Token | Hex / Value | Pacific Variable | Usage |
-|---|---|---|---|
-| `surfaceBase` | `#FAF8F5` | `color-surface-base-default` | App background everywhere |
-| `surfaceElevated` | `#FFFFFF` | `color-surface-elevated-default` | Cards, inputs, menus |
-| `surfaceTint` | `#F0EDE8` | `color-surface-tint-default` | Chip backgrounds, tints, hover states |
-| `surfaceEdge` | `rgba(10,10,10,0.10)` | `color-surface-edge-default` | Borders, dividers |
-| `surfaceEdgeLight` | `rgba(10,10,10,0.05)` | `color-surface-edge-light` | Light borders (proposal card border) |
-| `surfaceMuted` | `#F5F3F0` | `color-surface-muted-default` | Muted backgrounds (safety badge informational/suggestive) |
-| `contentPrimary` | `#1A1919` | `color-content-primary-default` | Primary text, active UI, dark fills |
-| `contentSecondary` | `#706F6E` | `color-content-secondary-default` | Secondary text, inactive icons, meta text |
-| `contentBone600` | `#5C5B5A` | `color-content-bone-600` | User bubble bg, send button bg, suggestion pill border |
-| `contentStatusbar` | `#0A0A0A` | — | Status bar tint (near black) |
-| `contentMuted` | `#D0CCC5` | `color-content-muted-default` | Empty state placeholder icons, drag handle |
-| `contentBrand` | `#00A2C7` | `color-content-brand-default` | Brand cyan — demo indicator, memory save button, shimmer target |
-| `danger` | `#FA2D25` | `color-status-danger-default` | Delete icon color, delete button bg |
-| `dangerLight` | `#EF4444` | `color-status-danger-light` | At-risk goal ring stroke |
-| `dangerChipText` | `#DC2626` | — | Risk/alert chip text |
-| `dangerChipBg` | `#FEE2E2` | — | Risk/alert chip background |
-| `success` | `#22C55E` | `color-status-success-default` | Goal completion ring |
-| `successDark` | `#16A34A` | `color-status-success-dark` | Milestone text, completed status |
-| `successBg` | `#DCFCE7` | — | Milestone chip bg, completed badge bg |
-| `successBorder` | `#BBF7D0` | — | Success border (unused in current code) |
-| `successBgLight` | `#F0FDF4` | — | Completed goal card bg |
-| `warning` | `#B45309` | `color-status-warning-default` | Actionable safety tier text |
-| `warningBg` | `#FEF3C7` | — | Actionable safety tier bg |
-| `info` | `#2563EB` | `color-status-info-default` | Handoff chip text |
-| `infoBg` | `#DBEAFE` | — | Handoff chip bg |
-| `progressTrack` | `#E5E1DA` | — | Goal ring track color |
-| `frameBg` | `#E8E4DE` | — | Frame backgrounds |
+> Source of truth: Pacific Design System v1.40.0 (`pacific_color_token_themes.dart`). Primitive values reference the bone/blue/red/green/yellow scales. All mappings below are for the **Light** theme.
 
-**Hardcoded colors not in `colors.ts`:**
+#### Core Surface Tokens
 
-| Value | Usage | Notes |
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `surfaceBase` | `#FAF8F5` | `surfaceBase` | `bone50` | App background everywhere |
+| `surfaceElevated` | `#FFFFFF` | `surfaceElevatedDefault` | `bone0` | Cards, inputs, menus |
+| `surfaceTint` | `#F0EDE8` | — (prototype only) | ~`bone100` | Chip backgrounds, tints, proposal cards |
+| `surfaceMuted` | `#F5F3F0` | `surfaceInfoDefault` | `bone150` | Safety badge informational/suggestive bg |
+
+#### Edge / Stroke Tokens
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `surfaceEdge` | `rgba(10,10,10,0.10)` | `strokeDividePrimary` / `strokeEdge` | `bone100010Pct` | Borders, dividers |
+| `surfaceEdgeLight` | `rgba(10,10,10,0.05)` | — (prototype only, lighter than strokeEdge) | — | Proposal card border |
+
+**Note:** Pacific's `surfaceEdge` token is `bone100016Pct` (0.16 opacity) — heavier than our stroke usage. Our prototype `surfaceEdge` maps to `strokeDividePrimary` (0.10), not Pacific's `surfaceEdge`.
+
+#### Content Tokens
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `contentPrimary` | `#1A1919` | `contentPrimaryDefault` | `bone850` | Primary text, active UI, dark fills |
+| `contentSecondary` | `#706F6E` | `contentSecondary` | `bone550` | Secondary text, inactive icons, meta text |
+| `contentBone600` | `#5C5B5A` | `contentIndicatorUnselected` | `bone600` | User bubble bg, send button bg, suggestion pill border |
+| `contentStatusbar` | `#0A0A0A` | `contentStatusBar` | `bone1000` | Status bar tint |
+| `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` | Empty state placeholder icons, drag handle |
+| `contentDimmed` | `#BDBBB9` | — (prototype only) | ~`bone300` | Edit character count, muted more-icon |
+| `contentBrand` | `#00A2C7` | `contentBrand` | `blue550` | Brand cyan — demo indicator, shimmer target |
+
+#### Status Tokens — Danger
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `danger` | `#FA2D25` | `contentDanger` | `red600` | Delete icon color, delete button bg |
+| `dangerLight` | `#EF4444` | — (prototype only) | ~`red550` | At-risk goal ring stroke |
+| `dangerChipText` | `#DC2626` | `contentDanger` | `red600` | Risk/alert chip text |
+| `dangerChipBg` | `#FEE2E2` | `surfaceDangerDefault` | `red50` | Risk/alert chip background |
+
+#### Status Tokens — Success
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `success` | `#22C55E` | `contentSuccess` | `green550` | Goal completion ring |
+| `successDark` | `#16A34A` | `contentSuccessEmphasized` | `green600` | Milestone text, completed status |
+| `successBg` | `#DCFCE7` | `surfaceSuccessDefault` | `green50` | Milestone chip bg, completed badge bg |
+| `successBorder` | `#BBF7D0` | — (prototype only) | — | Success border (unused in current code) |
+| `successBgLight` | `#F0FDF4` | — (prototype only, lighter than surfaceSuccessDefault) | — | Completed goal card bg |
+
+#### Status Tokens — Warning / Caution
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `warning` | `#B45309` | `contentCaution` | `yellow600` | Actionable safety tier text |
+| `warningBg` | `#FEF3C7` | `surfaceCautionDefault` | `yellow50` | Actionable safety tier bg |
+
+#### Status Tokens — Info / Tip
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `info` | `#2563EB` | `contentTip` | `blue650` | Handoff chip text |
+| `infoBg` | `#DBEAFE` | `surfaceTipDefault` | `blue50` | Handoff chip bg |
+
+#### Utility Tokens
+
+| Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|---|
+| `progressTrack` | `#E5E1DA` | `surfaceIndicatorUnselected` | `bone250` | Goal ring track color |
+| `frameBg` | `#E8E4DE` | — (prototype only) | ~`bone200` | Frame backgrounds |
+
+#### Button Tokens (reference)
+
+| Pacific Token | Primitive | Prototype Mapping |
 |---|---|---|
-| `#0F0F0F` | Toast background | Near-black |
-| `#32B7D9` | Toast undo action text | Brand cyan variant |
-| `#BDBBB9` | Edit character count, muted more-icon | Inactive gray |
-| `#c4a882` | Typing shimmer base color | Warm gold |
-| `rgba(0,0,0,0.35)` | ScenarioSwitcher backdrop | Modal overlay |
-| `rgba(0,0,0,0.4)` | MemoryCenter delete-all confirm overlay | Modal overlay |
-| `rgba(10,10,10,0.06)` | ChatHistory card border, divider | Lighter than surfaceEdge |
-| `rgba(10,10,10,0.08)` | Memory card border | Between edge and edgeLight |
-| `rgba(10,10,10,0.16)` | Menu shadow, card shadow | Drop shadow color |
-| `rgba(10,10,10,0.2)` | Edit cancel button border | Heavier than edge |
-| `rgba(112,111,110,0.6)` | Filter count text (MemoryCenter) | Transparent secondary |
-| `rgba(255,255,255,0.2)` | Active scenario icon bg | White overlay |
-| `rgba(255,255,255,0.6)` | Active scenario subtitle, filter count active | Muted white |
+| `buttonNeutralDefault` | `bone850` | Confirm pill bg → `contentPrimary` |
+| `buttonBrandDefault` | `blue550` | Brand actions → `contentBrand` |
+| `buttonDestructiveDefault` | `red600` | Delete button bg → `danger` |
+
+#### Hardcoded colors not yet in `colors.ts`
+
+| Value | Pacific Token | Primitive | Usage |
+|---|---|---|---|
+| `#0F0F0F` | `surfaceToast` | `bone950` | Toast background |
+| `#32B7D9` | — (prototype only) | — | Toast undo action text |
+| `#c4a882` | — (prototype only) | — | Typing shimmer base color |
+| `rgba(0,0,0,0.35)` | `surfaceScrim` | `bone100050Pct` | ScenarioSwitcher backdrop |
+| `rgba(0,0,0,0.4)` | `surfaceScrim` | `bone100050Pct` | MemoryCenter delete-all overlay |
+| `rgba(10,10,10,0.06)` | — (custom) | — | ChatHistory card border |
+| `rgba(10,10,10,0.08)` | — (custom) | — | Memory card border |
+| `rgba(10,10,10,0.16)` | `surfaceEdge` | `bone100016Pct` | Menu shadow, card shadow |
+| `rgba(10,10,10,0.2)` | — (custom) | — | Edit cancel button border |
+| `rgba(112,111,110,0.6)` | — (custom) | — | Filter count text (MemoryCenter) |
+| `rgba(255,255,255,0.2)` | — (custom) | — | Active scenario icon bg |
+| `rgba(255,255,255,0.6)` | — (custom) | — | Active scenario subtitle |
+
+**Migration note:** Prototype hex values are approximations of Pacific primitives. During Flutter migration, replace all prototype hex values with exact Pacific primitive references (e.g., `bone850` instead of `#1A1919`). Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens.
 
 ### 1.2 Typography
 
