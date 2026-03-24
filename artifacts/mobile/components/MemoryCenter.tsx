@@ -25,14 +25,16 @@ function PencilIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: s
 }
 
 function PauseIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
-  const w = size * (10 / 13);
+  const w = size * (9.83333 / 12.1667);
   return (
-    <Svg width={w} height={size} viewBox="0 0 10 13" fill="none">
+    <Svg width={w} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
       <Path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M1 0.5C0.447715 0.5 0 0.947715 0 1.5V11.5C0 12.0523 0.447715 12.5 1 12.5H3C3.55228 12.5 4 12.0523 4 11.5V1.5C4 0.947715 3.55228 0.5 3 0.5H1ZM7 0.5C6.44772 0.5 6 0.947715 6 1.5V11.5C6 12.0523 6.44772 12.5 7 12.5H9C9.55228 12.5 10 12.0523 10 11.5V1.5C10 0.947715 9.55228 0.5 9 0.5H7Z"
-        fill={color}
+        d="M8.41667 0.75H7.08333C6.71514 0.75 6.41667 1.04848 6.41667 1.41667V10.75C6.41667 11.1182 6.71514 11.4167 7.08333 11.4167H8.41667C8.78486 11.4167 9.08333 11.1182 9.08333 10.75V1.41667C9.08333 1.04848 8.78486 0.75 8.41667 0.75Z"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M2.75 0.75H1.41667C1.04848 0.75 0.75 1.04848 0.75 1.41667V10.75C0.75 11.1182 1.04848 11.4167 1.41667 11.4167H2.75C3.11819 11.4167 3.41667 11.1182 3.41667 10.75V1.41667C3.41667 1.04848 3.11819 0.75 2.75 0.75Z"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
       />
     </Svg>
   );
@@ -44,8 +46,8 @@ function PlayIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: str
     <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingLeft: 1.5 }}>
       <Svg width={w} height={size} viewBox="0 0 11 13" fill="none">
         <Path
-          d="M1.5 1.49C1.5 0.87 2.19 0.5 2.73 0.83L9.83 5.81C10.35 6.12 10.35 6.88 9.83 7.19L2.73 12.17C2.19 12.5 1.5 12.13 1.5 11.51V1.49Z"
-          fill={color}
+          d="M1.75 1.51795V11.482C1.75 11.7784 2.07378 11.9568 2.32283 11.7916L9.82717 6.80959C10.0506 6.66148 10.0506 6.33852 9.82717 6.19041L2.32283 1.20836C2.07378 1.04318 1.75 1.22159 1.75 1.51795Z"
+          stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
         />
       </Svg>
     </View>
