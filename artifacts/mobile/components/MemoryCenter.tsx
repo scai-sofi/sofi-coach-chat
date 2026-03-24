@@ -254,12 +254,14 @@ function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number;
 
 function PauseMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 9.83333 12.1667" fill="none">
       <Path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8 5C8 4.44772 8.44772 4 9 4H10C10.5523 4 11 4.44772 11 5V19C11 19.5523 10.5523 20 10 20H9C8.44772 20 8 19.5523 8 19V5ZM13 5C13 4.44772 13.4477 4 14 4H15C15.5523 4 16 4.44772 16 5V19C16 19.5523 15.5523 20 15 20H14C13.4477 20 13 19.5523 13 19V5Z"
-        fill={color}
+        d="M8.41667 0.75H7.08333C6.71514 0.75 6.41667 1.04848 6.41667 1.41667V10.75C6.41667 11.1182 6.71514 11.4167 7.08333 11.4167H8.41667C8.78486 11.4167 9.08333 11.1182 9.08333 10.75V1.41667C9.08333 1.04848 8.78486 0.75 8.41667 0.75Z"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Path
+        d="M2.75 0.75H1.41667C1.04848 0.75 0.75 1.04848 0.75 1.41667V10.75C0.75 11.1182 1.04848 11.4167 1.41667 11.4167H2.75C3.11819 11.4167 3.41667 11.1182 3.41667 10.75V1.41667C3.41667 1.04848 3.11819 0.75 2.75 0.75Z"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
       />
     </Svg>
   );
