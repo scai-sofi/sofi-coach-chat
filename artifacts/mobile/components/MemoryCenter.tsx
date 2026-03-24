@@ -227,13 +227,62 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   );
 }
 
-function MoreIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+function MoreIcon({ size = 20, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10Z"
+        fill={color}
+      />
+      <Path
+        d="M7 10C7 10.6904 6.44036 11.25 5.75 11.25C5.05964 11.25 4.5 10.6904 4.5 10C4.5 9.30964 5.05964 8.75 5.75 8.75C6.44036 8.75 7 9.30964 7 10Z"
+        fill={color}
+      />
+      <Path
+        d="M11.25 10C11.25 10.6904 10.6904 11.25 10 11.25C9.30964 11.25 8.75 10.6904 8.75 10C8.75 9.30964 9.30964 8.75 10 8.75C10.6904 8.75 11.25 9.30964 11.25 10Z"
+        fill={color}
+      />
+      <Path
+        d="M15.5 10C15.5 10.6904 14.9404 11.25 14.25 11.25C13.5596 11.25 13 10.6904 13 10C13 9.30964 13.5596 8.75 14.25 8.75C14.9404 8.75 15.5 9.30964 15.5 10Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+function PauseMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M12 7C13.1046 7 14 6.10457 14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5C10 6.10457 10.8954 7 12 7ZM12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14ZM14 19C14 20.1046 13.1046 21 12 21C10.8954 21 10 20.1046 10 19C10 17.8954 10.8954 17 12 17C13.1046 17 14 17.8954 14 19Z"
+        d="M8 5C8 4.44772 8.44772 4 9 4H10C10.5523 4 11 4.44772 11 5V19C11 19.5523 10.5523 20 10 20H9C8.44772 20 8 19.5523 8 19V5ZM13 5C13 4.44772 13.4477 4 14 4H15C15.5523 4 16 4.44772 16 5V19C16 19.5523 15.5523 20 15 20H14C13.4477 20 13 19.5523 13 19V5Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+function PlayMenuIcon({ size = 24, color = Colors.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M6 4.83167C6 3.94839 6.96725 3.40832 7.72111 3.89137L19.0711 11.0597C19.7889 11.5196 19.7889 12.5804 19.0711 13.0403L7.72111 20.2086C6.96725 20.6917 6 20.1516 6 19.2683V4.83167Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+function DeleteMenuIcon({ size = 24, color = Colors.danger }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M8 4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V5H19C19.5523 5 20 5.44772 20 6C20 6.55228 19.5523 7 19 7H5C4.44772 7 4 6.55228 4 6C4 5.44772 4.44772 5 5 5H8V4ZM10 5H14V4H10V5ZM6 7.99699C6.55228 7.99699 7 8.44471 7 8.99699V18C7 19.1046 7.89543 20 9 20H15C16.1046 20 17 19.1046 17 18V8.99699C17 8.44471 17.4477 7.99699 18 7.99699C18.5523 7.99699 19 8.44471 19 8.99699V18C19 20.2091 17.2091 22 15 22H9C6.79086 22 5 20.2091 5 18V8.99699C5 8.44471 5.44772 7.99699 6 7.99699ZM10 9C10.5523 9 11 9.44772 11 10V17C11 17.5523 10.5523 18 10 18C9.44772 18 9 17.5523 9 17V10C9 9.44772 9.44772 9 10 9ZM14 9C14.5523 9 15 9.44772 15 10V17C15 17.5523 14.5523 18 14 18C13.4477 18 13 17.5523 13 17V10C13 9.44772 13.4477 9 14 9Z"
         fill={color}
       />
     </Svg>
@@ -308,7 +357,7 @@ export function MemoryCenter() {
           <View style={styles.rightControls}>
             {memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' && (
               <Pressable style={styles.iconBtn} onPress={() => setShowMoreMenu(!showMoreMenu)} hitSlop={8}>
-                <MoreIcon size={24} color={Colors.contentPrimary} />
+                <MoreIcon size={20} color={showMoreMenu ? '#BDBBB9' : Colors.contentPrimary} />
               </Pressable>
             )}
           </View>
@@ -316,41 +365,45 @@ export function MemoryCenter() {
       </View>
 
       {showMoreMenu && (
-        <>
-          <Pressable style={styles.menuBackdrop} onPress={() => setShowMoreMenu(false)} />
-          <View style={[styles.moreMenu, { top: insets.top + 44 }]}>
-            <Pressable
-              style={styles.menuItem}
-              onPress={() => {
-                const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
-                const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
-                const allPaused = activeCount === 0 && pausedCount > 0;
-                pauseAllMemories();
-                setShowMoreMenu(false);
-                showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
-              }}
-            >
-              <Text style={styles.menuText}>
-                {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
-                  ? 'Resume all'
-                  : 'Pause all'}
-              </Text>
-              {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
-                ? <PlayIcon size={16} color={Colors.contentPrimary} />
-                : <PauseIcon size={16} color={Colors.contentPrimary} />}
-            </Pressable>
-            <Pressable
-              style={styles.menuItemLast}
-              onPress={() => {
-                setShowMoreMenu(false);
-                setShowDeleteConfirm(true);
-              }}
-            >
-              <Text style={[styles.menuText, { color: Colors.danger }]}>Delete all</Text>
-              <DeleteIcon size={16} color={Colors.danger} />
-            </Pressable>
+        <View style={styles.menuOverlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setShowMoreMenu(false)} />
+          <View style={[styles.menuPositioner, { paddingTop: insets.top + 44 }]}>
+            <View style={styles.menuShadow}>
+              <View style={styles.menuInner}>
+                <Pressable
+                  style={styles.menuItem}
+                  onPress={() => {
+                    const activeCount = memories.filter(m => m.status === 'ACTIVE').length;
+                    const pausedCount = memories.filter(m => m.status === 'PAUSED').length;
+                    const allPaused = activeCount === 0 && pausedCount > 0;
+                    pauseAllMemories();
+                    setShowMoreMenu(false);
+                    showToast({ message: allPaused ? 'All memories resumed.' : 'All memories paused.' });
+                  }}
+                >
+                  <Text style={styles.menuText}>
+                    {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
+                      ? 'Resume all'
+                      : 'Pause all'}
+                  </Text>
+                  {memories.filter(m => m.status === 'ACTIVE').length === 0 && memories.filter(m => m.status === 'PAUSED').length > 0
+                    ? <PlayMenuIcon size={24} color={Colors.contentPrimary} />
+                    : <PauseMenuIcon size={24} color={Colors.contentPrimary} />}
+                </Pressable>
+                <Pressable
+                  style={styles.menuItemLast}
+                  onPress={() => {
+                    setShowMoreMenu(false);
+                    setShowDeleteConfirm(true);
+                  }}
+                >
+                  <Text style={[styles.menuText, { color: Colors.danger }]}>Delete all</Text>
+                  <DeleteMenuIcon size={24} color={Colors.danger} />
+                </Pressable>
+              </View>
+            </View>
           </View>
-        </>
+        </View>
       )}
 
       {showDeleteConfirm && (
@@ -504,24 +557,32 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingRight: 16,
   },
-  menuBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 149,
-  },
-  moreMenu: {
+  menuOverlay: {
     position: 'absolute',
-    right: 16,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: 150,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.08)',
-    shadowColor: 'rgba(10,10,10,0.12)',
-    shadowOffset: { width: 0, height: 4 },
+  },
+  menuPositioner: {
+    alignItems: 'flex-end',
+    paddingRight: 16,
+  },
+  menuShadow: {
+    width: 212,
+    borderRadius: 20,
+    shadowColor: 'rgba(10,10,10,0.16)',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 1,
     shadowRadius: 16,
     elevation: 8,
-    minWidth: 180,
+  },
+  menuInner: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 2,
+    paddingHorizontal: 16,
     overflow: 'hidden',
   },
   menuItem: {
@@ -529,22 +590,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
     borderBottomWidth: 0.75,
-    borderBottomColor: 'rgba(10,10,10,0.06)',
+    borderBottomColor: 'rgba(10,10,10,0.1)',
   },
   menuItemLast: {
     height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
   },
   menuText: {
     fontSize: 16,
-    fontFamily: Fonts.regular,
+    fontFamily: Fonts.medium,
     color: Colors.contentPrimary,
     lineHeight: 20,
+    flex: 1,
   },
   iconBtn: {
     width: 24,
