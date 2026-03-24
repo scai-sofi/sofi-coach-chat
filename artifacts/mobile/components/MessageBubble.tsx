@@ -350,14 +350,14 @@ function MemoryProposalCard({ message }: { message: Message }) {
   }
 
   return (
-    <View style={[styles.proposalCard, { paddingBottom: 16 }]}>
+    <View style={styles.proposalCard}>
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={14} color={Colors.contentSecondary} style={{ marginTop: 2 }} />
+        <Feather name="cpu" size={14} color={Colors.contentSecondary} style={styles.proposalIcon} />
         <Text style={styles.proposalText}>
-          Want me to remember: <Text style={{ fontFamily: Fonts.regular }}>"{proposal.content}"</Text>?
+          Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
       </View>
-      <View style={[styles.proposalButtons, { marginLeft: 16 }]}>
+      <View style={styles.proposalButtonsIndented}>
         <Pressable style={styles.confirmBtn} onPress={() => confirmMemory(message.id)}>
           <Text style={styles.confirmBtnText}>Remember</Text>
         </Pressable>
@@ -380,7 +380,7 @@ function GoalProposalCard({ message }: { message: Message }) {
         <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
           <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
-        <Text style={[styles.confirmedText, { color: Colors.contentPrimary }]}>Goal created — check your goals panel</Text>
+        <Text style={styles.confirmedTextPrimary}>Goal created — check your goals panel</Text>
       </View>
     );
   }
@@ -390,8 +390,8 @@ function GoalProposalCard({ message }: { message: Message }) {
   return (
     <View style={styles.proposalCard}>
       <View style={styles.proposalHeader}>
-        <Feather name="target" size={14} color={Colors.contentSecondary} style={{ marginTop: 2 }} />
-        <View style={{ flex: 1 }}>
+        <Feather name="target" size={14} color={Colors.contentSecondary} style={styles.proposalIcon} />
+        <View style={styles.proposalContentWrap}>
           <Text style={styles.proposalText}>{proposal.title}</Text>
           <Text style={styles.proposalDetail}>
             Target: ${proposal.targetAmount.toLocaleString()} · ${proposal.monthlyContribution}/mo · {monthStr} · Linked: {proposal.linkedAccount}
@@ -404,7 +404,7 @@ function GoalProposalCard({ message }: { message: Message }) {
           <Text style={styles.approvalHintText}>Needs your approval</Text>
         </View>
       )}
-      <View style={[styles.proposalButtons, { marginTop: showApproval ? 0 : undefined }]}>
+      <View style={styles.proposalButtons}>
         <Pressable style={styles.confirmBtn} onPress={() => confirmGoal(message.id)}>
           <Text style={styles.confirmBtnText}>Set up goal</Text>
         </Pressable>
@@ -427,7 +427,7 @@ function InsightToActionCard({ message }: { message: Message }) {
         <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
           <Path d="M20 6L9 17L4 12" stroke={Colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
-        <Text style={[styles.confirmedText, { color: Colors.contentPrimary }]}>All set — saved to memory & goal created</Text>
+        <Text style={styles.confirmedTextPrimary}>All set — saved to memory & goal created</Text>
       </View>
     );
   }
@@ -446,12 +446,10 @@ function InsightToActionCard({ message }: { message: Message }) {
   const showApproval = message.safetyTier === 'actionable';
   return (
     <View style={styles.proposalCard}>
-      <View style={[styles.proposalHeader, { gap: 10 }]}>
-        <View style={styles.insightIcon}>
-          <Feather name="target" size={14} color="#fff" />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.proposalText, { fontSize: 14, lineHeight: 18 }]}>{gp.title}</Text>
+      <View style={styles.proposalHeader}>
+        <Feather name="target" size={14} color={Colors.contentSecondary} style={styles.proposalIcon} />
+        <View style={styles.proposalContentWrap}>
+          <Text style={styles.proposalText}>{gp.title}</Text>
           <Text style={styles.proposalDetail}>
             ${gp.targetAmount.toLocaleString()} · ${gp.monthlyContribution}/mo · ~{months} months
           </Text>
@@ -463,12 +461,12 @@ function InsightToActionCard({ message }: { message: Message }) {
           <Text style={styles.approvalHintText}>Needs your approval</Text>
         </View>
       )}
-      <View style={[styles.proposalButtons, { marginTop: showApproval ? 8 : 12 }]}>
-        <Pressable style={[styles.confirmBtn, { paddingHorizontal: 14, paddingVertical: 7 }]} onPress={() => acceptInsightToAction(message.id)}>
-          <Text style={[styles.confirmBtnText, { fontSize: 13 }]}>Set up goal</Text>
+      <View style={styles.proposalButtons}>
+        <Pressable style={styles.confirmBtn} onPress={() => acceptInsightToAction(message.id)}>
+          <Text style={styles.confirmBtnText}>Set up goal</Text>
         </Pressable>
-        <Pressable onPress={() => saveInsightMemoryOnly(message.id)} style={{ paddingHorizontal: 14, paddingVertical: 7 }}>
-          <Text style={{ fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary }}>Just remember</Text>
+        <Pressable style={styles.dismissBtn} onPress={() => saveInsightMemoryOnly(message.id)}>
+          <Text style={styles.dismissBtnText}>Just remember</Text>
         </Pressable>
       </View>
     </View>
@@ -759,10 +757,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 8,
   },
   confirmedText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
+  confirmedTextPrimary: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 10 },
+  proposalIcon: { marginTop: 2 },
+  proposalContentWrap: { flex: 1 },
   proposalText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
+  proposalQuote: { fontFamily: Fonts.regular },
   proposalDetail: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
   proposalButtons: { flexDirection: 'row', gap: 8 },
+  proposalButtonsIndented: { flexDirection: 'row', gap: 8, marginLeft: 22 },
   confirmBtn: {
     backgroundColor: Colors.contentPrimary, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
@@ -779,11 +782,6 @@ const styles = StyleSheet.create({
   },
   approvalHintText: {
     fontSize: 11, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 14,
-  },
-  insightIcon: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: Colors.contentPrimary,
-    alignItems: 'center', justifyContent: 'center', marginTop: 2,
   },
   actionRow: {
     flexDirection: 'row', alignItems: 'center', gap: 16,

@@ -335,22 +335,32 @@ These are elements rendered inside AI message bubbles.
 
 ### 3.1 Component Hierarchy
 
+All proposal cards now share a unified visual language (normalized in Task #10).
+
 | Component | Background | Border | Radius | Icon | Body Text | Detail Text | Buttons |
 |---|---|---|---|---|---|---|---|
 | MemoryProposalCard | surfaceTint | 1px edgeLight | 16 | Feather `cpu` 14, secondary, bare | 13px Medium | — | Remember / Not now |
 | GoalProposalCard | surfaceTint | 1px edgeLight | 16 | Feather `target` 14, secondary, bare | 13px Medium | 12px Regular secondary | Set up goal / Just chatting |
-| InsightToActionCard | surfaceTint | 1px edgeLight | 16 | Feather `target` 14, **white, in 32px black circle** | **14px** Medium (inline override) | 12px Regular secondary | Set up goal / Just remember |
-| Confirmed (check) | surfaceTint | 1px edgeLight | 16 | SVG checkmark 14×14, bone600 | 13px Medium secondary | — | — |
+| InsightToActionCard | surfaceTint | 1px edgeLight | 16 | Feather `target` 14, secondary, bare | 13px Medium | 12px Regular secondary | Set up goal / Just remember |
+| Confirmed (check) | surfaceTint | 1px edgeLight | 16 | SVG checkmark 14×14, bone600 | 13px Medium (secondary or primary) | — | — |
 | Confirmed (memory only) | surfaceTint | 1px edgeLight | 16 | Feather `cpu` 14, secondary | 13px Medium secondary | — | — |
 
-**Known inconsistencies (to be normalized in Task #10):**
+**Shared proposal card spec:**
 
-1. **Icon treatment**: Memory/Goal proposals use bare Feather icons. InsightToAction uses a 32px black circle with white icon inside — mixed approach.
-2. **Body text size**: Memory/Goal proposals use 13px (from stylesheet). InsightToAction overrides to 14px via inline style.
-3. **Button style**: Memory/Goal use stylesheet-defined confirm/dismiss pills. InsightToAction uses inline styles with different padding (h14/v7 vs h12/v6) and different text sizes (13px vs 12px).
-4. **Button pattern**: InsightToAction "Just remember" is a plain text pressable (no border, no background) vs "Not now" / "Just chatting" which use outlined pills.
-5. **Spacing**: InsightToAction proposalHeader has `gap: 10` (inline) vs default `gap: 8`. proposalButtons `marginTop` varies (12/8/undefined).
-6. **Card padding**: MemoryProposalCard adds `paddingBottom: 16` inline override. Others use base `padding: 12`.
+| Property | Value |
+|---|---|
+| Card padding | 12px (all sides) |
+| Header layout | Row, gap 8, alignItems flex-start, marginBottom 10 |
+| Icon position | marginTop 2 |
+| Body text | 13px Medium, contentPrimary, lineHeight 18 |
+| Detail text | 12px Regular, contentSecondary, marginTop 2, lineHeight 16 |
+| Confirm button | Black pill — bg contentPrimary, radius 9999, padding h12/v6, text 12px Medium white |
+| Dismiss button | Outlined pill — border 1px rgba(10,10,10,0.1), radius 9999, padding h12/v6, text 12px Medium contentSecondary |
+| Button row | Row, gap 8 |
+| Memory button indent | marginLeft 22 (aligns with text after icon) |
+| Confirmed text (secondary) | 13px Medium, contentSecondary, lineHeight 18 |
+| Confirmed text (primary) | 13px Medium, contentPrimary, lineHeight 18 |
+| Approval hint | Row, gap 4, marginTop 8, marginBottom 4, paddingLeft 2 — 11px Medium contentSecondary |
 
 ### 3.2 Chip Badge
 
@@ -481,7 +491,7 @@ These are elements rendered inside AI message bubbles.
 | Checkmark SVG (confirmed) | 14×14 | 0 0 24 24 | Stroked (1.5) | contentBone600 | Confirmed proposal state |
 | Checkmark SVG (copied) | 20×20 | 0 0 24 24 | Stroked (1.25) | contentBone600 | Copy action feedback |
 | Feather cpu | 14 | — | Feather | contentSecondary | Memory proposal icon |
-| Feather target | 14 | — | Feather | contentSecondary / white | Goal/insight proposal icon |
+| Feather target | 14 | — | Feather | contentSecondary | Goal/insight proposal icon |
 | Feather shield | 10 | — | Feather | contentSecondary | Approval hint |
 | Feather star | 13 | — | Feather | white | Proactive system pill |
 | Feather chevron-right | 12 | — | Feather | per chip | Chip badge trailing |
@@ -663,7 +673,7 @@ View (overlay: absoluteFill, zIndex 100, justifyContent flex-end)
 - SettingsMenuIcon uses stroke style while all other menu icons use filled style.
 
 ### Inline Component Inconsistencies
-- See Section 3.1 for the full list of inconsistencies between MemoryProposalCard, GoalProposalCard, and InsightToActionCard. These will be normalized in Task #10.
+- Resolved in Task #10. All proposal cards now share unified icon treatment (bare Feather), text sizes (13px body, 12px detail), button patterns (confirm pill + dismiss outlined pill), and spacing (gap 8, padding 12). See Section 3.1 for the normalized spec.
 
 ---
 
