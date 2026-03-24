@@ -25,38 +25,24 @@ This document covers two distinct but tightly interconnected features. They can 
 - **Access:** Goals can be created and reviewed from Coach Chat (conversational, contextual) and from app Settings (direct, structured). **Save Up goals are directly linked to SoFi Banking's existing Vault feature** — creating a Save Up goal either connects to an existing Vault or prompts the member to create one.
 - **Who it's for:** Members with a specific financial intention — an emergency fund, a debt payoff plan, a savings target — who want accountability and progress visibility.
 
-### How they connect
+### How memory and goals work together
 
-- Memory makes Goals personal. When a member has told Coach "I want to retire by 55," that context shapes how Coach frames every goal conversation.
-- Goals generate memories. Creating a goal is itself a high-signal memory event — Coach knows what the member is working toward.
-- Goal-aware responses draw on both. Coach's Next Step / Progress Delta / Risk Alert patterns require both memory (who this person is) and goal state (where they stand).
-- Neither requires the other to launch, but both are significantly weaker in isolation.
+Neither feature requires the other to launch, but both are significantly weaker in isolation. They share a single processing pipeline and reinforce each other at every layer:
 
-### Memory + Goals integration — how it actually works
+**Shared pipeline** — Every AI response passes through `parseMarkers()` on the server, which extracts both memory markers (`[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`) and goal markers (`[GOAL_PROPOSAL]`) in a single pass. The client receives `memoryActions` and `goalActions` in the same response payload and processes them together via `applyMemoryAndGoalActions()`.
 
-The memory and goal systems share a single processing pipeline but serve distinct roles. Here's the concrete integration:
+**Goals create memories** — When the AI proposes a goal, it typically also emits a `[MEMORY_SAVE]PRIORITIES|...` marker. Accepting a goal stores a PRIORITIES memory alongside it — so Coach retains persistent knowledge of what the member is working toward. Example: a goal proposal for "Pay Off Credit Card — $4,200" also saves "Wants to pay off credit card debt by year-end" as a PRIORITIES memory.
 
-**1. Shared marker pipeline**
+**Memories make goals personal** — When generating a response, the AI prompt includes both all active memories (who this person is, their financial context) and all active goals (what they're working toward, progress, confidence). This combination enables four goal-aware response patterns:
 
-Every AI response passes through `parseMarkers()` on the server, which extracts both memory markers (`[MEMORY_SAVE]`, `[MEMORY_PROPOSAL]`, `[MEMORY_UPDATE]`) and goal markers (`[GOAL_PROPOSAL]`) in a single pass. The client receives both `memoryActions` and `goalActions` arrays in the same response payload and processes them together via `applyMemoryAndGoalActions()`.
-
-**2. Goals create PRIORITIES memories**
-
-When the AI proposes a goal, it typically also emits a `[MEMORY_SAVE]PRIORITIES|...` marker. This means accepting a goal also stores a PRIORITIES memory — giving Coach persistent knowledge of what the member is working toward. Example: a goal proposal for "Pay Off Credit Card — $4,200" also saves "Wants to pay off credit card debt by year-end" as a PRIORITIES memory.
-
-**3. Memories inform goal-aware responses**
-
-When the AI generates a response, the prompt includes both:
-- All active memories (who this person is, what they value, their financial situation)
-- All active goals (what they're working toward, current progress, confidence)
-
-This combination enables the four goal-aware response patterns:
 - **Next Step** — uses memory (financial context) + goal (specific target) to suggest an action
 - **Progress Delta** — uses goal state to show how a topic affects goal progress
 - **Risk Alert** — uses goal state + memory (spending patterns, income) to flag risks
 - **None** — topic is unrelated to any goal; no forced connection
 
-**4. Memory mode affects goals differently**
+**Independent lifecycles** — Memories and goals can be managed independently. Pausing, editing, or deleting memories doesn't affect linked goals; completing or dismissing goals doesn't remove related memories. Deleting all memories does not delete goals (and vice versa).
+
+**Memory mode asymmetry** — Goals keep working even when memory is turned off. A member can track goals without broader personalization:
 
 | Memory mode | Memory behavior | Goal behavior |
 |---|---|---|
@@ -64,16 +50,7 @@ This combination enables the four goal-aware response patterns:
 | `ask-first` | All saves converted to proposals | Goals track normally; memory proposals require confirmation |
 | `off` | No memory reads or writes | Goals still tracked — `acceptDraftGoal` works regardless of memory mode |
 
-This asymmetry is intentional: a member might want goal tracking without broader personalization.
-
-**5. Lifecycle independence**
-
-Memories and goals have independent lifecycles:
-- Memories can be paused, edited, or deleted without affecting linked goals
-- Goals can be completed, paused, or dismissed without removing related memories
-- Deleting all memories does not delete goals (and vice versa)
-
-**6. UI surfaces**
+**Where each feature surfaces in the UI:**
 
 | Surface | Memory | Goals | Both |
 |---|---|---|---|
