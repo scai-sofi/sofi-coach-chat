@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -98,7 +98,7 @@ export function EmptyChat() {
       <View style={styles.suggestionsSection}>
         <Animated.View style={fullCardAnimStyle}>
           <Pressable
-            style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
+            style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor, ...(Platform.OS === 'web' ? { boxShadow: `0px 1px 4px ${colors.shadowColor}` } : {}) }]}
             onPress={() => sendMessage(fullCard.text)}
           >
             <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
@@ -110,7 +110,7 @@ export function EmptyChat() {
           {halfCards.map((card, i) => (
             <Pressable
               key={i}
-              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
+              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor, ...(Platform.OS === 'web' ? { boxShadow: `0px 1px 4px ${colors.shadowColor}` } : {}) }]}
               onPress={() => sendMessage(card.text)}
             >
               <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
