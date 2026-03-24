@@ -58,7 +58,7 @@ Neither feature requires the other to launch, but both are significantly weaker 
 | Memory Center | Full CRUD for memories | — | PRIORITIES category shows goal-related memories |
 | Goals Dashboard | — | Full goal cards, milestones, progress | — |
 | Settings | Memory mode toggle | — | — |
-| Chat header menu | Memory Center entry | Goals Dashboard entry (with DRAFT badge) | — |
+| Chat header menu | Memory Center entry | Goals Dashboard entry (with numeric draft count badge) | — |
 
 ### Design principles
 
@@ -378,7 +378,7 @@ When applicable, Coach's response includes one of four patterns:
 | Suggestion chips | Horizontally scrollable pills below AI response |
 | Safety tier badge | Color-coded pill above message text |
 | Approval hint | Shield icon + "Needs your approval" label inside actionable cards (replaces standalone badge) |
-| Confirmed state | SVG checkmark + summary text (e.g., "Saved to memory", "Goal created", "All set — saved to memory & goal created") |
+| Confirmed state | SVG checkmark + summary text — memory: "Saved to memory", goal: "Goal created — check your goals panel" |
 | Action footer | Copy (with SVG checkmark confirmation), thumbs up/down (PNG icons with `tintColor: contentBone600`), provenance toggle |
 
 ### Memory Center
@@ -401,16 +401,20 @@ Accessed via the chat header menu. Full-screen overlay panel.
 
 ### Goals Dashboard
 
-Accessed via the chat header menu. Full-screen overlay panel.
+Accessed via the chat header menu (with numeric badge showing draft count). Full-screen overlay panel. Goals are organized into three sections: Suggested (DRAFT), Active, and Completed — separated by labeled dividers.
 
 | Component | Description |
 |---|---|
-| Panel header | Title + close button |
-| Goal cards | Circular progress ring, title, status pill (On Track / At Risk / Completed) |
-| Goal metadata | Monthly target, target date, linked account, current vs. target amount |
-| Milestone markers | Visual indicators for 25%/50%/75%/100% milestones |
-| Confidence indicator | Numeric score with status coloring |
-| Empty state | Message when no goals exist |
+| Panel header | Title ("My goals") + back chevron |
+| Suggested section | Section header with star icon + "Suggested" label in `contentBrand`; shows DRAFT goals with `SuggestedGoalCard` |
+| Suggested goal card | Brand-colored border, "Suggested" badge, goal title, type badge, target/monthly/timeline/linked account, [Set up goal] / [Dismiss] buttons |
+| Goal cards | Circular progress ring, title, type badge ("Save Up" / "Pay Down" / "Done"), current vs. target amount |
+| Goal status row | Status icon + text ("On track" / "At risk" / "Goal reached!" / "Active") + confidence score as "N% confidence" |
+| Goal metadata | Monthly target, est. completion (months remaining), linked account |
+| Milestone markers | Pill-style indicators for 25%/50%/75%/100% with check-circle icon when reached |
+| Ask about goal | "Ask about this goal" button linking back to chat (hidden on completed goals) |
+| Footer | Summary counts: "N active · N suggested · N completed · Auto-updated from your accounts" |
+| Empty state | Target icon + "No goals yet. Tell the coach what you're working toward and it will help you set one up." |
 
 ---
 
