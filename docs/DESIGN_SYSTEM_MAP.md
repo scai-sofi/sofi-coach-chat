@@ -693,7 +693,7 @@ When a goal suggestion is queued, a system pill message appears: "I've added a g
 | Icon | Size | Component | Style | Color |
 |---|---|---|---|---|
 | ChevronLeftIcon | 24×24 | ChatHistory, SettingsPanel | Filled | contentPrimary |
-| NewChatIcon | 24×24 | ChatHistory | Filled | contentPrimary |
+| ChatNewIcon | 24×24 | ChatHistory | Filled | contentPrimary |
 | Arrow-left (scroll) | 14.5×11.5 | ScrollAnchor | Filled | `#1A1919` |
 | Arrow-up (send) | 11.5×14.5 | InputBar | Filled | white |
 | Feather search | 16 | ChatHistory | Feather | contentSecondary |
@@ -707,16 +707,17 @@ Every custom SVG icon definition and the file where it lives:
 
 | File | SVG Components Defined |
 |---|---|
-| `ChatHeader.tsx` | DemoIcon, CloseIcon, ClockIcon, MoreIcon, ChatNewIcon, MemoryMenuIcon, GoalsMenuIcon, PencilMenuIcon, SettingsMenuIcon, DeleteMenuIcon |
-| `MemoryCenter.tsx` | ChevronLeftIcon, SearchIcon, FilterIcon, PencilIcon, PauseIcon, PlayIcon, DeleteIcon, MoreIcon, PauseMenuIcon, PlayMenuIcon, DeleteMenuIcon |
-| `SettingsPanel.tsx` | ChevronLeftIcon, RadioSelected, RadioUnselected |
-| `GoalsDashboard.tsx` | ChevronLeftIcon, ProgressRing |
-| `ChatHistory.tsx` | ChevronLeftIcon, NewChatIcon |
+| `icons.tsx` (shared) | ChevronLeftIcon, CloseIcon, MoreIcon, DemoIcon, ClockIcon, ChatNewIcon, MemoryMenuIcon, GoalsMenuIcon, PencilMenuIcon, SettingsMenuIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon |
+| `MemoryCenter.tsx` | PencilIcon (13×13), PauseIcon, PlayIcon, DeleteIcon |
+| `SettingsPanel.tsx` | RadioSelected, RadioUnselected |
+| `SearchBar.tsx` | FilterIcon |
 | `ScrollAnchor.tsx` | Arrow-left (inline) |
 | `InputBar.tsx` | Arrow-up (inline) |
 | `MessageBubble.tsx` | Checkmark (inline, 2 sizes) |
 
-**Icon duplication note:** `ChevronLeftIcon` is defined independently in 4 files (ChatHistory, GoalsDashboard, SettingsPanel, MemoryCenter) — all with identical SVG paths. `MoreIcon` is duplicated in ChatHeader and MemoryCenter. `DeleteMenuIcon` is duplicated in ChatHeader and MemoryCenter. All should be extracted to a shared icon module before Flutter migration.
+**Import chain:** `AppBar.tsx` imports `ChevronLeftIcon` from `icons.tsx` and renders it for the `back` variant. All panels (GoalsDashboard, SettingsPanel, ChatHistory, MemoryCenter) get the back chevron via `<AppBar variant="back">` — no local ChevronLeftIcon definitions remain. `ChatHeader.tsx` imports all header icons from `icons.tsx`. `MemoryCenter.tsx` imports `MoreIcon`, `DeleteMenuIcon`, `PauseMenuIcon`, `PlayMenuIcon` from `icons.tsx`; `ChatHistory.tsx` imports `ChatNewIcon` from `icons.tsx`.
+
+**Remaining local icons:** `MemoryCenter` still defines small card-action icons (PencilIcon 13×13, PauseIcon, PlayIcon, DeleteIcon) locally — these are smaller, card-specific variants distinct from the menu-sized versions in `icons.tsx`. `SettingsPanel` defines RadioSelected/RadioUnselected locally. `SearchBar` defines FilterIcon locally. `GoalsDashboard` defines ProgressRing (SVG Circle) inline.
 
 ---
 
