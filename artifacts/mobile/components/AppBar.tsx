@@ -28,6 +28,7 @@ interface BackAppBarProps extends AppBarBaseProps {
   title: string;
   onBack: () => void;
   rightAction?: AppBarAction;
+  rightActions?: AppBarAction[];
 }
 
 interface SheetAppBarProps extends AppBarBaseProps {
@@ -47,6 +48,7 @@ export function AppBar(props: AppBarProps) {
   }
 
   if (props.variant === 'back') {
+    const actions = props.rightActions ?? (props.rightAction ? [props.rightAction] : []);
     return (
       <View style={[styles.headerWrap, { paddingTop: insets.top, backgroundColor: bgColor }]}>
         <View style={styles.titleBar}>
@@ -59,11 +61,11 @@ export function AppBar(props: AppBarProps) {
             <Text style={styles.title} numberOfLines={1}>{props.title}</Text>
           </View>
           <View style={styles.rightZone}>
-            {props.rightAction && (
-              <Pressable style={styles.iconBtn} onPress={props.rightAction.onPress} hitSlop={props.rightAction.hitSlop ?? 8}>
-                {props.rightAction.icon}
+            {actions.map((action, i) => (
+              <Pressable key={i} style={styles.iconBtn} onPress={action.onPress} hitSlop={action.hitSlop ?? 8}>
+                {action.icon}
               </Pressable>
-            )}
+            ))}
           </View>
         </View>
       </View>

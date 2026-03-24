@@ -163,20 +163,34 @@
 
 ## 2. Global Components
 
-### 2.1 App Bar (Panel Header)
+### 2.1 App Bar (`AppBar` component)
 
-Shared across MemoryCenter, SettingsPanel, GoalsDashboard, ChatHistory.
+Shared component: `components/AppBar.tsx`. Used by ChatHeader, MemoryCenter, SettingsPanel, GoalsDashboard, ChatHistory, ScenarioSwitcher.
+
+**Shared layout spec:**
 
 | Property | Value |
 |---|---|
-| Height | 44px |
-| Background | surfaceBase |
-| Layout | Row: leftControls (100px) + titleArea (flex) + rightControls (100px) |
-| Title | 16px Medium, contentPrimary, centered |
-| Icon button container | 24×24, centered, borderRadius 12 (ChatHeader) or none |
-| Back icon | ChevronLeftIcon 24×24, filled SVG |
+| Title bar height | 44px |
+| Background | surfaceBase (configurable via `backgroundColor` prop) |
+| Left zone | width 104px, paddingLeft 16, paddingRight 4 |
+| Center zone | flex 1, centered, overflow hidden |
+| Right zone | width 104px, paddingRight 16, justifyContent flex-end, gap 20 |
+| Title | 16px Medium, contentPrimary, centered, numberOfLines 1 |
+| Icon button | 24×24, centered, borderRadius 12 |
+| Hit slop | 8px default |
+| Safe area | paddingTop = safeAreaInsets.top (handled internally) |
+| Right actions | Up to 2 action icons, spaced with gap 20 |
 
-**ChatHeader variant:** Left/Right zones are 104px. Right zone has gap 20 between icons.
+**Variants:**
+
+| Variant | Left | Center | Right |
+|---|---|---|---|
+| `standard` | Optional action icon | Title + optional subtitle | Up to 2 action icons (`rightActions[]`) |
+| `back` | ChevronLeftIcon (onBack) | Title | Up to 2 action icons (`rightActions[]` or single `rightAction`) |
+| `sheet` | — | Left-aligned title | Optional close button |
+
+**Sheet variant** has different layout: `flexDirection: row`, `justifyContent: space-between`, `paddingHorizontal: 20`, `paddingVertical: 12`. No safe area inset. No left/center/right zones.
 
 ### 2.2 Radio Button
 
