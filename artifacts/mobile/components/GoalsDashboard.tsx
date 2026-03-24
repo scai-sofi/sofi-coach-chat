@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   goalCard: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     padding: 16,
     gap: 12,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   askBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
     paddingVertical: 8, borderRadius: 9999,
-    borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)',
+    borderWidth: 1, borderColor: Colors.surfaceEdge,
   },
   askBtnText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary },
   sectionHeader: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentBrand, lineHeight: 18,
   },
   suggestedCard: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     padding: 16,
     gap: 12,
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     color: '#fff', fontSize: 12, fontFamily: Fonts.medium,
   },
   suggestedDismissBtn: {
-    borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 9999,
+    borderWidth: 1, borderColor: Colors.surfaceEdge, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
   suggestedDismissText: {

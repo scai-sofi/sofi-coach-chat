@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
   bulletText: {},
   divider: {
     height: 0.75,
-    backgroundColor: 'rgba(10,10,10,0.1)',
+    backgroundColor: Colors.surfaceEdge,
     marginVertical: 16,
   },
   safetyBadge: {
@@ -683,7 +683,7 @@ const styles = StyleSheet.create({
   safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
     backgroundColor: Colors.surfaceTint,
-    borderWidth: 1, borderColor: 'rgba(10,10,10,0.05)',
+    borderWidth: 1, borderColor: Colors.surfaceEdgeLight,
     borderRadius: 16, padding: 12,
   },
   confirmedCard: {
@@ -705,7 +705,7 @@ const styles = StyleSheet.create({
   },
   confirmBtnText: { color: '#fff', fontSize: 12, fontFamily: Fonts.medium },
   dismissBtn: {
-    borderWidth: 1, borderColor: 'rgba(10,10,10,0.1)', borderRadius: 9999,
+    borderWidth: 1, borderColor: Colors.surfaceEdge, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
   dismissBtnText: { color: Colors.contentSecondary, fontSize: 12, fontFamily: Fonts.medium },

@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     paddingHorizontal: 16,
-    shadowColor: '#0A0A0A',
+    shadowColor: Colors.contentStatusbar,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   modeRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(10,10,10,0.1)',
+    borderBottomColor: Colors.surfaceEdge,
   },
   modeTextArea: {
     flex: 1,

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontFamily: Fonts.medium,
-    color: '#ffffff',
+    color: Colors.surfaceElevated,
     lineHeight: 20,
   },
   actionText: {

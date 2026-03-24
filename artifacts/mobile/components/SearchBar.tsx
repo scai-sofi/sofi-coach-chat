@@ -40,7 +40,7 @@ export function SearchBar({
           placeholderTextColor={Colors.contentSecondary}
           value={value}
           onChangeText={onChangeText}
-          cursorColor="#5C5B5A"
+          cursorColor={Colors.contentBone600}
           selectionColor="rgba(92,91,90,0.3)"
         />
       </View>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: Colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: 'rgba(10,10,10,0.1)',
+    borderColor: Colors.surfaceEdge,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,

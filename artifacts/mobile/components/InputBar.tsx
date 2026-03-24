@@ -48,7 +48,7 @@ export function InputBar() {
             maxLength={2000}
             onSubmitEditing={handleSend}
             blurOnSubmit={false}
-            cursorColor="#5c5b5a"
+            cursorColor={Colors.contentBone600}
             selectionColor="rgba(92,91,90,0.3)"
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}
@@ -98,10 +98,10 @@ const styles = StyleSheet.create({
   },
   inputPill: {
     minHeight: 48,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 24,
     borderWidth: 0.75,
-    borderColor: 'rgba(10,10,10,0.1)',
+    borderColor: Colors.surfaceEdge,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 100,
-    backgroundColor: '#5c5b5a',
+    backgroundColor: Colors.contentBone600,
     alignItems: 'center',
     justifyContent: 'center',
   },

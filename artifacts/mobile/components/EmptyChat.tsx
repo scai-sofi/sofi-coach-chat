@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   fullCard: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 16,
     padding: 16,
     gap: 4,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   halfCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 16,
     padding: 16,
     height: 92,
