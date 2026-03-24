@@ -55,7 +55,7 @@ export const lightTheme: AppTheme = {
   contentPrimary: '#1a1919',
   contentPrimaryInverse: '#ffffff',
   contentSecondary: '#706f6e',
-  contentBone600: '#5c5b5a',
+  contentBone600: '#adacaa',
   contentStatusbar: '#0a0a0a',
   contentMuted: '#d0ccc5',
   contentDimmed: '#bdbbb9',
