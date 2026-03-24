@@ -33,7 +33,7 @@ Neither feature requires the other to launch, but both are significantly weaker 
 
 **Goals create memories** — When the AI proposes a goal, it typically also emits a `[MEMORY_SAVE]PRIORITIES|...` marker. Accepting a goal stores a PRIORITIES memory alongside it — so Coach retains persistent knowledge of what the member is working toward. Example: a goal proposal for "Pay Off Credit Card — $4,200" also saves "Wants to pay off credit card debt by year-end" as a PRIORITIES memory.
 
-**Memories make goals personal** — When generating a response, the AI prompt includes both all active memories (who this person is, their financial context) and all active goals (what they're working toward, progress, confidence). This combination enables four goal-aware response patterns:
+**Memories make goals personal** — Every time Coach responds, it sees both the member's memories and their active goals. Memories tell Coach *who this person is* — their income, risk tolerance, life situation. Goals tell Coach *what they're working toward* — targets, progress, timelines. Together, they let Coach tailor responses using four patterns:
 
 - **Next Step** — uses memory (financial context) + goal (specific target) to suggest an action
 - **Progress Delta** — uses goal state to show how a topic affects goal progress
