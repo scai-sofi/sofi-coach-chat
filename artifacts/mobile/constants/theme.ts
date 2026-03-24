@@ -43,6 +43,7 @@ export interface AppTheme {
   borderMedium: string;
   inverseAlpha60: string;
   inverseAlpha20: string;
+  userBubbleBg: string;
 }
 
 export const lightTheme: AppTheme = {
@@ -90,6 +91,7 @@ export const lightTheme: AppTheme = {
   borderMedium: 'rgba(10,10,10,0.20)',
   inverseAlpha60: 'rgba(255,255,255,0.6)',
   inverseAlpha20: 'rgba(255,255,255,0.2)',
+  userBubbleBg: '#5c5b5a',
 };
 
 export const darkTheme: AppTheme = {
@@ -137,4 +139,5 @@ export const darkTheme: AppTheme = {
   borderMedium: 'rgba(250,248,245,0.20)',
   inverseAlpha60: 'rgba(0,0,0,0.6)',
   inverseAlpha20: 'rgba(0,0,0,0.2)',
+  userBubbleBg: '#4d4c4b',
 };
