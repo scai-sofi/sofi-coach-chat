@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
   },
   confirmedText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentSecondary, lineHeight: 18 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 10 },
-  proposalText: { fontSize: 13, fontFamily: Fonts.medium, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
+  proposalText: { fontSize: 13, fontFamily: Fonts.regular, color: Colors.contentPrimary, lineHeight: 18, flex: 1 },
   proposalDetail: { fontSize: 12, color: Colors.contentSecondary, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
   proposalButtons: { flexDirection: 'row', gap: 8 },
   confirmBtn: {
