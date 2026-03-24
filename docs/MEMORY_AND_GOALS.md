@@ -76,13 +76,13 @@ No competitor has combined all three of: **structured goals + conversational mem
 
 ### Memory categories
 
-The prototype uses three categories. The design doc's six categories (Preferences, Life Context, Financial Attitudes, Goal-Related, Explicit Facts, Other) are collapsed into three for simplicity — production may expand.
+Three memory categories, each with a default save behavior that determines whether the AI saves automatically or asks the member first:
 
-| Category      | Label        | What it captures | Save type |
+| Category      | Label        | What it captures | Default save behavior |
 |---|---|---|---|
-| `ABOUT_ME`    | About me     | Life situation, household, location, accounts, financial products, income, balances, employment, factual details | Auto-save |
-| `PREFERENCES` | Preferences  | Communication style, detail level, risk tolerance, financial approach, saving vs spending philosophy | Propose |
-| `PRIORITIES`  | Priorities   | Current goals, focus areas, debt payoff targets, savings targets, life events being planned around | Auto-save or Propose |
+| `ABOUT_ME`    | About me     | Life situation, household, location, accounts, financial products, income, balances, employment, factual details | Auto-save — unambiguous personal facts are stored immediately |
+| `PREFERENCES` | Preferences  | Communication style, detail level, risk tolerance, financial approach, saving vs spending philosophy | Propose — inferred patterns require member confirmation |
+| `PRIORITIES`  | Priorities   | Current goals, focus areas, debt payoff targets, savings targets, life events being planned around | Auto-save for explicit statements, propose for inferred priorities |
 
 ### Trigger rules — when to capture memories
 
