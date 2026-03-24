@@ -139,66 +139,77 @@ These appear as `rgba()` in code. Pacific names them with suffixes like `010Pct`
 
 **Type Scale:**
 
-| Usage | Size | Weight | LineHeight | Extra | Component(s) |
-|---|---|---|---|---|---|
-| Greeting title | 24 | Medium | 28 | letterSpacing -0.5 | EmptyChat |
-| AI section header | 18 | Medium | 24 | letterSpacing -0.2 | MessageBubble (headerText) |
-| Confirm dialog title | 18 | Bold | 24 | — | MemoryCenter (confirmTitle) |
-| Body text / AI text | 16 | Regular | 20 | paddingHorizontal 4 | MessageBubble (aiText) |
-| User message | 16 | Regular | 20 | — | MessageBubble (userText) |
-| Panel titles | 16 | Medium | 20 | centered | All panel headers |
-| Menu items | 16 | Medium | 20 | flex: 1 | ChatHeader, MemoryCenter |
-| Input text | 16 | Regular | 20 | — | InputBar, MemoryCenter search |
-| Suggestion pills | 16 | Regular | 20 | — | MessageBubble (suggestionText) |
-| Memory content | 16 | Regular | 20 | — | MemoryCenter (memContent) |
-| Empty state title | 16 | Medium | 20 | — | MemoryCenter (emptyTitle) |
-| Analyzing shimmer | 16 | Medium | 20 | letterSpacing 0 | TypingIndicator |
-| Goal title | 15 | Medium | 20 | — | GoalsDashboard (goalTitle) |
-| Toast message | 14 | Medium | 20 | white | Toast |
-| Toast undo | 14 | Bold | 20 | color #32B7D9 | Toast |
-| Memory meta | 14 | Medium | 20 | contentSecondary | MemoryCenter (memMetaText) |
-| Section labels | 14 | Medium | 20 | contentSecondary | Settings, MemoryCenter |
-| Edit buttons text | 14 | Bold | 20 | — | MemoryCenter (editSaveText, editCancelText) |
-| Confirm dialog body | 14 | Regular | 20 | contentSecondary | MemoryCenter (confirmDesc) |
-| Scenario row title | 14 | Medium | 18 | — | ScenarioSwitcher (rowTitle) |
-| Proposal text | 13 | Medium | 18 | contentPrimary | MessageBubble (proposalText) |
-| Confirmed text | 13 | Medium | 18 | contentSecondary | MessageBubble (confirmedText) |
-| System message | 13 | Medium | 18 | contentSecondary | MessageBubble (systemText) |
-| Goal amount | 13 | Regular | — | contentSecondary | GoalsDashboard |
-| History group label | 13 | Medium | 18 | contentSecondary | ChatHistory |
-| Ask button text | 13 | Medium | — | contentPrimary | GoalsDashboard |
-| Clear filters | 13 | Medium | — | contentPrimary | MemoryCenter |
-| Proposal detail | 12 | Regular | 16 | contentSecondary | MessageBubble (proposalDetail) |
-| Chip label | 12 | Medium | — | letterSpacing 0.1 | MessageBubble (chipText) |
-| Card label (uppercase) | 12 | Medium | 16 | letterSpacing 0.6 | EmptyChat (cardLabel) |
-| Demo indicator | 12 | Medium | 16 | letterSpacing 0.1, brand | ChatHeader |
-| Goal status text | 12 | Medium | — | varies by status | GoalsDashboard |
-| Detail labels | 12 | Regular | — | contentSecondary | GoalsDashboard |
-| Filter chip text | 12 | Medium | — | contentSecondary | MemoryCenter |
-| Scenario subtitle | 12 | Regular | 16 | contentSecondary | ScenarioSwitcher |
-| Confirm btn text | 12 | Medium | — | white | MessageBubble (confirmBtnText) |
-| Dismiss btn text | 12 | Medium | — | contentSecondary | MessageBubble (dismissBtnText) |
-| Why this? | 12 | Regular | — | contentSecondary | MessageBubble (inline) |
-| Provenance text | 12 | Regular | 16 | contentSecondary | MessageBubble (provenanceText) |
-| Disclaimer text | 11 | Regular | 16 | contentSecondary | InputBar |
-| Footer text | 11 | Regular | 14-16 | contentSecondary | GoalsDashboard, ScenarioSwitcher |
-| Milestone text | 11 | Medium | — | contentSecondary | GoalsDashboard |
-| Filter count | 11 | Regular | — | rgba(112,111,110,0.6) | MemoryCenter |
-| Approval hint | 11 | Medium | 14 | contentSecondary | MessageBubble |
-| Safety badge text | 10 | Medium | 12 | varies | MessageBubble (safetyText) |
-| Type badge text | 10 | Medium | — | uppercase, contentSecondary | GoalsDashboard |
+> **Pacific Scale column:** Maps each prototype text usage to the closest canonical Pacific text style name. Pacific's hierarchy is Display → Headline → Title → Label → Body, each with ExtraLarge/Large/Medium/Small/ExtraSmall variants. Sizes marked ⚠ fall between standard Pacific steps and may need rounding during Flutter migration.
+
+| Usage | Size | Weight | LineHeight | Extra | Pacific Scale | Component(s) |
+|---|---|---|---|---|---|---|
+| Greeting title | 24 | Medium | 28 | letterSpacing -0.5 | `headlineSmall` | EmptyChat |
+| AI section header | 18 | Medium | 24 | letterSpacing -0.2 | `titleLarge` ⚠ | MessageBubble (headerText) |
+| Confirm dialog title | 18 | Bold | 24 | — | `titleLarge` ⚠ | MemoryCenter (confirmTitle) |
+| Body text / AI text | 16 | Regular | 20 | paddingHorizontal 4 | `bodyLarge` | MessageBubble (aiText) |
+| User message | 16 | Regular | 20 | — | `bodyLarge` | MessageBubble (userText) |
+| Panel titles | 16 | Medium | 20 | centered | `titleMedium` | All panel headers |
+| Menu items | 16 | Medium | 20 | flex: 1 | `titleMedium` | ChatHeader, MemoryCenter |
+| Input text | 16 | Regular | 20 | — | `bodyLarge` | InputBar, MemoryCenter search |
+| Suggestion pills | 16 | Regular | 20 | — | `bodyLarge` | MessageBubble (suggestionText) |
+| Memory content | 16 | Regular | 20 | — | `bodyLarge` | MemoryCenter (memContent) |
+| Empty state title | 16 | Medium | 20 | — | `titleMedium` | MemoryCenter (emptyTitle) |
+| Analyzing shimmer | 16 | Medium | 20 | letterSpacing 0 | `titleMedium` | TypingIndicator |
+| Goal title | 15 | Medium | 20 | — | `titleMedium` ⚠ Δ1 | GoalsDashboard (goalTitle) |
+| Toast message | 14 | Medium | 20 | white | `labelLarge` | Toast |
+| Toast undo | 14 | Bold | 20 | color #32B7D9 | `labelLarge` + bold | Toast |
+| Memory meta | 14 | Medium | 20 | contentSecondary | `labelLarge` | MemoryCenter (memMetaText) |
+| Section labels | 14 | Medium | 20 | contentSecondary | `labelLarge` | Settings, MemoryCenter |
+| Edit buttons text | 14 | Bold | 20 | — | `labelLarge` + bold | MemoryCenter (editSaveText, editCancelText) |
+| Confirm dialog body | 14 | Regular | 20 | contentSecondary | `bodyMedium` | MemoryCenter (confirmDesc) |
+| Scenario row title | 14 | Medium | 18 | — | `labelLarge` | ScenarioSwitcher (rowTitle) |
+| Proposal text | 13 | Medium | 18 | contentPrimary | `bodyMedium` ⚠ Δ1 | MessageBubble (proposalText) |
+| Confirmed text | 13 | Medium | 18 | contentSecondary | `bodyMedium` ⚠ Δ1 | MessageBubble (confirmedText) |
+| System message | 13 | Medium | 18 | contentSecondary | `bodyMedium` ⚠ Δ1 | MessageBubble (systemText) |
+| Goal amount | 13 | Regular | — | contentSecondary | `bodySmall` ⚠ Δ1 | GoalsDashboard |
+| History group label | 13 | Medium | 18 | contentSecondary | `bodyMedium` ⚠ Δ1 | ChatHistory |
+| Ask button text | 13 | Medium | — | contentPrimary | `bodyMedium` ⚠ Δ1 | GoalsDashboard |
+| Clear filters | 13 | Medium | — | contentPrimary | `bodyMedium` ⚠ Δ1 | MemoryCenter |
+| Proposal detail | 12 | Regular | 16 | contentSecondary | `bodySmall` | MessageBubble (proposalDetail) |
+| Chip label | 12 | Medium | — | letterSpacing 0.1 | `labelMedium` | MessageBubble (chipText) |
+| Card label (uppercase) | 12 | Medium | 16 | letterSpacing 0.6 | `overline` | EmptyChat (cardLabel) |
+| Demo indicator | 12 | Medium | 16 | letterSpacing 0.1, brand | `labelMedium` | ChatHeader |
+| Goal status text | 12 | Medium | — | varies by status | `labelMedium` | GoalsDashboard |
+| Detail labels | 12 | Regular | — | contentSecondary | `bodySmall` | GoalsDashboard |
+| Filter chip text | 12 | Medium | — | contentSecondary | `labelMedium` | MemoryCenter |
+| Scenario subtitle | 12 | Regular | 16 | contentSecondary | `bodySmall` | ScenarioSwitcher |
+| Confirm btn text | 12 | Medium | — | white | `labelMedium` | MessageBubble (confirmBtnText) |
+| Dismiss btn text | 12 | Medium | — | contentSecondary | `labelMedium` | MessageBubble (dismissBtnText) |
+| Why this? | 12 | Regular | — | contentSecondary | `bodySmall` | MessageBubble (inline) |
+| Provenance text | 12 | Regular | 16 | contentSecondary | `bodySmall` | MessageBubble (provenanceText) |
+| Disclaimer text | 11 | Regular | 16 | contentSecondary | `labelSmall` | InputBar |
+| Footer text | 11 | Regular | 14-16 | contentSecondary | `labelSmall` | GoalsDashboard, ScenarioSwitcher |
+| Milestone text | 11 | Medium | — | contentSecondary | `labelSmall` | GoalsDashboard |
+| Filter count | 11 | Regular | — | rgba(112,111,110,0.6) | `labelSmall` | MemoryCenter |
+| Approval hint | 11 | Medium | 14 | contentSecondary | `labelSmall` | MessageBubble |
+| Safety badge text | 10 | Medium | 12 | varies | below scale ⚠ | MessageBubble (safetyText) |
+| Type badge text | 10 | Medium | — | uppercase, contentSecondary | below scale ⚠ | GoalsDashboard |
+
+**Pacific Scale migration notes:**
+- **18px** usages map to `titleLarge` — Pacific's standard may be 22px; verify against `textTokens.titleLarge` and adjust if needed.
+- **13px** usages fall between `bodyMedium` (14px) and `bodySmall` (12px); round to nearest during migration.
+- **15px** (goal title) falls between `titleMedium` (16px) and `labelLarge` (14px); round up to `titleMedium`.
+- **10px** usages are below Pacific's standard scale; use `labelSmall` with a size override or a custom style.
+- Scale names follow the `{scale}{SizeVariant}` convention: e.g. `headlineSmall`, `bodyLarge`, `labelMedium`.
 
 ### 1.3 Shadows
 
-| Name | Color | Offset | Radius | Opacity | Elevation | Pacific Variable | Usage |
-|---|---|---|---|---|---|---|---|
-| dropShadow-down-2 | `#0A0A0A` | 0, 2 | 8 | 0.04 | 2 | `dropShadow-down-2` | Settings card |
-| card-light | `rgba(10,10,10,0.06)` | 0, 2 | 8 | 1 | 2 | — | Memory cards |
-| card-standard | `rgba(10,10,10,0.16)` | 0, 1 | 4 | 1 | 2 | — | EmptyChat cards, goal cards |
-| menu-shadow | `rgba(10,10,10,0.16)` | 0, 6 | 16 | 1 | 8 | — | More menus |
-| scroll-anchor | `#0A0A0A` | 0, 2 | 8 | 0.08 | 4 | — | ScrollAnchor button |
-| toast-shadow | `rgba(10,10,10,0.16)` | 0, 0 | 1 | 1 | 8 | — | Toast |
-| sheet-shadow | `#000` | 0, -4 | 16 | 0.1 | 16 | — | ScenarioSwitcher bottom sheet |
+> **Pacific Level column:** Pacific provides 5 elevation levels (`dropShadowDown1`–`dropShadowDown5` and `dropShadowUp1`–`dropShadowUp5`). Higher levels = more offset + blur. All shadows use `bone1000` (`#0a0a0a`) as the base color.
+
+| Name | Color | Offset | Radius | Opacity | Pacific Level | Usage |
+|---|---|---|---|---|---|---|
+| dropShadow-down-2 | `#0A0A0A` | 0, 2 | 8 | 0.04 | `dropShadowDown2` ✓ | Settings card |
+| card-light | `rgba(10,10,10,0.06)` | 0, 2 | 8 | 1 | ~`dropShadowDown2` | Memory cards |
+| card-standard | `rgba(10,10,10,0.16)` | 0, 1 | 4 | 1 | ~`dropShadowDown1` | EmptyChat cards, goal cards |
+| menu-shadow | `rgba(10,10,10,0.16)` | 0, 6 | 16 | 1 | ~`dropShadowDown4` | More menus |
+| scroll-anchor | `#0A0A0A` | 0, 2 | 8 | 0.08 | ~`dropShadowDown2` | ScrollAnchor button |
+| toast-shadow | `rgba(10,10,10,0.16)` | 0, 0 | 1 | 1 | ~`dropShadowDown1` | Toast |
+| sheet-shadow | `#000` | 0, -4 | 16 | 0.1 | ~`dropShadowUp4` | ScenarioSwitcher bottom sheet |
 
 ### 1.4 Border Radii
 
@@ -215,20 +226,27 @@ These appear as `rgba()` in code. Pacific names them with suffixes like `010Pct`
 
 ### 1.5 Spacing Constants
 
-| Token | Value | Usage |
-|---|---|---|
-| Screen padding | 16px | Horizontal padding on all major containers |
-| Header height | 44px | All header bars / title bars |
-| Left/Right zone width | 100–104px | Panel headers (100), ChatHeader (104) |
-| Message gap (aiRow) | 16px | Gap between AI message sections |
-| AI content gap | 8px | Gap between content blocks |
-| Card gap | 12px | Gap between memory cards, goal cards |
-| Section gap | 12px | Gap between section label and card |
-| Chip row gap | 6px | Gap between inline chips |
-| Menu item height | 48px | All menu item rows |
-| Menu width | 212px | More menu dropdown |
-| Menu divider | 0.75px | Between menu items |
-| Card divider | 0.75–1px | Between settings rows, ChatHistory items |
+> **Pacific rpx column:** Pacific spacing tokens run from `rpx10` (10px) to `rpx56` (56px) in 2px increments. Values below 10px or non-even values have no direct `rpx*` token — marked with "—".
+
+| Token | Value | Pacific rpx | Usage |
+|---|---|---|---|
+| Screen padding | 16px | `rpx16` | Horizontal padding on all major containers |
+| Header height | 44px | `rpx44` | All header bars / title bars |
+| Left/Right zone width | 100–104px | — (layout) | Panel headers (100), ChatHeader (104) |
+| Message gap (aiRow) | 16px | `rpx16` | Gap between AI message sections |
+| AI content gap | 8px | — (< rpx10) | Gap between content blocks |
+| Card gap | 12px | `rpx12` | Gap between memory cards, goal cards |
+| Section gap | 12px | `rpx12` | Gap between section label and card |
+| Chip row gap | 6px | — (< rpx10) | Gap between inline chips |
+| Menu item height | 48px | `rpx48` | All menu item rows |
+| Menu width | 212px | — (layout) | More menu dropdown |
+| Menu divider | 0.75px | — (sub-pixel) | Between menu items |
+| Card divider | 0.75–1px | — (sub-pixel) | Between settings rows, ChatHistory items |
+
+**Spacing migration notes:**
+- Values 4px, 6px, 8px have no Pacific `rpx*` equivalent — use platform small-spacing constants.
+- Layout-specific widths (100px, 104px, 212px) are not spacing tokens — keep as fixed layout values.
+- Sub-pixel dividers (0.75px) are hairline borders, not spacing — keep as raw values.
 
 ---
 

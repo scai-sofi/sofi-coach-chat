@@ -1,10 +1,10 @@
 # Pacific Color Mapper
 
-**A color reference for AI-first designers.** Built for people designing in Replit, Cursor, Claude.ai, or any AI tool — without direct access to the Pacific Design System codebase. This file is your complete Pacific color token reference.
+**A design token reference for AI-first designers.** Built for people designing in Replit, Cursor, Claude.ai, or any AI tool — without direct access to the Pacific Design System codebase. This file is your complete Pacific token reference: colors, typography scale, spacing, elevation, and border radii.
 
 **How it works:** Describe what you're designing, share a hex from Figma, or drop a Figma frame URL. The AI looks up the right Pacific token and tells you exactly what to use in your code.
 
-**Self-contained.** All 181 Pacific color tokens with their light and dark values are embedded here. No installs, no scripts, no SoFi repo access needed.
+**Self-contained.** All 181 Pacific color tokens with their light and dark values are embedded here, plus typography scale names, spacing tokens (`rpx10`–`rpx56`), 5-level elevation system, and border radius tokens. No installs, no scripts, no SoFi repo access needed.
 
 ---
 
@@ -130,6 +130,108 @@ You hand off:
 > *"Button fill: `buttonBrandDefault` (Pacific token)"*
 
 The Flutter engineer writes `colors.buttonBrandDefault`. The web engineer uses the same token name in whatever system your web team uses. No guessing, no wrong-color bugs, and the button automatically shows the correct shade in dark mode.
+
+---
+
+## Typography Scale
+
+Pacific defines text styles using a two-part naming convention: **scale** + **size variant**. The scale describes the role, the size variant controls the magnitude.
+
+**Hierarchy (large → small):** Display → Headline → Title → Label → Body
+
+Each scale has five size variants: ExtraLarge, Large, Medium, Small, ExtraSmall.
+
+| Scale | Role | Typical Use |
+|---|---|---|
+| Display | Hero numbers, large callouts | Account balance, greeting |
+| Headline | Page titles, section headers | Screen title, modal title |
+| Title | Subsection headers, card titles | Card header, list group title |
+| Label | UI labels, captions, metadata | Button text, chip label, badge |
+| Body | Paragraph text, descriptions | Message body, form helper text |
+
+**Additional styles:** Underline, Overline, Button, BodyEmphasized — used for specialized UI elements.
+
+**Token name format:** `{scale}{SizeVariant}` in camelCase — e.g. `headlineMedium`, `bodySmall`, `labelLarge`, `titleExtraSmall`.
+
+**In code:**
+- **Web (StyleX):** `textTokens.headlineMedium` from `@sofi-web-ui/base`
+- **Flutter:** `context.textTheme.headlineMedium`
+- **React Native (prototype):** Map manually — see DESIGN_SYSTEM_MAP.md § 1.2 for prototype-to-Pacific type scale mapping
+
+---
+
+## Spacing Tokens
+
+Pacific uses `rpx*` tokens for all spacing (margin, padding, gap). Values range from `rpx10` (10px) to `rpx56` (56px) in **2px increments**.
+
+| Token | px | rem |
+|---|---|---|
+| `rpx10` | 10 | 0.625 |
+| `rpx12` | 12 | 0.75 |
+| `rpx14` | 14 | 0.875 |
+| `rpx16` | 16 | 1.0 |
+| `rpx18` | 18 | 1.125 |
+| `rpx20` | 20 | 1.25 |
+| `rpx22` | 22 | 1.375 |
+| `rpx24` | 24 | 1.5 |
+| `rpx26` | 26 | 1.625 |
+| `rpx28` | 28 | 1.75 |
+| `rpx30` | 30 | 1.875 |
+| `rpx32` | 32 | 2.0 |
+| `rpx34` | 34 | 2.125 |
+| `rpx36` | 36 | 2.25 |
+| `rpx38` | 38 | 2.375 |
+| `rpx40` | 40 | 2.5 |
+| `rpx42` | 42 | 2.625 |
+| `rpx44` | 44 | 2.75 |
+| `rpx46` | 46 | 2.875 |
+| `rpx48` | 48 | 3.0 |
+| `rpx50` | 50 | 3.125 |
+| `rpx52` | 52 | 3.25 |
+| `rpx54` | 54 | 3.375 |
+| `rpx56` | 56 | 3.5 |
+
+Values below 10px (e.g. 4, 6, 8) are not covered by `rpx*` tokens — use platform-appropriate small spacing constants.
+
+**In code:**
+- **Web (StyleX):** `globalTokens.rpx16` from `@sofi-web-ui/base/dist/globalTokens.stylex`
+- **Flutter:** `PacificSpacing.rpx16` (or equivalent from `sofi_design_system`)
+- **React Native (prototype):** Raw pixel values — see DESIGN_SYSTEM_MAP.md § 1.5 for prototype-to-Pacific spacing mapping
+
+---
+
+## Elevation (Box Shadows)
+
+Pacific provides 5 elevation levels for depth, available in both downward and upward directions.
+
+| Level | Token (down) | Token (up) | Typical Use |
+|---|---|---|---|
+| 1 | `dropShadowDown1` | `dropShadowUp1` | Subtle card edges, dividers |
+| 2 | `dropShadowDown2` | `dropShadowUp2` | Cards, list items |
+| 3 | `dropShadowDown3` | `dropShadowUp3` | Floating buttons, toolbars |
+| 4 | `dropShadowDown4` | `dropShadowUp4` | Menus, dropdowns |
+| 5 | `dropShadowDown5` | `dropShadowUp5` | Modals, bottom sheets |
+
+Higher levels = more offset, larger blur radius, slightly more opacity. All shadows use `bone1000` (`#0a0a0a`) as the shadow color.
+
+**In code:**
+- **Web (StyleX):** `boxShadowsTokens.dropShadowDown2` from `@sofi-web-ui/base/dist/boxShadows.stylex`
+- **Flutter:** `PacificElevation.level2` (or equivalent from `sofi_design_system`)
+
+---
+
+## Border Radius Tokens
+
+Pacific provides four standard border radius values via `globalTokens.borderRadius*`.
+
+| Token | Value | Typical Use |
+|---|---|---|
+| `borderRadius12` | 12px | Buttons, small interactive elements |
+| `borderRadius16` | 16px | Cards, containers, input fields |
+| `borderRadius20` | 20px | Larger cards, dialogs, sheets |
+| `borderRadius24` | 24px | Pills, search bars, large inputs |
+
+For full-circle / pill shapes, use a large arbitrary value (e.g. 9999px) — there is no dedicated Pacific `borderRadiusPill` token.
 
 ---
 
