@@ -887,43 +887,34 @@ Slide-in from right (same animation pattern as ChatHistory). Accessible from ove
 
 ### Color Palette
 
-```
-surfaceBase:       #FAF8F5   (app background everywhere)
-surfaceElevated:   #FFFFFF   (cards, inputs, menus)
-surfaceTint:       #F0EDE8   (chip backgrounds, tints, hover states)
-surfaceEdge:       rgba(10,10,10,0.10)  (borders, dividers)
-surfaceEdgeLight:  rgba(10,10,10,0.05)  (light borders)
-surfaceMuted:      #F5F3F0   (muted backgrounds)
+**Full migration reference:** See `docs/PACIFIC_COLOR_TOKENS.md` for the complete prototype→Pacific migration map with delta scores and correction flags. The `pacific-color-mapper` skill (`.agents/skills/pacific-color-mapper/SKILL.md`) has all 181 Pacific semantic tokens with exact hex values.
 
-contentPrimary:    #1A1919   (primary text, active UI elements)
-contentSecondary:  #706F6E   (secondary text, inactive icons)
-contentBone600:    #5C5B5A   (user bubble bg, send button bg, suggestion pill borders)
-contentBrand:      #00A2C7   (brand cyan — demo indicator, memory save button)
-contentMuted:      #D0CCC5   (empty state placeholder icons)
+**⚠ Several prototype hex values below are Tailwind CSS approximations, NOT Pacific primitives.** The Pacific column shows the correct production value.
 
-danger:            #FA2D25   (delete icon color)
-dangerLight:       #EF4444   (at-risk goal ring)
-dangerChipText:    #DC2626   (risk chip text)
-dangerChipBg:      #FEE2E2   (risk chip background)
-
-success:           #22C55E   (goal completion ring)
-successDark:       #16A34A   (milestone text, confirmation text)
-successBg:         #DCFCE7   (milestone chip bg, completed goal badge bg)
-successBgLight:    #F0FDF4   (completed goal card bg)
-successBorder:     #BBF7D0   (success border)
-
-warning:           #B45309   (actionable safety tier text)
-warningBg:         #FEF3C7   (actionable safety tier bg)
-
-info:              #2563EB   (handoff text)
-infoBg:            #DBEAFE   (handoff bg)
-
-progressTrack:     #E5E1DA   (goal ring track color)
-frameBg:           #E8E4DE   (frame backgrounds)
-
-toast bg:          #0F0F0F   (toast notification)
-undo cyan:         #32B7D9   (toast undo button)
-```
+| Prototype Token | Prototype Hex | Pacific Token | Pacific Hex | Usage |
+|---|---|---|---|---|
+| `surfaceBase` | `#FAF8F5` | `surfaceBase` | `#faf8f5` ✓ | App background |
+| `surfaceElevated` | `#FFFFFF` | `surfaceElevatedDefault` | `#ffffff` ✓ | Cards, inputs, menus |
+| `surfaceTint` | `#F0EDE8` | ~`surfaceInfoDefault` | `#f0eeeb` ~ | Chip bg, tints |
+| `surfaceEdge` | `rgba(10,10,10,0.10)` | `strokeDividePrimary` | same ✓ | Borders, dividers |
+| `surfaceMuted` | `#F5F3F0` | `surfaceInfoLabel` | `#f5f3f0` ✓ | Muted backgrounds |
+| `contentPrimary` | `#1A1919` | `contentPrimaryDefault` | `#1a1919` ✓ | Primary text |
+| `contentSecondary` | `#706F6E` | `contentSecondary` | `#706f6e` ✓ | Secondary text |
+| `contentBone600` | `#5C5B5A` | `contentIndicatorUnselected` | `#5c5b5a` ✓ | User bubble bg, send button |
+| `contentBrand` | `#00A2C7` | `contentBrand` | `#00a2c7` ✓ | Brand cyan |
+| `contentMuted` | `#D0CCC5` | `contentHint` | `#dbdad7` ❌ | Placeholder icons |
+| `danger` | `#FA2D25` | `contentDanger` | `#fa2d25` ✓ | Delete icon |
+| `success` | `#22C55E` | `contentSuccess` | `#1bc245` ❌ | Goal completion ring |
+| `successDark` | `#16A34A` | `contentSuccessEmphasized` | `#19a623` ❌ | Milestone text |
+| `successBg` | `#DCFCE7` | `surfaceSuccessDefault` | `#ebf9ee` ❌ | Milestone chip bg |
+| `warning` | `#B45309` | `contentCaution` | `#8c6914` ❌ | Actionable tier text |
+| `warningBg` | `#FEF3C7` | `surfaceCautionDefault` | `#fff5e5` ❌ | Actionable tier bg |
+| `info` | `#2563EB` | `contentTip` | `#006280` ❌ | Handoff text |
+| `infoBg` | `#DBEAFE` | `surfaceTipDefault` | `#edf8fc` ❌ | Handoff bg |
+| `dangerChipBg` | `#FEE2E2` | `surfaceDangerDefault` | `#ffe5e5` ~ | Risk chip bg |
+| `progressTrack` | `#E5E1DA` | `surfaceIndicatorUnselected` | `#dbdad7` ⚠ | Goal ring track |
+| toast bg | `#0F0F0F` | `surfaceToast` | `#0f0f0f` ✓ | Toast notification |
+| undo cyan | `#32B7D9` | `buttonBrandDefaultInverse` | `#32b7d9` ✓ | Toast undo button |
 
 ### Typography
 

@@ -8,7 +8,7 @@
 
 ### 1.1 Color Palette
 
-> Source of truth: Pacific Design System v1.40.0 (`pacific_color_token_themes.dart`). Primitive values reference the bone/blue/red/green/yellow scales. All mappings below are for the **Light** theme.
+> Source of truth: `pacific-color-mapper` skill (`.agents/skills/pacific-color-mapper/SKILL.md`). For the complete migration map with delta scores, see `docs/PACIFIC_COLOR_TOKENS.md`. All mappings below are for the **Light** theme.
 
 #### Core Surface Tokens
 
@@ -16,8 +16,8 @@
 |---|---|---|---|---|
 | `surfaceBase` | `#FAF8F5` | `surfaceBase` | `bone50` | App background everywhere |
 | `surfaceElevated` | `#FFFFFF` | `surfaceElevatedDefault` | `bone0` | Cards, inputs, menus |
-| `surfaceTint` | `#F0EDE8` | — (prototype only) | ~`bone100` | Chip backgrounds, tints, proposal cards |
-| `surfaceMuted` | `#F5F3F0` | `surfaceInfoDefault` | `bone150` | Safety badge informational/suggestive bg |
+| `surfaceTint` | `#F0EDE8` | — (prototype only) | ~`bone150` (`#f0eeeb`, Δ3) | Chip backgrounds, tints, proposal cards |
+| `surfaceMuted` | `#F5F3F0` | `surfaceInfoLabel` | `bone100` | Safety badge informational/suggestive bg |
 
 #### Edge / Stroke Tokens
 
@@ -36,8 +36,8 @@
 | `contentSecondary` | `#706F6E` | `contentSecondary` | `bone550` | Secondary text, inactive icons, meta text |
 | `contentBone600` | `#5C5B5A` | `contentIndicatorUnselected` | `bone600` | User bubble bg, send button bg, suggestion pill border |
 | `contentStatusbar` | `#0A0A0A` | `contentStatusBar` | `bone1000` | Status bar tint |
-| `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` | Empty state placeholder icons, drag handle |
-| `contentDimmed` | `#BDBBB9` | — (prototype only) | ~`bone300` | Edit character count, muted more-icon |
+| `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` (`#dbdad7`, ❌ Δ25) | Empty state placeholder icons, drag handle |
+| `contentDimmed` | `#BDBBB9` | `contentDisabled2` | `bone350` ✓ | Edit character count, muted more-icon |
 | `contentBrand` | `#00A2C7` | `contentBrand` | `blue550` | Brand cyan — demo indicator, shimmer target |
 
 #### Status Tokens — Danger
@@ -45,17 +45,17 @@
 | Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
 |---|---|---|---|---|
 | `danger` | `#FA2D25` | `contentDanger` | `red600` | Delete icon color, delete button bg |
-| `dangerLight` | `#EF4444` | — (prototype only) | ~`red550` | At-risk goal ring stroke |
-| `dangerChipText` | `#DC2626` | `contentDanger` | `red600` | Risk/alert chip text |
-| `dangerChipBg` | `#FEE2E2` | `surfaceDangerDefault` | `red50` | Risk/alert chip background |
+| `dangerLight` | `#EF4444` | — (prototype only) | ~`red550` (`#fb4a43`, ⚠ Tailwind) | At-risk goal ring stroke |
+| `dangerChipText` | `#DC2626` | `contentDanger` | `red600` (`#fa2d25`, ❌ Tailwind) | Risk/alert chip text |
+| `dangerChipBg` | `#FEE2E2` | `surfaceDangerDefault` | `red50` (`#ffe5e5`, ~ Δ4) | Risk/alert chip background |
 
 #### Status Tokens — Success
 
 | Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
 |---|---|---|---|---|
-| `success` | `#22C55E` | `contentSuccess` | `green550` | Goal completion ring |
-| `successDark` | `#16A34A` | `contentSuccessEmphasized` | `green600` | Milestone text, completed status |
-| `successBg` | `#DCFCE7` | `surfaceSuccessDefault` | `green50` | Milestone chip bg, completed badge bg |
+| `success` | `#22C55E` | `contentSuccess` | `green550` (`#1bc245`, ❌ Tailwind) | Goal completion ring |
+| `successDark` | `#16A34A` | `contentSuccessEmphasized` | `green600` (`#19a623`, ❌ Tailwind) | Milestone text, completed status |
+| `successBg` | `#DCFCE7` | `surfaceSuccessDefault` | `green50` (`#ebf9ee`, ⚠ Tailwind) | Milestone chip bg, completed badge bg |
 | `successBorder` | `#BBF7D0` | — (prototype only) | — | Success border (unused in current code) |
 | `successBgLight` | `#F0FDF4` | — (prototype only, lighter than surfaceSuccessDefault) | — | Completed goal card bg |
 
@@ -63,15 +63,15 @@
 
 | Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
 |---|---|---|---|---|
-| `warning` | `#B45309` | `contentCaution` | `yellow600` | Actionable safety tier text |
-| `warningBg` | `#FEF3C7` | `surfaceCautionDefault` | `yellow50` | Actionable safety tier bg |
+| `warning` | `#B45309` | `contentCaution` | `yellow600` (`#8c6914`, ❌ Tailwind) | Actionable safety tier text |
+| `warningBg` | `#FEF3C7` | `surfaceCautionDefault` | `yellow50` (`#fff5e5`, ❌ Tailwind) | Actionable safety tier bg |
 
 #### Status Tokens — Info / Tip
 
 | Prototype Token | Hex / Value | Pacific Token | Primitive | Usage |
 |---|---|---|---|---|
-| `info` | `#2563EB` | `contentTip` | `blue650` | Handoff chip text |
-| `infoBg` | `#DBEAFE` | `surfaceTipDefault` | `blue50` | Handoff chip bg |
+| `info` | `#2563EB` | `contentTip` | `blue650` (`#006280`, ❌ Tailwind — not Pacific) | Handoff chip text |
+| `infoBg` | `#DBEAFE` | `surfaceTipDefault` | `blue50` (`#edf8fc`, ❌ Tailwind) | Handoff chip bg |
 
 #### Utility Tokens
 
@@ -105,7 +105,7 @@
 | `rgba(255,255,255,0.2)` | — (custom) | — | Active scenario icon bg |
 | `rgba(255,255,255,0.6)` | — (custom) | — | Active scenario subtitle |
 
-**Migration note:** Prototype hex values are approximations of Pacific primitives. During Flutter migration, replace all prototype hex values with exact Pacific primitive references (e.g., `bone850` instead of `#1A1919`). Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens.
+**Migration note:** Prototype hex values marked ❌ are Tailwind CSS colors, NOT Pacific primitives — they must be replaced with the Pacific hex values shown in parentheses during Flutter migration. Tokens marked "prototype only" need Pacific equivalents assigned or should be consolidated into existing Pacific tokens. See `docs/PACIFIC_COLOR_TOKENS.md` for the full delta-scored migration map and alpha/opacity token reference.
 
 ### 1.2 Typography
 
