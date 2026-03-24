@@ -47,6 +47,7 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **Typography:** Uses TT Norms font family (Regular, Medium, Bold) with defined sizes and line heights for body, headers, and labels.
 - **Spacing & Layout:** Standardized padding, gaps, border-radii, and header heights.
 - **Animations:** GPU-accelerated animations for streaming entrance, block fade-in, typing indicator shimmer, and dropdowns.
+- **Design System Map:** `docs/DESIGN_SYSTEM_MAP.md` — comprehensive inventory of all tokens, components, icons, and patterns, mapped to Pacific design system equivalents for Flutter migration.
 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
