@@ -210,7 +210,7 @@ Three user-configurable memory modes, set via Settings panel:
 | Delete individual | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory | Implemented |
 | Chip tap-through | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation | Implemented |
 | Version history | Expandable row showing prior versions with timestamps | Not implemented |
-| Clear all memories | Global "delete all" action in Memory Center | Not implemented |
+| Clear all memories | Global "Delete all" with confirmation dialog (dynamic count) in Memory Center | Implemented |
 | Per-category controls | Toggle per category, set retention window | Not implemented |
 
 ### Frequency & throttling
@@ -320,7 +320,7 @@ interface Milestone {
 - **Delete** — Member taps trash icon → memory marked as deleted → toast with "Undo" to restore
 - **Search & filter** — Text search bar and category filter chips with counts for finding specific memories
 
-*Not yet demonstrated: Version history, clear all, per-category retention controls*
+*Not yet demonstrated: Version history, per-category retention controls*
 
 ### 3. Goal Discovery from Conversation
 
@@ -389,8 +389,8 @@ When applicable, Coach's response includes one of four patterns:
 
 | Component | Description |
 |---|---|
-| User message bubble | Right-aligned, dark background |
-| AI message block | Left-aligned, light background, streaming support |
+| User message bubble | Right-aligned, `contentBone600` (bone400) bg, `contentPrimaryInverse` text |
+| AI message block | Left-aligned, transparent background, streaming support |
 | Memory proposal card | Inline card with [Remember] / [Not now] buttons |
 | "Saved to memory" chip | Tappable chip below AI message — navigates to Memory Center and highlights the memory |
 | "Memory updated" chip | Tappable chip — same navigation behavior as "Saved to memory" |
@@ -400,7 +400,7 @@ When applicable, Coach's response includes one of four patterns:
 | Safety tier badge | Color-coded pill above message text |
 | Approval hint | Shield icon + "Needs your approval" label inside actionable cards (replaces standalone badge) |
 | Confirmed state | SVG checkmark + summary text (e.g., "Saved to memory", "Goal created", "All set — saved to memory & goal created") |
-| Action footer | Copy (with SVG checkmark confirmation), thumbs up/down, provenance toggle |
+| Action footer | Copy (with SVG checkmark confirmation), thumbs up/down (PNG icons with `tintColor: contentBone600`), provenance toggle |
 
 ### Memory Center (implemented)
 
@@ -432,6 +432,37 @@ Accessed via the chat header menu. Full-screen overlay panel.
 | Milestone markers | Visual indicators for 25%/50%/75%/100% milestones |
 | Confidence indicator | Numeric score with status coloring |
 | Empty state | Message when no goals exist |
+
+---
+
+## Theme System — Implementation Details
+
+The prototype implements dynamic light/dark theming using Pacific design tokens. All color values are resolved at runtime through the theme context — zero hardcoded colors in render paths.
+
+### Architecture
+
+| File | Role |
+|---|---|
+| `constants/theme.ts` | Defines `lightTheme` and `darkTheme` objects (type `AppTheme`) with all color tokens |
+| `context/ThemeContext.tsx` | React context + `useTheme()` hook; follows device color scheme preference |
+| All components | Access `const { colors } = useTheme()` — no direct `Colors.*` imports for rendering |
+
+### Key design decisions
+
+- **`contentBone600`** is mapped to bone400 (`#adacaa`) in **both** light and dark mode. This is an intentional one-off for chat UI elements: user bubble background, send button, cursor, action icon tint, suggestion pill border.
+- **User bubble** uses `contentBone600` bg + `contentPrimaryInverse` text (not a dedicated `whiteOnDark` or `userBubbleBg` token).
+- **Active-on-primary-bg pattern**: When an element sits on a `contentPrimary` background (e.g., active scenario row), text uses `contentPrimaryInverse`, subdued text uses `inverseAlpha60`, and overlay fills use `inverseAlpha20`.
+- **ErrorFallback** manages its own dark mode via `useColorScheme` internally — intentional since the theme context may not be available during error states.
+- **Dark mode token bumps**: `contentMuted` → `#4d4c4b`, `contentDimmed` → `#585756`, `progressTrack` → `#3d3d3c` (bumped from near-invisible values for usability).
+- **PNG action icons** (copy, thumbs up/down) use `tintColor: colors.contentBone600` for theme adaptability.
+
+### Migration pattern
+
+Components follow a consistent theming pattern:
+1. `useTheme()` hook at the top of every component
+2. Module-level lookup tables converted to factory functions `getXxx(c: AppTheme)` that return style objects
+3. Static `StyleSheet.create` for layout-only styles (no color values)
+4. Color values applied as inline style overrides: `style={[styles.foo, { color: colors.contentPrimary }]}`
 
 ---
 
@@ -483,8 +514,9 @@ Demo scenarios use pre-loaded canned conversations with pre-set memories and goa
 | Level               | Feature | Surface                 | Prototype status | Controls |
 | ------------------- | ------- | ----------------------- | ---------------- | -------- |
 | 3 — Item            | Memory  | Memory Center           | Implemented | Edit, pause/resume, delete with undo, search, category filter |
+| 2 — Global          | Memory  | Memory Center header    | Implemented | Pause all / resume all toggle, delete all with confirmation dialog |
 
-**Not yet implemented:** Global pause all / delete all toggle, per-category toggle, retention window settings, per-response "Don't use this" flag, global Goals on/off in Settings, proactive notification controls.
+**Not yet implemented:** Per-category toggle, retention window settings, per-response "Don't use this" flag, global Goals on/off in Settings, proactive notification controls.
 
 ---
 

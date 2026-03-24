@@ -34,7 +34,7 @@
 |---|---|---|---|---|
 | `contentPrimary` | `#1A1919` | `contentPrimaryDefault` | `bone850` | Primary text, active UI, dark fills |
 | `contentSecondary` | `#706F6E` | `contentSecondary` | `bone550` | Secondary text, inactive icons, meta text |
-| `contentBone600` | `#5C5B5A` | `contentIndicatorUnselected` | `bone600` | User bubble bg, send button bg, suggestion pill border |
+| `contentBone600` | `#adacaa` | — (intentional one-off) | `bone400` (both modes) | User bubble bg, send button bg, cursor, action icon tint, suggestion pill border |
 | `contentStatusbar` | `#0A0A0A` | `contentStatusBar` | `bone1000` | Status bar tint |
 | `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` (`#dbdad7`, ❌ Δ25) | Empty state placeholder icons, drag handle |
 | `contentDimmed` | `#BDBBB9` | `contentDisabled2` | `bone350` ✓ | Edit character count, muted more-icon |
@@ -88,22 +88,24 @@
 | `buttonBrandDefault` | `blue550` | Brand actions → `contentBrand` |
 | `buttonDestructiveDefault` | `red600` | Delete button bg → `danger` |
 
-#### Hardcoded colors not yet in `colors.ts`
+#### Previously hardcoded colors — now tokenized in `theme.ts`
 
-| Value | Pacific Token | Primitive | Usage |
-|---|---|---|---|
-| `#0F0F0F` | `surfaceToast` | `bone950` | Toast background |
-| `#32B7D9` | — (prototype only) | — | Toast undo action text |
-| `#c4a882` | — (prototype only) | — | Typing shimmer base color |
-| `rgba(0,0,0,0.35)` | `surfaceScrim` | `bone100050Pct` | ScenarioSwitcher backdrop |
-| `rgba(0,0,0,0.4)` | `surfaceScrim` | `bone100050Pct` | MemoryCenter delete-all overlay |
-| `rgba(10,10,10,0.06)` | — (custom) | — | ChatHistory card border |
-| `rgba(10,10,10,0.08)` | — (custom) | — | Memory card border |
-| `rgba(10,10,10,0.16)` | `surfaceEdge` | `bone100016Pct` | Menu shadow, card shadow |
-| `rgba(10,10,10,0.2)` | — (custom) | — | Edit cancel button border |
-| `rgba(112,111,110,0.6)` | — (custom) | — | Filter count text (MemoryCenter) |
-| `rgba(255,255,255,0.2)` | — (custom) | — | Active scenario icon bg |
-| `rgba(255,255,255,0.6)` | — (custom) | — | Active scenario subtitle |
+All previously hardcoded `rgba()` and hex values have been migrated to named tokens in the theme system:
+
+| Token | Light Value | Dark Value | Pacific Ref | Usage |
+|---|---|---|---|---|
+| `surfaceToast` | `#0F0F0F` | `#2a2929` | `surfaceToast` / `bone950` | Toast background |
+| `toastAction` | `#32B7D9` | `#32B7D9` | — | Toast undo action text |
+| `shimmerBase` | `#c4a882` | `#8a7a65` | — | Typing shimmer base color |
+| `scrimBackdrop` | `rgba(0,0,0,0.35)` | `rgba(0,0,0,0.5)` | `surfaceScrim` | ScenarioSwitcher backdrop |
+| `scrimHeavy` | `rgba(0,0,0,0.4)` | `rgba(0,0,0,0.55)` | `surfaceScrim` | Delete-all overlay |
+| `shadowEdge` | `rgba(10,10,10,0.06)` | `rgba(250,248,245,0.06)` | — | Card border (ChatHistory) |
+| `borderSubtle` | `rgba(10,10,10,0.08)` | `rgba(250,248,245,0.08)` | — | Memory card border |
+| `shadowColor` | `rgba(10,10,10,0.16)` | `rgba(0,0,0,0.3)` | `surfaceEdge` | Menu shadow, card shadow |
+| `borderMedium` | `rgba(10,10,10,0.2)` | `rgba(250,248,245,0.15)` | — | Edit cancel button border |
+| `inverseAlpha20` | `rgba(255,255,255,0.2)` | `rgba(255,255,255,0.2)` | — | Active scenario icon bg |
+| `inverseAlpha60` | `rgba(255,255,255,0.6)` | `rgba(255,255,255,0.6)` | — | Active scenario subtitle |
+| `whiteOnDark` | `#ffffff` | `#ffffff` | — | Text on dark backgrounds |
 
 #### Alpha / Opacity Primitives
 
@@ -337,9 +339,9 @@ Global notification system via `ToastProvider`.
 | Pill padding | left 20, right 8, vertical 8 |
 | Input font | 16px Regular, contentPrimary, lineHeight 20 |
 | Placeholder | "Message", contentSecondary |
-| Cursor color | `#5C5B5A` |
+| Cursor color | `contentBone600` (bone400 `#adacaa`) |
 | Selection color | `rgba(92,91,90,0.3)` |
-| Send button | 32×32 circle, bg `#5C5B5A`, white arrow SVG 11.5×14.5 |
+| Send button | 32×32 circle, bg `contentBone600` (bone400 `#adacaa`), white arrow SVG 11.5×14.5 |
 | Disclaimer | 11px Regular, contentSecondary, centered |
 
 ### 2.8 Search Bar
@@ -357,7 +359,7 @@ Shared `SearchBar` component (`components/SearchBar.tsx`) used in MemoryCenter a
 | Icon | Feather `search` size 16, `Colors.contentSecondary` |
 | Input font | 16px Regular, `Colors.contentPrimary`, lineHeight 20 |
 | Placeholder | "Search", `Colors.contentSecondary` |
-| Cursor color | `#5C5B5A` (contentBone600) |
+| Cursor color | `contentBone600` (bone400 `#adacaa`) |
 | Selection color | `rgba(92,91,90,0.3)` |
 | Internal gap | 8px (between icon and input) |
 | Pill padding | horizontal 16 |
@@ -644,9 +646,9 @@ When a goal suggestion is queued, a system pill message appears: "I've added a g
 | Feather star | 13 | — | Feather | white | Proactive system pill |
 | Feather chevron-right | 12 | — | Feather | per chip | Chip badge trailing |
 | Feather chevron-up/down | 12 | — | Feather | contentSecondary | Why this? toggle |
-| PNG icon-copy | 20×20 | — | Image | — | Action footer |
-| PNG icon-thumbs-up | 20×20 | — | Image | — | Action footer |
-| PNG icon-thumbs-down | 20×20 | — | Image | — | Action footer |
+| PNG icon-copy | 20×20 | — | Image | tintColor: contentBone600 | Action footer |
+| PNG icon-thumbs-up | 20×20 | — | Image | tintColor: contentBone600 | Action footer |
+| PNG icon-thumbs-down | 20×20 | — | Image | tintColor: contentBone600 | Action footer |
 
 ### 4.4 SettingsPanel Icons
 
@@ -811,17 +813,18 @@ View (overlay: absoluteFill, zIndex 100, justifyContent flex-end)
 ## 7. Migration Notes
 
 ### Token Gaps
-- Several hardcoded color values (`#0F0F0F`, `#32B7D9`, `#BDBBB9`, `#c4a882`) need Pacific variable assignments.
+- All previously hardcoded color values (`#0F0F0F`, `#32B7D9`, `#c4a882`, etc.) have been tokenized in the theme system. See Section 1.1 "Previously hardcoded colors" table.
 - Semantic status colors (danger/success/warning/info chip variants) may not have direct Pacific equivalents — verify against Pacific's status color system.
 
 ### Component Gaps
-- `ChevronLeftIcon` duplicated in 4 files — extract to shared icon module before Flutter migration.
-- `MoreIcon` duplicated in ChatHeader and MemoryCenter with identical SVG — extract.
-- Search bar implementation differs slightly between MemoryCenter (custom SVG, 1px border) and ChatHistory (Feather icon, 0.75px border).
+- Search bar implementation differs slightly between MemoryCenter (1px border) and ChatHistory (0.75px border).
 - SettingsMenuIcon uses stroke style while all other menu icons use filled style.
 
 ### Inline Component Inconsistencies
 - Resolved in Task #10. All proposal cards now share unified icon treatment (bare Feather), text sizes (13px body, 12px detail), button patterns (confirm pill + dismiss outlined pill), and spacing (gap 8, padding 12). See Section 3.1 for the normalized spec.
+
+### Theme System
+- Full light/dark theming implemented via `constants/theme.ts` + `context/ThemeContext.tsx`. All components use `useTheme()` — zero hardcoded colors in render paths. See MEMORY_AND_GOALS.md "Theme System" section for migration pattern details.
 
 ---
 
