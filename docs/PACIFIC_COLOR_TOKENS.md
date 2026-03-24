@@ -1,308 +1,286 @@
-# Pacific Design System — Color Tokens
+# Pacific Color Token Lookup
 
-Extracted from `sofi_design_system_tokens` v1.40.0 (`pacific_color_tokens_scheme.dart` + `pacific_color_token_themes.dart`).
-
-Values are listed as their **primitive token references** (e.g. `blue550`, `bone850`). There are 6 theme variants: **Light**, **Minimum**, **Maximum**, **Dark**, **LightModeAccessible**, **DarkModeAccessible**. The two canonical themes are Light and Dark.
-
----
-
-## 1. Marketing
-
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `marketingWhite` | Secondary, white container (and sometimes page) background | `bone0` | `bone850` |
-| `marketingBone` | Primary, off-white (bone) page background | `bone50` | `bone1000` |
-| `marketingSofiBlue` | Special use, SoFi blue page and container backgrounds | `blue550` | `blue500` |
-| `marketingEggplant` | Special use, SoFi blue page and container backgrounds | `mktgEggplant` | `mktgEggplant` |
-| `marketingInk` | Special use, SoFi blue page and container backgrounds | `mktgInk` | `mktgInk` |
-| `marketingBerry` | — | `mktgBerry` | `mktgBerry` |
+Source of truth for mapping hex values seen in Figma to Pacific Design System semantic tokens.
+Extracted from `sofi_design_system_tokens` v1.40.0 (`pacific_color_token_themes.dart`).
 
 ---
 
-## 2. Plus
+## Quick Reference: Hex → Primitive → Semantic Token
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `plusLightPurple` | — | `plusLightPurple` | `plusDarkPurple` |
-| `plusPopPurple` | — | `plusPopPurple` | `bone0` |
-
----
-
-## 3. Documentation
-
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `documentationPink` | Used to color all brand button default state elements | `pink` | `pink` |
-| `documentationBlue` | Used to color all brand button disabled state elements | `blue` | `blue` |
-| `documentationPurple` | Used to color all brand button hover state elements | `purple` | `purple` |
-| `documentationGreen` | Used to color all brand button pressed state elements | `green` | `green` |
+When Figma MCP returns a color (via `getDesignContext` or `getScreenshot`), use this file to:
+1. Match the hex to a **primitive** (e.g., `#1A1919` → `bone850`)
+2. Look up which **semantic tokens** use that primitive (e.g., `bone850` → `contentPrimaryDefault`, `buttonNeutralDefault`, `surfaceIndicatorSelected`)
+3. Pick the semantic token that fits the element's role (text? surface? stroke?)
 
 ---
 
-## 4. iOS Keypad
+## 1. Primitive Hex Scales
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `ioskeypadSurface` | Used to color all brand button default state elements | `bone250` | `bone750` |
-| `ioskeypadKeysPrimary` | Used to color all brand button disabled state elements | `bone0` | `bone700` |
-| `ioskeypadKeysSecondary` | Used to color all brand button hover state elements | `bone350` | `bone850` |
-| `ioskeypadContent` | Used to color all brand button pressed state elements | `bone950` | `bone0` |
-| `ioskeypadShadow` | Used to color all brand button pressed state elements | `bone500` | `bone950` |
+### Bone Scale (Warm Neutrals)
 
----
+| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
+|-----------|-----|-----------|-------------------------------|
+| `bone0` | `#FFFFFF` | yes | `surfaceElevatedDefault`, `contentPrimaryInverse`, `contentOnDark` |
+| `bone50` | `#FAF8F5` | yes | `surfaceBase`, `contentPrimaryDefault` (Dark) |
+| `bone100` | `#F0EDE8` | ~approx | `surfaceInfoLabel` |
+| `bone150` | `#E8E5DF` | ~approx | `surfaceInfoDefault`, `surfaceElevatedDisabled`, `surfaceSwitchUnselected` |
+| `bone200` | `#E0DCD5` | ~approx | `surfaceSwitchUnselectedHover` |
+| `bone250` | `#D0CCC5` | yes | `contentHint`, `contentDisabled`, `contentIndicatorDisabled`, `strokeIndicatorUnselectedDefault`, `surfaceIndicatorUnselected`, `buttonBrandDisabled` |
+| `bone300` | `#BDBBB9` | ~approx | (no direct semantic token — prototype `contentDimmed`) |
+| `bone350` | `#A8A6A3` | ~approx | `contentDisabled2`, `buttonBrandDisabled2` |
+| `bone450` | `#8A8887` | ~approx | `contentIndicatorUnselected` (Dark) |
+| `bone500` | `#7E7C7B` | ~approx | `contentSecondary` (Dark), `surfaceIndicatorSelectedSecondary` (Dark) |
+| `bone550` | `#706F6E` | yes | `contentSecondary`, `surfaceIndicatorSelectedSecondary` |
+| `bone600` | `#5C5B5A` | yes | `contentIndicatorUnselected` |
+| `bone650` | `#4A4948` | ~approx | `surfaceElevatedDisabledEmphasized` (Dark) |
+| `bone700` | `#3A3938` | ~approx | `surfaceToast` (Dark), `contentDisabled` (Dark) |
+| `bone750` | `#2E2D2C` | ~approx | `surfaceIndicatorUnselected` (Dark), `surfaceElevatedDisabled` (Dark) |
+| `bone800` | `#242322` | ~approx | `surfaceInfoDefault` (Dark) |
+| `bone850` | `#1A1919` | yes | `contentPrimaryDefault`, `buttonNeutralDefault`, `surfaceIndicatorSelected`, `strokeIndicatorSelected`, `contentIndicatorSelected`, `contentLinkPrimary` |
+| `bone900` | `#141313` | ~approx | `surfaceIndicatorRange` (Dark) |
+| `bone950` | `#0F0F0F` | yes | `surfaceToast` |
+| `bone1000` | `#0A0A0A` | yes | `contentStatusBar`, `contentPrimaryInverse` (Dark), `buttonBrandInverse` (Dark) |
 
-## 5. Stroke
+#### Bone + Alpha (Opacity Variants)
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `strokeIndicatorHover` | Used for hover states of controls and more | `bone850` | `bone50` |
-| `strokeIndicatorSelected` | Used for selected states of controls and more | `bone850` | `bone50` |
-| `strokeIndicatorPressed` | Used for pressed states of controls and more | `bone850` | `bone50` |
-| `strokeIndicatorError` | Used for some error states | `red600` | `red600` |
-| `strokeIndicatorErrorHover` | — | `red650` | `red650` |
-| `strokeIndicatorErrorPressed` | — | `red700` | `red700` |
-| `strokeIndicatorDisabled` | Used for disabled states of controls and more | `bone100010Pct` | `bone010Pct` |
-| `strokeIndicatorUnselectedDefault` | Used for horizontal rules beneath content, off state in tab navigation | `bone250` | `bone750` |
-| `strokeIndicatorUnselectedEmphasized` | Selector for filter pills | `bone100040Pct` | `bone040Pct` |
-| `strokeIndicatorGhost` | Used for horizontal rules beneath content, off state in tab navigation | `bone030Pct` | `bone030Pct` |
-| `strokeOnDark` | — | `bone0` | `bone50` |
-| `strokeOnDarkDisabled` | — | `bone08Pct` | `bone08Pct` |
-| `strokeBrand` | Used for some hover and focused states | `blue550` | `blue500` |
-| `strokeDividePrimary` | Default horizontal and vertical rules dividing content over surface-primary | `bone100010Pct` | `bone010Pct` |
-| `strokeDivideSecondary` | Default horizontal and vertical rules dividing content over surface-secondary | `bone100010Pct` | `bone07Pct` |
-| `strokePositiveDefault` | Horizontal and vertical rules dividing content communicating positive movement | `green550` | `green550` |
-| `strokeNegativeDefault` | Horizontal and vertical rules dividing content communicating negative movement | `red600` | `red600` |
-| `strokeEdge` | Used to define edge of certain containers | `bone100010Pct` | `bone07Pct` |
-| `strokeIndicatorCaution` | — | `yellow600` | `yellow350` |
+These appear as `rgba()` in code. Pacific names them with a suffix like `010Pct`, `016Pct`, `050Pct`, etc.
 
----
+| Primitive | CSS Value | Common Semantic Tokens (Light) |
+|-----------|-----------|-------------------------------|
+| `bone100010Pct` | `rgba(10,10,10, 0.10)` | `strokeDividePrimary`, `strokeDivideSecondary`, `strokeEdge`, `strokeIndicatorDisabled`, `surfaceScrollHandle` |
+| `bone100016Pct` | `rgba(10,10,10, 0.16)` | `surfaceEdge`, `surfaceGhostDefaultEmphasized` |
+| `bone100020Pct` | `rgba(10,10,10, 0.20)` | `buttonNeutralDefaultDiminish` |
+| `bone100040Pct` | `rgba(10,10,10, 0.40)` | `strokeIndicatorUnselectedEmphasized` |
+| `bone100050Pct` | `rgba(10,10,10, 0.50)` | `surfaceScrim` |
+| `bone10004Pct` | `rgba(10,10,10, 0.04)` | `surfaceElevatedHover`, `surfaceIndicatorHover` |
+| `bone10007Pct` | `rgba(10,10,10, 0.07)` | `surfaceGhostDefault`, `buttonNeutralPressedDiminish` |
+| `bone10008Pct` | `rgba(10,10,10, 0.08)` | `surfaceElevatedPressed`, `surfaceIndicatorPressed` |
+| `bone030Pct` | `rgba(~bone, 0.03)` | `strokeIndicatorGhost` |
 
-## 6. Button
+**Key distinction:** Our prototype `surfaceEdge` (`rgba(10,10,10,0.10)`) maps to `strokeDividePrimary` (`bone100010Pct`), NOT Pacific's `surfaceEdge` which is `bone100016Pct` (0.16 opacity — heavier).
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `buttonBrandDefault` | Used to color all brand button default state elements | `blue550` | `blue500` |
-| `buttonBrandDefaultInverse` | Used to color all brand button default state elements | `blue500` | `blue500` |
-| `buttonBrandInverse` | — | `bone0` | `bone1000` |
-| `buttonBrandDisabled` | Used to color all brand button disabled state elements | `bone150` | `bone750` |
-| `buttonBrandDisabled2` | Used to color all brand button disabled state elements | `bone350` | `bone850` |
-| `buttonBrandHover` | Used to color all brand button hover state elements | `blue600` | `blue550` |
-| `buttonBrandPressed` | Used to color all brand button pressed state elements | `blue650` | `blue600` |
-| `buttonDestructiveDefault` | Used to color all destructive button default state elements | `red600` | `red600` |
-| `buttonDestructiveDisabled` | Used to color all destructive button disabled state elements | `red150` | `red850` |
-| `buttonDestructiveDisabled2` | Used to color all destructive button disabled state elements | `red350` | `red800` |
-| `buttonDestructiveHover` | Used to color all destructive button hover state elements | `red650` | `red650` |
-| `buttonDestructivePressed` | Used to color all destructive button pressed state elements | `red700` | `red700` |
-| `buttonDestructiveInverse` | Used to color destructive button primary state text and glyphs | `bone0` | `bone1000` |
-| `buttonOnDark` | Used to color brand button primary state text and glyphs | `bone0` | `bone0` |
-| `buttonOnDarkDiminish` | — | `bone012Pct` | `bone010Pct` |
-| `buttonOnDarkInverse` | — | `bone1000` | `bone1000` |
-| `buttonOnDarkHover` | — | `bone080Pct` | `bone070Pct` |
-| `buttonOnDarkHover2` | — | `bone020Pct` | `bone012Pct` |
-| `buttonOnDarkHover3` | — | `bone010Pct` | `bone07Pct` |
-| `buttonOnDarkPressed` | — | `bone060Pct` | `bone050Pct` |
-| `buttonOnDarkPressed2` | — | `bone012Pct` | `bone07Pct` |
-| `buttonOnDarkPressed3` | — | `bone07Pct` | `bone04Pct` |
-| `buttonOnDarkDisabled` | — | `bone012Pct` | `bone010Pct` |
-| `buttonOnDarkDisabled2` | — | `bone020Pct` | `bone012Pct` |
-| `buttonOnDarkDisabledDiminish` | — | `bone08Pct` | `bone07Pct` |
-| `buttonOnDarkDisabledDiminish2` | — | `bone020Pct` | `bone020Pct` |
-| `buttonNeutralDefault` | — | `bone850` | `bone50` |
-| `buttonNeutralDefaultDiminish` | — | `bone100020Pct` | `bone020Pct` |
-| `buttonNeutralDisabled` | — | `bone250` | `bone700` |
-| `buttonNeutralHover` | — | `bone700` | `bone300` |
-| `buttonNeutralPressed` | — | `bone1000` | `bone0` |
-| `buttonNeutralHoverDiminish` | — | `bone10004Pct` | `bone04Pct` |
-| `buttonNeutralPressedDiminish` | — | `bone10007Pct` | `bone07Pct` |
-| `buttonTip` | — | `blue650` | `blue600` |
-| `buttonTipHover` | — | `blue700` | `blue650` |
-| `buttonCaution` | — | `yellow600` | `yellow350` |
-| `buttonCautionHover` | — | `yellow650` | `yellow400` |
-| `buttonDangerEmphasized` | Used to color all destructive button default state elements | `red650` | `red600` |
-| `buttonDangerEmphasizedHover` | Used to color all destructive button default state elements | `red700` | `red650` |
-| `buttonSuccess` | — | `green600` | `green550` |
-| `buttonSuccessHover` | — | `green650` | `green600` |
-| `buttonInvestPositiveDefault` | — | `green550` | `green550` |
-| `buttonInvestPositiveHover` | — | `green600` | `green600` |
-| `buttonInvestPositivePressed` | — | `green700` | `green700` |
-| `buttonInvestPositiveSelected` | — | `green550` | `green550` |
-| `buttonInvestNeutralDefault` | — | `bone550` | `bone550` |
-| `buttonInvestNeutralHover` | — | `bone600` | `bone600` |
-| `buttonInvestNeutralPressed` | — | `bone700` | `bone700` |
-| `buttonInvestNeutralSelected` | — | `bone500` | `bone500` |
-| `buttonInvestNegativeDefault` | — | `red600` | `red600` |
-| `buttonInvestNegativeHover` | — | `red650` | `red650` |
-| `buttonInvestNegativePressed` | — | `red700` | `red700` |
-| `buttonInvestNegativeSelected` | — | `red600` | `red600` |
+### Blue Scale (Brand)
+
+| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
+|-----------|-----|-----------|-------------------------------|
+| `blue50` | `#E6F7FB` | ~approx | `surfaceTipDefault` |
+| `blue100` | `#B3E8F2` | ~approx | `gradientCoachMark1` |
+| `blue300` | `#66C9E0` | ~approx | `contentChartF` |
+| `blue450` | `#33B0CC` | ~approx | `gradientCoachMark2`, `contentChartA` |
+| `blue500` | `#00A2C7` | yes | `buttonBrandDefaultInverse`, `contentBrand` (Dark), `surfaceIndicatorSelectedBrand` (Dark) |
+| `blue550` | `#0095B8` | ~approx | `buttonBrandDefault`, `contentBrand`, `contentLinkSecondary`, `surfaceSub`, `surfaceNeutral`, `strokeBrand` |
+| `blue600` | `#0088A9` | ~approx | `buttonBrandHover`, `contentChartB` |
+| `blue650` | `#007B9A` | ~approx | `contentTip`, `buttonTip` |
+| `blue700` | `#006E8B` | ~approx | `buttonTipHover` |
+| `blue750` | `#00617C` | ~approx | `surfaceSubDark`, `contentChartC` |
+
+### Red Scale (Danger / Negative)
+
+| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
+|-----------|-----|-----------|-------------------------------|
+| `red50` | `#FEE2E2` | yes | `surfaceDangerDefault`, `surfaceNegativeDiminish` |
+| `red550` | `#EF4444` | ~approx | `contentChart5` |
+| `red600` | `#FA2D25` | yes | `contentDanger`, `contentNegative`, `surfaceAlert`, `surfaceNegativeDefault`, `buttonDestructiveDefault`, `strokeIndicatorError` |
+| `red650` | `#E5281F` | ~approx | `contentDangerEmphasized`, `surfaceDangerEmphasize`, `buttonDangerEmphasized` |
+| `red700` | `#CC231B` | ~approx | `buttonDestructivePressed` |
+
+### Green Scale (Success / Positive)
+
+| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
+|-----------|-----|-----------|-------------------------------|
+| `green50` | `#DCFCE7` | yes | `surfaceSuccessDefault`, `surfacePositiveDiminish` |
+| `green550` | `#22C55E` | yes | `contentSuccess`, `contentPositive`, `surfacePositiveDefault`, `strokePositiveDefault`, `buttonInvestPositiveDefault` |
+| `green600` | `#16A34A` | yes | `contentSuccessEmphasized`, `buttonSuccess` |
+| `green650` | `#138D40` | ~approx | `buttonSuccessHover` |
+
+### Yellow Scale (Caution / Warning)
+
+| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
+|-----------|-----|-----------|-------------------------------|
+| `yellow50` | `#FEF3C7` | yes | `surfaceCautionDefault` |
+| `yellow250` | `#E5C35A` | ~approx | `contentChart8` |
+| `yellow350` | `#D4A843` | ~approx | `surfaceCautionEmphasize`, `contentCautionOnDark` |
+| `yellow600` | `#B45309` | yes | `contentCaution`, `contentIndicatorCaution`, `buttonCaution`, `strokeIndicatorCaution` |
+| `yellow650` | `#9A4808` | ~approx | `buttonCautionHover` |
 
 ---
 
-## 7. Gradient
+## 2. Reverse Lookup: Semantic Token → Primitive + Hex
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `gradientSubDark` | — | `blue7500Pct` | `bone10000Pct` |
-| `gradientPlus1` | — | `plus100` | `plus400` |
-| `gradientOnSub1` | — | `bone020Pct` | `bone010Pct` |
-| `gradientPlus2` | — | `plus200` | `plus500` |
-| `gradientPlus3` | — | `plus300` | `plus600` |
-| `gradientOnSub2` | — | `bone08Pct` | `bone04Pct` |
-| `gradientOnBase1` | — | `bone150` | `bone850` |
-| `gradientOnBase2` | — | `bone50` | `bone950` |
-| `gradientBaseTrans` | — | `bone500Pct` | `bone10000Pct` |
-| `gradientSubCryptoTrans` | — | `blue5500Pct` | `bone10000Pct` |
-| `gradientOnElevated1` | — | `bone50` | `bone850` |
-| `gradientOnElevated2` | — | `bone0` | `bone1000` |
-| `gradientElevatedTrans` | — | `bone00Pct` | `bone10000Pct` |
-| `gradientCoachMark1` | — | `blue100` | `blue500` |
-| `gradientCoachMark2` | — | `blue450` | `blue400` |
-| `gradientSub1` | — | `blue500` | `blue800` |
-| `gradientSub2` | — | `blue550` | `blue850` |
+### Surface Tokens (Backgrounds)
 
----
+| Pacific Token | Light Primitive | Approx Hex | Role |
+|---------------|----------------|------------|------|
+| `surfaceBase` | `bone50` | `#FAF8F5` | Page background |
+| `surfaceElevatedDefault` | `bone0` | `#FFFFFF` | Card / container background |
+| `surfaceElevatedHover` | `bone10004Pct` | `rgba(10,10,10,0.04)` | Card hover state |
+| `surfaceElevatedPressed` | `bone10008Pct` | `rgba(10,10,10,0.08)` | Card pressed state |
+| `surfaceElevatedSelected` | `bone850` | `#1A1919` | Selected pill / toggle bg |
+| `surfaceElevatedDisabled` | `bone150` | `#E8E5DF` | Disabled input bg |
+| `surfaceBottomSheet` | `bone50` | `#FAF8F5` | Bottom sheet bg |
+| `surfaceToast` | `bone950` | `#0F0F0F` | Toast notification bg |
+| `surfaceScrim` | `bone100050Pct` | `rgba(10,10,10,0.50)` | Overlay / modal backdrop |
+| `surfaceEdge` | `bone100016Pct` | `rgba(10,10,10,0.16)` | Container edge definition |
+| `surfaceGhostDefault` | `bone10007Pct` | `rgba(10,10,10,0.07)` | Ghost pill / status bg |
+| `surfaceGhostDefaultEmphasized` | `bone100016Pct` | `rgba(10,10,10,0.16)` | Emphasized ghost bg |
+| `surfaceInfoDefault` | `bone150` | `#E8E5DF` | Info banner bg |
+| `surfaceInfoLabel` | `bone100` | `#F0EDE8` | Subheader bg |
+| `surfaceTipDefault` | `blue50` | `#E6F7FB` | Tip banner bg |
+| `surfaceSuccessDefault` | `green50` | `#DCFCE7` | Success banner bg |
+| `surfaceCautionDefault` | `yellow50` | `#FEF3C7` | Caution banner bg |
+| `surfaceDangerDefault` | `red50` | `#FEE2E2` | Danger banner bg |
+| `surfaceAlert` | `red600` | `#FA2D25` | Alert dot |
+| `surfaceIndicatorSelected` | `bone850` | `#1A1919` | Pagination dot on |
+| `surfaceIndicatorUnselected` | `bone250` | `#D0CCC5` | Pagination dot off |
+| `surfaceIndicatorSelectedBrand` | `blue550` | `#0095B8` | Brand-colored selected indicator |
+| `surfaceSub` | `blue550` | `#0095B8` | SoFi blue page bg |
 
-## 8. Surface
+### Content Tokens (Text & Icons)
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `surfaceSub` | Special use, SoFi blue page and container backgrounds | `blue550` | `blue1000` |
-| `surfaceSubDark` | — | `blue750` | `bone1000` |
-| `surfaceSubCrypto` | Special use, SoFi blue page and container backgrounds | `blue550` | `bone1000` |
-| `surfaceSubError` | — | `blue750` | `blue900` |
-| `surfaceBase` | Primary, off-white (bone) page background | `bone50` | `bone1000` |
-| `surfaceElevatedDefault` | Secondary, white container (and sometimes page) background | `bone0` | `bone850` |
-| `surfaceElevatedHover` | Secondary, white container (and sometimes page) background | `bone10004Pct` | `bone04Pct` |
-| `surfaceElevatedPressed` | Secondary, white container (and sometimes page) background | `bone10008Pct` | `bone08Pct` |
-| `surfaceElevatedUnselected` | — | `bone0` | `bone850` |
-| `surfaceElevatedSelected` | — | `bone850` | `bone0` |
-| `surfaceElevatedDisabled` | — | `bone150` | `bone750` |
-| `surfaceElevatedDisabledEmphasized` | — | `bone250` | `bone650` |
-| `surfaceBottomSheet` | — | `bone50` | `bone850` |
-| `surfaceIndicatorSelected` | Used for on state of pagination indicator | `bone850` | `bone50` |
-| `surfaceIndicatorSelectedSecondary` | — | `bone550` | `bone500` |
-| `surfaceIndicatorSelectedBrand` | — | `blue550` | `blue500` |
-| `surfaceIndicatorUnselected` | Used for off state of pagination indicator | `bone250` | `bone750` |
-| `surfaceIndicatorUnselectedHover` | Used for off state of pagination indicator | `bone300` | `bone650` |
-| `surfaceIndicatorHover` | — | `bone10004Pct` | `bone04Pct` |
-| `surfaceIndicatorPressed` | Secondary, white container (and sometimes page) background | `bone10008Pct` | `bone08Pct` |
-| `surfaceIndicatorDisabled` | — | `bone150` | `bone750` |
-| `surfaceIndicatorRange` | Used to highlight the in-between dates in range variant of date picker | `bone150` | `bone900` |
-| `surfaceGhostDefault` | Used to fill containers (like status pills) that reside on surfaces that change from light to dark | `bone10007Pct` | `bone07Pct` |
-| `surfaceGhostDefaultEmphasized` | Used to fill containers (like status pills) that reside on surfaces that change from light to dark | `bone100016Pct` | `bone012Pct` |
-| `surfaceGhostOnDark` | Used to fill containers (like status pills) that reside on dark surfaces, photography or illustration | `bone010Pct` | `bone010Pct` |
-| `surfaceGhostOnDarkDisabled` | — | `bone012Pct` | `bone012Pct` |
-| `surfaceGhostOnDarkDisabled2` | — | `bone020Pct` | `bone020Pct` |
-| `surfaceInfoLabel` | Apply this token to the containers housing subheaders | `bone100` | `bone08Pct` |
-| `surfaceInfoDefault` | Used to fill containers that contain content communicating information (info banners) | `bone150` | `bone800` |
-| `surfaceInfoDiminish` | Used for pills that sit over their corresponding surface color | `bone10007Pct` | `bone010Pct` |
-| `surfaceTipDefault` | Used to fill containers that contain content communicating tips (tip banners) | `blue50` | `blue900` |
-| `surfaceTipDiminish` | Used for pills that sit over their corresponding surface color | `blue55010Pct` | `blue55010Pct` |
-| `surfaceNeutral` | Special use, SoFi blue page and container backgrounds | `blue550` | `blue500` |
-| `surfaceScrollHandle` | Used for pills that sit over their corresponding surface color | `bone100010Pct` | `bone010Pct` |
-| `surfaceSuccessDefault` | Used to fill containers that contain content communicating success (success banners) | `green50` | `green900` |
-| `surfaceSuccessDiminish` | Used for pills that sit over their corresponding surface color | `green55010Pct` | `green55010Pct` |
-| `surfaceCautionDefault` | Used to fill containers that contain content communicating caution (caution banners) | `yellow50` | `yellow800` |
-| `surfaceCautionEmphasize` | Used to fill containers that contain content communicating caution (caution banners) | `yellow350` | `yellow350` |
-| `surfaceCautionDiminish` | Used for pills that sit over their corresponding surface color | `yellow60010Pct` | `yellow35010Pct` |
-| `surfaceDangerDefault` | Used to fill containers that contain content communicating warning (warning banners) | `red50` | `red850` |
-| `surfaceDangerEmphasize` | Used to fill containers that contain content communicating warning (warning banners) | `red650` | `red600` |
-| `surfaceDangerDiminish` | Used for pills that sit over their corresponding surface color | `red60010Pct` | `red60010Pct` |
-| `surfaceAlert` | Used for alert dot appended to notification and chat glyphs | `red600` | `red600` |
-| `surfacePositiveDefault` | Used to fill interactive containers that communicate positive movement | `green550` | `green550` |
-| `surfacePositiveDiminish` | Used to fill containers that contain content communicating positive movement (performance pills) | `green50` | `green900` |
-| `surfaceNegativeDefault` | Used to fill interactive containers that communicate negative movement | `red600` | `red600` |
-| `surfaceNegativeDiminish` | Used to fill containers that contain content communicating negative movement (performance pills) | `red50` | `red850` |
-| `surfaceScrim` | Used to fill background on overlays and bottom sheets | `bone100050Pct` | `bone100070Pct` |
-| `surfaceScrimFab` | — | `bone5080Pct` | `bone100070Pct` |
-| `surfaceToast` | Used to fill background on overlays and bottom sheets | `bone950` | `bone700` |
-| `surfaceEdge` | — | `bone100016Pct` | `bone020Pct` |
-| `surfaceSwitchSelected` | — | `bone0` | `bone750` |
-| `surfaceSwitchUnselected` | — | `bone150` | `bone800` |
-| `surfaceSwitchUnselectedHover` | — | `bone200` | `bone850` |
+| Pacific Token | Light Primitive | Approx Hex | Role |
+|---------------|----------------|------------|------|
+| `contentPrimaryDefault` | `bone850` | `#1A1919` | Primary text, icons |
+| `contentPrimaryInverse` | `bone0` | `#FFFFFF` | Text on dark surfaces |
+| `contentSecondary` | `bone550` | `#706F6E` | Secondary text, meta |
+| `contentHint` | `bone250` | `#D0CCC5` | Placeholder / hint text |
+| `contentDisabled` | `bone250` | `#D0CCC5` | Disabled text |
+| `contentBrand` | `blue550` | `#0095B8` | Brand-colored text |
+| `contentOnDark` | `bone0` | `#FFFFFF` | Text on dark bg |
+| `contentLinkPrimary` | `bone850` | `#1A1919` | Standalone text links |
+| `contentLinkSecondary` | `blue550` | `#0095B8` | Inline text links |
+| `contentTip` | `blue650` | `#007B9A` | Tip / new-item text |
+| `contentInfo` | `bone850` | `#1A1919` | Info banner text |
+| `contentSuccess` | `green550` | `#22C55E` | Success text |
+| `contentSuccessEmphasized` | `green600` | `#16A34A` | Emphasized success |
+| `contentCaution` | `yellow600` | `#B45309` | Caution text |
+| `contentDanger` | `red600` | `#FA2D25` | Danger / error text |
+| `contentPositive` | `green550` | `#22C55E` | Positive movement |
+| `contentNegative` | `red600` | `#FA2D25` | Negative movement |
+| `contentIndicatorSelected` | `bone850` | `#1A1919` | Active tab text |
+| `contentIndicatorUnselected` | `bone600` | `#5C5B5A` | Inactive tab text |
+| `contentIndicatorDisabled` | `bone250` | `#D0CCC5` | Disabled tab text |
+| `contentStatusBar` | `bone1000` | `#0A0A0A` | iOS status bar |
 
----
+### Stroke Tokens (Borders & Dividers)
 
-## 9. Content
+| Pacific Token | Light Primitive | Approx Hex | Role |
+|---------------|----------------|------------|------|
+| `strokeDividePrimary` | `bone100010Pct` | `rgba(10,10,10,0.10)` | Dividers over primary surface |
+| `strokeDivideSecondary` | `bone100010Pct` | `rgba(10,10,10,0.10)` | Dividers over secondary surface |
+| `strokeEdge` | `bone100010Pct` | `rgba(10,10,10,0.10)` | Container edges |
+| `strokeIndicatorSelected` | `bone850` | `#1A1919` | Selected control border |
+| `strokeIndicatorUnselectedDefault` | `bone250` | `#D0CCC5` | Unselected control border |
+| `strokeIndicatorUnselectedEmphasized` | `bone100040Pct` | `rgba(10,10,10,0.40)` | Filter pill border |
+| `strokeIndicatorGhost` | `bone030Pct` | `rgba(~,~,~,0.03)` | Very light rule |
+| `strokeIndicatorDisabled` | `bone100010Pct` | `rgba(10,10,10,0.10)` | Disabled control border |
+| `strokeBrand` | `blue550` | `#0095B8` | Focus / brand border |
+| `strokePositiveDefault` | `green550` | `#22C55E` | Positive divider |
+| `strokeNegativeDefault` | `red600` | `#FA2D25` | Negative divider |
+| `strokeIndicatorError` | `red600` | `#FA2D25` | Error border |
 
-| Token | Description | Light | Dark |
-|-------|-------------|-------|------|
-| `contentPrimaryDefault` | Primary text and glyphs | `bone850` | `bone50` |
-| `contentPrimaryInverse` | Used for selector pills or other elements with medium to dark surfaces | `bone0` | `bone1000` |
-| `contentOnLight` | Primary text and glyphs that reside on dark surfaces, photography or illustration | `bone850` | `bone850` |
-| `contentOnDark` | Primary text and glyphs that reside on dark surfaces, photography or illustration | `bone0` | `bone0` |
-| `contentOnDarkDiminish` | Primary text and glyphs that reside on dark surfaces, photography or illustration | `bone080Pct` | `bone5080Pct` |
-| `contentOnDarkDisabled` | — | `bone020Pct` | `bone020Pct` |
-| `contentOnDarkDisabled2` | — | `bone060Pct` | `bone060Pct` |
-| `contentDisabled` | Primary text and glyphs that reside on dark surfaces, photography or illustration | `bone250` | `bone700` |
-| `contentDisabled2` | Primary text and glyphs that reside on dark surfaces, photography or illustration | `bone350` | `bone850` |
-| `contentSecondary` | Secondary text and glyphs | `bone550` | `bone500` |
-| `contentHint` | Used for hint text prior to user input in Text Input component | `bone250` | `bone500` |
-| `contentBrand` | — | `blue550` | `blue500` |
-| `contentLinkPrimary` | Use for default, standalone text links | `bone850` | `bone50` |
-| `contentLinkSecondary` | Use for inline text links (text link in legal copy) | `blue550` | `blue500` |
-| `contentInfo` | Text and glyphs communicating information (info banners) | `bone850` | `bone50` |
-| `contentTip` | Text and glyphs communicating tips (tip banners) and new items, information | `blue650` | `blue450` |
-| `contentSuccess` | Text and glyphs communicating success (success banners) | `green550` | `green550` |
-| `contentSuccessEmphasized` | Text and glyphs communicating success (success banners) | `green600` | `green550` |
-| `contentCaution` | Text and glyphs communicating caution (caution banners) | `yellow600` | `yellow350` |
-| `contentCautionOnDark` | — | `yellow350` | `yellow350` |
-| `contentDanger` | Text and glyphs communicating warning (warning banners) | `red600` | `red600` |
-| `contentDangerEmphasized` | Text and glyphs communicating warning (warning banners) | `red650` | `red600` |
-| `contentPositive` | Text and glyphs communicating positive movement | `green550` | `green550` |
-| `contentNegative` | Text and glyphs communicating negative movement | `red600` | `red600` |
-| `contentIndicatorSelected` | Used for text and glyphs, on state in tab navigation | `bone850` | `bone50` |
-| `contentIndicatorCaution` | — | `yellow600` | `yellow350` |
-| `contentIndicatorFair` | User for fair performance indicator | `orangeFair` | `orangeFairOnDark` |
-| `contentIndicatorError` | — | `red600` | `red600` |
-| `contentIndicatorErrorHover` | — | `red650` | `red650` |
-| `contentIndicatorErrorPressed` | — | `red700` | `red700` |
-| `contentIndicatorSelectedInverse` | — | `bone0` | `bone1000` |
-| `contentIndicatorUnselected` | Used for text and glyphs, off state in tab navigation | `bone600` | `bone450` |
-| `contentIndicatorHover` | Used for text and glyphs, hover state in tab navigation | `bone850` | `bone50` |
-| `contentIndicatorDisabled` | Used for text and glyphs, disabled state in tab navigation | `bone250` | `bone750` |
-| `contentStatusBar` | Used only for device status content (iOS time, signal, wifi, battery) | `bone1000` | `bone0` |
-| `contentChartA` | — | `blue450` | `blue450` |
-| `contentChartB` | — | `blue600` | `blue600` |
-| `contentChartC` | — | `blue750` | `blue750` |
-| `contentChartD` | — | `bone850` | `bone250` |
-| `contentChartE` | — | `blue550` | `blue450` |
-| `contentChartF` | — | `blue300` | `blue650` |
-| `contentHighlight` | — | `bone100010Pct` | `bone020Pct` |
-| `contentChart1` | — | `blue500` | `blue500` |
-| `contentChart2` | — | `blue600` | `blue600` |
-| `contentChart3` | — | `crypto400` | `crypto400` |
-| `contentChart4` | — | `mktgBerry` | `mktgBerry` |
-| `contentChart5` | — | `red550` | `red550` |
-| `contentChart6` | — | `red450` | `red450` |
-| `contentChart7` | — | `yellow350` | `yellow350` |
-| `contentChart8` | — | `yellow250` | `yellow250` |
-| `contentChart9` | — | `green550` | `green550` |
-| `contentChart10` | — | `green450` | `green450` |
-| `contentChartDisbursed1` | — | `bone350` | `bone800` |
-| `contentChartDisbursed2` | — | `bone500` | `bone750` |
-| `contentChartDisbursed3` | — | `bone650` | `bone700` |
-| `contentChartDisbursed4` | — | `bone800` | `bone650` |
-| `contentCryptoCoinShadow` | — | `blue600` | `bone800` |
+### Button Tokens
+
+| Pacific Token | Light Primitive | Approx Hex | Role |
+|---------------|----------------|------------|------|
+| `buttonBrandDefault` | `blue550` | `#0095B8` | Primary brand CTA |
+| `buttonBrandHover` | `blue600` | `#0088A9` | Brand hover |
+| `buttonBrandPressed` | `blue650` | `#007B9A` | Brand pressed |
+| `buttonBrandDisabled` | `bone150` | `#E8E5DF` | Brand disabled bg |
+| `buttonBrandInverse` | `bone0` | `#FFFFFF` | Brand button text |
+| `buttonNeutralDefault` | `bone850` | `#1A1919` | Neutral CTA bg |
+| `buttonNeutralHover` | `bone700` | `#3A3938` | Neutral hover |
+| `buttonNeutralPressed` | `bone1000` | `#0A0A0A` | Neutral pressed |
+| `buttonDestructiveDefault` | `red600` | `#FA2D25` | Delete / destructive CTA |
+| `buttonDestructiveInverse` | `bone0` | `#FFFFFF` | Destructive button text |
 
 ---
 
-## Theme Variants Summary
+## 3. Prototype → Pacific Migration Map
+
+Quick lookup for our local `colors.ts` tokens → Pacific equivalents:
+
+| `colors.ts` Key | Hex | Pacific Token | Primitive |
+|-----------------|-----|---------------|-----------|
+| `surfaceBase` | `#FAF8F5` | `surfaceBase` | `bone50` |
+| `surfaceElevated` | `#FFFFFF` | `surfaceElevatedDefault` | `bone0` |
+| `surfaceTint` | `#F0EDE8` | — (no equivalent) | ~`bone100` |
+| `surfaceEdge` | `rgba(10,10,10,0.10)` | `strokeDividePrimary` | `bone100010Pct` |
+| `surfaceEdgeLight` | `rgba(10,10,10,0.05)` | — (no equivalent) | — |
+| `surfaceMuted` | `#F5F3F0` | `surfaceInfoDefault` | `bone150` |
+| `contentPrimary` | `#1A1919` | `contentPrimaryDefault` | `bone850` |
+| `contentSecondary` | `#706F6E` | `contentSecondary` | `bone550` |
+| `contentBone600` | `#5C5B5A` | `contentIndicatorUnselected` | `bone600` |
+| `contentStatusbar` | `#0A0A0A` | `contentStatusBar` | `bone1000` |
+| `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` |
+| `contentDimmed` | `#BDBBB9` | — (no equivalent) | ~`bone300` |
+| `contentBrand` | `#00A2C7` | `contentBrand` | `blue550` |
+| `danger` | `#FA2D25` | `contentDanger` | `red600` |
+| `dangerChipBg` | `#FEE2E2` | `surfaceDangerDefault` | `red50` |
+| `success` | `#22C55E` | `contentSuccess` | `green550` |
+| `successDark` | `#16A34A` | `contentSuccessEmphasized` | `green600` |
+| `successBg` | `#DCFCE7` | `surfaceSuccessDefault` | `green50` |
+| `warning` | `#B45309` | `contentCaution` | `yellow600` |
+| `warningBg` | `#FEF3C7` | `surfaceCautionDefault` | `yellow50` |
+| `info` | `#2563EB` | `contentTip` | `blue650` |
+| `infoBg` | `#DBEAFE` | `surfaceTipDefault` | `blue50` |
+| `progressTrack` | `#E5E1DA` | `surfaceIndicatorUnselected` | `bone250` |
+
+---
+
+## 4. Figma MCP Workflow
+
+When using `getDesignContext` or `getScreenshot` from Figma MCP:
+
+1. **Figma returns hex color** → Search Section 1 (Primitive Hex Scales) to find the primitive name
+2. **Figma returns a style/variable name** → It may already be a Pacific token name — verify in Section 2
+3. **Choosing the right semantic token** → Same primitive can be used by many semantic tokens. Pick based on:
+   - **Text or icon?** → use `content*` tokens
+   - **Background fill?** → use `surface*` tokens
+   - **Border or divider?** → use `stroke*` tokens
+   - **Clickable element?** → use `button*` tokens
+4. **Not in Pacific?** → If a hex doesn't match any primitive, it's likely a one-off or custom value. Note it as "prototype only" in the design system map.
+
+### Common Figma Patterns
+
+| What You See in Figma | Pacific Token | Notes |
+|------------------------|---------------|-------|
+| Near-white page bg (`#FAF8F5`) | `surfaceBase` | bone50 |
+| Pure white card (`#FFFFFF`) | `surfaceElevatedDefault` | bone0 |
+| Dark text (`#1A1919`) | `contentPrimaryDefault` | bone850 |
+| Gray secondary text (`#706F6E`) | `contentSecondary` | bone550 |
+| Medium gray icon (`#5C5B5A`) | `contentIndicatorUnselected` | bone600 |
+| Very light border (10% opacity) | `strokeDividePrimary` | bone100010Pct |
+| Dark toast/snackbar bg | `surfaceToast` | bone950 |
+| Semi-transparent overlay | `surfaceScrim` | bone100050Pct |
+| SoFi brand blue | `contentBrand` / `buttonBrandDefault` | blue550 |
+| Red error / delete | `contentDanger` / `buttonDestructiveDefault` | red600 |
+| Green success | `contentSuccess` | green550 |
+| Yellow warning text | `contentCaution` | yellow600 |
+| Light red banner bg | `surfaceDangerDefault` | red50 |
+| Light green banner bg | `surfaceSuccessDefault` | green50 |
+| Light blue tip bg | `surfaceTipDefault` | blue50 |
+
+---
+
+## 5. Token Naming Convention
+
+Tokens follow `[category][Modifier][State]`:
+
+- **Category**: `surface`, `content`, `stroke`, `button`, `gradient`, `marketing`, `plus`, `ioskeypad`
+- **Modifier**: `Brand`, `Elevated`, `Indicator`, `Ghost`, `Tip`, `Success`, `Caution`, `Danger`, `Positive`, `Negative`, `OnDark`, `Neutral`, `Destructive`, `Chart`
+- **State**: `Default`, `Hover`, `Pressed`, `Disabled`, `Selected`, `Unselected`, `Inverse`, `Diminish`, `Emphasized`
+
+---
+
+## 6. Theme Variants
 
 | Variant | Class | Notes |
 |---------|-------|-------|
-| **Light** | `PacificColorTokensLight` | Default light theme |
-| **Minimum** | `PacificColorTokensMinimum` | Same values as Light; intended as baseline |
-| **Maximum** | `PacificColorTokensMaximum` | Slightly bolder light-mode variant |
-| **Dark** | `PacificColorTokensDark` | Default dark theme |
-| **LightModeAccessible** | `PacificColorTokensLightModeAccessible` | Accessible contrast variant of Light |
-| **DarkModeAccessible** | `PacificColorTokensDarkModeAccessible` | Accessible contrast variant of Dark |
+| **Light** | `PacificColorTokensLight` | Default — all mappings above use this |
+| **Dark** | `PacificColorTokensDark` | Dark theme |
+| **Minimum** | `PacificColorTokensMinimum` | Same as Light; baseline |
+| **Maximum** | `PacificColorTokensMaximum` | Slightly bolder light variant |
+| **LightModeAccessible** | `PacificColorTokensLightModeAccessible` | High-contrast light |
+| **DarkModeAccessible** | `PacificColorTokensDarkModeAccessible` | High-contrast dark |
 
----
-
-## Token Naming Convention
-
-Tokens follow a `[category][Modifier][State]` pattern:
-
-- **Category**: `surface`, `content`, `stroke`, `button`, `gradient`, `marketing`, `plus`, `documentation`, `ioskeypad`
-- **Modifier**: describes the semantic role (e.g. `Brand`, `Destructive`, `Elevated`, `Indicator`, `Ghost`, `Tip`, `Success`, `Caution`, `Danger`, `Positive`, `Negative`, `OnDark`, `Chart`)
-- **State** (where applicable): `Default`, `Hover`, `Pressed`, `Disabled`, `Selected`, `Unselected`, `Inverse`, `Diminish`, `Emphasized`
+This project targets **Light** theme only. Dark theme primitives are listed in the bone scale for reference.
