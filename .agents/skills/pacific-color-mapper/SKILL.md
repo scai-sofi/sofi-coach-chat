@@ -153,10 +153,7 @@ Each scale has five size variants: ExtraLarge, Large, Medium, Small, ExtraSmall.
 
 **Token name format:** `{scale}{SizeVariant}` in camelCase — e.g. `headlineMedium`, `bodySmall`, `labelLarge`, `titleExtraSmall`.
 
-**In code:**
-- **Web (StyleX):** `textTokens.headlineMedium` from `@sofi-web-ui/base`
-- **Flutter:** `context.textTheme.headlineMedium`
-- **React Native (prototype):** Map manually — see DESIGN_SYSTEM_MAP.md § 1.2 for prototype-to-Pacific type scale mapping
+**In code:** Use the token name (e.g. `headlineMedium`) with your platform's text theme API. See DESIGN_SYSTEM_MAP.md § 1.2 for prototype-to-Pacific type scale mapping.
 
 ---
 
@@ -193,10 +190,7 @@ Pacific uses `rpx*` tokens for all spacing (margin, padding, gap). Values range 
 
 Values below 10px (e.g. 4, 6, 8) are not covered by `rpx*` tokens — use platform-appropriate small spacing constants.
 
-**In code:**
-- **Web (StyleX):** `globalTokens.rpx16` from `@sofi-web-ui/base/dist/globalTokens.stylex`
-- **Flutter:** `PacificSpacing.rpx16` (or equivalent from `sofi_design_system`)
-- **React Native (prototype):** Raw pixel values — see DESIGN_SYSTEM_MAP.md § 1.5 for prototype-to-Pacific spacing mapping
+**In code:** Use the token name (e.g. `rpx16`) with your platform's spacing API. See DESIGN_SYSTEM_MAP.md § 1.5 for prototype-to-Pacific spacing mapping.
 
 ---
 
@@ -214,9 +208,7 @@ Pacific provides 5 elevation levels for depth, available in both downward and up
 
 Higher levels = more offset, larger blur radius, slightly more opacity. All shadows use `bone1000` (`#0a0a0a`) as the shadow color.
 
-**In code:**
-- **Web (StyleX):** `boxShadowsTokens.dropShadowDown2` from `@sofi-web-ui/base/dist/boxShadows.stylex`
-- **Flutter:** `PacificElevation.level2` (or equivalent from `sofi_design_system`)
+**In code:** Use the token name (e.g. `dropShadowDown2`) with your platform's elevation/shadow API.
 
 ---
 
