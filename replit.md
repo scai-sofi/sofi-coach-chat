@@ -49,7 +49,8 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **Spacing & Layout:** Standardized padding, gaps, border-radii, and header heights.
 - **Animations:** GPU-accelerated animations for streaming entrance, block fade-in, typing indicator shimmer, and dropdowns.
 - **Design System Map:** `docs/DESIGN_SYSTEM_MAP.md` — comprehensive inventory of all tokens, components, icons, and patterns, mapped to Pacific design system equivalents for Flutter migration.
-- **Pacific Color Tokens:** `docs/PACIFIC_COLOR_TOKENS.md` — source of truth extracted from Pacific v1.40.0 (`pacific_color_token_themes.dart`). Bone600 = `#5C5B5A`.
+- **Pacific Color Tokens:** `docs/PACIFIC_COLOR_TOKENS.md` — hex values corrected from `pacific-color-mapper` skill (authoritative). Key: bone250=`#dbdad7`, bone350=`#bdbbb9`, green550=`#1bc245`, green600=`#19a623`, yellow600=`#8c6914`, blue500=`#32b7d9`, blue550=`#00a2c7`. Several prototype colors (success/warning/info) used Tailwind hex values, NOT Pacific — see migration map in the doc.
+- **Pacific Color Mapper Skill:** `.agents/skills/pacific-color-mapper/SKILL.md` — authoritative hex lookup for all 181 Pacific semantic tokens, full primitive scales, CSS/TypeScript bootstrap, Figma MCP workflow.
 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.

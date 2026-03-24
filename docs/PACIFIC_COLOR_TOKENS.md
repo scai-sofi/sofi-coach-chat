@@ -18,28 +18,29 @@ When Figma MCP returns a color (via `getDesignContext` or `getScreenshot`), use 
 
 ### Bone Scale (Warm Neutrals)
 
-| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
-|-----------|-----|-----------|-------------------------------|
-| `bone0` | `#FFFFFF` | yes | `surfaceElevatedDefault`, `contentPrimaryInverse`, `contentOnDark` |
-| `bone50` | `#FAF8F5` | yes | `surfaceBase`, `contentPrimaryDefault` (Dark) |
-| `bone100` | `#F0EDE8` | ~approx | `surfaceInfoLabel` |
-| `bone150` | `#E8E5DF` | ~approx | `surfaceInfoDefault`, `surfaceElevatedDisabled`, `surfaceSwitchUnselected` |
-| `bone200` | `#E0DCD5` | ~approx | `surfaceSwitchUnselectedHover` |
-| `bone250` | `#D0CCC5` | yes | `contentHint`, `contentDisabled`, `contentIndicatorDisabled`, `strokeIndicatorUnselectedDefault`, `surfaceIndicatorUnselected`, `buttonBrandDisabled` |
-| `bone300` | `#BDBBB9` | ~approx | (no direct semantic token — prototype `contentDimmed`) |
-| `bone350` | `#A8A6A3` | ~approx | `contentDisabled2`, `buttonBrandDisabled2` |
-| `bone450` | `#8A8887` | ~approx | `contentIndicatorUnselected` (Dark) |
-| `bone500` | `#7E7C7B` | ~approx | `contentSecondary` (Dark), `surfaceIndicatorSelectedSecondary` (Dark) |
-| `bone550` | `#706F6E` | yes | `contentSecondary`, `surfaceIndicatorSelectedSecondary` |
-| `bone600` | `#5C5B5A` | yes | `contentIndicatorUnselected` |
-| `bone650` | `#4A4948` | ~approx | `surfaceElevatedDisabledEmphasized` (Dark) |
-| `bone700` | `#3A3938` | ~approx | `surfaceToast` (Dark), `contentDisabled` (Dark) |
-| `bone750` | `#2E2D2C` | ~approx | `surfaceIndicatorUnselected` (Dark), `surfaceElevatedDisabled` (Dark) |
-| `bone800` | `#242322` | ~approx | `surfaceInfoDefault` (Dark) |
-| `bone850` | `#1A1919` | yes | `contentPrimaryDefault`, `buttonNeutralDefault`, `surfaceIndicatorSelected`, `strokeIndicatorSelected`, `contentIndicatorSelected`, `contentLinkPrimary` |
-| `bone900` | `#141313` | ~approx | `surfaceIndicatorRange` (Dark) |
-| `bone950` | `#0F0F0F` | yes | `surfaceToast` |
-| `bone1000` | `#0A0A0A` | yes | `contentStatusBar`, `contentPrimaryInverse` (Dark), `buttonBrandInverse` (Dark) |
+| Primitive | Hex | Common Semantic Tokens (Light) |
+|-----------|-----|-------------------------------|
+| `bone0` | `#ffffff` | `surfaceElevatedDefault`, `contentPrimaryInverse`, `contentOnDark` |
+| `bone50` | `#faf8f5` | `surfaceBase`, `surfaceBottomSheet`, `contentPrimaryDefault` (Dark) |
+| `bone100` | `#f5f3f0` | `surfaceInfoLabel` |
+| `bone150` | `#f0eeeb` | `surfaceInfoDefault`, `surfaceElevatedDisabled`, `surfaceSwitchUnselected`, `buttonBrandDisabled` |
+| `bone200` | `#e5e4e1` | `surfaceSwitchUnselectedHover` |
+| `bone250` | `#dbdad7` | `contentHint`, `contentDisabled`, `contentIndicatorDisabled`, `strokeIndicatorUnselectedDefault`, `surfaceIndicatorUnselected`, `surfaceElevatedDisabledEmphasized`, `buttonNeutralDisabled` |
+| `bone300` | `#cccac8` | `surfaceIndicatorUnselectedHover` |
+| `bone350` | `#bdbbb9` | `contentDisabled2`, `buttonBrandDisabled2`, `ioskeypadKeysSecondary` |
+| `bone400` | `#adacaa` | — |
+| `bone450` | `#999896` | `contentIndicatorUnselected` (Dark) |
+| `bone500` | `#858482` | `ioskeypadShadow`, `contentSecondary` (Dark), `surfaceIndicatorSelectedSecondary` (Dark) |
+| `bone550` | `#706f6e` | `contentSecondary`, `surfaceIndicatorSelectedSecondary`, `buttonInvestNeutralDefault` |
+| `bone600` | `#5c5b5a` | `contentIndicatorUnselected`, `buttonInvestNeutralHover` |
+| `bone650` | `#4d4c4b` | `surfaceElevatedDisabledEmphasized` (Dark), `contentChartDisbursed3` |
+| `bone700` | `#3d3d3c` | `buttonNeutralHover`, `buttonInvestNeutralPressed`, `surfaceToast` (Dark), `contentDisabled` (Dark) |
+| `bone750` | `#2e2e2d` | `surfaceIndicatorUnselected` (Dark), `surfaceElevatedDisabled` (Dark), `buttonBrandDisabled` (Dark) |
+| `bone800` | `#242323` | `surfaceInfoDefault` (Dark), `contentChartDisbursed4` |
+| `bone850` | `#1a1919` | `contentPrimaryDefault`, `buttonNeutralDefault`, `surfaceIndicatorSelected`, `strokeIndicatorSelected`, `contentIndicatorSelected`, `contentLinkPrimary`, `surfaceElevatedSelected` |
+| `bone900` | `#141414` | `surfaceIndicatorRange` (Dark) |
+| `bone950` | `#0f0f0f` | `surfaceToast`, `ioskeypadContent` |
+| `bone1000` | `#0a0a0a` | `contentStatusBar`, `buttonNeutralPressed`, `contentPrimaryInverse` (Dark), `buttonBrandInverse` (Dark) |
 
 #### Bone + Alpha (Opacity Variants)
 
@@ -61,51 +62,68 @@ These appear as `rgba()` in code. Pacific names them with a suffix like `010Pct`
 
 ### Blue Scale (Brand)
 
-| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
-|-----------|-----|-----------|-------------------------------|
-| `blue50` | `#E6F7FB` | ~approx | `surfaceTipDefault` |
-| `blue100` | `#B3E8F2` | ~approx | `gradientCoachMark1` |
-| `blue300` | `#66C9E0` | ~approx | `contentChartF` |
-| `blue450` | `#33B0CC` | ~approx | `gradientCoachMark2`, `contentChartA` |
-| `blue500` | `#00A2C7` | yes | `buttonBrandDefaultInverse`, `contentBrand` (Dark), `surfaceIndicatorSelectedBrand` (Dark) |
-| `blue550` | `#0095B8` | ~approx | `buttonBrandDefault`, `contentBrand`, `contentLinkSecondary`, `surfaceSub`, `surfaceNeutral`, `strokeBrand` |
-| `blue600` | `#0088A9` | ~approx | `buttonBrandHover`, `contentChartB` |
-| `blue650` | `#007B9A` | ~approx | `contentTip`, `buttonTip` |
-| `blue700` | `#006E8B` | ~approx | `buttonTipHover` |
-| `blue750` | `#00617C` | ~approx | `surfaceSubDark`, `contentChartC` |
+| Primitive | Hex | Common Semantic Tokens (Light) |
+|-----------|-----|-------------------------------|
+| `blue50` | `#edf8fc` | `surfaceTipDefault` |
+| `blue100` | `#e5f6fc` | `gradientCoachMark1` |
+| `blue300` | `#ade4f5` | `contentChartF` |
+| `blue400` | `#87d6ed` | `gradientCoachMark2` (Dark) |
+| `blue450` | `#65cae5` | `contentChartA`, `gradientCoachMark2` |
+| `blue500` | `#32b7d9` | `buttonBrandDefaultInverse`, `gradientSub1`, `contentChart1` |
+| `blue550` | `#00a2c7` | `buttonBrandDefault`, `contentBrand`, `contentLinkSecondary`, `surfaceSub`, `surfaceNeutral`, `strokeBrand`, `surfaceSubCrypto` |
+| `blue600` | `#0080a3` | `buttonBrandHover`, `contentChartB`, `contentChart2` |
+| `blue650` | `#006280` | `contentTip`, `buttonTip`, `buttonBrandPressed` |
+| `blue700` | `#005471` | `buttonTipHover` |
+| `blue750` | `#004661` | `surfaceSubDark`, `surfaceSubError`, `contentChartC` |
+| `blue800` | `#003951` | `gradientSub1` (Dark) |
+| `blue850` | `#002c40` | `gradientSub2` (Dark) |
+| `blue900` | `#002638` | `surfaceTipDefault` (Dark), `surfaceSubError` (Dark) |
+| `blue1000` | `#001722` | `surfaceSub` (Dark) |
 
 ### Red Scale (Danger / Negative)
 
-| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
-|-----------|-----|-----------|-------------------------------|
-| `red50` | `#FEE2E2` | yes | `surfaceDangerDefault`, `surfaceNegativeDiminish` |
-| `red550` | `#EF4444` | ~approx | `contentChart5` |
-| `red600` | `#FA2D25` | yes | `contentDanger`, `contentNegative`, `surfaceAlert`, `surfaceNegativeDefault`, `buttonDestructiveDefault`, `strokeIndicatorError` |
-| `red650` | `#E5281F` | ~approx | `contentDangerEmphasized`, `surfaceDangerEmphasize`, `buttonDangerEmphasized` |
-| `red700` | `#CC231B` | ~approx | `buttonDestructivePressed` |
+| Primitive | Hex | Common Semantic Tokens (Light) |
+|-----------|-----|-------------------------------|
+| `red50` | `#ffe5e5` | `surfaceDangerDefault`, `surfaceNegativeDiminish` |
+| `red150` | `#ffd7d6` | `buttonDestructiveDisabled` |
+| `red350` | `#fda7a4` | `buttonDestructiveDisabled2` |
+| `red450` | `#fc7c77` | `contentChart6` |
+| `red550` | `#fb4a43` | `contentChart5` |
+| `red600` | `#fa2d25` | `contentDanger`, `contentNegative`, `surfaceAlert`, `surfaceNegativeDefault`, `buttonDestructiveDefault`, `strokeIndicatorError` |
+| `red650` | `#cd251e` | `contentDangerEmphasized`, `surfaceDangerEmphasize`, `buttonDangerEmphasized`, `buttonDestructiveHover` |
+| `red700` | `#a01d18` | `buttonDestructivePressed`, `buttonDangerEmphasizedHover`, `buttonInvestNegativePressed` |
+| `red800` | `#731511` | `buttonDestructiveDisabled2` (Dark) |
+| `red850` | `#352120` | `surfaceDangerDefault` (Dark), `surfaceNegativeDiminish` (Dark) |
 
 ### Green Scale (Success / Positive)
 
-| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
-|-----------|-----|-----------|-------------------------------|
-| `green50` | `#DCFCE7` | yes | `surfaceSuccessDefault`, `surfacePositiveDiminish` |
-| `green550` | `#22C55E` | yes | `contentSuccess`, `contentPositive`, `surfacePositiveDefault`, `strokePositiveDefault`, `buttonInvestPositiveDefault` |
-| `green600` | `#16A34A` | yes | `contentSuccessEmphasized`, `buttonSuccess` |
-| `green650` | `#138D40` | ~approx | `buttonSuccessHover` |
+| Primitive | Hex | Common Semantic Tokens (Light) |
+|-----------|-----|-------------------------------|
+| `green50` | `#ebf9ee` | `surfaceSuccessDefault`, `surfacePositiveDiminish` |
+| `green450` | `#63d580` | `contentChart10` |
+| `green550` | `#1bc245` | `contentSuccess`, `contentPositive`, `surfacePositiveDefault`, `strokePositiveDefault`, `buttonInvestPositiveDefault` |
+| `green600` | `#19a623` | `contentSuccessEmphasized`, `buttonSuccess`, `buttonInvestPositiveHover` |
+| `green650` | `#178a00` | `buttonSuccessHover` |
+| `green700` | `#157206` | `buttonInvestPositivePressed` |
+| `green900` | `#102916` | `surfaceSuccessDefault` (Dark), `surfacePositiveDiminish` (Dark) |
 
 ### Yellow Scale (Caution / Warning)
 
-| Primitive | Hex | Confirmed | Common Semantic Tokens (Light) |
-|-----------|-----|-----------|-------------------------------|
-| `yellow50` | `#FEF3C7` | yes | `surfaceCautionDefault` |
-| `yellow250` | `#E5C35A` | ~approx | `contentChart8` |
-| `yellow350` | `#D4A843` | ~approx | `surfaceCautionEmphasize`, `contentCautionOnDark` |
-| `yellow600` | `#B45309` | yes | `contentCaution`, `contentIndicatorCaution`, `buttonCaution`, `strokeIndicatorCaution` |
-| `yellow650` | `#9A4808` | ~approx | `buttonCautionHover` |
+| Primitive | Hex | Common Semantic Tokens (Light) |
+|-----------|-----|-------------------------------|
+| `yellow50` | `#fff5e5` | `surfaceCautionDefault` |
+| `yellow250` | `#ffdc5c` | `contentChart8` |
+| `yellow350` | `#ffcc00` | `surfaceCautionEmphasize`, `contentCautionOnDark`, `contentChart7` |
+| `yellow400` | `#f2c102` | `buttonCautionHover` (Dark) |
+| `yellow600` | `#8c6914` | `contentCaution`, `contentIndicatorCaution`, `buttonCaution`, `strokeIndicatorCaution` |
+| `yellow650` | `#6c5518` | `buttonCautionHover` |
+| `yellow800` | `#353320` | `surfaceCautionDefault` (Dark) |
 
 ---
 
 ## 2. Reverse Lookup: Semantic Token → Light / Dark Primitives
+
+**Hex values sourced from `pacific-color-mapper` skill — authoritative primitive→hex lookup.**
 
 ### Surface Tokens (Backgrounds)
 
@@ -363,33 +381,47 @@ These appear as `rgba()` in code. Pacific names them with a suffix like `010Pct`
 
 ## 3. Prototype → Pacific Migration Map
 
-Quick lookup for our local `colors.ts` tokens → Pacific equivalents:
+Quick lookup for our local `colors.ts` tokens → Pacific equivalents.
 
-| `colors.ts` Key | Hex | Pacific Token | Primitive |
-|-----------------|-----|---------------|-----------|
-| `surfaceBase` | `#FAF8F5` | `surfaceBase` | `bone50` |
-| `surfaceElevated` | `#FFFFFF` | `surfaceElevatedDefault` | `bone0` |
-| `surfaceTint` | `#F0EDE8` | — (no equivalent) | ~`bone100` |
-| `surfaceEdge` | `rgba(10,10,10,0.10)` | `strokeDividePrimary` | `bone100010Pct` |
-| `surfaceEdgeLight` | `rgba(10,10,10,0.05)` | — (no equivalent) | — |
-| `surfaceMuted` | `#F5F3F0` | `surfaceInfoDefault` | `bone150` |
-| `contentPrimary` | `#1A1919` | `contentPrimaryDefault` | `bone850` |
-| `contentSecondary` | `#706F6E` | `contentSecondary` | `bone550` |
-| `contentBone600` | `#5C5B5A` | `contentIndicatorUnselected` | `bone600` |
-| `contentStatusbar` | `#0A0A0A` | `contentStatusBar` | `bone1000` |
-| `contentMuted` | `#D0CCC5` | `contentHint` | `bone250` |
-| `contentDimmed` | `#BDBBB9` | — (no equivalent) | ~`bone300` |
-| `contentBrand` | `#00A2C7` | `contentBrand` | `blue550` |
-| `danger` | `#FA2D25` | `contentDanger` | `red600` |
-| `dangerChipBg` | `#FEE2E2` | `surfaceDangerDefault` | `red50` |
-| `success` | `#22C55E` | `contentSuccess` | `green550` |
-| `successDark` | `#16A34A` | `contentSuccessEmphasized` | `green600` |
-| `successBg` | `#DCFCE7` | `surfaceSuccessDefault` | `green50` |
-| `warning` | `#B45309` | `contentCaution` | `yellow600` |
-| `warningBg` | `#FEF3C7` | `surfaceCautionDefault` | `yellow50` |
-| `info` | `#2563EB` | `contentTip` | `blue650` |
-| `infoBg` | `#DBEAFE` | `surfaceTipDefault` | `blue50` |
-| `progressTrack` | `#E5E1DA` | `surfaceIndicatorUnselected` | `bone250` |
+**⚠ IMPORTANT: Several prototype hex values are Tailwind CSS colors, NOT Pacific primitives.** These were used during early prototyping and must be corrected during Flutter migration. The table below shows the actual Pacific hex (from `pacific-color-mapper` skill) alongside our prototype value.
+
+| `colors.ts` Key | Prototype Hex | Pacific Token | Primitive | Pacific Hex | Δ | Status |
+|-----------------|---------------|---------------|-----------|-------------|---|--------|
+| `surfaceBase` | `#faf8f5` | `surfaceBase` | `bone50` | `#faf8f5` | 0 | ✓ |
+| `surfaceElevated` | `#ffffff` | `surfaceElevatedDefault` | `bone0` | `#ffffff` | 0 | ✓ |
+| `surfaceTint` | `#f0ede8` | — (no equivalent) | ~`bone150` | `#f0eeeb` | 3 | ~ |
+| `surfaceEdge` | `rgba(10,10,10,0.10)` | `strokeDividePrimary` | `bone100010Pct` | same | 0 | ✓ |
+| `surfaceEdgeLight` | `rgba(10,10,10,0.05)` | — (no equivalent) | — | — | — | proto |
+| `surfaceMuted` | `#f5f3f0` | `surfaceInfoLabel` | `bone100` | `#f5f3f0` | 0 | ✓ |
+| `contentPrimary` | `#1a1919` | `contentPrimaryDefault` | `bone850` | `#1a1919` | 0 | ✓ |
+| `contentSecondary` | `#706f6e` | `contentSecondary` | `bone550` | `#706f6e` | 0 | ✓ |
+| `contentBone600` | `#5c5b5a` | `contentIndicatorUnselected` | `bone600` | `#5c5b5a` | 0 | ✓ |
+| `contentStatusbar` | `#0a0a0a` | `contentStatusBar` | `bone1000` | `#0a0a0a` | 0 | ✓ |
+| `contentMuted` | `#d0ccc5` | `contentHint` | `bone250` | `#dbdad7` | 25 | ❌ off-palette |
+| `contentDimmed` | `#bdbbb9` | `contentDisabled2` | `bone350` | `#bdbbb9` | 0 | ✓ |
+| `contentBrand` | `#00a2c7` | `contentBrand` | `blue550` | `#00a2c7` | 0 | ✓ |
+| `danger` | `#fa2d25` | `contentDanger` | `red600` | `#fa2d25` | 0 | ✓ |
+| `dangerLight` | `#ef4444` | — | ~`red550` | `#fb4a43` | 14 | ⚠ Tailwind |
+| `dangerChipText` | `#dc2626` | `contentDanger` | `red600` | `#fa2d25` | 30 | ❌ Tailwind |
+| `dangerChipBg` | `#fee2e2` | `surfaceDangerDefault` | `red50` | `#ffe5e5` | 4 | ~ |
+| `success` | `#22c55e` | `contentSuccess` | `green550` | `#1bc245` | 26 | ❌ Tailwind |
+| `successDark` | `#16a34a` | `contentSuccessEmphasized` | `green600` | `#19a623` | 39 | ❌ Tailwind |
+| `successBg` | `#dcfce7` | `surfaceSuccessDefault` | `green50` | `#ebf9ee` | 17 | ⚠ Tailwind |
+| `successBorder` | `#bbf7d0` | — | — | — | — | proto |
+| `successBgLight` | `#f0fdf4` | — | — | — | — | proto |
+| `warning` | `#b45309` | `contentCaution` | `yellow600` | `#8c6914` | 47 | ❌ Tailwind |
+| `warningBg` | `#fef3c7` | `surfaceCautionDefault` | `yellow50` | `#fff5e5` | 30 | ❌ Tailwind |
+| `info` | `#2563eb` | — | — | — | — | ❌ Tailwind (not Pacific) |
+| `infoBg` | `#dbeafe` | `surfaceTipDefault` | `blue50` | `#edf8fc` | 22 | ❌ Tailwind |
+| `progressTrack` | `#e5e1da` | `surfaceIndicatorUnselected` | `bone250` | `#dbdad7` | 14 | ⚠ approx |
+
+**Migration notes:**
+- Tokens marked **❌ Tailwind** used Tailwind CSS color values during prototyping. Replace with Pacific hex during Flutter migration.
+- `contentMuted` (#d0ccc5) does not match any Pacific primitive — it sits between bone250 (#dbdad7) and bone300 (#cccac8). Use `contentHint` (bone250) or `contentDisabled` (bone250) in production.
+- `contentDimmed` (#bdbbb9) is exactly `bone350` = Pacific `contentDisabled2`.
+- `info` (#2563eb) is Tailwind blue-600, not in Pacific at all. Use `contentTip` (blue650 = #006280) or `contentBrand` (blue550 = #00a2c7).
+- `surfaceTint` (#f0ede8) is close to `bone150` (#f0eeeb, Δ3) — use `surfaceInfoDefault` or `surfaceElevatedDisabled` in production.
+- `surfaceMuted` (#f5f3f0) is exactly `bone100` — maps to `surfaceInfoLabel` in Pacific.
 
 ---
 
