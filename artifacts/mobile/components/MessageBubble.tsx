@@ -469,14 +469,14 @@ function ActionFooter({ message }: { message: Message }) {
               </Svg>
             </View>
           ) : (
-            <Image source={iconCopy} style={styles.actionIcon} />
+            <Image source={iconCopy} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
           )}
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbUp(!thumbUp)}>
-          <Image source={thumbUp ? iconThumbsUpFilled : iconThumbsUp} style={styles.actionIcon} />
+          <Image source={thumbUp ? iconThumbsUpFilled : iconThumbsUp} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbDown(!thumbDown)}>
-          <Image source={thumbDown ? iconThumbsDownFilled : iconThumbsDown} style={styles.actionIcon} />
+          <Image source={thumbDown ? iconThumbsDownFilled : iconThumbsDown} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
         </Pressable>
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
