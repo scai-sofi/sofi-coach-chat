@@ -72,56 +72,6 @@ No competitor has combined all three of: **structured goals + conversational mem
 
 ---
 
-## Goals & Success Metrics
-
-**User goals:**
-
-- Feel genuinely known by the Coach across sessions — not repeat themselves
-- Understand and control what the AI has learned about them
-- Set meaningful financial goals and track progress against real account data
-- Receive timely, contextual alerts when plans are at risk or milestones are reached
-
-**Business goals:**
-
-- Increase Coach Chat session depth and return rate
-- Drive goal creation and adherence as a cross-product engagement signal
-- Deepen connection across SoFi product lines through in-chat recommendations
-- Differentiate SoFi Coach from generic AI assistants through transparency and persistence
-
-**North Star:** *Goal-Adjusted Financial Improvement Score* — a composite measuring whether members with active goals + memory enabled are making measurable financial progress compared to members without.
-
-**Product metrics:**
-
-| Metric                     | Description                                                         | Target                |
-| -------------------------- | ------------------------------------------------------------------- | --------------------- |
-| Memory adoption            | % of active Coach users with ≥ 3 active memories at 30 days         | > 60%                 |
-| Goal creation rate         | % of Coach users who create ≥ 1 goal within first 3 sessions        | > 40%                 |
-| Goal adherence (30/60/90d) | % of active goals where actual monthly contribution ≥ 80% of target | > 70%                 |
-| Goal completion rate       | % of goals reaching 100% within stated timeframe                    | > 25% at 6 months     |
-| Coach Chat return rate     | % of users returning within 7 days                                  | +15 pp vs. non-memory |
-| Containment rate           | % of conversations resolved without human escalation                | > 65%                 |
-
-**Safety metrics:**
-
-| Metric                                                | Target     |
-| ----------------------------------------------------- | ---------- |
-| Incorrect memory rate (member-flagged)                | < 5%       |
-| Compliance-flagged responses per 10,000 conversations | < 1        |
-| Memory deletion SLA (request → full purge)            | < 24 hours |
-| Sensitive data stored without explicit consent        | 0          |
-
-**Experimentation plan:**
-
-| Experiment                                         | Measure                                             |
-| -------------------------------------------------- | --------------------------------------------------- |
-| Memory on vs. off                                  | Return rate, session depth, CSAT                    |
-| Implicit memory suggestions vs. explicit-only      | Memory adoption rate, incorrect-memory rate         |
-| Goal-contextual responses vs. standard             | Goal adherence, CSAT                                |
-| Proactive alerts vs. passive tracking only         | Goal completion rate, notification unsubscribe rate |
-| Cold-start guided onboarding vs. organic discovery | 30-day memory count, goal creation rate             |
-
----
-
 ## Memory System — Implementation Spec
 
 ### Memory categories
@@ -564,6 +514,56 @@ The prototype includes 10 demo scenarios that collectively demonstrate every imp
 | 8 | Cross-Product Orchestration | Multi-product allocation, DRAFT goal in Goals Center |
 | 9 | Tiered Safety Responses | All 4 safety tiers, provenance, handoff |
 | 10 | Free Chat — Live AI | Live GPT-4o-mini, real-time memory/goal detection |
+
+---
+
+## Success Metrics
+
+**User goals:**
+
+- Feel genuinely known by the Coach across sessions — not repeat themselves
+- Understand and control what the AI has learned about them
+- Set meaningful financial goals and track progress against real account data
+- Receive timely, contextual alerts when plans are at risk or milestones are reached
+
+**Business goals:**
+
+- Increase Coach Chat session depth and return rate
+- Drive goal creation and adherence as a cross-product engagement signal
+- Deepen connection across SoFi product lines through in-chat recommendations
+- Differentiate SoFi Coach from generic AI assistants through transparency and persistence
+
+**North Star:** *Goal-Adjusted Financial Improvement Score* — a composite measuring whether members with active goals + memory enabled are making measurable financial progress compared to members without.
+
+**Product metrics:**
+
+| Metric                     | Description                                                         | Target                |
+| -------------------------- | ------------------------------------------------------------------- | --------------------- |
+| Memory adoption            | % of active Coach users with ≥ 3 active memories at 30 days         | > 60%                 |
+| Goal creation rate         | % of Coach users who create ≥ 1 goal within first 3 sessions        | > 40%                 |
+| Goal adherence (30/60/90d) | % of active goals where actual monthly contribution ≥ 80% of target | > 70%                 |
+| Goal completion rate       | % of goals reaching 100% within stated timeframe                    | > 25% at 6 months     |
+| Coach Chat return rate     | % of users returning within 7 days                                  | +15 pp vs. non-memory |
+| Containment rate           | % of conversations resolved without human escalation                | > 65%                 |
+
+**Safety metrics:**
+
+| Metric                                                | Target     |
+| ----------------------------------------------------- | ---------- |
+| Incorrect memory rate (member-flagged)                | < 5%       |
+| Compliance-flagged responses per 10,000 conversations | < 1        |
+| Memory deletion SLA (request → full purge)            | < 24 hours |
+| Sensitive data stored without explicit consent        | 0          |
+
+**Experimentation plan:**
+
+| Experiment                                         | Measure                                             |
+| -------------------------------------------------- | --------------------------------------------------- |
+| Memory on vs. off                                  | Return rate, session depth, CSAT                    |
+| Implicit memory suggestions vs. explicit-only      | Memory adoption rate, incorrect-memory rate         |
+| Goal-contextual responses vs. standard             | Goal adherence, CSAT                                |
+| Proactive alerts vs. passive tracking only         | Goal completion rate, notification unsubscribe rate |
+| Cold-start guided onboarding vs. organic discovery | 30-day memory count, goal creation rate             |
 
 ---
 
