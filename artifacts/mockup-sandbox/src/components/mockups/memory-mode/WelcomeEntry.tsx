@@ -6,55 +6,12 @@ import {
 } from './_shared';
 
 export function WelcomeEntry() {
-  const [screen, setScreen] = useState<'welcome' | 'incognito'>('welcome');
+  const [showIncognito, setShowIncognito] = useState(false);
 
   return (
     <PhoneFrame>
       <StatusBar />
 
-      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          opacity: screen === 'welcome' ? 1 : 0,
-          transform: screen === 'welcome' ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'opacity 0.35s ease, transform 0.35s ease',
-          pointerEvents: screen === 'welcome' ? 'auto' : 'none',
-        }}>
-          <WelcomeScreen onIncognito={() => setScreen('incognito')} />
-        </div>
-
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          opacity: screen === 'incognito' ? 1 : 0,
-          transform: screen === 'incognito' ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'opacity 0.35s ease, transform 0.35s ease',
-          pointerEvents: screen === 'incognito' ? 'auto' : 'none',
-        }}>
-          <IncognitoScreen onClose={() => setScreen('welcome')} />
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8 }}>
-        <div style={{
-          width: 134,
-          height: 5,
-          borderRadius: 100,
-          backgroundColor: '#000000',
-        }} />
-      </div>
-    </PhoneFrame>
-  );
-}
-
-function WelcomeScreen({ onIncognito }: { onIncognito: () => void }) {
-  return (
-    <>
       <PacificAppBar
         leftIcon={<CloseIconSvg size={24} />}
         title="Coach"
@@ -144,7 +101,7 @@ function WelcomeScreen({ onIncognito }: { onIncognito: () => void }) {
           </div>
 
           <div
-            onClick={onIncognito}
+            onClick={() => setShowIncognito(true)}
             style={{
               width: 32,
               height: 32,
@@ -185,117 +142,161 @@ function WelcomeScreen({ onIncognito }: { onIncognito: () => void }) {
           Privacy policy
         </span>
       </div>
-    </>
-  );
-}
 
-function IncognitoScreen({ onClose }: { onClose: () => void }) {
-  return (
-    <>
-      <PacificAppBar
-        leftIcon={<div onClick={onClose}><CloseIconSvg size={24} /></div>}
-        title="Coach"
-        subtitle={
-          <span style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: V.contentSecondary,
-            lineHeight: '16px',
-            letterSpacing: '0.1px',
-          }}>
-            Incognito chat
-          </span>
-        }
-        rightIcons={[
-          <ClockIconSvg size={20} />,
-          <MoreIconSvg size={20} />,
-        ]}
+      <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8 }}>
+        <div style={{
+          width: 134,
+          height: 5,
+          borderRadius: 100,
+          backgroundColor: '#000000',
+        }} />
+      </div>
+
+      <div
+        onClick={() => setShowIncognito(false)}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: V.scrimBackdrop,
+          opacity: showIncognito ? 1 : 0,
+          transition: 'opacity 0.35s ease',
+          pointerEvents: showIncognito ? 'auto' : 'none',
+          zIndex: 90,
+        }}
       />
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 24,
-          width: 358,
-        }}>
-          <GlyphHideStrokeLarge size={40} color={V.contentPrimary} />
+      <div style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 0,
+        transform: showIncognito ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)',
+        zIndex: 100,
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: V.surfaceBase,
+        borderTopLeftRadius: showIncognito ? 0 : 16,
+        borderTopRightRadius: showIncognito ? 0 : 16,
+      }}>
+        <StatusBar />
 
+        <PacificAppBar
+          leftIcon={
+            <div onClick={() => setShowIncognito(false)} style={{ cursor: 'pointer' }}>
+              <CloseIconSvg size={24} />
+            </div>
+          }
+          title="Coach"
+          subtitle={
+            <span style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: V.contentSecondary,
+              lineHeight: '16px',
+              letterSpacing: '0.1px',
+            }}>
+              Incognito chat
+            </span>
+          }
+          rightIcons={[
+            <ClockIconSvg size={20} />,
+            <MoreIconSvg size={20} />,
+          ]}
+        />
+
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 8,
-            width: '100%',
-            textAlign: 'center',
+            alignItems: 'center',
+            gap: 24,
+            width: 358,
           }}>
-            <p style={{
-              fontSize: 24,
-              fontWeight: 500,
-              color: V.contentPrimary,
-              lineHeight: '28px',
-              letterSpacing: '-0.5px',
-              margin: 0,
+            <GlyphHideStrokeLarge size={40} color={V.contentPrimary} />
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              width: '100%',
+              textAlign: 'center',
             }}>
-              You're in incognito mode
-            </p>
-            <p style={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: V.contentSecondary,
-              lineHeight: '20px',
-              letterSpacing: '0px',
-              margin: 0,
-            }}>
-              Nothing in this conversation will be saved or used in future conversations
-            </p>
+              <p style={{
+                fontSize: 24,
+                fontWeight: 500,
+                color: V.contentPrimary,
+                lineHeight: '28px',
+                letterSpacing: '-0.5px',
+                margin: 0,
+              }}>
+                You're in incognito mode
+              </p>
+              <p style={{
+                fontSize: 14,
+                fontWeight: 400,
+                color: V.contentSecondary,
+                lineHeight: '20px',
+                letterSpacing: '0px',
+                margin: 0,
+              }}>
+                Nothing in this conversation will be saved or used in future conversations
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ paddingInline: 16, paddingBottom: 0 }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <div style={{
-            flex: 1,
-            height: 48,
-            borderRadius: 24,
-            border: `0.75px solid ${V.surfaceEdge}`,
-            display: 'flex',
-            alignItems: 'center',
-            paddingLeft: 20,
-            paddingRight: 8,
-            backgroundColor: V.surfaceElevated,
-          }}>
-            <span style={{
+        <div style={{ paddingInline: 16, paddingBottom: 0 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{
               flex: 1,
-              fontSize: 16,
-              fontWeight: 400,
-              color: V.contentSecondary,
-              lineHeight: '20px',
+              height: 48,
+              borderRadius: 24,
+              border: `0.75px solid ${V.surfaceEdge}`,
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 20,
+              paddingRight: 8,
+              backgroundColor: V.surfaceElevated,
             }}>
-              Message
-            </span>
-          </div>
+              <span style={{
+                flex: 1,
+                fontSize: 16,
+                fontWeight: 400,
+                color: V.contentSecondary,
+                lineHeight: '20px',
+              }}>
+                Message
+              </span>
+            </div>
 
-          <div style={{
-            width: 32,
-            height: 32,
-            borderRadius: 100,
-            border: `0.75px solid ${V.surfaceEdge}`,
-            backgroundColor: '#f0eeeb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <GlyphHideStroke size={14.5} color={V.contentPrimary} />
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: 100,
+              border: `0.75px solid ${V.surfaceEdge}`,
+              backgroundColor: '#f0eeeb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <GlyphHideStroke size={14.5} color={V.contentPrimary} />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 21, paddingBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 21, paddingBottom: 8 }}>
+          <div style={{
+            width: 134,
+            height: 5,
+            borderRadius: 100,
+            backgroundColor: V.contentStatusbar,
+          }} />
+        </div>
       </div>
-    </>
+    </PhoneFrame>
   );
 }
 
