@@ -203,8 +203,9 @@ Three user-configurable memory modes, set via Settings panel:
 
 | Source | Label in UI | When it's set |
 |---|---|---|
-| `IMPLICIT_CONFIRMED` | "AI inferred" | Tier 1 auto-saved by AI, or Tier 2 proposal confirmed by user |
-| `EXPLICIT` | "You created" | Tier 3 — manually added by the member in Memory Center |
+| `IMPLICIT_CONFIRMED` | "Coach learned" | Tier 1 auto-saved by AI, or Tier 2 proposal confirmed by user |
+| `MEMBER_360` | "From your profile" | Tier 1 auto-saved from Member 360 profile data |
+| `EXPLICIT` | "You added" | Tier 3 — manually added by the member in Memory Center |
 
 ### Memory lifecycle
 
@@ -212,9 +213,9 @@ Three user-configurable memory modes, set via Settings panel:
 |---|---|---|
 | Auto-save with notification | Tier 1 | AI detects a low-sensitivity fact → saves immediately → "Saved to memory" chip always appears on message → chip is tappable to navigate to Memory Center |
 | Propose for permission | Tier 2 | AI detects a preference or sensitive data → shows proposal card with [Remember] / [Not now] buttons → nothing saved until user approves |
-| Manual creation | Tier 3 | User creates memory in Memory Center → source: EXPLICIT → labeled "You created" |
+| Manual creation | Tier 3 | User creates memory in Memory Center → source: EXPLICIT → labeled "You added" |
 | Memory update | Any | AI detects a correction → finds best-matching active memory by category + word overlap → replaces content → shows "Memory updated" chip |
-| View all memories | — | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred" or "You created") and date |
+| View all memories | — | Member opens Memory Center from chat header → memories grouped by category, each with source label ("Coach learned", "From your profile", or "You added") and date |
 | Search | — | Text search bar in Memory Center filters memories by content |
 | Category filter | — | Filter chips with per-category counts; toggle to show only one category |
 | Edit individual | — | Pencil icon on memory card → inline TextInput with Save/Cancel buttons and character counter (300 max) |
@@ -333,7 +334,7 @@ interface Milestone {
 - Nothing saved until member explicitly approves
 
 **Tier 3 — Manual (user-created):**
-- Member creates memory directly in Memory Center → source: `EXPLICIT` → labeled "You created" → highest-confidence signal
+- Member creates memory directly in Memory Center → source: `EXPLICIT` → labeled "You added" → highest-confidence signal
 
 **Memory update (any tier):**
 - Member corrects a previously stored fact ("Actually, I make $130k now") → Coach finds best-matching active memory and replaces content → "Memory updated" chip shown inline
@@ -342,7 +343,7 @@ interface Milestone {
 - Tier 1 auto-save for `ABOUT_ME` contradicts SoFi profile data → escalates to a Member360ConflictCard prompting "Update your profile to [value]?" → Update / Not now
 
 **Memory management:**
-- **Full disclosure** — Memory Center shows all memories grouped by category, each with source label ("AI inferred" or "You created") and date
+- **Full disclosure** — Memory Center shows all memories grouped by category, each with source label ("Coach learned", "From your profile", or "You added") and date
 - **Edit** — Member taps pencil icon on a memory card → inline edit with Save/Cancel and character counter
 - **Pause** — Member taps pause icon → memory is retained but excluded from Coach context → "Paused · not used in chat" label with 50% opacity → tap play icon to resume
 - **Delete** — Member taps trash icon → memory marked as deleted → toast with "Undo" to restore
@@ -439,7 +440,7 @@ Accessed via the chat header menu. Full-screen overlay panel.
 | Panel header | Title ("Coach memory") + back chevron |
 | Search bar | Text search with search icon; filters memories by content match |
 | Category filter | Filter button toggles filter chips; each chip shows category name + count; tap to filter by category |
-| Memory cards | Rounded cards showing content text, source label ("AI inferred" or "You created"), and date |
+| Memory cards | Rounded cards showing content text, source label ("Coach learned", "From your profile", or "You added"), and date |
 | Card actions | Three icon buttons per card: pencil (edit), pause/play (toggle), trash (delete) |
 | Inline edit mode | TextInput with Save/Cancel buttons and character counter (300 max) |
 | Paused state | Card renders at 50% opacity with "Paused · not used in chat" label |
@@ -515,8 +516,8 @@ Components follow a consistent theming pattern:
 - `shouldAllowProposal()` returns true unless memory mode is `off` (blocks all proposals when memory is disabled)
 - No cooldown — all memory and goal actions fire immediately
 - `applyMemoryAndGoalActions()` processes both memory and goal actions together:
-  - Memory saves → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
-  - Memory proposals → user confirms → `IMPLICIT_CONFIRMED` source → "AI inferred" label in UI
+  - Memory saves → `IMPLICIT_CONFIRMED` source → "Coach learned" label in UI
+  - Memory proposals → user confirms → `IMPLICIT_CONFIRMED` source → "Coach learned" label in UI
   - Memory updates → find best match by category + content similarity → replace content
   - Goal proposal (with or without PRIORITIES memory) → DRAFT goal in Goals Center + chat nudge
   - Duplicate detection: exact content match (case-insensitive) prevents re-saving

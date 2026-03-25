@@ -93,7 +93,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
     }
   }, [highlighted, highlightAnim]);
 
-  const sourceLabel = memory.source === 'EXPLICIT' ? 'You created' : 'AI inferred';
+  const sourceLabel = memory.source === 'EXPLICIT' ? 'You added' : memory.source === 'MEMBER_360' ? 'From your profile' : 'Coach learned';
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const handleEdit = () => {
