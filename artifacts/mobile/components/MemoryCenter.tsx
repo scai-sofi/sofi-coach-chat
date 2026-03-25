@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
@@ -9,7 +8,7 @@ import { useToast } from '@/components/Toast';
 import { MemoryCategory, MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ORDER, Memory } from '@/constants/types';
 import { AppBar, useAppBarHeight } from '@/components/AppBar';
 import { OverflowMenu } from '@/components/OverflowMenu';
-import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
+import { MoreIcon, PlusIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterChip } from '@/components/FilterChip';
 
@@ -288,7 +287,7 @@ export function MemoryCenter() {
         onBack={() => setActivePanel('none')}
         rightActions={memoryMode !== 'off' ? [
           ...(showAddForm ? [] : [{
-            icon: <Feather name="plus" size={20} color={colors.contentPrimary} />,
+            icon: <PlusIcon size={20} color={colors.contentPrimary} />,
             onPress: openAddForm,
           }]),
           ...(memories.filter(m => m.status !== 'DELETED').length > 0 ? [{
