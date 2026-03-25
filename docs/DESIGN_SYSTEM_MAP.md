@@ -456,11 +456,23 @@ These are elements rendered inside AI message bubbles.
 
 ### 3.0 Memory System — Three Tiers
 
-The memory system operates in three tiers based on who initiates and how sensitive the information is. The decision is driven by two axes: **Confidence** (how certain this is lasting) and **Sensitivity** (privacy/stakes).
+The memory system operates in three tiers based on **who initiates** and **how sensitive** the information is. The decision is driven by two axes: **Confidence** (how certain this is lasting) and **Sensitivity** (privacy/stakes).
+
+**Decision Matrix (Confidence × Sensitivity):**
+
+| Information Type | Example | Logic | Tier |
+|---|---|---|---|
+| Operational Context | "I'm focused on my Q2 budget" | Low sensitivity; high immediate utility | Tier 1 (Auto-Save) |
+| Stylistic Patterns | User consistently asks for bullet points | Mirroring behavior; non-invasive | Tier 1 (Auto-Save) |
+| Specific Facts | "My dog's name is Barnaby" | Persistent but low-stakes personal data | Tier 1 (Auto-Save) |
+| Core Preferences | "Never use jargon with me" | High-impact; changes future output significantly | Tier 2 (Propose) |
+| Sensitive Data | "Here is my home address" | High privacy risk | Tier 2 (Propose) |
+
+**Three Tiers:**
 
 | Tier | Trigger | Marker | Source | UX Pattern | Client Component |
 |---|---|---|---|---|---|
-| 1. Auto-Save | AI detects low-sensitivity, high-confidence fact | `[MEMORY_SAVE]` | `IMPLICIT_CONFIRMED` | Ambient "Saved to memory" chip | Chip badge on message |
+| 1. Auto-Save | AI detects low-sensitivity, high-confidence fact | `[MEMORY_SAVE]` | `IMPLICIT_CONFIRMED` | "Saved to memory" chip on message (always visible) | Chip badge on message |
 | 2. Propose | AI detects preference, subjective opinion, or sensitive fact | `[MEMORY_PROPOSAL]` | `IMPLICIT_CONFIRMED` (after approval) | Confirmation card: Remember / Not now | MemoryProposalCard |
 | 3. Manual | User creates memory in Memory Center | — (client-side) | `EXPLICIT` | Standard form in Memory Center | MemoryCenter add form |
 

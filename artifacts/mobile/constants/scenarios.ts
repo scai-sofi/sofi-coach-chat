@@ -97,7 +97,7 @@ function buildScenarios(): Scenario[] {
     {
       id: 'memory-lifecycle',
       title: 'Memory System',
-      subtitle: 'Auto-save, proposals, corrections, and profile conflict detection',
+      subtitle: 'Three tiers: auto-save, proposals, manual — plus corrections and profile conflicts',
       icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
@@ -145,6 +145,7 @@ function buildScenarios(): Scenario[] {
       memories: [
         ...SHARED_MEMORIES,
         { id: 'mem-mi-1', category: 'ABOUT_ME', content: 'Has 401k at Vanguard with $45,000 balance', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
+        { id: 'mem-manual-1', category: 'PRIORITIES', content: 'Saving for a home down payment by 2028', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(3), updatedAt: daysAgo(3) },
       ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
     },
