@@ -408,16 +408,16 @@ function Member360ConflictCard({ message }: { message: Message }) {
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="alert-circle" size={14} color={colors.warningDark || '#B45309'} style={styles.proposalIcon} />
+        <Feather name="cpu" size={14} color={colors.contentSecondary} style={styles.proposalIcon} />
         <View style={styles.proposalContentWrap}>
           <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
             This differs from your SoFi profile
           </Text>
-          <Text style={[styles.conflictDetail, { color: colors.contentSecondary }]}>
-            You said: <Text style={styles.conflictValue}>"{conflict.userValue}"</Text>
+          <Text style={[styles.proposalDetail, { color: colors.contentSecondary }]}>
+            You said: <Text style={{ fontFamily: Fonts.medium }}>"{conflict.userValue}"</Text>
           </Text>
-          <Text style={[styles.conflictDetail, { color: colors.contentSecondary }]}>
-            Profile: <Text style={styles.conflictValue}>"{conflict.profileValue}"</Text>
+          <Text style={[styles.proposalDetail, { color: colors.contentSecondary }]}>
+            Profile: <Text style={{ fontFamily: Fonts.medium }}>"{conflict.profileValue}"</Text>
           </Text>
         </View>
       </View>
@@ -774,8 +774,6 @@ const styles = StyleSheet.create({
   proposalText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18, flex: 1 },
   proposalQuote: { fontFamily: Fonts.regular },
   proposalDetail: { fontSize: 12, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
-  conflictDetail: { fontSize: 12, fontFamily: Fonts.regular, marginTop: 4, lineHeight: 16 },
-  conflictValue: { fontFamily: Fonts.medium },
   proposalButtons: { flexDirection: 'row', gap: 8 },
   proposalButtonsIndented: { flexDirection: 'row', gap: 8, marginLeft: 22 },
   confirmBtn: {
