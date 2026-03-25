@@ -407,25 +407,28 @@ export function MemoryCenter() {
                 placeholderTextColor={colors.contentDimmed}
               />
               <View style={styles.addCatRow}>
-                {MEMORY_CATEGORY_ORDER.map(cat => (
-                  <Pressable
-                    key={cat}
-                    style={[
-                      styles.addCatChip,
-                      { backgroundColor: colors.surfaceTint },
-                      addCategory === cat && { backgroundColor: colors.contentPrimary },
-                    ]}
-                    onPress={() => setAddCategory(cat)}
-                  >
-                    <Text style={[
-                      styles.addCatChipText,
-                      { color: colors.contentSecondary },
-                      addCategory === cat && { color: colors.contentPrimaryInverse },
-                    ]}>
-                      {MEMORY_CATEGORY_LABELS[cat]}
-                    </Text>
-                  </Pressable>
-                ))}
+                {MEMORY_CATEGORY_ORDER.map(cat => {
+                  const selected = addCategory === cat;
+                  return (
+                    <Pressable
+                      key={cat}
+                      style={[
+                        styles.addCatChip,
+                        { backgroundColor: colors.surfaceTint, borderColor: colors.borderSubtle },
+                        selected && { backgroundColor: colors.contentPrimary, borderColor: colors.contentPrimary },
+                      ]}
+                      onPress={() => setAddCategory(cat)}
+                    >
+                      <Text style={[
+                        styles.addCatChipText,
+                        { color: colors.contentSecondary },
+                        selected && { color: colors.contentPrimaryInverse },
+                      ]}>
+                        {MEMORY_CATEGORY_LABELS[cat]}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
               </View>
               <View style={styles.editToolRow}>
                 <Text style={[styles.editCharCount, { color: addText.length > ADD_MAX_CHARS ? colors.danger : colors.contentDimmed }]}>
@@ -670,8 +673,9 @@ const styles = StyleSheet.create({
   },
   addCatChip: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: 9999,
+    borderWidth: 0.75,
   },
   addCatChipText: {
     fontSize: 12,
