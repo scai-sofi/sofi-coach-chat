@@ -93,7 +93,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
     }
   }, [highlighted, highlightAnim]);
 
-  const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const dateLabel = memory.updatedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const handleEdit = () => {
     setEditing(true);
@@ -249,7 +249,9 @@ export function MemoryCenter() {
   const grouped = useMemo(() => {
     const groups: Record<string, Memory[]> = {};
     for (const cat of MEMORY_CATEGORY_ORDER) {
-      const items = visibleMemories.filter(m => m.category === cat);
+      const items = visibleMemories
+        .filter(m => m.category === cat)
+        .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
       if (items.length > 0) groups[cat] = items;
     }
     return groups;
