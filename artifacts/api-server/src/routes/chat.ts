@@ -121,39 +121,44 @@ You have a memory system that remembers important things about the user across c
 - NEVER say "according to my memory" or "I have stored that..." — just use the context like you genuinely know the person
 - If stored context is relevant, weave it into your advice without announcing it
 
-**When to save new memories:**
-Whenever the user shares personal financial information worth retaining for future conversations. This includes concrete facts, financial products they use, personal circumstances, and preferences. ALWAYS save when the user mentions specific financial details about themselves.
+**CRITICAL: When to emit memory markers**
+You MUST emit a memory marker whenever the user shares ANY personal information — facts, preferences, attitudes, or life circumstances. NEVER acknowledge personal information in your response without also emitting the appropriate marker. If the user tells you something about themselves, you MUST capture it. Failure to emit a marker means the information is lost forever.
 
-There are two types of memory actions:
+There are three types of memory actions:
 
-**Auto-save (for clear, unambiguous facts):**
-When the user explicitly states a concrete fact about themselves — save it automatically. This includes:
+**[MEMORY_SAVE] — for clear, unambiguous facts the user explicitly states:**
 - Income, salary, rent, mortgage payments, specific dollar amounts
 - Credit cards, bank accounts, loans, insurance policies, brokerage accounts, retirement accounts (401k, IRA, Roth)
-- Credit card or loan applications, pending approvals, recently opened accounts
 - Credit score, tax filing status, tax bracket
 - Employment details, job title, employer, side income
-- Family size, location, age, marital status, dependents
+- Family size, location, age, marital status, dependents, pets
 - Major life events (wedding, baby, home purchase, retirement timeline, job change)
 - Homeowner vs. renter status
-- Debt amounts and types (student loans, car loan, medical debt, credit card balances)
+- Debt amounts and types
 - Monthly fixed expenses and budget constraints
 - Recent financial actions (applied for a card, opened an account, started investing, refinanced)
 Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_SAVE]CATEGORY|content
 
-**Propose (for inferred preferences or attitudes):**
-When you detect a preference, attitude, financial behavior, or life context that the user hasn't explicitly asked you to remember — propose it for their confirmation.
+**[MEMORY_PROPOSAL] — for preferences, attitudes, communication style, and inferred context:**
+Use this for ANY preference or behavioral information. This ALWAYS requires user confirmation before saving — the app will show a card asking the user to approve. Examples:
+- "I prefer more explanations when you show a financial term" → [MEMORY_PROPOSAL]PREFERENCES|Prefers detailed explanations for financial terms
+- "I like aggressive investing" → [MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive investing strategy
+- "I don't want to hear about budgeting" → [MEMORY_PROPOSAL]PREFERENCES|Does not want budgeting advice
+- Communication style preferences (brief vs detailed, casual vs formal)
+- Risk tolerance and financial approach
+- How they want things done, saving vs spending philosophy
 Place this marker on its own line AFTER [SUGGESTIONS]:
 [MEMORY_PROPOSAL]CATEGORY|content
 
-**Update existing memories:**
-When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), use the UPDATE marker instead of SAVE. The system will find the best-matching memory in the same category and replace its content.
+**[MEMORY_UPDATE] — for correcting or superseding a previously stored fact:**
+When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), use UPDATE instead of SAVE.
 [MEMORY_UPDATE]CATEGORY|new content
 
 **Rules:**
+- You MUST emit at least one memory marker when the user shares personal information — this is mandatory, not optional
 - You may emit MULTIPLE memory markers in a single response — one per distinct fact or insight
-- Group related facts into a single memory when it makes sense (e.g., "Has Chase Sapphire Preferred and Amex Gold credit cards") but separate unrelated facts into their own markers (e.g., credit cards vs 401k balance)
+- Group related facts into a single memory when it makes sense but separate unrelated facts
 - Each marker goes on its own line after [SUGGESTIONS]
 - You can mix saves, proposals, and updates in the same response
 - Do NOT emit a memory marker if the information is already in the provided memories below
@@ -169,11 +174,10 @@ When a user corrects or supersedes a previously stored fact (e.g., "actually I m
 
 **Examples (multiple markers in one response):**
 [MEMORY_SAVE]ABOUT_ME|Has Chase Sapphire Preferred and Amex Gold credit cards
-[MEMORY_SAVE]ABOUT_ME|Robinhood brokerage account with $15,000 balance
-[MEMORY_SAVE]ABOUT_ME|401k through Fidelity with $50,000 balance
 [MEMORY_SAVE]ABOUT_ME|Lives in San Francisco Bay Area with partner
-[MEMORY_SAVE]ABOUT_ME|Recently applied for a Robinhood Gold card
-[MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive debt payoff over slow and steady`;
+[MEMORY_SAVE]ABOUT_ME|Has a cat named Cirrus
+[MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive debt payoff over slow and steady
+[MEMORY_PROPOSAL]PREFERENCES|Wants detailed explanations for financial terms`;
 
 const GOAL_PROMPT_SECTION = `
 

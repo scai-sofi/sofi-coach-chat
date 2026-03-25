@@ -317,6 +317,15 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           } else if (!otherProposal) {
             otherProposal = p;
           }
+        } else if (action.type === 'proposal' || (action.type === 'save' && category === 'PREFERENCES')) {
+          if (shouldAllowProposal()) {
+            const p = { id: uid(), content: action.content, category: category as MemoryCategory };
+            if (category === 'PRIORITIES' && !prioritiesProposal) {
+              prioritiesProposal = p;
+            } else if (!otherProposal) {
+              otherProposal = p;
+            }
+          }
         } else if (action.type === 'update') {
           const sameCategory = memoriesRef.current.filter(
             m => m.status === 'ACTIVE' && m.category === category
@@ -347,13 +356,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
             source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
             createdAt: new Date(), updatedAt: new Date(),
           });
-        } else if (action.type === 'proposal' && shouldAllowProposal()) {
-          const p = { id: uid(), content: action.content, category: category as MemoryCategory };
-          if (category === 'PRIORITIES' && !prioritiesProposal) {
-            prioritiesProposal = p;
-          } else if (!otherProposal) {
-            otherProposal = p;
-          }
         }
       }
     }
