@@ -1,4 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@font-face {
+  font-family: 'TTNorms';
+  src: url('./TTNorms-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TTNorms';
+  src: url('./TTNorms-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TTNorms';
+  src: url('./TTNorms-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --surface-base: #faf8f5;
@@ -21,7 +43,7 @@
   --shadow-color: rgba(10,10,10,0.16);
   --drop-shadow-2: 0px 2px 8px rgba(10,10,10,0.04);
   --selection-color: rgba(92,91,90,0.3);
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font: 'TTNorms', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {

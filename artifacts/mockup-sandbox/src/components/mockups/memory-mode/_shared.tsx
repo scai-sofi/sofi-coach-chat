@@ -241,7 +241,7 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
       width: '100%',
       minHeight: '100vh',
       backgroundColor: V.surfaceBase,
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      fontFamily: "'TTNorms', -apple-system, BlinkMacSystemFont, sans-serif",
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
