@@ -22,9 +22,9 @@ export function OverflowMenu({ items, topOffset, onClose, zIndex = 50 }: Overflo
   const { colors } = useTheme();
   return (
     <View style={[styles.menuOverlay, { zIndex }]}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+      <Pressable style={[StyleSheet.absoluteFill, { top: topOffset }]} onPress={onClose} />
       <View style={[styles.menuPositioner, { paddingTop: topOffset }]}>
-        <View style={[styles.menuShadow, { shadowColor: colors.shadowColor }]}>
+        <View style={[styles.menuShadow, { boxShadow: '0px 6px 16px rgba(10,10,10,0.08)' }]}>
           <View style={[styles.menuInner, { backgroundColor: colors.surfaceElevated }]}>
             {items.map((item, index) => {
               const isLast = index === items.length - 1;
@@ -62,10 +62,6 @@ const styles = StyleSheet.create({
   menuShadow: {
     width: 212,
     borderRadius: 20,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 8,
   },
   menuInner: {
     borderRadius: 20,
