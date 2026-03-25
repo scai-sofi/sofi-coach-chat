@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
-import Svg, { Path, Line } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
+import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
@@ -10,15 +11,6 @@ import { AppBar, useAppBarHeight } from '@/components/AppBar';
 import { OverflowMenu } from '@/components/OverflowMenu';
 import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
 import { SearchBar } from '@/components/SearchBar';
-
-function PlusIcon({ size = 20, color = '#000' }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
-      <Line x1="10" y1="4" x2="10" y2="16" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-      <Line x1="4" y1="10" x2="16" y2="10" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
-    </Svg>
-  );
-}
 
 function PencilIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
   return (
@@ -294,7 +286,7 @@ export function MemoryCenter() {
         onBack={() => setActivePanel('none')}
         rightActions={memoryMode !== 'off' ? [
           ...(showAddForm ? [] : [{
-            icon: <PlusIcon size={20} color={colors.contentPrimary} />,
+            icon: <Feather name="plus" size={20} color={colors.contentPrimary} />,
             onPress: openAddForm,
           }]),
           ...(memories.filter(m => m.status !== 'DELETED').length > 0 ? [{
