@@ -114,70 +114,71 @@ Rules:
 const MEMORY_PROMPT_SECTION = `
 
 ## Memory System
-You have a memory system that remembers important things about the user across conversations. Use it wisely.
+You have a memory system that remembers important things about the user across conversations.
 
 **How to use stored memories:**
 - Reference what you know naturally — "Since you're in the Bay Area..." or "Given your wedding timeline..."
 - NEVER say "according to my memory" or "I have stored that..." — just use the context like you genuinely know the person
-- If stored context is relevant, weave it into your advice without announcing it
 
-**CRITICAL: When to emit memory markers**
-You MUST emit a memory marker whenever the user shares ANY personal information — facts, preferences, attitudes, or life circumstances. NEVER acknowledge personal information in your response without also emitting the appropriate marker. If the user tells you something about themselves, you MUST capture it. Failure to emit a marker means the information is lost forever.
+**CRITICAL: You MUST emit a memory marker whenever the user reveals something personal. Missing a marker means the information is lost forever.**
 
-There are three types of memory actions:
+The key distinction between SAVE and PROPOSAL is whether the information is **objective** or **subjective**:
 
-**[MEMORY_SAVE] — for clear, unambiguous facts the user explicitly states:**
-- Income, salary, rent, mortgage payments, specific dollar amounts
-- Credit cards, bank accounts, loans, insurance policies, brokerage accounts, retirement accounts (401k, IRA, Roth)
-- Credit score, tax filing status, tax bracket
-- Employment details, job title, employer, side income
-- Family size, location, age, marital status, dependents, pets
-- Major life events (wedding, baby, home purchase, retirement timeline, job change)
-- Homeowner vs. renter status
-- Debt amounts and types
-- Monthly fixed expenses and budget constraints
-- Recent financial actions (applied for a card, opened an account, started investing, refinanced)
-Place this marker on its own line AFTER [SUGGESTIONS]:
-[MEMORY_SAVE]CATEGORY|content
+### [MEMORY_SAVE] — Objective, verifiable facts
+Use for statements that are concrete and falsifiable — things that could appear on a tax return, a bank statement, or an ID card. A third party could verify these independently.
 
-**[MEMORY_PROPOSAL] — for preferences, attitudes, communication style, and inferred context:**
-Use this for ANY preference or behavioral information. This ALWAYS requires user confirmation before saving — the app will show a card asking the user to approve. Examples:
-- "I prefer more explanations when you show a financial term" → [MEMORY_PROPOSAL]PREFERENCES|Prefers detailed explanations for financial terms
-- "I like aggressive investing" → [MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive investing strategy
-- "I don't want to hear about budgeting" → [MEMORY_PROPOSAL]PREFERENCES|Does not want budgeting advice
-- Communication style preferences (brief vs detailed, casual vs formal)
-- Risk tolerance and financial approach
-- How they want things done, saving vs spending philosophy
-Place this marker on its own line AFTER [SUGGESTIONS]:
-[MEMORY_PROPOSAL]CATEGORY|content
+Examples of objective facts:
+- "I make $120k a year" → [MEMORY_SAVE]ABOUT_ME|Income is $120k/year
+- "I live in Denver" → [MEMORY_SAVE]ABOUT_ME|Lives in Denver
+- "I have a 401k at Fidelity" → [MEMORY_SAVE]ABOUT_ME|Has 401k at Fidelity
+- "I'm 34" → [MEMORY_SAVE]ABOUT_ME|Age 34
+- "I have a cat named Cirrus" → [MEMORY_SAVE]ABOUT_ME|Has a cat named Cirrus
+- "My rent is $2,200" → [MEMORY_SAVE]ABOUT_ME|Monthly rent is $2,200
+- "I just applied for a Chase Sapphire card" → [MEMORY_SAVE]ABOUT_ME|Recently applied for Chase Sapphire card
 
-**[MEMORY_UPDATE] — for correcting or superseding a previously stored fact:**
-When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), use UPDATE instead of SAVE.
+### [MEMORY_PROPOSAL] — Subjective opinions, preferences, attitudes, values
+Use for statements that reflect the user's mindset, style, feelings, or approach. These are interpretive — a coach would naturally confirm them back ("So it sounds like you prefer...?") before writing them down.
+
+Examples of subjective statements:
+- "I prefer detailed explanations" → [MEMORY_PROPOSAL]PREFERENCES|Prefers detailed explanations for financial concepts
+- "I like aggressive investing" → [MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive investment strategy
+- "I don't really care about budgeting" → [MEMORY_PROPOSAL]PREFERENCES|Not interested in budgeting advice
+- "Keep it simple for me" → [MEMORY_PROPOSAL]PREFERENCES|Prefers concise, simple explanations
+- "I'm more of a set-it-and-forget-it person" → [MEMORY_PROPOSAL]PREFERENCES|Prefers passive, low-maintenance financial approach
+- "I'd rather pay off debt fast than save slowly" → [MEMORY_PROPOSAL]PREFERENCES|Prioritizes aggressive debt payoff
+- "I want to retire early" → [MEMORY_PROPOSAL]PRIORITIES|Wants to pursue early retirement
+- "I'm focused on building an emergency fund first" → [MEMORY_PROPOSAL]PRIORITIES|Prioritizing emergency fund as first goal
+
+### [MEMORY_UPDATE] — Correcting a previously stored fact
+When the user corrects or supersedes a prior fact (e.g., "actually I make $130k now"), use UPDATE.
 [MEMORY_UPDATE]CATEGORY|new content
 
-**Rules:**
-- You MUST emit at least one memory marker when the user shares personal information — this is mandatory, not optional
-- You may emit MULTIPLE memory markers in a single response — one per distinct fact or insight
-- Group related facts into a single memory when it makes sense but separate unrelated facts
-- Each marker goes on its own line after [SUGGESTIONS]
-- You can mix saves, proposals, and updates in the same response
-- Do NOT emit a memory marker if the information is already in the provided memories below
-- Use MEMORY_UPDATE (not MEMORY_SAVE) when the user corrects or changes a previously stored fact
-- Do NOT propose obvious conversational statements — only genuinely useful context
-- Keep each memory content concise (under 100 characters) — a brief factual statement
-- The memory marker lines must NOT appear in your main response text — only after [SUGGESTIONS]
+### Decision test
+Ask yourself: "Could a stranger verify this from a document or record?"
+- YES → [MEMORY_SAVE] (it's an objective fact)
+- NO → [MEMORY_PROPOSAL] (it's subjective — confirm before storing)
 
-**Valid categories:**
-- ABOUT_ME — life situation, household, location, accounts, financial products, income, balances, recent financial actions, employment, factual details about the user
-- PREFERENCES — communication style, detail level, risk tolerance, financial approach, how they want things done, saving vs spending philosophy
-- PRIORITIES — current goals, focus areas, things they're working toward, life events they're planning around, debt payoff targets, savings targets
+### Rules
+- You MUST emit at least one marker when the user shares personal information — mandatory, not optional
+- Multiple markers per response are allowed — one per distinct piece of information
+- Each marker goes on its own line AFTER [SUGGESTIONS]
+- Do NOT emit a marker if the information is already stored in the memories below
+- Use MEMORY_UPDATE (not SAVE) when correcting a previously stored fact
+- Keep each memory concise (under 100 characters)
+- Markers must NOT appear in your main response text — only after [SUGGESTIONS]
 
-**Examples (multiple markers in one response):**
-[MEMORY_SAVE]ABOUT_ME|Has Chase Sapphire Preferred and Amex Gold credit cards
+### Valid categories
+- ABOUT_ME — verifiable life facts: location, accounts, income, employment, family, age, balances, financial products
+- PREFERENCES — subjective: communication style, risk tolerance, financial philosophy, how they want advice delivered
+- PRIORITIES — subjective intent: goals, focus areas, what they're working toward, life events they're planning for
+
+### Examples
+[MEMORY_SAVE]ABOUT_ME|Has Chase Sapphire Preferred and Amex Gold cards
 [MEMORY_SAVE]ABOUT_ME|Lives in San Francisco Bay Area with partner
 [MEMORY_SAVE]ABOUT_ME|Has a cat named Cirrus
-[MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive debt payoff over slow and steady
-[MEMORY_PROPOSAL]PREFERENCES|Wants detailed explanations for financial terms`;
+[MEMORY_PROPOSAL]PREFERENCES|Prefers aggressive debt payoff over gradual approach
+[MEMORY_PROPOSAL]PREFERENCES|Wants detailed explanations for financial terms
+[MEMORY_PROPOSAL]PRIORITIES|Focused on saving for a home down payment`;
 
 const GOAL_PROMPT_SECTION = `
 
@@ -360,56 +361,64 @@ function parseSuggestions(text: string): { reply: string; suggestions: string[] 
 
 function inferMissingMemoryActions(userMessage: string, existingActions: MemoryAction[], memoryMode?: string): MemoryAction[] {
   if (memoryMode === 'off') return existingActions;
+  if (existingActions.length > 0) return existingActions;
 
-  const msg = userMessage.toLowerCase();
-  const inferred: MemoryAction[] = [];
+  const msg = userMessage.toLowerCase().trim();
+  if (msg.length < 8 || msg.length > 300) return existingActions;
 
-  const preferencePatterns = [
-    { re: /i\s+prefer\s+(.{5,60})/i, extract: (m: RegExpMatchArray) => m[1].replace(/[.!,]+$/, '').trim() },
-    { re: /i\s+like\s+(more|less|detailed|brief|simple|aggressive|conservative|short|long)\s+(.{3,50})/i, extract: (m: RegExpMatchArray) => `${m[1]} ${m[2]}`.replace(/[.!,]+$/, '').trim() },
-    { re: /i\s+(?:don'?t|do\s+not)\s+(?:want|like|need)\s+(.{5,60})/i, extract: (m: RegExpMatchArray) => `Does not want ${m[1]}`.replace(/[.!,]+$/, '').trim() },
-    { re: /(?:keep|make)\s+(?:it|things)\s+(simple|brief|detailed|short|concise)/i, extract: (m: RegExpMatchArray) => `Prefers ${m[1]} responses` },
-    { re: /i'?m\s+(?:more\s+of\s+a|a)\s+(conservative|aggressive|moderate|cautious|risk.?taker)\s+(?:investor|person|type)/i, extract: (m: RegExpMatchArray) => `${m[1]} investor` },
+  const subjectiveSignals = [
+    /\bi\s+prefer\b/i,
+    /\bi\s+like\b/i,
+    /\bi\s+(?:don'?t|do\s*n'?t|do\s+not)\s+(?:like|want|need|care)/i,
+    /\bkeep\s+(?:it|things)\s+/i,
+    /\bi'?m\s+(?:more\s+of|kind\s+of|sort\s+of)\s+a?\s*/i,
+    /\bi'?d\s+rather\b/i,
+    /\bfor\s+me\b/i,
+    /\bi\s+(?:tend\s+to|usually|always|never)\b/i,
+    /\bi\s+(?:feel|think|believe|want)\b/i,
+    /\bi\s+(?:hate|love|enjoy|avoid)\b/i,
+    /\bmy\s+(?:style|approach|philosophy|mindset)\b/i,
   ];
 
-  const factPatterns = [
-    { re: /i\s+(?:make|earn|have\s+a\s+salary\s+of)\s+\$?([\d,]+k?)\s*(?:a\s+year|per\s+year|annually|\/yr)?/i, extract: (m: RegExpMatchArray) => `Income: $${m[1]}${m[1].includes('k') ? '' : ''}/year` },
-    { re: /i\s+(?:live|am|i'm)\s+in\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:,\s*[A-Z]{2})?)/i, extract: (m: RegExpMatchArray) => `Lives in ${m[1]}` },
-    { re: /i\s+(?:have|got)\s+(?:a\s+)?(?:cat|dog|pet)\s+(?:named|called)\s+(\w+)/i, extract: (m: RegExpMatchArray) => `Has a pet named ${m[1]}` },
-    { re: /i\s+(?:work|am\s+(?:a|an))\s+(?:at\s+)?(.{3,40}?)(?:\s*[.!]|$)/i, extract: (m: RegExpMatchArray) => `Works as/at ${m[1]}`.replace(/[.!,]+$/, '').trim() },
-    { re: /i'?m\s+(\d{2})\s*(?:years?\s*old)?/i, extract: (m: RegExpMatchArray) => `Age: ${m[1]}` },
-    { re: /i\s+have\s+(?:a\s+)?(\d+)\s*(?:k|K)?\s+in\s+(?:my\s+)?(\w+(?:\s+\w+)?)\s*(?:account)?/i, extract: (m: RegExpMatchArray) => `Has $${m[1]}${m[1].includes('k') || m[1].includes('K') ? '' : 'k'} in ${m[2]}` },
+  const objectiveSignals = [
+    /\$[\d,]+/,
+    /\b\d{2,3}k\b/i,
+    /\bi\s+(?:make|earn|owe|pay|have)\s+\$?[\d,]+/i,
+    /\bi\s+(?:live|am|i'm)\s+in\s+[A-Z]/i,
+    /\bi\s+(?:work|am\s+(?:a|an))\s+/i,
+    /\bi'?m\s+\d{2}\b/,
+    /\bmy\s+(?:salary|income|rent|mortgage|401k|ira|roth)\b/i,
+    /\bi\s+(?:have|got|own)\s+(?:a\s+)?(?:\d|chase|amex|citi|capital\s*one|fidelity|vanguard|schwab|robinhood)/i,
+    /\b(?:married|single|divorced|engaged|kids?|children|dependents?)\b/i,
+    /\bi\s+(?:just|recently)\s+(?:applied|opened|started|bought|sold|refinanced)/i,
+    /\b(?:credit\s*score|tax\s*bracket|filing\s*status)\b/i,
   ];
 
-  const existingContents = existingActions.map(a => a.content.toLowerCase());
+  const isSubjective = subjectiveSignals.some(re => re.test(msg));
+  const isObjective = objectiveSignals.some(re => re.test(userMessage));
 
-  for (const pat of preferencePatterns) {
-    const match = userMessage.match(pat.re);
-    if (match) {
-      const content = `Prefers ${pat.extract(match)}`;
-      const shortContent = content.slice(0, 100);
-      if (!existingContents.some(c => c.includes(shortContent.toLowerCase().slice(0, 20)))) {
-        inferred.push({ type: 'proposal', category: 'PREFERENCES', content: shortContent });
-      }
-    }
+  if (!isSubjective && !isObjective) return existingActions;
+
+  const selfReferential = /\bi\s|i'|my\s|i'm\b/i.test(msg);
+  if (!selfReferential) return existingActions;
+
+  const content = userMessage
+    .replace(/[.!?]+$/, '')
+    .trim()
+    .slice(0, 100);
+
+  if (isSubjective && !isObjective) {
+    console.log("[MEMORY FALLBACK] Subjective statement detected, injecting proposal");
+    return [{ type: 'proposal', category: 'PREFERENCES', content }];
   }
 
-  for (const pat of factPatterns) {
-    const match = userMessage.match(pat.re);
-    if (match) {
-      const content = pat.extract(match);
-      const shortContent = content.slice(0, 100);
-      if (!existingContents.some(c => c.includes(shortContent.toLowerCase().slice(0, 20)))) {
-        inferred.push({ type: 'save', category: 'ABOUT_ME', content: shortContent });
-      }
-    }
+  if (isObjective && !isSubjective) {
+    console.log("[MEMORY FALLBACK] Objective fact detected, injecting save");
+    return [{ type: 'save', category: 'ABOUT_ME', content }];
   }
 
-  if (inferred.length > 0 && existingActions.length === 0) {
-    console.log("[MEMORY FALLBACK] AI missed markers, injecting:", JSON.stringify(inferred));
-    return inferred;
-  }
-  return existingActions;
+  console.log("[MEMORY FALLBACK] Mixed signals, defaulting to proposal");
+  return [{ type: 'proposal', category: 'PREFERENCES', content }];
 }
 
 interface ChatMessage {
