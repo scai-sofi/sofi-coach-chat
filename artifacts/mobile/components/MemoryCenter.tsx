@@ -293,10 +293,10 @@ export function MemoryCenter() {
         title="Coach memory"
         onBack={() => setActivePanel('none')}
         rightActions={memoryMode !== 'off' ? [
-          ...(showAddForm ? [] : [{
-            icon: <PlusIcon size={20} color={colors.contentPrimary} />,
-            onPress: openAddForm,
-          }]),
+          {
+            icon: <PlusIcon size={20} color={showAddForm ? colors.contentDimmed : colors.contentPrimary} />,
+            onPress: showAddForm ? undefined : openAddForm,
+          },
           ...(memories.filter(m => m.status !== 'DELETED').length > 0 ? [{
             icon: <MoreIcon size={20} color={showMoreMenu ? colors.contentDimmed : colors.contentPrimary} />,
             onPress: () => setShowMoreMenu(!showMoreMenu),
