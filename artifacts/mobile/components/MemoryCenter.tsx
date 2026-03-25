@@ -202,22 +202,30 @@ export function MemoryCenter() {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [addText, setAddText] = useState('');
-  const [addCategory, setAddCategory] = useState<MemoryCategory>('ABOUT_ME');
   const addInputRef = useRef<TextInput>(null);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffsetRef = useRef(0);
   const { showToast } = useToast();
   const ADD_MAX_CHARS = 300;
 
+  const classifyCategory = (text: string): MemoryCategory => {
+    const lower = text.toLowerCase();
+    const priorityWords = ['goal', 'want to', 'plan to', 'saving for', 'working toward', 'retire', 'priority', 'focus on', 'hoping to', 'dream of', 'target', 'aiming'];
+    const prefWords = ['prefer', 'like to', "don't like", 'rather', 'style', 'format', 'simple', 'detailed', 'aggressive', 'conservative', 'avoid', 'always', 'never', 'hate', 'love'];
+    if (priorityWords.some(w => lower.includes(w))) return 'PRIORITIES';
+    if (prefWords.some(w => lower.includes(w))) return 'PREFERENCES';
+    return 'ABOUT_ME';
+  };
+
   const handleAddSave = () => {
     Keyboard.dismiss();
     const trimmed = addText.trim();
     if (trimmed.length > 0 && trimmed.length <= ADD_MAX_CHARS) {
-      addMemory(trimmed, addCategory);
+      const category = classifyCategory(trimmed);
+      addMemory(trimmed, category);
       showToast({ message: 'Memory added.' });
       setShowAddForm(false);
       setAddText('');
-      setAddCategory('ABOUT_ME');
     }
   };
 
@@ -225,7 +233,6 @@ export function MemoryCenter() {
     Keyboard.dismiss();
     setShowAddForm(false);
     setAddText('');
-    setAddCategory('ABOUT_ME');
   };
 
   const openAddForm = () => {
@@ -402,16 +409,6 @@ export function MemoryCenter() {
                 placeholder="What should your coach remember?"
                 placeholderTextColor={colors.contentDimmed}
               />
-              <View style={styles.addCatRow}>
-                {MEMORY_CATEGORY_ORDER.map(cat => (
-                  <FilterChip
-                    key={cat}
-                    label={MEMORY_CATEGORY_LABELS[cat]}
-                    selected={addCategory === cat}
-                    onPress={() => setAddCategory(cat)}
-                  />
-                ))}
-              </View>
               <View style={styles.editToolRow}>
                 <Text style={[styles.editCharCount, { color: addText.length > ADD_MAX_CHARS ? colors.danger : colors.contentDimmed }]}>
                   {addText.length}/{ADD_MAX_CHARS}
@@ -638,10 +635,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     lineHeight: 16,
     letterSpacing: 0.1,
-  },
-  addCatRow: {
-    flexDirection: 'row',
-    gap: 6,
   },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
   emptyTitle: {
