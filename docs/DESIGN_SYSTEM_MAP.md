@@ -454,15 +454,32 @@ Used in MemoryCenter for "Delete all memories?".
 
 These are elements rendered inside AI message bubbles.
 
+### 3.0 Memory System — Three Tiers
+
+The memory system operates in three tiers based on who initiates and how sensitive the information is. The decision is driven by two axes: **Confidence** (how certain this is lasting) and **Sensitivity** (privacy/stakes).
+
+| Tier | Trigger | Marker | Source | UX Pattern | Client Component |
+|---|---|---|---|---|---|
+| 1. Auto-Save | AI detects low-sensitivity, high-confidence fact | `[MEMORY_SAVE]` | `IMPLICIT_CONFIRMED` | Ambient "Saved to memory" chip | Chip badge on message |
+| 2. Propose | AI detects preference, subjective opinion, or sensitive fact | `[MEMORY_PROPOSAL]` | `IMPLICIT_CONFIRMED` (after approval) | Confirmation card: Remember / Not now | MemoryProposalCard |
+| 3. Manual | User creates memory in Memory Center | — (client-side) | `EXPLICIT` | Standard form in Memory Center | MemoryCenter add form |
+
+**Key rule:** Sensitivity overrides objectivity — a verifiable fact that is high-stakes (e.g., home address, medical info) uses Tier 2 (propose), not Tier 1 (auto-save).
+
+**Member 360 conflict:** When a Tier 1 auto-save for `ABOUT_ME` contradicts the SoFi profile, it escalates to a Member360ConflictCard (Tier 1→2 hybrid) with "Use what I said" / "Keep profile" resolution.
+
+**MEMORY_UPDATE** corrects previously stored facts regardless of originating tier.
+
 ### 3.1 Component Hierarchy
 
-All proposal cards now share a unified visual language (normalized in Task #10).
+All proposal cards share a unified visual language.
 
 | Component | Background | Border | Radius | Icon | Body Text | Detail Text | Buttons |
 |---|---|---|---|---|---|---|---|
-| MemoryProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 14)`, secondary | 13 `w500` | — | Remember / Not now |
-| GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 14)`, secondary | 13 `w500` | 12 `w400` secondary | Set up goal / Just chatting |
-| Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 14×14, bone600 | 13 `w500` (secondary or primary) | — | — |
+| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 14)`, secondary | 14 `w500` | — | Remember / Not now |
+| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 14)`, secondary | 14 `w500` | 14 `w500` (quote: `w400`) | Use what I said / Keep profile |
+| GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 14)`, secondary | 14 `w500` | 12 `w400` secondary | Set up goal / Just chatting |
+| Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 14×14, bone600 | 14 `w500` (secondary or primary) | — | — |
 
 > **Note:** InsightToActionCard has been retired (Task #12). Goal suggestions now surface as DRAFT goals in the Goals Center instead of inline cards in chat.
 
