@@ -39,13 +39,13 @@ export function ChatHeader() {
       icon: <ClockIcon size={20} color={colors.contentPrimary} />,
       onPress: () => { Keyboard.dismiss(); setActivePanel('history'); },
     },
-    ...(hasActiveChat ? [{
+    {
       icon: <MoreIcon size={20} color={menuOpen ? colors.contentDimmed : colors.contentPrimary} />,
       onPress: () => { Keyboard.dismiss(); setMenuOpen(!menuOpen); },
-    }] : []),
+    },
   ];
 
-  const menuItems = [
+  const menuItems = hasActiveChat ? [
     {
       label: 'New chat',
       icon: <ChatNewIcon size={24} color={colors.contentPrimary} />,
@@ -81,6 +81,27 @@ export function ChatHeader() {
       icon: <DeleteMenuIcon size={24} color={colors.danger} />,
       onPress: () => { clearConversation(); setMenuOpen(false); },
       danger: true,
+    },
+  ] : [
+    {
+      label: 'Chat memory',
+      icon: <MemoryMenuIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('memory'); setMenuOpen(false); },
+    },
+    {
+      label: 'Goals',
+      icon: <GoalsMenuIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('goals'); setMenuOpen(false); },
+      badge: draftGoalCount > 0 ? (
+        <View style={[styles.goalsBadge, { backgroundColor: colors.contentBrand }]}>
+          <Text style={[styles.goalsBadgeText, { color: colors.whiteOnDark }]}>{draftGoalCount}</Text>
+        </View>
+      ) : undefined,
+    },
+    {
+      label: 'Settings',
+      icon: <SettingsMenuIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('settings'); setMenuOpen(false); },
     },
   ];
 
