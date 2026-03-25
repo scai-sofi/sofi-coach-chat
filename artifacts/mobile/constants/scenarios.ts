@@ -96,60 +96,28 @@ function buildScenarios(): Scenario[] {
     },
     {
       id: 'memory-lifecycle',
-      title: 'Memory Lifecycle',
-      subtitle: 'Explicit save, implicit proposal, correction flow',
+      title: 'Memory System',
+      subtitle: 'Auto-save, proposals, corrections, and profile conflict detection',
       icon: 'brain',
       messages: [
-        { id: uid(), role: 'user', content: 'I want you to remember that I\'m risk-averse with investments', timestamp: new Date(now.getTime() - 300000) },
-        {
-          id: uid(), role: 'ai', content: "**Saved to Memory**\n\nGot it — I've saved: \"Risk-averse with investments\"\n\n**How I'll Use This**\nGoing forward, I'll focus on lower-risk strategies when we discuss your portfolio — things like index funds, bonds, and conservative allocations. I won't recommend high-volatility plays or aggressive growth strategies unless you tell me your comfort level has changed.\n\n**Your Control**\nYou can update this anytime in the Memory Center (brain icon in the menu). Risk tolerance often evolves over time, and I'll adjust right along with you.",
-          timestamp: new Date(now.getTime() - 290000),
-          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
-          autoSaveMemory: { content: 'Risk-averse with investments', category: 'PREFERENCES' },
-        },
-        { id: uid(), role: 'user', content: 'What do you know about me?', timestamp: new Date(now.getTime() - 240000) },
-        {
-          id: uid(), role: 'ai', content: "**What I Know About You**\n\nI currently have 6 active memories across 3 categories:\n\n**About me**\n• Household of 2, living in San Francisco Bay Area\n\n**Preferences**\n• Prefers detailed breakdowns with numbers\n• Prefers weekly check-ins over daily notifications\n• Risk-averse with investments\n\n**Priorities**\n• Dining out is a focus area for spending reduction\n• Saving for a wedding in October 2027\n\n**How I Use This**\nThese memories help me personalize my advice — from the level of detail I give you, to which goals I prioritize in recommendations, to how I frame financial decisions.\n\n**Your Control**\nYou can edit, pause, or remove any of these anytime — tap the brain icon in the menu to open the Memory Center. Everything stays transparent.",
-          timestamp: new Date(now.getTime() - 230000),
-        },
-        { id: uid(), role: 'user', content: 'Actually, that dining thing is outdated — I\'ve been cooking more lately', timestamp: new Date(now.getTime() - 180000) },
-        {
-          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and credit card payoff.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority? That way I can factor it into future spending advice and recipe-vs-restaurant decisions.",
-          timestamp: new Date(now.getTime() - 170000),
-          chips: [{ type: 'memory-updated', label: 'Memory updated' }],
-          memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PRIORITIES' },
-        },
-      ],
-      memories: [
-        ...SHARED_MEMORIES,
-        { id: 'mem-6', category: 'PREFERENCES', content: 'Risk-averse with investments', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
-      ],
-      goals: [{ ...EMERGENCY_FUND_GOAL }],
-    },
-    {
-      id: 'memory-intelligence',
-      title: 'Memory Intelligence',
-      subtitle: 'Auto-save facts, propose preferences, and detect profile conflicts',
-      icon: 'database',
-      messages: [
-        { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 360000) },
+        { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
         {
           id: uid(), role: 'ai', content: "**Nice — that's a solid foundation.**\n\nA $45,000 401k balance at your stage is great progress. That puts you ahead of the national median for your age group.\n\n**Quick Context**\n• **Current balance:** $45,000\n• **Provider:** Vanguard\n• **Typical growth at 7%:** Could become ~$200k in 20 years without adding another dollar\n• **With $500/month contributions:** Could reach ~$450k in 20 years\n\nAre you currently contributing, and do you know if your employer offers a match?",
-          timestamp: new Date(now.getTime() - 350000),
+          timestamp: new Date(now.getTime() - 410000),
           chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
           suggestions: ["Yes, I get a 4% match", "I'm not sure about my match", "How much should I contribute?"],
         },
-        { id: uid(), role: 'user', content: "I'd rather focus on paying off debt before investing more", timestamp: new Date(now.getTime() - 300000) },
+        { id: uid(), role: 'user', content: "I'd rather focus on paying off debt before investing more", timestamp: new Date(now.getTime() - 360000) },
         {
           id: uid(), role: 'ai', content: "**That's a thoughtful approach.**\n\nPrioritizing debt payoff before ramping up investments is a valid strategy — especially if you're carrying high-interest debt like credit cards.\n\n**The General Framework**\n\n• **Step 1:** Get the employer match (it's free money)\n• **Step 2:** Pay off high-interest debt (anything over ~7% APR)\n• **Step 3:** Build emergency fund to 3 months\n• **Step 4:** Max out retirement contributions\n\n**Where You Stand**\nWith $45k already in your 401k and an emergency fund in progress, you're in a great position. Clearing debt first means your future investment dollars work harder — they're not fighting against interest payments.\n\nOnce the debt is gone, you'll have significant monthly cash flow to redirect into investing.",
-          timestamp: new Date(now.getTime() - 290000),
+          timestamp: new Date(now.getTime() - 350000),
           memoryProposal: { id: uid(), content: 'Prioritizes debt payoff before increasing investments', category: 'PREFERENCES' },
           suggestions: ["Show me my debt overview", "What's a good payoff strategy?", "How much am I spending on interest?"],
         },
-        { id: uid(), role: 'user', content: "I make about $130,000 a year", timestamp: new Date(now.getTime() - 240000) },
+        { id: uid(), role: 'user', content: "I make about $130,000 a year", timestamp: new Date(now.getTime() - 300000) },
         {
           id: uid(), role: 'ai', content: "**Good to know — that gives me a clearer picture.**\n\nAt $130k/year, here's a quick financial health snapshot:\n\n**Income Breakdown (estimated)**\n• **Gross monthly:** ~$10,833\n• **After taxes (est.):** ~$7,800/month\n• **Current savings rate:** ~24% based on your spending patterns\n\n**How This Compares**\nA 24% savings rate at $130k is well above average. If you can maintain that while paying off debt, you'll be in excellent shape to ramp up investing once you're debt-free.\n\n**One Thing to Watch**\nAt this income level, you might be close to the Roth IRA income limit ($161k for single filers). Something to keep in mind as your income grows — I can help you plan around that when the time comes.",
-          timestamp: new Date(now.getTime() - 230000),
+          timestamp: new Date(now.getTime() - 290000),
           chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
           member360Conflict: {
             id: uid(),
@@ -158,6 +126,13 @@ function buildScenarios(): Scenario[] {
             profileValue: 'Annual income: $115,000/year',
           },
           suggestions: ["Tell me about Roth limits", "What's my ideal budget split?", "How can I increase my savings rate?"],
+        },
+        { id: uid(), role: 'user', content: "Actually, that dining thing is outdated — I've been cooking more lately", timestamp: new Date(now.getTime() - 240000) },
+        {
+          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority?",
+          timestamp: new Date(now.getTime() - 230000),
+          chips: [{ type: 'memory-updated', label: 'Memory updated' }],
+          memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PRIORITIES' },
         },
         { id: uid(), role: 'user', content: "Keep explanations simple for me — I don't need all the technical jargon", timestamp: new Date(now.getTime() - 180000) },
         {
@@ -332,7 +307,7 @@ function buildScenarios(): Scenario[] {
 export const SCENARIOS = buildScenarios();
 
 export const SCENARIO_ORDER = [
-  'cold-start', 'returning-member', 'memory-lifecycle', 'memory-intelligence',
+  'cold-start', 'returning-member', 'memory-lifecycle',
   'goal-discovery', 'proactive-risk', 'milestone-celebration', 'weekly-recap',
   'cross-product', 'tiered-safety',
 ];
