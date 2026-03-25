@@ -1,21 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
 :root {
-  --sofi-surface-base: #faf8f5;
-  --sofi-surface-elevated: #ffffff;
-  --sofi-surface-tint: #f0ede8;
-  --sofi-surface-edge: rgba(10,10,10,0.10);
-  --sofi-surface-muted: #f5f3f0;
-  --sofi-content-primary: #1a1919;
-  --sofi-content-secondary: #706f6e;
-  --sofi-content-bone600: #5c5b5a;
-  --sofi-content-muted: #d0ccc5;
-  --sofi-content-dimmed: #bdbbb9;
-  --sofi-content-brand: #00a2c7;
-  --sofi-content-statusbar: #0a0a0a;
-  --sofi-danger: #fa2d25;
-  --sofi-white: #ffffff;
-  --sofi-scrim: rgba(0,0,0,0.35);
-  --sofi-shadow: 0px 2px 8px rgba(10,10,10,0.04);
-  --sofi-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --surface-base: #faf8f5;
+  --surface-elevated: #ffffff;
+  --surface-tint: #f0ede8;
+  --surface-edge: rgba(10,10,10,0.10);
+  --surface-edge-light: rgba(10,10,10,0.05);
+  --surface-muted: #f5f3f0;
+  --content-primary: #1a1919;
+  --content-primary-inverse: #ffffff;
+  --content-secondary: #706f6e;
+  --content-bone600: #5c5b5a;
+  --content-statusbar: #0a0a0a;
+  --content-muted: #d0ccc5;
+  --content-dimmed: #bdbbb9;
+  --content-brand: #00a2c7;
+  --danger: #fa2d25;
+  --white-on-dark: #ffffff;
+  --scrim-backdrop: rgba(0,0,0,0.35);
+  --shadow-color: rgba(10,10,10,0.16);
+  --drop-shadow-2: 0px 2px 8px rgba(10,10,10,0.04);
+  --selection-color: rgba(92,91,90,0.3);
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -25,6 +31,7 @@
 }
 
 body {
-  font-family: var(--sofi-font);
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
+  background: var(--surface-base);
 }

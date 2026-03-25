@@ -1,74 +1,54 @@
 import './_group.css';
+import {
+  V, PhoneFrame, StatusBar, PacificAppBar,
+  DemoIconSvg, ClockIconSvg, ChatNewIconSvg, MemoryMenuIconSvg,
+} from './_shared';
 
 export function BottomSheet() {
   return (
-    <div style={{
-      width: '100%',
-      minHeight: '100vh',
-      backgroundColor: 'var(--sofi-surface-base)',
-      fontFamily: 'var(--sofi-font)',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-    }}>
-      {/* Status bar */}
-      <div style={{
-        height: 54,
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        paddingBottom: 8,
-      }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--sofi-content-primary)' }}>9:41</span>
-      </div>
+    <PhoneFrame>
+      <StatusBar />
 
-      {/* App bar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingInline: 16,
-        height: 56,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <DemoIcon />
-          <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--sofi-content-primary)' }}>SoFi Coach</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ClockIcon />
-          <NewChatIcon />
-        </div>
-      </div>
+      <PacificAppBar
+        leftIcon={<DemoIconSvg size={20} />}
+        title="SoFi Coach"
+        rightIcons={[
+          <ClockIconSvg size={20} />,
+          <ChatNewIconSvg size={20} />,
+        ]}
+      />
 
-      {/* Chat area - dimmed behind sheet */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, padding: 16, opacity: 0.3 }}>
-        <div style={{ textAlign: 'center', marginTop: 40 }}>
-          <div style={{
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: 'var(--sofi-surface-tint)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-          }}>
-            <span style={{ fontSize: 28 }}>💬</span>
-          </div>
-          <span style={{ fontSize: 18, fontWeight: 600, color: 'var(--sofi-content-primary)', display: 'block', marginBottom: 8 }}>
-            Start a conversation
-          </span>
-          <span style={{ fontSize: 14, color: 'var(--sofi-content-secondary)', lineHeight: '20px' }}>
-            Your financial coach is ready to help.
-          </span>
+      {/* Dimmed chat background behind sheet */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, opacity: 0.3 }}>
+        <div style={{
+          width: 56,
+          height: 56,
+          borderRadius: 28,
+          backgroundColor: V.surfaceTint,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 16,
+        }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path fillRule="evenodd" clipRule="evenodd" d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z" fill={V.contentMuted} />
+            <path fillRule="evenodd" clipRule="evenodd" d="M12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8ZM6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12Z" fill={V.contentMuted} />
+            <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill={V.contentMuted} />
+          </svg>
         </div>
+        <span style={{ fontSize: 24, fontWeight: 500, color: V.contentPrimary, lineHeight: '28px', letterSpacing: '-0.5px', textAlign: 'center', marginBottom: 8 }}>
+          {"I'm Coach.\nHow can I help?"}
+        </span>
+        <span style={{ fontSize: 14, fontWeight: 400, color: V.contentSecondary, lineHeight: '20px', textAlign: 'center' }}>
+          Your financial coach is ready to help.
+        </span>
       </div>
 
       {/* Scrim overlay */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.35)',
+        backgroundColor: V.scrimBackdrop,
         zIndex: 10,
       }} />
 
@@ -78,98 +58,65 @@ export function BottomSheet() {
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: 'var(--sofi-surface-elevated)',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        backgroundColor: V.surfaceElevated,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         zIndex: 20,
-        boxShadow: '0px -4px 24px rgba(10,10,10,0.12)',
+        boxShadow: '0px -6px 16px rgba(10,10,10,0.16)',
       }}>
         {/* Handle */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, paddingBottom: 8 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: 'var(--sofi-content-muted)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: V.contentMuted }} />
         </div>
 
-        <div style={{ padding: '8px 24px 16px' }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sofi-content-primary)', display: 'block', marginBottom: 4, lineHeight: '28px' }}>
+        {/* Sheet header */}
+        <div style={{ padding: '8px 20px 16px' }}>
+          <span style={{ fontSize: 16, fontWeight: 500, color: V.contentPrimary, display: 'block', lineHeight: '20px', marginBottom: 4 }}>
             New conversation
           </span>
-          <span style={{ fontSize: 14, color: 'var(--sofi-content-secondary)', lineHeight: '20px' }}>
+          <span style={{ fontSize: 14, fontWeight: 400, color: V.contentSecondary, lineHeight: '20px' }}>
             Choose how you'd like to chat
           </span>
         </div>
 
         {/* Option cards */}
         <div style={{ padding: '0 16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* Standard chat */}
           <ChatOptionCard
-            icon={
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sofi-content-brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z" />
-                <rect x="3" y="8" width="18" height="14" rx="2" />
-                <circle cx="9" cy="15" r="1.5" fill="var(--sofi-content-brand)" stroke="none" />
-                <circle cx="15" cy="15" r="1.5" fill="var(--sofi-content-brand)" stroke="none" />
-              </svg>
-            }
-            iconBg="rgba(0,162,199,0.1)"
+            icon={<MemoryMenuIconSvg size={22} color={V.contentBrand} />}
+            iconBg="rgba(0,162,199,0.08)"
             title="With memory"
             description="Coach remembers your preferences and goals across sessions"
             selected={false}
           />
-
-          {/* Incognito chat */}
           <ChatOptionCard
-            icon={
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--sofi-content-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                <line x1="1" y1="1" x2="23" y2="23" />
-              </svg>
-            }
-            iconBg="var(--sofi-surface-tint)"
+            icon={<EyeOffSvg size={22} color={V.contentPrimary} />}
+            iconBg={V.surfaceTint}
             title="Without memory"
             description="Nothing from this chat will be saved — perfect for sensitive questions"
             selected={true}
           />
         </div>
 
-        {/* CTA */}
+        {/* CTA button */}
         <div style={{ padding: '0 16px 34px' }}>
           <button style={{
             width: '100%',
             padding: '14px 24px',
-            borderRadius: 28,
-            backgroundColor: 'var(--sofi-content-primary)',
-            color: 'var(--sofi-surface-base)',
+            borderRadius: 9999,
+            backgroundColor: V.contentPrimary,
+            color: V.contentPrimaryInverse,
             fontSize: 16,
-            fontWeight: 600,
+            fontWeight: 500,
             border: 'none',
             cursor: 'pointer',
             lineHeight: '20px',
+            fontFamily: 'inherit',
           }}>
             Start chat
           </button>
         </div>
       </div>
-
-      {/* Annotation */}
-      <div style={{
-        position: 'absolute',
-        top: 110,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        backgroundColor: 'var(--sofi-content-brand)',
-        color: 'white',
-        fontSize: 11,
-        fontWeight: 700,
-        padding: '4px 10px',
-        borderRadius: 6,
-        lineHeight: '14px',
-        zIndex: 30,
-        whiteSpace: 'nowrap',
-      }}>
-        Choice at conversation start ↓
-      </div>
-    </div>
+    </PhoneFrame>
   );
 }
 
@@ -187,10 +134,9 @@ function ChatOptionCard({ icon, iconBg, title, description, selected }: {
       gap: 14,
       padding: '14px 16px',
       borderRadius: 16,
-      border: `2px solid ${selected ? 'var(--sofi-content-primary)' : 'var(--sofi-surface-edge)'}`,
-      backgroundColor: selected ? 'var(--sofi-surface-muted)' : 'var(--sofi-surface-elevated)',
+      border: `1.5px solid ${selected ? V.contentPrimary : V.surfaceEdge}`,
+      backgroundColor: selected ? V.surfaceMuted : V.surfaceElevated,
       cursor: 'pointer',
-      transition: 'all 0.2s ease',
     }}>
       <div style={{
         width: 44,
@@ -205,18 +151,19 @@ function ChatOptionCard({ icon, iconBg, title, description, selected }: {
         {icon}
       </div>
       <div style={{ flex: 1 }}>
-        <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--sofi-content-primary)', display: 'block', lineHeight: '20px' }}>
+        <span style={{ fontSize: 16, fontWeight: 500, color: V.contentPrimary, display: 'block', lineHeight: '20px' }}>
           {title}
         </span>
-        <span style={{ fontSize: 13, color: 'var(--sofi-content-secondary)', lineHeight: '18px' }}>
+        <span style={{ fontSize: 13, fontWeight: 400, color: V.contentSecondary, lineHeight: '18px' }}>
           {description}
         </span>
       </div>
+      {/* Radio */}
       <div style={{
-        width: 22,
-        height: 22,
-        borderRadius: 11,
-        border: `2px solid ${selected ? 'var(--sofi-content-primary)' : 'var(--sofi-content-dimmed)'}`,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        border: `1.5px solid ${selected ? V.contentPrimary : V.contentDimmed}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -224,10 +171,10 @@ function ChatOptionCard({ icon, iconBg, title, description, selected }: {
       }}>
         {selected && (
           <div style={{
-            width: 12,
-            height: 12,
-            borderRadius: 6,
-            backgroundColor: 'var(--sofi-content-primary)',
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: V.contentPrimary,
           }} />
         )}
       </div>
@@ -235,30 +182,12 @@ function ChatOptionCard({ icon, iconBg, title, description, selected }: {
   );
 }
 
-function DemoIcon() {
+function EyeOffSvg({ size = 20, color = V.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sofi-content-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sofi-content-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
-
-function NewChatIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sofi-content-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
     </svg>
   );
 }
