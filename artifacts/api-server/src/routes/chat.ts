@@ -239,7 +239,7 @@ What about balance transfer?
 [MEMORY_PROPOSAL]PRIORITIES|Paying off credit card debt is a priority
 [GOAL_PROPOSAL]DEBT_PAYOFF|Credit Card Payoff|8000|12|700|SoFi Credit Card`;
 
-function buildSystemPrompt(memories?: string[]): string {
+function buildSystemPrompt(memories?: string[], memoryMode?: string): string {
   let prompt = SYSTEM_PROMPT + MEMORY_PROMPT_SECTION + GOAL_PROMPT_SECTION;
 
   if (memories && memories.length > 0) {
@@ -254,6 +254,18 @@ ${memoryContext}`;
 
 ## What You Know About This User
 You don't have any stored memories about this user yet. Pay attention to personal facts they share — this is a great opportunity to start building context with a [MEMORY_SAVE] for explicit facts.`;
+  }
+
+  if (memoryMode === 'ask-first') {
+    prompt += `
+
+## IMPORTANT: Memory Mode is "Always Ask First"
+The user has enabled "Always ask me first" for memory. You MUST still emit [MEMORY_SAVE] markers for ANY personal information the user shares (location, pets, family, income, accounts, preferences, etc.). The client will convert these to proposals that the user can approve or dismiss. Do NOT skip memory markers just because this mode is active — the user wants to be asked, not ignored. Always extract and emit memory markers for personal facts.`;
+  } else if (memoryMode === 'off') {
+    prompt += `
+
+## Memory Mode: Off
+The user has turned off memory. Do NOT emit any [MEMORY_SAVE], [MEMORY_PROPOSAL], or [MEMORY_UPDATE] markers.`;
   }
 
   return prompt;
@@ -344,16 +356,17 @@ interface ChatRequest {
   message: string;
   history?: ChatMessage[];
   memories?: string[];
+  memoryMode?: string;
 }
 
-function validateChatRequest(req: Request, res: any): { message: string; sanitizedHistory: Array<{ role: "user" | "assistant"; content: string }>; sanitizedMemories: string[] } | null {
+function validateChatRequest(req: Request, res: any): { message: string; sanitizedHistory: Array<{ role: "user" | "assistant"; content: string }>; sanitizedMemories: string[]; memoryMode?: string } | null {
   const clientIp = getClientIp(req);
   if (!checkRateLimit(clientIp)) {
     res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
     return null;
   }
 
-  const { message, history = [], memories = [] } = req.body as ChatRequest;
+  const { message, history = [], memories = [], memoryMode } = req.body as ChatRequest;
 
   if (!message || typeof message !== "string") {
     res.status(400).json({ error: "Message is required" });
@@ -378,7 +391,10 @@ function validateChatRequest(req: Request, res: any): { message: string; sanitiz
     .slice(0, MAX_MEMORIES)
     .map((m) => m.slice(0, MAX_MEMORY_LENGTH));
 
-  return { message, sanitizedHistory, sanitizedMemories };
+  const validModes = ['full', 'ask-first', 'off'];
+  const safeMemoryMode = typeof memoryMode === 'string' && validModes.includes(memoryMode) ? memoryMode : undefined;
+
+  return { message, sanitizedHistory, sanitizedMemories, memoryMode: safeMemoryMode };
 }
 
 router.post("/chat", async (req, res) => {
@@ -386,7 +402,7 @@ router.post("/chat", async (req, res) => {
     const validated = validateChatRequest(req, res);
     if (!validated) return;
 
-    const systemPrompt = buildSystemPrompt(validated.sanitizedMemories);
+    const systemPrompt = buildSystemPrompt(validated.sanitizedMemories, validated.memoryMode);
 
     const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
       { role: "system", content: systemPrompt },
@@ -424,7 +440,7 @@ router.post("/chat/stream", async (req, res) => {
     const validated = validateChatRequest(req, res);
     if (!validated) return;
 
-    const systemPrompt = buildSystemPrompt(validated.sanitizedMemories);
+    const systemPrompt = buildSystemPrompt(validated.sanitizedMemories, validated.memoryMode);
 
     const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
       { role: "system", content: systemPrompt },

@@ -436,7 +436,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     controller: AbortController, aiMsgId: string, version: number,
     memoryStrings: string[],
   ): Promise<boolean> => {
-    const body: Record<string, unknown> = { message: text, history, memories: memoryStrings };
+    const body: Record<string, unknown> = { message: text, history, memories: memoryStrings, memoryMode: memoryModeRef.current };
 
     const overallTimer = setTimeout(() => controller.abort(), 60_000);
 
@@ -709,7 +709,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     if (!supportsStreaming) {
       try {
-        const body: Record<string, unknown> = { message: text, history, memories: memoryStrings };
+        const body: Record<string, unknown> = { message: text, history, memories: memoryStrings, memoryMode: memoryModeRef.current };
 
         const res = await fetch(`${API_BASE}/chat`, {
           method: 'POST',
