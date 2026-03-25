@@ -21,9 +21,9 @@ interface OverflowMenuProps {
 export function OverflowMenu({ items, topOffset, onClose, zIndex = 50 }: OverflowMenuProps) {
   const { colors } = useTheme();
   return (
-    <View style={[styles.menuOverlay, { zIndex }]}>
-      <Pressable style={[StyleSheet.absoluteFill, { top: topOffset }]} onPress={onClose} />
-      <View style={[styles.menuPositioner, { paddingTop: topOffset }]}>
+    <View style={[styles.menuOverlay, { zIndex, top: topOffset }]} pointerEvents="box-none">
+      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+      <View style={[styles.menuPositioner]}>
         <View style={[styles.menuShadow, { boxShadow: '0px 6px 16px rgba(10,10,10,0.08)' }]}>
           <View style={[styles.menuInner, { backgroundColor: colors.surfaceElevated }]}>
             {items.map((item, index) => {
