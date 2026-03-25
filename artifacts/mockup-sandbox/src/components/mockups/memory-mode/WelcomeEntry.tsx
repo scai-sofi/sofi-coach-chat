@@ -1,14 +1,60 @@
+import { useState } from 'react';
 import './_group.css';
 import {
   V, PhoneFrame, StatusBar, PacificAppBar, EmptyChatCard,
-  CloseIconSvg, ClockIconSvg, SendArrowSvg,
+  CloseIconSvg, ClockIconSvg, MoreIconSvg,
 } from './_shared';
 
 export function WelcomeEntry() {
+  const [screen, setScreen] = useState<'welcome' | 'incognito'>('welcome');
+
   return (
     <PhoneFrame>
       <StatusBar />
 
+      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          opacity: screen === 'welcome' ? 1 : 0,
+          transform: screen === 'welcome' ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'opacity 0.35s ease, transform 0.35s ease',
+          pointerEvents: screen === 'welcome' ? 'auto' : 'none',
+        }}>
+          <WelcomeScreen onIncognito={() => setScreen('incognito')} />
+        </div>
+
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          opacity: screen === 'incognito' ? 1 : 0,
+          transform: screen === 'incognito' ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'opacity 0.35s ease, transform 0.35s ease',
+          pointerEvents: screen === 'incognito' ? 'auto' : 'none',
+        }}>
+          <IncognitoScreen onClose={() => setScreen('welcome')} />
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8 }}>
+        <div style={{
+          width: 134,
+          height: 5,
+          borderRadius: 100,
+          backgroundColor: '#000000',
+        }} />
+      </div>
+    </PhoneFrame>
+  );
+}
+
+function WelcomeScreen({ onIncognito }: { onIncognito: () => void }) {
+  return (
+    <>
       <PacificAppBar
         leftIcon={<CloseIconSvg size={24} />}
         title="Coach"
@@ -17,7 +63,6 @@ export function WelcomeEntry() {
         ]}
       />
 
-      {/* Top section — Orb + greeting */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -27,7 +72,6 @@ export function WelcomeEntry() {
         width: 358,
         marginInline: 'auto',
       }}>
-        {/* Orb placeholder — 78px glass orb circle */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
           <div style={{
             width: 78,
@@ -36,7 +80,6 @@ export function WelcomeEntry() {
             background: 'linear-gradient(135deg, rgba(0,162,199,0.15) 0%, rgba(196,168,130,0.25) 50%, rgba(0,162,199,0.2) 100%)',
             boxShadow: 'inset 0 0 20px rgba(255,255,255,0.4)',
           }} />
-          {/* Caustic shadow */}
           <div style={{
             width: 96,
             height: 16,
@@ -45,7 +88,6 @@ export function WelcomeEntry() {
           }} />
         </div>
 
-        {/* Greeting */}
         <p style={{
           fontSize: 24,
           fontWeight: 500,
@@ -61,10 +103,8 @@ export function WelcomeEntry() {
         </p>
       </div>
 
-      {/* Spacer */}
       <div style={{ flex: 1 }} />
 
-      {/* Suggestion cards */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -79,10 +119,8 @@ export function WelcomeEntry() {
         </div>
       </div>
 
-      {/* Input area with incognito button — matching Figma exactly */}
       <div style={{ paddingInline: 16, paddingTop: 16, paddingBottom: 0 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {/* Input pill — 318px width in Figma (flex to fill minus button) */}
           <div style={{
             flex: 1,
             height: 48,
@@ -105,25 +143,29 @@ export function WelcomeEntry() {
             </span>
           </div>
 
-          {/* Incognito / eye-hide button — the entry point */}
-          <div style={{
-            width: 32,
-            height: 32,
-            borderRadius: 100,
-            border: `0.75px solid ${V.surfaceEdge}`,
-            backgroundColor: V.surfaceElevated,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}>
+          <div
+            onClick={onIncognito}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 100,
+              border: `0.75px solid ${V.surfaceEdge}`,
+              backgroundColor: V.surfaceElevated,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = V.surfaceTint; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = V.surfaceElevated; }}
+          >
             <GlyphHideStroke size={14.5} color={V.contentPrimary} />
           </div>
         </div>
       </div>
 
-      {/* Disclaimer links */}
       <div style={{
         display: 'flex',
         gap: 12,
@@ -143,26 +185,136 @@ export function WelcomeEntry() {
           Privacy policy
         </span>
       </div>
+    </>
+  );
+}
 
-      {/* Home indicator */}
-      <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8 }}>
+function IncognitoScreen({ onClose }: { onClose: () => void }) {
+  return (
+    <>
+      <PacificAppBar
+        leftIcon={<div onClick={onClose}><CloseIconSvg size={24} /></div>}
+        title="Coach"
+        subtitle={
+          <span style={{
+            fontSize: 12,
+            fontWeight: 500,
+            color: V.contentSecondary,
+            lineHeight: '16px',
+            letterSpacing: '0.1px',
+          }}>
+            Incognito chat
+          </span>
+        }
+        rightIcons={[
+          <ClockIconSvg size={20} />,
+          <MoreIconSvg size={20} />,
+        ]}
+      />
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{
-          width: 134,
-          height: 5,
-          borderRadius: 100,
-          backgroundColor: '#000000',
-        }} />
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 24,
+          width: 358,
+        }}>
+          <GlyphHideStrokeLarge size={40} color={V.contentPrimary} />
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            width: '100%',
+            textAlign: 'center',
+          }}>
+            <p style={{
+              fontSize: 24,
+              fontWeight: 500,
+              color: V.contentPrimary,
+              lineHeight: '28px',
+              letterSpacing: '-0.5px',
+              margin: 0,
+            }}>
+              You're in incognito mode
+            </p>
+            <p style={{
+              fontSize: 14,
+              fontWeight: 400,
+              color: V.contentSecondary,
+              lineHeight: '20px',
+              letterSpacing: '0px',
+              margin: 0,
+            }}>
+              Nothing in this conversation will be saved or used in future conversations
+            </p>
+          </div>
+        </div>
       </div>
-    </PhoneFrame>
+
+      <div style={{ paddingInline: 16, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{
+            flex: 1,
+            height: 48,
+            borderRadius: 24,
+            border: `0.75px solid ${V.surfaceEdge}`,
+            display: 'flex',
+            alignItems: 'center',
+            paddingLeft: 20,
+            paddingRight: 8,
+            backgroundColor: V.surfaceElevated,
+          }}>
+            <span style={{
+              flex: 1,
+              fontSize: 16,
+              fontWeight: 400,
+              color: V.contentSecondary,
+              lineHeight: '20px',
+            }}>
+              Message
+            </span>
+          </div>
+
+          <div style={{
+            width: 32,
+            height: 32,
+            borderRadius: 100,
+            border: `0.75px solid ${V.surfaceEdge}`,
+            backgroundColor: '#f0eeeb',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <GlyphHideStroke size={14.5} color={V.contentPrimary} />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 21, paddingBottom: 8 }}>
+      </div>
+    </>
   );
 }
 
 function GlyphHideStroke({ size = 14.5, color = V.contentPrimary }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-      <line x1="1" y1="1" x2="23" y2="23" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: 'scaleY(-1)' }}>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="1" y1="1" x2="23" y2="23" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function GlyphHideStrokeLarge({ size = 40, color = V.contentPrimary }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: 'scaleY(-1)' }}>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="1" y1="1" x2="23" y2="23" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
