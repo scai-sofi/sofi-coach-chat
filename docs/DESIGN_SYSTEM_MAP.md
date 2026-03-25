@@ -374,7 +374,7 @@ Shared widget used in MemoryCenter and ChatHistory.
 |---|---|
 | Height | `SizedBox(height: 48)` |
 | Background | `surfaceElevated` (white, from token) |
-| Border | `Border.all(width: 1, color: Color.fromRGBO(10, 10, 10, 0.1))` |
+| Border | `Border.all(width: 0.75, color: surfaceEdge)` |
 | Border radius | `BorderRadius.circular(24)` |
 | Icon | `Icon(Icons.search, size: 16, color: contentSecondary)` |
 | Input font | `TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: contentPrimary, height: 1.25)` |
@@ -488,10 +488,10 @@ All proposal cards share a unified visual language.
 
 | Component | Background | Border | Radius | Icon | Body Text | Detail Text | Buttons |
 |---|---|---|---|---|---|---|---|
-| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, contentPrimary | 12 `w500` `ls: 0.1` | — | Remember / Not now |
-| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, contentPrimary | 12 `w500` `ls: 0.1` — "Update your profile to [value]?" | — | Update / Not now |
-| GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w400` secondary | Set up goal / Just chatting |
-| Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 12×12, bone600 | 12 `w500` `ls: 0.1` (secondary or primary) | — | — |
+| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 0.75, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, contentPrimary | 12 `w500` `ls: 0.1` | — | Remember / Not now |
+| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 0.75, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, contentPrimary | 12 `w500` `ls: 0.1` — "Update your profile to [value]?" | — | Update / Not now |
+| GoalProposalCard | surfaceTint | `Border.all(width: 0.75, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w400` secondary | Set up goal / Just chatting |
+| Confirmed (check) | surfaceTint | `Border.all(width: 0.75, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 12×12, bone600 | 12 `w500` `ls: 0.1` (secondary or primary) | — | — |
 
 > **Note:** InsightToActionCard has been retired (Task #12). Goal suggestions now surface as DRAFT goals in the Goals Center instead of inline cards in chat.
 
@@ -505,7 +505,7 @@ All proposal cards share a unified visual language.
 | Body text | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.33, letterSpacing: 0.1)` |
 | Detail text | `TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: contentSecondary, height: 1.33)`, `EdgeInsets.only(top: 2)` |
 | Confirm button | Dark pill — `Container(color: contentPrimary, shape: StadiumBorder())`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)` |
-| Dismiss button | Outlined pill — `Border.all(width: 1, color: Color.fromRGBO(10, 10, 10, 0.1))`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
+| Dismiss button | Outlined pill — `Border.all(width: 0.75, color: surfaceEdge)`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 | Button row | `Row`, `SizedBox(width: 8)` |
 | Memory button indent | `EdgeInsets.only(left: 18)` (aligns with text after 12px icon + 6px gap) |
 | Confirmed text (secondary) | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary, height: 1.33, letterSpacing: 0.1)` |
@@ -518,7 +518,7 @@ All proposal cards share a unified visual language.
 |---|---|
 | Layout | `Row`, `SizedBox(width: 6)`, `BorderRadius.circular(16)` |
 | Padding | `EdgeInsets.symmetric(horizontal: 10, vertical: 6)` |
-| Border | `Border.all(width: 1, color: surfaceEdgeLight)` |
+| Border | `Border.all(width: 0.75, color: surfaceEdgeLight)` |
 | Shape | `RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))` |
 | Left icon | Feather/Icon 12 |
 | Label | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, height: 1.33, letterSpacing: 0.1)` |
@@ -627,7 +627,7 @@ Added in Task #12. When the AI detects a goal opportunity, it creates a DRAFT go
 | Type badge | Same as GoalCard typeBadge |
 | Detail text | `TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: contentSecondary)` |
 | Confirm button | Dark pill — `color: contentPrimary`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)` |
-| Dismiss button | Outlined pill — `Border.all(width: 1, color: Color.fromRGBO(10, 10, 10, 0.1))`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
+| Dismiss button | Outlined pill — `Border.all(width: 0.75, color: surfaceEdge)`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 | Button row | `Row`, `SizedBox(width: 8)` |
 
 **Goals Menu Badge (ChatHeader):**

@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   askBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
     paddingVertical: 8, borderRadius: 9999,
-    borderWidth: 1,
+    borderWidth: 0.75,
   },
   askBtnText: { fontSize: 14, fontFamily: Fonts.medium },
   sectionHeader: {
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     gap: 12,
-    borderWidth: 1,
+    borderWidth: 0.75,
     borderStyle: 'dashed',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     fontSize: 12, fontFamily: Fonts.medium,
   },
   suggestedDismissBtn: {
-    borderWidth: 1, borderRadius: 9999,
+    borderWidth: 0.75, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
   suggestedDismissText: {

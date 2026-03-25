@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 0.75,
   },
   chipText: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
   aiContent: { gap: 8 },
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
   },
   safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
-    borderWidth: 1, borderRadius: 16, padding: 12,
+    borderWidth: 0.75, borderRadius: 16, padding: 12,
   },
   confirmedCard: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
   },
   confirmBtnText: { fontSize: 12, fontFamily: Fonts.medium },
   dismissBtn: {
-    borderWidth: 1, borderRadius: 9999,
+    borderWidth: 0.75, borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,
   },
   dismissBtnText: { fontSize: 12, fontFamily: Fonts.medium },
