@@ -488,8 +488,8 @@ All proposal cards share a unified visual language.
 
 | Component | Background | Border | Radius | Icon | Body Text | Detail Text | Buttons |
 |---|---|---|---|---|---|---|---|
-| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` | — | Remember / Not now |
-| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` — "Update your profile to [value]?" | — | Update / Not now |
+| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, contentPrimary | 12 `w500` `ls: 0.1` | — | Remember / Not now |
+| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, contentPrimary | 12 `w500` `ls: 0.1` — "Update your profile to [value]?" | — | Update / Not now |
 | GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w400` secondary | Set up goal / Just chatting |
 | Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 12×12, bone600 | 12 `w500` `ls: 0.1` (secondary or primary) | — | — |
 

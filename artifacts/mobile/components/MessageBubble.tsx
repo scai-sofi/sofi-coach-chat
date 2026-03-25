@@ -366,7 +366,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
+        <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
@@ -406,7 +406,7 @@ function Member360ConflictCard({ message }: { message: Message }) {
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
+        <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Update your profile to <Text style={styles.proposalQuote}>"{conflict.userValue}"</Text>?
         </Text>
