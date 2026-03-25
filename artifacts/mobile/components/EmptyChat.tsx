@@ -98,7 +98,7 @@ export function EmptyChat() {
       <View style={styles.suggestionsSection}>
         <Animated.View style={fullCardAnimStyle}>
           <Pressable
-            style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
+            style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.contentStatusbar }]}
             onPress={() => sendMessage(fullCard.text)}
           >
             <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
@@ -110,7 +110,7 @@ export function EmptyChat() {
           {halfCards.map((card, i) => (
             <Pressable
               key={i}
-              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
+              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.contentStatusbar }]}
               onPress={() => sendMessage(card.text)}
             >
               <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
@@ -160,9 +160,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     gap: 4,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
   halfRow: {
@@ -174,9 +174,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     height: 92,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
   cardLabel: {

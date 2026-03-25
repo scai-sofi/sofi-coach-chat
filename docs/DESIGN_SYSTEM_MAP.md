@@ -205,9 +205,9 @@ In Flutter, use `Color.fromRGBO(r, g, b, opacity)` or the `0xAARRGGBB` hex forma
 
 | Name | Flutter `BoxShadow` | Pacific Level | Usage |
 |---|---|---|---|
-| dropShadow-down-2 | `BoxShadow(color: Color(0x0A0A0A0A), offset: Offset(0, 2), blurRadius: 8)` | `dropShadowDown2` ✓ | Settings card |
+| dropShadow-down-2 | `BoxShadow(color: Color(0x0A0A0A0A), offset: Offset(0, 2), blurRadius: 8)` | `dropShadowDown2` ✓ | Settings card, EmptyChat cards |
 | card-light | `BoxShadow(color: Color.fromRGBO(10, 10, 10, 0.06), offset: Offset(0, 2), blurRadius: 8)` | ~`dropShadowDown2` | Memory cards |
-| card-standard | `BoxShadow(color: Color.fromRGBO(10, 10, 10, 0.16), offset: Offset(0, 1), blurRadius: 4)` | ~`dropShadowDown1` | EmptyChat cards, goal cards |
+| card-standard | `BoxShadow(color: Color.fromRGBO(10, 10, 10, 0.16), offset: Offset(0, 1), blurRadius: 4)` | ~`dropShadowDown1` | Goal cards |
 | menu-shadow | `BoxShadow(color: Color.fromRGBO(10, 10, 10, 0.16), offset: Offset(0, 6), blurRadius: 16)` | ~`dropShadowDown4` | More menus |
 | scroll-anchor | `BoxShadow(color: Color(0x140A0A0A), offset: Offset(0, 2), blurRadius: 8)` | ~`dropShadowDown2` | ScrollAnchor button |
 | toast-shadow | `BoxShadow(color: Color.fromRGBO(10, 10, 10, 0.16), offset: Offset(0, 0), blurRadius: 1)` | ~`dropShadowDown1` | Toast |
