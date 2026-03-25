@@ -355,7 +355,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
   if (proposal.confirmed) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
           <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
         <Text style={[styles.confirmedText, { color: colors.contentSecondary }]}>Saved to memory</Text>
@@ -366,7 +366,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={14} color={colors.contentSecondary} style={styles.proposalIcon} />
+        <Feather name="cpu" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
@@ -397,7 +397,7 @@ function Member360ConflictCard({ message }: { message: Message }) {
         : 'Skipped';
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
           <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
         <Text style={[styles.confirmedText, { color: colors.contentSecondary }]}>{resolvedLabel}</Text>
@@ -408,7 +408,7 @@ function Member360ConflictCard({ message }: { message: Message }) {
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={14} color={colors.contentSecondary} style={styles.proposalIcon} />
+        <Feather name="cpu" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
         <View style={styles.proposalContentWrap}>
           <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
             This differs from your SoFi profile
@@ -448,7 +448,7 @@ function GoalProposalCard({ message }: { message: Message }) {
   if (proposal.confirmed) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
           <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
         <Text style={[styles.confirmedTextPrimary, { color: colors.contentPrimary }]}>Goal created — check your goals panel</Text>
@@ -461,7 +461,7 @@ function GoalProposalCard({ message }: { message: Message }) {
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
-        <Feather name="target" size={14} color={colors.contentSecondary} style={styles.proposalIcon} />
+        <Feather name="target" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
         <View style={styles.proposalContentWrap}>
           <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>{proposal.title}</Text>
           <Text style={[styles.proposalDetail, { color: colors.contentSecondary }]}>
@@ -766,16 +766,16 @@ const styles = StyleSheet.create({
   confirmedCard: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
   },
-  confirmedText: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20 },
-  confirmedTextPrimary: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20 },
-  proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 10 },
-  proposalIcon: { marginTop: 3 },
+  confirmedText: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
+  confirmedTextPrimary: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
+  proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginBottom: 10 },
+  proposalIcon: { marginTop: 2 },
   proposalContentWrap: { flex: 1 },
-  proposalText: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, flex: 1 },
+  proposalText: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1, flex: 1 },
   proposalQuote: { fontFamily: Fonts.regular },
   proposalDetail: { fontSize: 12, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
   proposalButtons: { flexDirection: 'row', gap: 8 },
-  proposalButtonsIndented: { flexDirection: 'row', gap: 8, marginLeft: 22 },
+  proposalButtonsIndented: { flexDirection: 'row', gap: 8, marginLeft: 18 },
   confirmBtn: {
     borderRadius: 9999,
     paddingHorizontal: 12, paddingVertical: 6,

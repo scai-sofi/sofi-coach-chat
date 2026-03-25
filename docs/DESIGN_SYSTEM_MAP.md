@@ -165,8 +165,8 @@ In Flutter, use `Color.fromRGBO(r, g, b, opacity)` or the `0xAARRGGBB` hex forma
 | Edit buttons text | 14 | `w700` | 1.43 (20/14) | — | `labelLarge` + bold | MemoryCenter (editSaveText, editCancelText) |
 | Confirm dialog body | 14 | `w400` | 1.43 (20/14) | contentSecondary | `bodyMedium` | MemoryCenter (confirmDesc) |
 | Scenario row title | 14 | `w500` | 1.29 (18/14) | — | `labelLarge` | ScenarioSwitcher (rowTitle) |
-| Proposal text | 14 | `w500` | 1.43 (20/14) | contentPrimary | `labelLarge` | MessageBubble (proposalText) |
-| Confirmed text | 14 | `w500` | 1.43 (20/14) | contentSecondary | `labelLarge` | MessageBubble (confirmedText) |
+| Proposal text | 12 | `w500` | 1.33 (16/12) | `letterSpacing: 0.1`, contentPrimary | `labelMedium` | MessageBubble (proposalText) |
+| Confirmed text | 12 | `w500` | 1.33 (16/12) | `letterSpacing: 0.1`, contentSecondary | `labelMedium` | MessageBubble (confirmedText) |
 | System message | 14 | `w500` | 1.43 (20/14) | contentSecondary | `labelLarge` | MessageBubble (systemText) |
 | Goal amount | 14 | `w400` | — | contentSecondary | `bodyMedium` | GoalsDashboard |
 | History group label | 14 | `w500` | 1.43 (20/14) | contentSecondary | `labelLarge` | ChatHistory |
@@ -488,10 +488,10 @@ All proposal cards share a unified visual language.
 
 | Component | Background | Border | Radius | Icon | Body Text | Detail Text | Buttons |
 |---|---|---|---|---|---|---|---|
-| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 14)`, secondary | 14 `w500` | — | Remember / Not now |
-| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 14)`, secondary | 14 `w500` | 14 `w500` (quote: `w400`) | Use what I said / Keep profile |
-| GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 14)`, secondary | 14 `w500` | 12 `w400` secondary | Set up goal / Just chatting |
-| Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 14×14, bone600 | 14 `w500` (secondary or primary) | — | — |
+| MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` | — | Remember / Not now |
+| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w500` (quote: `w400`) | Use what I said / Keep profile |
+| GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w400` secondary | Set up goal / Just chatting |
+| Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 12×12, bone600 | 12 `w500` `ls: 0.1` (secondary or primary) | — | — |
 
 > **Note:** InsightToActionCard has been retired (Task #12). Goal suggestions now surface as DRAFT goals in the Goals Center instead of inline cards in chat.
 
@@ -500,16 +500,16 @@ All proposal cards share a unified visual language.
 | Property | Flutter Value |
 |---|---|
 | Card padding | `EdgeInsets.all(12)` |
-| Header layout | `Row`, `SizedBox(width: 8)`, `CrossAxisAlignment.start`, `EdgeInsets.only(bottom: 10)` |
+| Header layout | `Row`, `SizedBox(width: 6)`, `CrossAxisAlignment.start`, `EdgeInsets.only(bottom: 10)` |
 | Icon position | `Padding(padding: EdgeInsets.only(top: 2))` |
-| Body text | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.43)` |
+| Body text | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.33, letterSpacing: 0.1)` |
 | Detail text | `TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: contentSecondary, height: 1.33)`, `EdgeInsets.only(top: 2)` |
 | Confirm button | Dark pill — `Container(color: contentPrimary, shape: StadiumBorder())`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)` |
 | Dismiss button | Outlined pill — `Border.all(width: 1, color: Color.fromRGBO(10, 10, 10, 0.1))`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 | Button row | `Row`, `SizedBox(width: 8)` |
-| Memory button indent | `EdgeInsets.only(left: 22)` (aligns with text after icon) |
-| Confirmed text (secondary) | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentSecondary, height: 1.43)` |
-| Confirmed text (primary) | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.43)` |
+| Memory button indent | `EdgeInsets.only(left: 18)` (aligns with text after 12px icon + 6px gap) |
+| Confirmed text (secondary) | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary, height: 1.33, letterSpacing: 0.1)` |
+| Confirmed text (primary) | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.33, letterSpacing: 0.1)` |
 | Approval hint | `Row`, `SizedBox(width: 4)`, `EdgeInsets.only(top: 8, bottom: 4, left: 2)` — `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 
 ### 3.2 Chip Badge
