@@ -516,8 +516,8 @@ All proposal cards share a unified visual language.
 
 | Property | Flutter Value |
 |---|---|
-| Layout | `Row`, `SizedBox(width: 8)`, `BorderRadius.circular(16)` |
-| Padding | `EdgeInsets.all(12)` |
+| Layout | `Row`, `SizedBox(width: 6)`, `BorderRadius.circular(16)` |
+| Padding | `EdgeInsets.symmetric(horizontal: 10, vertical: 6)` |
 | Border | `Border.all(width: 1, color: surfaceEdgeLight)` |
 | Shape | `RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))` |
 | Left icon | Feather/Icon 12 |
