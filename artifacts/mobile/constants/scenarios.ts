@@ -326,15 +326,6 @@ function buildScenarios(): Scenario[] {
       memories: [...SHARED_MEMORIES],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
     },
-    {
-      id: 'free-chat',
-      title: 'Free Chat',
-      subtitle: 'Start a fresh conversation — type anything to explore',
-      icon: 'message-circle',
-      messages: [],
-      memories: [SHARED_MEMORIES[0], SHARED_MEMORIES[1]],
-      goals: [{ ...EMERGENCY_FUND_GOAL }],
-    },
   ];
 }
 
@@ -343,5 +334,5 @@ export const SCENARIOS = buildScenarios();
 export const SCENARIO_ORDER = [
   'cold-start', 'returning-member', 'memory-lifecycle', 'memory-intelligence',
   'goal-discovery', 'proactive-risk', 'milestone-celebration', 'weekly-recap',
-  'cross-product', 'tiered-safety', 'free-chat',
+  'cross-product', 'tiered-safety',
 ];
