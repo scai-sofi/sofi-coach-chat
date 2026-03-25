@@ -93,7 +93,6 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
     }
   }, [highlighted, highlightAnim]);
 
-  const sourceLabel = memory.source === 'EXPLICIT' ? 'You added' : memory.source === 'MEMBER_360' ? 'From your profile' : 'Coach learned';
   const dateLabel = memory.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const handleEdit = () => {
@@ -156,7 +155,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
           <Text style={[styles.memContent, { color: colors.contentPrimary }]}>{memory.content}</Text>
           <View style={styles.memMeta}>
             <Text style={[styles.memMetaText, { color: colors.contentSecondary }]}>
-              {memory.status === 'PAUSED' ? 'Paused · not used in chat' : `${sourceLabel} · ${dateLabel}`}
+              {memory.status === 'PAUSED' ? 'Paused · not used in chat' : dateLabel}
             </Text>
             <View style={styles.memActions}>
               <Pressable style={styles.memActionBtn} onPress={handleEdit}>
