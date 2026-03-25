@@ -22,6 +22,7 @@ const ICON_MAP: Record<string, FeatherIconName> = {
   'calendar-check': 'calendar',
   'layers': 'layers',
   'shield-check': 'shield',
+  'database': 'database',
   'message-circle': 'message-circle',
 };
 

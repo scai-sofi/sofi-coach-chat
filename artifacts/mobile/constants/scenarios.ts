@@ -127,6 +127,53 @@ function buildScenarios(): Scenario[] {
       goals: [{ ...EMERGENCY_FUND_GOAL }],
     },
     {
+      id: 'memory-intelligence',
+      title: 'Memory Intelligence',
+      subtitle: 'Auto-save facts, propose preferences, and detect profile conflicts',
+      icon: 'database',
+      messages: [
+        { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 360000) },
+        {
+          id: uid(), role: 'ai', content: "**Nice — that's a solid foundation.**\n\nA $45,000 401k balance at your stage is great progress. That puts you ahead of the national median for your age group.\n\n**Quick Context**\n• **Current balance:** $45,000\n• **Provider:** Vanguard\n• **Typical growth at 7%:** Could become ~$200k in 20 years without adding another dollar\n• **With $500/month contributions:** Could reach ~$450k in 20 years\n\nAre you currently contributing, and do you know if your employer offers a match?",
+          timestamp: new Date(now.getTime() - 350000),
+          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+          suggestions: ["Yes, I get a 4% match", "I'm not sure about my match", "How much should I contribute?"],
+        },
+        { id: uid(), role: 'user', content: "I'd rather focus on paying off debt before investing more", timestamp: new Date(now.getTime() - 300000) },
+        {
+          id: uid(), role: 'ai', content: "**That's a thoughtful approach.**\n\nPrioritizing debt payoff before ramping up investments is a valid strategy — especially if you're carrying high-interest debt like credit cards.\n\n**The General Framework**\n\n• **Step 1:** Get the employer match (it's free money)\n• **Step 2:** Pay off high-interest debt (anything over ~7% APR)\n• **Step 3:** Build emergency fund to 3 months\n• **Step 4:** Max out retirement contributions\n\n**Where You Stand**\nWith $45k already in your 401k and an emergency fund in progress, you're in a great position. Clearing debt first means your future investment dollars work harder — they're not fighting against interest payments.\n\nOnce the debt is gone, you'll have significant monthly cash flow to redirect into investing.",
+          timestamp: new Date(now.getTime() - 290000),
+          memoryProposal: { id: uid(), content: 'Prioritizes debt payoff before increasing investments', category: 'PREFERENCES' },
+          suggestions: ["Show me my debt overview", "What's a good payoff strategy?", "How much am I spending on interest?"],
+        },
+        { id: uid(), role: 'user', content: "I make about $130,000 a year", timestamp: new Date(now.getTime() - 240000) },
+        {
+          id: uid(), role: 'ai', content: "**Good to know — that gives me a clearer picture.**\n\nAt $130k/year, here's a quick financial health snapshot:\n\n**Income Breakdown (estimated)**\n• **Gross monthly:** ~$10,833\n• **After taxes (est.):** ~$7,800/month\n• **Current savings rate:** ~24% based on your spending patterns\n\n**How This Compares**\nA 24% savings rate at $130k is well above average. If you can maintain that while paying off debt, you'll be in excellent shape to ramp up investing once you're debt-free.\n\n**One Thing to Watch**\nAt this income level, you might be close to the Roth IRA income limit ($161k for single filers). Something to keep in mind as your income grows — I can help you plan around that when the time comes.",
+          timestamp: new Date(now.getTime() - 230000),
+          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+          member360Conflict: {
+            id: uid(),
+            field: 'Annual income',
+            userValue: 'Income is $130,000/year',
+            profileValue: 'Annual income: $115,000/year',
+          },
+          suggestions: ["Tell me about Roth limits", "What's my ideal budget split?", "How can I increase my savings rate?"],
+        },
+        { id: uid(), role: 'user', content: "Keep explanations simple for me — I don't need all the technical jargon", timestamp: new Date(now.getTime() - 180000) },
+        {
+          id: uid(), role: 'ai', content: "**Got it — plain language from here on out.**\n\nI'll skip the financial jargon and give you clear, straightforward answers. If I ever need to use a technical term, I'll explain it in simple words.\n\nThis actually helps me give you better advice — focused on what matters, without the noise. Just let me know if you ever want more detail on something specific.",
+          timestamp: new Date(now.getTime() - 170000),
+          memoryProposal: { id: uid(), content: 'Prefers simple explanations without financial jargon', category: 'PREFERENCES' },
+          suggestions: ["What should I focus on first?", "Show me my spending", "How are my goals doing?"],
+        },
+      ],
+      memories: [
+        ...SHARED_MEMORIES,
+        { id: 'mem-mi-1', category: 'ABOUT_ME', content: 'Has 401k at Vanguard with $45,000 balance', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
+      ],
+      goals: [{ ...EMERGENCY_FUND_GOAL }],
+    },
+    {
       id: 'goal-discovery',
       title: 'Goal Discovery & Creation',
       subtitle: 'Suggested goal surfaces in Goals Center from natural conversation',
@@ -294,7 +341,7 @@ function buildScenarios(): Scenario[] {
 export const SCENARIOS = buildScenarios();
 
 export const SCENARIO_ORDER = [
-  'cold-start', 'returning-member', 'memory-lifecycle', 'goal-discovery',
-  'proactive-risk', 'milestone-celebration', 'weekly-recap', 'cross-product',
-  'tiered-safety', 'free-chat',
+  'cold-start', 'returning-member', 'memory-lifecycle', 'memory-intelligence',
+  'goal-discovery', 'proactive-risk', 'milestone-celebration', 'weekly-recap',
+  'cross-product', 'tiered-safety', 'free-chat',
 ];
