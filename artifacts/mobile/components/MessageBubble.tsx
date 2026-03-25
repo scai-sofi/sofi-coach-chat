@@ -413,11 +413,11 @@ function Member360ConflictCard({ message }: { message: Message }) {
           <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
             This differs from your SoFi profile
           </Text>
-          <Text style={[styles.proposalDetail, { color: colors.contentSecondary }]}>
-            You said: <Text style={{ fontFamily: Fonts.medium }}>"{conflict.userValue}"</Text>
+          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
+            You said: <Text style={styles.proposalQuote}>"{conflict.userValue}"</Text>
           </Text>
-          <Text style={[styles.proposalDetail, { color: colors.contentSecondary }]}>
-            Profile: <Text style={{ fontFamily: Fonts.medium }}>"{conflict.profileValue}"</Text>
+          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
+            Profile: <Text style={styles.proposalQuote}>"{conflict.profileValue}"</Text>
           </Text>
         </View>
       </View>
