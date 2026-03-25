@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Line } from 'react-native-svg';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
@@ -10,6 +10,15 @@ import { AppBar, useAppBarHeight } from '@/components/AppBar';
 import { OverflowMenu } from '@/components/OverflowMenu';
 import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
 import { SearchBar } from '@/components/SearchBar';
+
+function PlusIcon({ size = 20, color = '#000' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <Line x1="10" y1="4" x2="10" y2="16" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+      <Line x1="4" y1="10" x2="16" y2="10" stroke={color} strokeWidth={1.5} strokeLinecap="round" />
+    </Svg>
+  );
+}
 
 function PencilIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
   return (
@@ -193,16 +202,48 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
 
 export function MemoryCenter() {
   const { colors } = useTheme();
-  const { memories, memoryMode, setActivePanel, pauseAllMemories, deleteAllMemories, highlightedMemoryId } = useCoach();
+  const { memories, memoryMode, setActivePanel, pauseAllMemories, deleteAllMemories, highlightedMemoryId, addMemory } = useCoach();
   const headerHeight = useAppBarHeight();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addText, setAddText] = useState('');
+  const [addCategory, setAddCategory] = useState<MemoryCategory>('ABOUT_ME');
+  const addInputRef = useRef<TextInput>(null);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffsetRef = useRef(0);
   const { showToast } = useToast();
+  const ADD_MAX_CHARS = 300;
+
+  const handleAddSave = () => {
+    Keyboard.dismiss();
+    const trimmed = addText.trim();
+    if (trimmed.length > 0 && trimmed.length <= ADD_MAX_CHARS) {
+      addMemory(trimmed, addCategory);
+      showToast({ message: 'Memory added.' });
+      setShowAddForm(false);
+      setAddText('');
+      setAddCategory('ABOUT_ME');
+    }
+  };
+
+  const handleAddCancel = () => {
+    Keyboard.dismiss();
+    setShowAddForm(false);
+    setAddText('');
+    setAddCategory('ABOUT_ME');
+  };
+
+  const openAddForm = () => {
+    setShowAddForm(true);
+    setTimeout(() => {
+      addInputRef.current?.focus();
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }, 100);
+  };
 
   const visibleMemories = useMemo(() => {
     return memories.filter(m => {
@@ -251,10 +292,16 @@ export function MemoryCenter() {
         variant="back"
         title="Coach memory"
         onBack={() => setActivePanel('none')}
-        rightAction={memories.filter(m => m.status !== 'DELETED').length > 0 && memoryMode !== 'off' ? {
-          icon: <MoreIcon size={20} color={showMoreMenu ? colors.contentDimmed : colors.contentPrimary} />,
-          onPress: () => setShowMoreMenu(!showMoreMenu),
-        } : undefined}
+        rightActions={memoryMode !== 'off' ? [
+          ...(showAddForm ? [] : [{
+            icon: <PlusIcon size={20} color={colors.contentPrimary} />,
+            onPress: openAddForm,
+          }]),
+          ...(memories.filter(m => m.status !== 'DELETED').length > 0 ? [{
+            icon: <MoreIcon size={20} color={showMoreMenu ? colors.contentDimmed : colors.contentPrimary} />,
+            onPress: () => setShowMoreMenu(!showMoreMenu),
+          }] : []),
+        ] : undefined}
       />
 
       {showMoreMenu && (() => {
@@ -355,6 +402,59 @@ export function MemoryCenter() {
           onScroll={(e) => { scrollOffsetRef.current = e.nativeEvent.contentOffset.y; }}
           scrollEventThrottle={16}
         >
+          {showAddForm && (
+            <View style={[styles.addCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.borderSubtle, shadowColor: colors.shadowEdge }]}>
+              <Text style={[styles.addLabel, { color: colors.contentSecondary }]}>New memory</Text>
+              <TextInput
+                ref={addInputRef}
+                style={[styles.editInput, { color: colors.contentPrimary }]}
+                value={addText}
+                onChangeText={(t) => { if (t.length <= ADD_MAX_CHARS) setAddText(t); }}
+                multiline
+                placeholder="What should your coach remember?"
+                placeholderTextColor={colors.contentDimmed}
+              />
+              <View style={styles.addCatRow}>
+                {MEMORY_CATEGORY_ORDER.map(cat => (
+                  <Pressable
+                    key={cat}
+                    style={[
+                      styles.addCatChip,
+                      { backgroundColor: colors.surfaceTint },
+                      addCategory === cat && { backgroundColor: colors.contentPrimary },
+                    ]}
+                    onPress={() => setAddCategory(cat)}
+                  >
+                    <Text style={[
+                      styles.addCatChipText,
+                      { color: colors.contentSecondary },
+                      addCategory === cat && { color: colors.contentPrimaryInverse },
+                    ]}>
+                      {MEMORY_CATEGORY_LABELS[cat]}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+              <View style={styles.editToolRow}>
+                <Text style={[styles.editCharCount, { color: addText.length > ADD_MAX_CHARS ? colors.danger : colors.contentDimmed }]}>
+                  {addText.length}/{ADD_MAX_CHARS}
+                </Text>
+                <View style={styles.editButtonGroup}>
+                  <Pressable style={[styles.editCancelBtn, { borderColor: colors.borderMedium }]} onPress={handleAddCancel}>
+                    <Text style={[styles.editCancelText, { color: colors.contentPrimary }]}>Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.editSaveBtn, { backgroundColor: addText.trim().length > 0 ? colors.contentBone600 : colors.surfaceTint }]}
+                    onPress={handleAddSave}
+                    disabled={addText.trim().length === 0}
+                  >
+                    <Text style={[styles.editSaveText, { color: addText.trim().length > 0 ? colors.whiteOnDark : colors.contentDimmed }]}>Save</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          )}
+
           {memoryMode === 'off' ? (
             <View style={styles.empty}>
               <Text style={[styles.emptyTitle, { color: colors.contentPrimary }]}>Memory is off</Text>
@@ -554,6 +654,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
+  },
+  addCard: {
+    borderRadius: 20,
+    padding: 16,
+    gap: 12,
+    borderWidth: 0.75,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 16,
+  },
+  addLabel: {
+    fontSize: 12,
+    fontFamily: Fonts.medium,
+    lineHeight: 16,
+    letterSpacing: 0.1,
+  },
+  addCatRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  addCatChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 9999,
+  },
+  addCatChipText: {
+    fontSize: 12,
+    fontFamily: Fonts.medium,
   },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
   emptyTitle: {
