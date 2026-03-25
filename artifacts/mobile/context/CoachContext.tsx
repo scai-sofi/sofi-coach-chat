@@ -903,8 +903,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         });
       }
 
-      const memOff = memoryModeRef.current === 'off';
-      const filteredChips = memOff
+      const suppressMemChips = memoryModeRef.current === 'off' || memoryModeRef.current === 'ask-first';
+      const filteredChips = suppressMemChips
         ? chips.filter(c => c.type !== 'memory-saved' && c.type !== 'memory-updated')
         : chips;
       const aiMsg: Message = {

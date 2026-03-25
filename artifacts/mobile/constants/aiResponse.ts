@@ -282,8 +282,7 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
     const factContent = userInput.replace(/remember\s*(that\s*)?/i, '').trim();
     if (factContent.length > 5) {
       return {
-        content: `**Saved to Memory**\n\nGot it — I've saved: "${factContent}"\n\n**How I'll Use This**\nI'll factor this into future advice, suggestions, and insights. For example, if this relates to a spending preference, I'll reference it when analyzing your budget. If it's a life event, I'll consider it when recommending timelines and priorities.\n\n**Your Control**\nYou can view, edit, or remove this anytime in the Memory Center (brain icon in the menu). Just say "forget about..." if you want me to remove something specific.`,
-        chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+        content: `Got it — I've noted: "${factContent}"\n\n**How I'll Use This**\nI'll factor this into future advice, suggestions, and insights. For example, if this relates to a spending preference, I'll reference it when analyzing your budget. If it's a life event, I'll consider it when recommending timelines and priorities.\n\n**Your Control**\nYou can view, edit, or remove this anytime in the Memory Center (brain icon in the menu). Just say "forget about..." if you want me to remove something specific.`,
         autoSaveMemory: { content: factContent, category: 'ABOUT_ME' },
       };
     }
