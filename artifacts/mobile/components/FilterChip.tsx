@@ -17,15 +17,15 @@ export function FilterChip({ label, selected, onPress, count }: FilterChipProps)
     <Pressable
       style={[
         styles.chip,
-        { backgroundColor: colors.surfaceTint, borderColor: colors.borderSubtle },
-        selected && { backgroundColor: colors.contentPrimary, borderColor: colors.contentPrimary },
+        { backgroundColor: colors.chipUnselectedBg, borderColor: colors.chipUnselectedBorder },
+        selected && { backgroundColor: colors.chipSelectedBg, borderColor: colors.chipSelectedBg },
       ]}
       onPress={onPress}
     >
       <Text
         style={[
           styles.label,
-          { color: colors.contentSecondary },
+          { color: colors.contentPrimary },
           selected && { color: colors.contentPrimaryInverse },
         ]}
       >
@@ -51,16 +51,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 9999,
-    borderWidth: 0.75,
+    borderWidth: 1,
   },
   label: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.medium,
+    lineHeight: 20,
   },
   count: {
-    fontSize: 11,
+    fontSize: 12,
+    fontFamily: Fonts.regular,
   },
 });

@@ -472,7 +472,7 @@ export function MemoryCenter() {
 
 const styles = StyleSheet.create({
   panel: { ...StyleSheet.absoluteFillObject, zIndex: 100 },
-  filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 44 },
+  filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 48 },
   filterRowContent: { flexDirection: 'row', gap: 6 },
   content: { flex: 1 },
   contentInner: { paddingHorizontal: 16, paddingBottom: 40 },

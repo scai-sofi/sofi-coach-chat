@@ -43,6 +43,9 @@ export interface AppTheme {
   borderMedium: string;
   inverseAlpha60: string;
   inverseAlpha20: string;
+  chipUnselectedBg: string;
+  chipUnselectedBorder: string;
+  chipSelectedBg: string;
 }
 
 export const lightTheme: AppTheme = {
@@ -90,6 +93,9 @@ export const lightTheme: AppTheme = {
   borderMedium: 'rgba(10,10,10,0.20)',
   inverseAlpha60: 'rgba(255,255,255,0.6)',
   inverseAlpha20: 'rgba(255,255,255,0.2)',
+  chipUnselectedBg: '#ffffff',
+  chipUnselectedBorder: '#dbdad7',
+  chipSelectedBg: '#1a1919',
 };
 
 export const darkTheme: AppTheme = {
@@ -137,4 +143,7 @@ export const darkTheme: AppTheme = {
   borderMedium: 'rgba(250,248,245,0.20)',
   inverseAlpha60: 'rgba(0,0,0,0.6)',
   inverseAlpha20: 'rgba(0,0,0,0.2)',
+  chipUnselectedBg: '#1a1919',
+  chipUnselectedBorder: '#4d4c4b',
+  chipSelectedBg: '#ffffff',
 };
