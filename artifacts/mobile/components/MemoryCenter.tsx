@@ -435,15 +435,15 @@ export function MemoryCenter() {
                   {addText.length}/{ADD_MAX_CHARS}
                 </Text>
                 <View style={styles.editButtonGroup}>
-                  <Pressable style={[styles.editCancelBtn, { borderColor: colors.borderMedium }]} onPress={handleAddCancel}>
-                    <Text style={[styles.editCancelText, { color: colors.contentPrimary }]}>Cancel</Text>
-                  </Pressable>
                   <Pressable
-                    style={[styles.editSaveBtn, { backgroundColor: addText.trim().length > 0 ? colors.contentBone600 : colors.surfaceTint }]}
+                    style={[styles.editSaveBtn, { backgroundColor: addText.trim().length > 0 ? colors.contentBrand : colors.surfaceTint }]}
                     onPress={handleAddSave}
                     disabled={addText.trim().length === 0}
                   >
                     <Text style={[styles.editSaveText, { color: addText.trim().length > 0 ? colors.whiteOnDark : colors.contentDimmed }]}>Save</Text>
+                  </Pressable>
+                  <Pressable style={[styles.editCancelBtn, { borderColor: colors.borderMedium }]} onPress={handleAddCancel}>
+                    <Text style={[styles.editCancelText, { color: colors.contentPrimary }]}>Cancel</Text>
                   </Pressable>
                 </View>
               </View>
