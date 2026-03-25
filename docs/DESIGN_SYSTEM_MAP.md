@@ -165,13 +165,13 @@ In Flutter, use `Color.fromRGBO(r, g, b, opacity)` or the `0xAARRGGBB` hex forma
 | Edit buttons text | 14 | `w700` | 1.43 (20/14) | — | `labelLarge` + bold | MemoryCenter (editSaveText, editCancelText) |
 | Confirm dialog body | 14 | `w400` | 1.43 (20/14) | contentSecondary | `bodyMedium` | MemoryCenter (confirmDesc) |
 | Scenario row title | 14 | `w500` | 1.29 (18/14) | — | `labelLarge` | ScenarioSwitcher (rowTitle) |
-| Proposal text | 13 | `w500` | 1.38 (18/13) | contentPrimary | `bodyMedium` ⚠ Δ1 | MessageBubble (proposalText) |
-| Confirmed text | 13 | `w500` | 1.38 (18/13) | contentSecondary | `bodyMedium` ⚠ Δ1 | MessageBubble (confirmedText) |
-| System message | 13 | `w500` | 1.38 (18/13) | contentSecondary | `bodyMedium` ⚠ Δ1 | MessageBubble (systemText) |
-| Goal amount | 13 | `w400` | — | contentSecondary | `bodySmall` ⚠ Δ1 | GoalsDashboard |
-| History group label | 13 | `w500` | 1.38 (18/13) | contentSecondary | `bodyMedium` ⚠ Δ1 | ChatHistory |
-| Ask button text | 13 | `w500` | — | contentPrimary | `bodyMedium` ⚠ Δ1 | GoalsDashboard |
-| Clear filters | 13 | `w500` | — | contentPrimary | `bodyMedium` ⚠ Δ1 | MemoryCenter |
+| Proposal text | 14 | `w500` | 1.43 (20/14) | contentPrimary | `labelLarge` | MessageBubble (proposalText) |
+| Confirmed text | 14 | `w500` | 1.43 (20/14) | contentSecondary | `labelLarge` | MessageBubble (confirmedText) |
+| System message | 14 | `w500` | 1.43 (20/14) | contentSecondary | `labelLarge` | MessageBubble (systemText) |
+| Goal amount | 14 | `w400` | — | contentSecondary | `bodyMedium` | GoalsDashboard |
+| History group label | 14 | `w500` | 1.43 (20/14) | contentSecondary | `labelLarge` | ChatHistory |
+| Ask button text | 14 | `w500` | — | contentPrimary | `labelLarge` | GoalsDashboard |
+| Clear filters | 14 | `w500` | — | contentPrimary | `labelLarge` | MemoryCenter |
 | Proposal detail | 12 | `w400` | 1.33 (16/12) | contentSecondary | `bodySmall` | MessageBubble (proposalDetail) |
 | Chip label | 12 | `w500` | — | `letterSpacing: 0.1` | `labelMedium` | MessageBubble (chipText) |
 | Card label (uppercase) | 12 | `w500` | 1.33 (16/12) | `letterSpacing: 0.6` | `overline` | EmptyChat (cardLabel) |
@@ -473,15 +473,15 @@ All proposal cards now share a unified visual language (normalized in Task #10).
 | Card padding | `EdgeInsets.all(12)` |
 | Header layout | `Row`, `SizedBox(width: 8)`, `CrossAxisAlignment.start`, `EdgeInsets.only(bottom: 10)` |
 | Icon position | `Padding(padding: EdgeInsets.only(top: 2))` |
-| Body text | `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.38)` |
+| Body text | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.43)` |
 | Detail text | `TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: contentSecondary, height: 1.33)`, `EdgeInsets.only(top: 2)` |
 | Confirm button | Dark pill — `Container(color: contentPrimary, shape: StadiumBorder())`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)` |
 | Dismiss button | Outlined pill — `Border.all(width: 1, color: Color.fromRGBO(10, 10, 10, 0.1))`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 | Button row | `Row`, `SizedBox(width: 8)` |
 | Memory button indent | `EdgeInsets.only(left: 22)` (aligns with text after icon) |
-| Confirmed text (secondary) | `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: contentSecondary, height: 1.38)` |
-| Confirmed text (primary) | `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.38)` |
-| Approval hint | `Row`, `SizedBox(width: 4)`, `EdgeInsets.only(top: 8, bottom: 4, left: 2)` — `TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: contentSecondary)` |
+| Confirmed text (secondary) | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentSecondary, height: 1.43)` |
+| Confirmed text (primary) | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentPrimary, height: 1.43)` |
+| Approval hint | `Row`, `SizedBox(width: 4)`, `EdgeInsets.only(top: 8, bottom: 4, left: 2)` — `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 
 ### 3.2 Chip Badge
 
@@ -531,8 +531,8 @@ All proposal cards now share a unified visual language (normalized in Task #10).
 
 | Variant | Background | Text | Icon |
 |---|---|---|---|
-| Standard | surfaceTint | `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: contentSecondary)` | — |
-| Proactive | contentPrimary | `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.white)` | star Icon 13, `Colors.white` |
+| Standard | surfaceTint | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentSecondary)` | — |
+| Proactive | contentPrimary | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)` | star Icon 14, `Colors.white` |
 | Layout | `Row`, `SizedBox(width: 8)`, `EdgeInsets.symmetric(horizontal: 16, vertical: 8)`, `StadiumBorder()` |
 
 ### 3.5 Suggestion Pills
@@ -579,8 +579,8 @@ Added in Task #12. When the AI detects a goal opportunity, it creates a DRAFT go
 | Property | Flutter Value |
 |---|---|
 | Layout | `Row`, `SizedBox(width: 6)`, `EdgeInsets.symmetric(vertical: 4)` |
-| Icon | star Icon 13, contentBrand |
-| Label | `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: contentBrand, height: 1.38)` |
+| Icon | star Icon 14, contentBrand |
+| Label | `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentBrand, height: 1.43)` |
 
 **Suggested Goal Card:**
 
@@ -595,7 +595,7 @@ Added in Task #12. When the AI detects a goal opportunity, it creates a DRAFT go
 | Suggested badge | surfaceTint bg, `BorderRadius.circular(4)`, `EdgeInsets.symmetric(horizontal: 8, vertical: 2)`, `TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: contentBrand, letterSpacing: 0.6)`, uppercase |
 | Title | `TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: contentPrimary)` (same as GoalCard) |
 | Type badge | Same as GoalCard typeBadge |
-| Detail text | `TextStyle(fontSize: 13, fontWeight: FontWeight.w400, color: contentSecondary)` |
+| Detail text | `TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: contentSecondary)` |
 | Confirm button | Dark pill — `color: contentPrimary`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)` |
 | Dismiss button | Outlined pill — `Border.all(width: 1, color: Color.fromRGBO(10, 10, 10, 0.1))`, `StadiumBorder()`, `EdgeInsets.symmetric(horizontal: 12, vertical: 6)`, `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: contentSecondary)` |
 | Button row | `Row`, `SizedBox(width: 8)` |
@@ -613,7 +613,7 @@ Added in Task #12. When the AI detects a goal opportunity, it creates a DRAFT go
 
 **Chat Nudge:**
 
-When a goal suggestion is queued, a system pill message appears: "I've added a goal suggestion to your Goals panel — check it when you're ready." Uses standard system pill pattern (surfaceTint bg, `TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: contentSecondary)`).
+When a goal suggestion is queued, a system pill message appears: "I've added a goal suggestion to your Goals panel — check it when you're ready." Uses standard system pill pattern (surfaceTint bg, `TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: contentSecondary)`).
 
 ---
 
@@ -860,7 +860,7 @@ Container(
           children: [
             Icon(size: 14),
             SizedBox(width: 8),
-            Expanded(child: Text(style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
+            Expanded(child: Text(style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
           ],
         ),
       ),

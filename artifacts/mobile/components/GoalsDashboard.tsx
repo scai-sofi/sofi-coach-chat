@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   },
   goalTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   ringText: {
-    position: 'absolute', fontSize: 13, fontFamily: Fonts.medium,
+    position: 'absolute', fontSize: 14, fontFamily: Fonts.medium,
   },
   goalInfo: { flex: 1, minWidth: 0 },
   goalTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     fontSize: 10, fontFamily: Fonts.medium,
     textTransform: 'uppercase',
   },
-  goalAmount: { fontSize: 13, fontFamily: Fonts.regular, marginTop: 2 },
+  goalAmount: { fontSize: 14, fontFamily: Fonts.regular, marginTop: 2 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   statusText: { fontSize: 12, fontFamily: Fonts.medium },
   confidenceText: { fontSize: 12, fontFamily: Fonts.regular, marginLeft: 4 },
@@ -287,12 +287,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8, borderRadius: 9999,
     borderWidth: 1,
   },
-  askBtnText: { fontSize: 13, fontFamily: Fonts.medium },
+  askBtnText: { fontSize: 14, fontFamily: Fonts.medium },
   sectionHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 4,
   },
   sectionHeaderText: {
-    fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18,
+    fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20,
   },
   suggestedCard: {
     borderRadius: 20,

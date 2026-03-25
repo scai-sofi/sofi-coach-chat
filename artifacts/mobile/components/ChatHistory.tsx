@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   groupLabel: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: Fonts.medium,
-    lineHeight: 18,
+    lineHeight: 20,
     marginBottom: 8,
     marginTop: 8,
   },

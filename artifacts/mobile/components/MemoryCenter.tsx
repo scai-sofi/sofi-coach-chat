@@ -567,5 +567,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 260,
   },
-  clearFilters: { fontSize: 13, fontFamily: Fonts.medium },
+  clearFilters: { fontSize: 14, fontFamily: Fonts.medium },
 });
