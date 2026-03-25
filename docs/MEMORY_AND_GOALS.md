@@ -46,9 +46,9 @@ Neither feature requires the other to launch, but both are significantly weaker 
 
 | Memory mode | Memory behavior | Goal behavior |
 |---|---|---|
-| `full` | Auto-save + proposals enabled | Goals track normally; AI references goals in responses |
-| `ask-first` | All memory actions converted to proposals | Goals track normally; memory proposals require confirmation |
-| `off` | No memory reads or writes | Goals still tracked — `acceptDraftGoal` works regardless of memory mode |
+| `full` | Tier 1 (auto-save + notification) and Tier 2 (proposals) enabled | Goals track normally; AI references goals in responses |
+| `ask-first` | All Tier 1 and Tier 2 actions converted to proposals | Goals track normally; memory proposals require confirmation |
+| `off` | No memory reads or writes; Tier 1 and Tier 2 suppressed | Goals still tracked — `acceptDraftGoal` works regardless of memory mode |
 
 **Where each feature surfaces in the UI:**
 
@@ -74,35 +74,68 @@ No competitor has combined all three of: **structured goals + conversational mem
 
 ## Memory System — Implementation Spec
 
+### Three-tier model
+
+The memory system operates in three tiers, driven by a **Confidence × Sensitivity** decision matrix. The two axes are:
+- **Confidence** — How certain is this lasting and accurate?
+- **Sensitivity** — What is the privacy risk or stakes of storing this?
+
+**Decision Matrix:**
+
+| Information Type | Example | Logic | Tier |
+|---|---|---|---|
+| Operational Context | "I'm focused on my Q2 budget" | Low sensitivity; high immediate utility | Tier 1 (Auto-Save) |
+| Stylistic Patterns | User consistently asks for bullet points | Mirroring behavior; non-invasive | Tier 1 (Auto-Save) |
+| Specific Facts | "My dog's name is Barnaby", "I make $120k" | Persistent but low-stakes personal data | Tier 1 (Auto-Save) |
+| Core Preferences | "Never use jargon with me" | High-impact; changes future output significantly | Tier 2 (Propose) |
+| Sensitive Data | "Here is my home address" | High privacy risk; regulated by 2026 standards | Tier 2 (Propose) |
+
+**Key rule:** Sensitivity overrides objectivity — a verifiable fact that is high-stakes (e.g., home address, medical info) uses Tier 2 (propose), not Tier 1 (auto-save).
+
+**Three Tiers:**
+
+| Tier | Trigger | Marker | Source | UX Pattern |
+|---|---|---|---|---|
+| 1. Auto-Save with Notification | AI detects low-sensitivity, high-confidence fact | `[MEMORY_SAVE]` | `IMPLICIT_CONFIRMED` | Saved automatically; "Saved to memory" chip always appears on the message |
+| 2. Propose — Ask for Permission | AI detects preference, subjective opinion, or sensitive fact | `[MEMORY_PROPOSAL]` | `IMPLICIT_CONFIRMED` (after approval) | Confirmation card: "Want me to remember this?" with Remember / Not now |
+| 3. Manual — User-Created | User creates memory in Memory Center | — (client-side) | `EXPLICIT` | Standard form in Memory Center; highest-confidence signal |
+
 ### Memory categories
 
-Three memory categories, each with a default save behavior that determines whether the AI saves automatically or asks the member first:
+Three memory categories. The tier used depends on the information type (per the decision matrix above), not the category alone:
 
-| Category      | Label        | What it captures | Default save behavior |
+| Category      | Label        | What it captures | Typical tier |
 |---|---|---|---|
-| `ABOUT_ME`    | About me     | Life situation, household, location, accounts, financial products, income, balances, employment, factual details | Auto-save — unambiguous personal facts are stored immediately |
-| `PREFERENCES` | Preferences  | Communication style, detail level, risk tolerance, financial approach, saving vs spending philosophy | Propose — inferred patterns require member confirmation |
-| `PRIORITIES`  | Priorities   | Current goals, focus areas, debt payoff targets, savings targets, life events being planned around | Auto-save for explicit statements, propose for inferred priorities |
+| `ABOUT_ME`    | About me     | Life situation, household, location, accounts, financial products, income, balances, employment, factual details | Tier 1 for low-stakes facts; Tier 2 for sensitive facts (address, medical) |
+| `PREFERENCES` | Preferences  | Communication style, detail level, risk tolerance, financial approach, saving vs spending philosophy | Tier 1 for observed patterns; Tier 2 for core preferences that change output |
+| `PRIORITIES`  | Priorities   | Current goals, focus areas, debt payoff targets, savings targets, life events being planned around | Tier 1 for explicit statements; Tier 2 for inferred priorities |
 
 ### Trigger rules — when to capture memories
 
-**Always auto-save (`MEMORY_SAVE`):**
+**Tier 1 — Auto-save with notification (`MEMORY_SAVE`):**
 
-Auto-save when the user shares any unambiguous personal fact. The AI does not ask for confirmation — it saves immediately and tells the user what was stored.
+Auto-save when the user shares low-sensitivity, high-confidence information. The AI saves immediately and a "Saved to memory" chip always appears on the message so the user knows what was stored.
 
-- **ABOUT_ME signals:** Financial specifics (income, salary, rent, debt amounts, balances, credit score), financial products (accounts, loans, insurance, retirement accounts), life details (age, location, household, employment), life events (wedding, baby, retirement timeline, job change), budget constraints (fixed expenses, discretionary budget, savings capacity)
-- **PRIORITIES signals:** Explicit goals ("I want to save $X for Y"), declared focus areas ("My priority right now is...")
+- **Operational context:** Current focus areas, session-specific goals, budget timelines
+- **Stylistic patterns:** Observed behavior (e.g., consistently asks for bullet points, prefers short answers)
+- **Specific facts (low-stakes):** Financial specifics (income, salary, rent, debt amounts, balances, credit score), financial products (accounts, loans, insurance, retirement accounts), life details (age, location, household, employment), life events (wedding, baby, retirement timeline, job change), family details (pets, household size)
+- **Explicit priorities:** Declared goals ("I want to save $X for Y"), declared focus areas ("My priority right now is...")
 
-**Propose for confirmation (`MEMORY_PROPOSAL`):**
+**Tier 2 — Propose for permission (`MEMORY_PROPOSAL`):**
 
-Propose when the AI infers something the user hasn't explicitly stated.
+Propose when the information is high-impact (would significantly change future responses) or sensitive (carries privacy risk even if factual). Nothing is saved until the user approves.
 
-- **PREFERENCES signals:** Communication style patterns, financial philosophy, detected investment style
-- **PRIORITIES signals:** Inferred goals from behavior patterns, emerging focus areas
+- **Core preferences:** Communication style philosophy, financial approach, risk tolerance declarations
+- **Sensitive facts:** Home address, medical information, SSN-adjacent data — even if objectively verifiable
+- **Inferred priorities:** Goals detected from behavior patterns, emerging focus areas the user hasn't explicitly stated
+
+**Tier 3 — Manual (client-side):**
+
+User creates memories directly in the Memory Center UI. No AI markers involved. These carry source `EXPLICIT` and represent the highest-confidence signal.
 
 **Update existing memories (`MEMORY_UPDATE`):**
 
-When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), the AI emits a `[MEMORY_UPDATE]` marker. The system finds the best-matching active memory in the same category and replaces its content.
+When a user corrects or supersedes a previously stored fact (e.g., "actually I make $130k now"), the AI emits a `[MEMORY_UPDATE]` marker regardless of which tier originally created the memory. The system finds the best-matching active memory in the same category and replaces its content.
 
 ### Memory markers
 
@@ -149,9 +182,9 @@ Three user-configurable memory modes, set via Settings panel:
 
 | Mode | Memory reads | Memory writes | Behavior |
 |---|---|---|---|
-| `full` (default) | AI receives all active memories | Auto-save and proposals enabled | Normal personalized behavior |
-| `ask-first` | AI receives all active memories | All memory actions (saves, updates, proposals) converted to proposals | User must explicitly confirm before any memory is persisted |
-| `off` | AI receives empty memory array | All saves/proposals/chips suppressed | No personalization; goals still tracked normally |
+| `full` (default) | AI receives all active memories | Tier 1 (auto-save + notification) and Tier 2 (proposals) enabled | Normal personalized behavior |
+| `ask-first` | AI receives all active memories | All Tier 1 and Tier 2 actions converted to proposals — nothing auto-saved | User must explicitly confirm before any memory is persisted |
+| `off` | AI receives empty memory array | Tier 1 and Tier 2 suppressed; all saves/proposals/chips blocked | No personalization; goals still tracked normally |
 
 **Settings panel:** Accessible from the overflow menu ("Settings" item with gear icon). Slide-in panel matching ChatHistory pattern. Three radio-style rows with label + description + radio button for selected mode.
 
@@ -170,24 +203,25 @@ Three user-configurable memory modes, set via Settings panel:
 
 | Source | Label in UI | When it's set |
 |---|---|---|
-| `IMPLICIT_CONFIRMED` | "AI inferred" | Auto-saved by AI, or proposal confirmed by user |
-| `EXPLICIT` | "You created" | Manually added by the member |
+| `IMPLICIT_CONFIRMED` | "AI inferred" | Tier 1 auto-saved by AI, or Tier 2 proposal confirmed by user |
+| `EXPLICIT` | "You created" | Tier 3 — manually added by the member in Memory Center |
 
 ### Memory lifecycle
 
-| Action | How it works |
-|---|---|
-| Auto-save | AI detects a fact → saves immediately → shows "Saved to memory" chip inline → chip is tappable to navigate to Memory Center |
-| Memory update | AI detects a correction → finds best-matching active memory by category + word overlap → replaces content → shows "Memory updated" chip |
-| Implicit proposal | AI infers a preference → shows proposal card with [Remember] / [Not now] buttons |
-| View all memories | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred" or "You created") and date |
-| Search | Text search bar in Memory Center filters memories by content |
-| Category filter | Filter chips with per-category counts; toggle to show only one category |
-| Edit individual | Pencil icon on memory card → inline TextInput with Save/Cancel buttons and character counter (300 max) |
-| Pause individual | Pause icon on memory card → toggles between ACTIVE/PAUSED → paused memories show "Paused · not used in chat" and render at 50% opacity → play icon to resume |
-| Delete individual | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory |
-| Chip tap-through | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation |
-| Clear all memories | Global "Delete all" with confirmation dialog (dynamic count) in Memory Center |
+| Action | Tier | How it works |
+|---|---|---|
+| Auto-save with notification | Tier 1 | AI detects a low-sensitivity fact → saves immediately → "Saved to memory" chip always appears on message → chip is tappable to navigate to Memory Center |
+| Propose for permission | Tier 2 | AI detects a preference or sensitive data → shows proposal card with [Remember] / [Not now] buttons → nothing saved until user approves |
+| Manual creation | Tier 3 | User creates memory in Memory Center → source: EXPLICIT → labeled "You created" |
+| Memory update | Any | AI detects a correction → finds best-matching active memory by category + word overlap → replaces content → shows "Memory updated" chip |
+| View all memories | — | Member opens Memory Center from chat header → memories grouped by category, each with source label ("AI inferred" or "You created") and date |
+| Search | — | Text search bar in Memory Center filters memories by content |
+| Category filter | — | Filter chips with per-category counts; toggle to show only one category |
+| Edit individual | — | Pencil icon on memory card → inline TextInput with Save/Cancel buttons and character counter (300 max) |
+| Pause individual | — | Pause icon on memory card → toggles between ACTIVE/PAUSED → paused memories show "Paused · not used in chat" and render at 50% opacity → play icon to resume |
+| Delete individual | — | Trash icon on memory card → sets status to DELETED → toast notification with "Undo" action that restores the memory |
+| Chip tap-through | 1, Any | Tapping a "Saved to memory" or "Memory updated" chip in chat opens Memory Center and briefly highlights the relevant memory card with a border animation |
+| Clear all memories | — | Global "Delete all" with confirmation dialog (dynamic count) in Memory Center |
 
 **Not yet implemented:** Version history (expandable row showing prior versions with timestamps), per-category controls (toggle per category, set retention window).
 
@@ -286,13 +320,28 @@ interface Milestone {
 - **Sessions 2–3:** Coach references prior context without being asked. Proposes additional memories. Suggests linking additional accounts for richer context.
 - **Session 4+:** Full personalization active.
 
-### 2. Memory Lifecycle
+### 2. Memory System — Three Tiers
 
-*Prototype status: Demonstrated via demo scenario "Memory Lifecycle — Correction Flow"*
+*Prototype status: Demonstrated via demo scenario "Memory System" — covers all three tiers, corrections, and profile conflict detection*
 
-- **Explicit save** — Member shares a fact → Coach saves immediately → "Saved to memory" chip shown inline → tapping the chip opens Memory Center and highlights the saved memory
-- **Memory update** — Member corrects a fact → Coach finds the best-matching memory and replaces its content → "Memory updated" chip shown inline with tap-through navigation
-- **Implicit proposal** — Coach detects a pattern → proposes inline: *"Want me to remember that?"* → [Remember] / [Not now]
+**Tier 1 — Auto-save with notification:**
+- Member shares a low-stakes fact ("I have a 401k at Vanguard with $45,000") → Coach saves immediately → "Saved to memory" chip always appears on the message → tapping the chip opens Memory Center and highlights the saved memory
+- Also covers operational context and stylistic patterns (observed behavior like preferring bullet points)
+
+**Tier 2 — Propose for permission:**
+- Coach detects a core preference ("I'd rather focus on paying off debt before investing more") or sensitive data → proposes inline: *"Want me to remember this?"* → [Remember] / [Not now]
+- Nothing saved until member explicitly approves
+
+**Tier 3 — Manual (user-created):**
+- Member creates memory directly in Memory Center → source: `EXPLICIT` → labeled "You created" → highest-confidence signal
+
+**Memory update (any tier):**
+- Member corrects a previously stored fact ("Actually, I make $130k now") → Coach finds best-matching active memory and replaces content → "Memory updated" chip shown inline
+
+**Member 360 conflict escalation:**
+- Tier 1 auto-save for `ABOUT_ME` contradicts SoFi profile data → escalates to a Member360ConflictCard showing both values → "Use what I said" / "Keep profile" resolution
+
+**Memory management:**
 - **Full disclosure** — Memory Center shows all memories grouped by category, each with source label ("AI inferred" or "You created") and date
 - **Edit** — Member taps pencil icon on a memory card → inline edit with Save/Cancel and character counter
 - **Pause** — Member taps pause icon → memory is retained but excluded from Coach context → "Paused · not used in chat" label with 50% opacity → tap play icon to resume
