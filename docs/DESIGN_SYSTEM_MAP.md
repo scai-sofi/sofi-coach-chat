@@ -173,7 +173,7 @@ In Flutter, use `Color.fromRGBO(r, g, b, opacity)` or the `0xAARRGGBB` hex forma
 | Ask button text | 14 | `w500` | — | contentPrimary | `labelLarge` | GoalsDashboard |
 | Clear filters | 14 | `w500` | — | contentPrimary | `labelLarge` | MemoryCenter |
 | Proposal detail | 12 | `w400` | 1.33 (16/12) | contentSecondary | `bodySmall` | MessageBubble (proposalDetail) |
-| Chip label | 12 | `w500` | — | `letterSpacing: 0.1` | `labelMedium` | MessageBubble (chipText) |
+| Chip label | 12 | `w500` | 1.33 (16/12) | `letterSpacing: 0.1` | `labelMedium` | MessageBubble (chipText) |
 | Card label (uppercase) | 12 | `w500` | 1.33 (16/12) | `letterSpacing: 0.6` | `overline` | EmptyChat (cardLabel) |
 | Demo indicator | 12 | `w500` | 1.33 (16/12) | `letterSpacing: 0.1`, brand | `labelMedium` | ChatHeader |
 | Goal status text | 12 | `w500` | — | varies by status | `labelMedium` | GoalsDashboard |
@@ -516,11 +516,12 @@ All proposal cards share a unified visual language.
 
 | Property | Flutter Value |
 |---|---|
-| Layout | `Row`, `SizedBox(width: 6)`, `StadiumBorder()` |
-| Padding | `EdgeInsets.symmetric(horizontal: 10, vertical: 6)` |
-| Shape | `StadiumBorder()` |
-| Left icon | Feather/Icon 11 |
-| Label | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 0.1)` |
+| Layout | `Row`, `SizedBox(width: 8)`, `BorderRadius.circular(16)` |
+| Padding | `EdgeInsets.all(12)` |
+| Border | `Border.all(width: 1, color: surfaceEdgeLight)` |
+| Shape | `RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))` |
+| Left icon | Feather/Icon 12 |
+| Label | `TextStyle(fontSize: 12, fontWeight: FontWeight.w500, height: 1.33, letterSpacing: 0.1)` |
 | Right icon | chevron-right Icon 12 |
 | Animation | `FadeTransition` 350ms + `SlideTransition` translateY 6→0 (`SpringSimulation` tension 120, friction 8) |
 

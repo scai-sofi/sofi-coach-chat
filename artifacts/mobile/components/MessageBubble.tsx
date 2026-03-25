@@ -309,7 +309,7 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
 
   const chipContent = (
     <>
-      <Feather name={style.icon} size={11} color={style.color} />
+      <Feather name={style.icon} size={12} color={style.color} />
       <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
       <Feather name="chevron-right" size={12} color={style.color} />
     </>
@@ -318,7 +318,7 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
   if (hasMemoryIds) {
     return (
       <RNAnimated.View style={animStyle}>
-        <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: style.bg }]}>
+        <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: style.bg, borderColor: colors.surfaceEdgeLight }]}>
           {chipContent}
         </Pressable>
       </RNAnimated.View>
@@ -327,7 +327,7 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
 
   return (
     <RNAnimated.View style={animStyle}>
-      <View style={[styles.chip, { backgroundColor: style.bg }]}>
+      <View style={[styles.chip, { backgroundColor: style.bg, borderColor: colors.surfaceEdgeLight }]}>
         {chipContent}
       </View>
     </RNAnimated.View>
@@ -732,10 +732,10 @@ const styles = StyleSheet.create({
   aiRow: { gap: 16 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9999,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    padding: 12, borderRadius: 16, borderWidth: 1,
   },
-  chipText: { fontSize: 12, fontFamily: Fonts.medium, letterSpacing: 0.1 },
+  chipText: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
   aiContent: { gap: 8 },
   aiText: { fontSize: 16, fontFamily: Fonts.regular, lineHeight: 20, paddingHorizontal: 4 },
   headerText: { fontSize: 18, fontFamily: Fonts.medium, letterSpacing: -0.2, lineHeight: 24 },
