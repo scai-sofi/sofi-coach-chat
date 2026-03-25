@@ -11,6 +11,7 @@ import { AppBar, useAppBarHeight } from '@/components/AppBar';
 import { OverflowMenu } from '@/components/OverflowMenu';
 import { MoreIcon, DeleteMenuIcon, PauseMenuIcon, PlayMenuIcon } from '@/components/icons';
 import { SearchBar } from '@/components/SearchBar';
+import { FilterChip } from '@/components/FilterChip';
 
 function PencilIcon({ size = 13, color = '#706f6e' }: { size?: number; color?: string }) {
   return (
@@ -370,18 +371,13 @@ export function MemoryCenter() {
         {(showFilters || filterCat) && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
             {MEMORY_CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => (
-              <Pressable
+              <FilterChip
                 key={cat}
-                style={[styles.filterChip, { backgroundColor: colors.surfaceTint }, filterCat === cat && { backgroundColor: colors.contentPrimary }]}
+                label={MEMORY_CATEGORY_LABELS[cat]}
+                selected={filterCat === cat}
                 onPress={() => setFilterCat(filterCat === cat ? null : cat)}
-              >
-                <Text style={[styles.filterChipText, { color: colors.contentSecondary }, filterCat === cat && { color: colors.contentPrimaryInverse }]}>
-                  {MEMORY_CATEGORY_LABELS[cat]}
-                </Text>
-                <Text style={[styles.filterCount, { color: colors.contentSecondary }, filterCat === cat && { color: colors.inverseAlpha60 }]}>
-                  {catCounts[cat] || 0}
-                </Text>
-              </Pressable>
+                count={catCounts[cat] || 0}
+              />
             ))}
           </ScrollView>
         )}
@@ -407,28 +403,14 @@ export function MemoryCenter() {
                 placeholderTextColor={colors.contentDimmed}
               />
               <View style={styles.addCatRow}>
-                {MEMORY_CATEGORY_ORDER.map(cat => {
-                  const selected = addCategory === cat;
-                  return (
-                    <Pressable
-                      key={cat}
-                      style={[
-                        styles.addCatChip,
-                        { backgroundColor: colors.surfaceTint, borderColor: colors.borderSubtle },
-                        selected && { backgroundColor: colors.contentPrimary, borderColor: colors.contentPrimary },
-                      ]}
-                      onPress={() => setAddCategory(cat)}
-                    >
-                      <Text style={[
-                        styles.addCatChipText,
-                        { color: colors.contentSecondary },
-                        selected && { color: colors.contentPrimaryInverse },
-                      ]}>
-                        {MEMORY_CATEGORY_LABELS[cat]}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+                {MEMORY_CATEGORY_ORDER.map(cat => (
+                  <FilterChip
+                    key={cat}
+                    label={MEMORY_CATEGORY_LABELS[cat]}
+                    selected={addCategory === cat}
+                    onPress={() => setAddCategory(cat)}
+                  />
+                ))}
               </View>
               <View style={styles.editToolRow}>
                 <Text style={[styles.editCharCount, { color: addText.length > ADD_MAX_CHARS ? colors.danger : colors.contentDimmed }]}>
@@ -490,18 +472,8 @@ export function MemoryCenter() {
 
 const styles = StyleSheet.create({
   panel: { ...StyleSheet.absoluteFillObject, zIndex: 100 },
-  filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 40 },
+  filterRow: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4, maxHeight: 44 },
   filterRowContent: { flexDirection: 'row', gap: 6 },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 9999,
-  },
-  filterChipText: { fontSize: 12, fontFamily: Fonts.medium },
-  filterCount: { fontSize: 11 },
   content: { flex: 1 },
   contentInner: { paddingHorizontal: 16, paddingBottom: 40 },
   subHeader: {
@@ -670,16 +642,6 @@ const styles = StyleSheet.create({
   addCatRow: {
     flexDirection: 'row',
     gap: 6,
-  },
-  addCatChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 9999,
-    borderWidth: 0.75,
-  },
-  addCatChipText: {
-    fontSize: 12,
-    fontFamily: Fonts.medium,
   },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
   emptyTitle: {
