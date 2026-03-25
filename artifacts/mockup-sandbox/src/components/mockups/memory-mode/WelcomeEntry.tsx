@@ -3,10 +3,12 @@ import './_group.css';
 import {
   V, PhoneFrame, StatusBar, PacificAppBar, EmptyChatCard,
   CloseIconSvg, ClockIconSvg, MoreIconSvg,
+  OverflowMenuPanel, MemoryMenuIconSvg, GoalsMenuIconSvg, SettingsMenuIconSvg,
 } from './_shared';
 
 export function WelcomeEntry() {
   const [showIncognito, setShowIncognito] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <PhoneFrame>
@@ -17,8 +19,22 @@ export function WelcomeEntry() {
         title="Coach"
         rightIcons={[
           <ClockIconSvg size={20} />,
+          <div onClick={() => setMenuOpen(!menuOpen)} style={{ cursor: 'pointer' }}>
+            <MoreIconSvg size={20} color={menuOpen ? V.contentDimmed : V.contentPrimary} />
+          </div>,
         ]}
       />
+
+      {menuOpen && (
+        <OverflowMenuPanel
+          items={[
+            { label: 'Chat memory', icon: <MemoryMenuIconSvg size={24} /> },
+            { label: 'Goals', icon: <GoalsMenuIconSvg size={24} /> },
+            { label: 'Settings', icon: <SettingsMenuIconSvg size={24} /> },
+          ]}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
 
       <div style={{
         display: 'flex',
