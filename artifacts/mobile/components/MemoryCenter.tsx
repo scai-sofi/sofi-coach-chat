@@ -398,19 +398,18 @@ export function MemoryCenter() {
           scrollEventThrottle={16}
         >
           {showAddForm && (
-            <View style={[styles.addCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.borderSubtle, shadowColor: colors.shadowEdge }]}>
-              <Text style={[styles.addLabel, { color: colors.contentSecondary }]}>New memory</Text>
+            <View style={[styles.memCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.borderSubtle, shadowColor: colors.shadowEdge, marginBottom: 16 }]}>
               <TextInput
                 ref={addInputRef}
                 style={[styles.editInput, { color: colors.contentPrimary }]}
                 value={addText}
                 onChangeText={(t) => { if (t.length <= ADD_MAX_CHARS) setAddText(t); }}
                 multiline
-                placeholder="What should your coach remember?"
-                placeholderTextColor={colors.contentDimmed}
+                placeholder="What do you want Coach to remember?"
+                placeholderTextColor={colors.contentDisabled}
               />
               <View style={styles.editToolRow}>
-                <Text style={[styles.editCharCount, { color: addText.length > ADD_MAX_CHARS ? colors.danger : colors.contentDimmed }]}>
+                <Text style={[styles.editCharCount, { color: addText.trim().length > 0 ? colors.contentDimmed : colors.contentDisabled2 }]}>
                   {addText.length}/{ADD_MAX_CHARS}
                 </Text>
                 <View style={styles.editButtonGroup}>
@@ -419,7 +418,7 @@ export function MemoryCenter() {
                     onPress={handleAddSave}
                     disabled={addText.trim().length === 0}
                   >
-                    <Text style={[styles.editSaveText, { color: addText.trim().length > 0 ? colors.whiteOnDark : colors.contentDimmed }]}>Save</Text>
+                    <Text style={[styles.editSaveText, { color: addText.trim().length > 0 ? colors.whiteOnDark : colors.contentDisabled2 }]}>Save</Text>
                   </Pressable>
                   <Pressable style={[styles.editCancelBtn, { borderColor: colors.borderMedium }]} onPress={handleAddCancel}>
                     <Text style={[styles.editCancelText, { color: colors.contentPrimary }]}>Cancel</Text>
@@ -618,23 +617,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
-  },
-  addCard: {
-    borderRadius: 20,
-    padding: 16,
-    gap: 12,
-    borderWidth: 0.75,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
-    marginBottom: 16,
-  },
-  addLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.medium,
-    lineHeight: 16,
-    letterSpacing: 0.1,
   },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
   emptyTitle: {

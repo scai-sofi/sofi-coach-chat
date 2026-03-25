@@ -12,6 +12,8 @@ export interface AppTheme {
   contentStatusbar: string;
   contentMuted: string;
   contentDimmed: string;
+  contentDisabled: string;
+  contentDisabled2: string;
   danger: string;
   dangerLight: string;
   dangerChipText: string;
@@ -62,6 +64,8 @@ export const lightTheme: AppTheme = {
   contentStatusbar: '#0a0a0a',
   contentMuted: '#d0ccc5',
   contentDimmed: '#bdbbb9',
+  contentDisabled: '#dbdad7',
+  contentDisabled2: '#bdbbb9',
   danger: '#fa2d25',
   dangerLight: '#ef4444',
   dangerChipText: '#dc2626',
@@ -112,6 +116,8 @@ export const darkTheme: AppTheme = {
   contentStatusbar: '#ffffff',
   contentMuted: '#4d4c4b',
   contentDimmed: '#585756',
+  contentDisabled: '#3a3938',
+  contentDisabled2: '#585756',
   danger: '#fa2d25',
   dangerLight: '#fb4a43',
   dangerChipText: '#fa2d25',
