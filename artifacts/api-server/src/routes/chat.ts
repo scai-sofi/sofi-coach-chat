@@ -260,11 +260,18 @@ ${memoryContext}`;
 You don't have any stored memories about this user yet. Pay attention to personal facts they share — this is a great opportunity to start building context with a [MEMORY_SAVE] for explicit facts.`;
   }
 
+  if (!memoryMode || memoryMode === 'full') {
+    prompt += `
+
+## IMPORTANT: Memory Mode is "Full" (Auto-save enabled)
+Memory is fully enabled. You MUST emit memory markers for every piece of personal information the user shares. Use [MEMORY_SAVE] for explicit facts (income, location, accounts, family, age, job) and [MEMORY_PROPOSAL] for preferences and attitudes (risk tolerance, communication style, financial philosophy). NEVER skip emitting a marker when the user shares personal information — emit it AFTER [SUGGESTIONS] on its own line. This is the most critical instruction: if the user tells you about themselves, ALWAYS emit a marker.`;
+  }
+
   if (memoryMode === 'ask-first') {
     prompt += `
 
 ## IMPORTANT: Memory Mode is "Always Ask First"
-The user has enabled "Always ask me first" for memory. You MUST still emit [MEMORY_SAVE] markers for ANY personal information the user shares (location, pets, family, income, accounts, preferences, etc.). The client will convert these to proposals that the user can approve or dismiss. Do NOT skip memory markers just because this mode is active — the user wants to be asked, not ignored. Always extract and emit memory markers for personal facts.`;
+The user has enabled "Always ask me first" for memory. You MUST emit [MEMORY_SAVE] markers for ALL personal information the user shares. The client will convert these to proposals that the user can approve or dismiss. Do NOT skip memory markers — the user wants to be asked, not ignored. ALWAYS extract and emit memory markers for every personal fact, preference, or life detail mentioned.`;
   } else if (memoryMode === 'off') {
     prompt += `
 
@@ -351,6 +358,60 @@ function parseSuggestions(text: string): { reply: string; suggestions: string[] 
   return { reply, suggestions };
 }
 
+function inferMissingMemoryActions(userMessage: string, existingActions: MemoryAction[], memoryMode?: string): MemoryAction[] {
+  if (memoryMode === 'off') return existingActions;
+
+  const msg = userMessage.toLowerCase();
+  const inferred: MemoryAction[] = [];
+
+  const preferencePatterns = [
+    { re: /i\s+prefer\s+(.{5,60})/i, extract: (m: RegExpMatchArray) => m[1].replace(/[.!,]+$/, '').trim() },
+    { re: /i\s+like\s+(more|less|detailed|brief|simple|aggressive|conservative|short|long)\s+(.{3,50})/i, extract: (m: RegExpMatchArray) => `${m[1]} ${m[2]}`.replace(/[.!,]+$/, '').trim() },
+    { re: /i\s+(?:don'?t|do\s+not)\s+(?:want|like|need)\s+(.{5,60})/i, extract: (m: RegExpMatchArray) => `Does not want ${m[1]}`.replace(/[.!,]+$/, '').trim() },
+    { re: /(?:keep|make)\s+(?:it|things)\s+(simple|brief|detailed|short|concise)/i, extract: (m: RegExpMatchArray) => `Prefers ${m[1]} responses` },
+    { re: /i'?m\s+(?:more\s+of\s+a|a)\s+(conservative|aggressive|moderate|cautious|risk.?taker)\s+(?:investor|person|type)/i, extract: (m: RegExpMatchArray) => `${m[1]} investor` },
+  ];
+
+  const factPatterns = [
+    { re: /i\s+(?:make|earn|have\s+a\s+salary\s+of)\s+\$?([\d,]+k?)\s*(?:a\s+year|per\s+year|annually|\/yr)?/i, extract: (m: RegExpMatchArray) => `Income: $${m[1]}${m[1].includes('k') ? '' : ''}/year` },
+    { re: /i\s+(?:live|am|i'm)\s+in\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:,\s*[A-Z]{2})?)/i, extract: (m: RegExpMatchArray) => `Lives in ${m[1]}` },
+    { re: /i\s+(?:have|got)\s+(?:a\s+)?(?:cat|dog|pet)\s+(?:named|called)\s+(\w+)/i, extract: (m: RegExpMatchArray) => `Has a pet named ${m[1]}` },
+    { re: /i\s+(?:work|am\s+(?:a|an))\s+(?:at\s+)?(.{3,40}?)(?:\s*[.!]|$)/i, extract: (m: RegExpMatchArray) => `Works as/at ${m[1]}`.replace(/[.!,]+$/, '').trim() },
+    { re: /i'?m\s+(\d{2})\s*(?:years?\s*old)?/i, extract: (m: RegExpMatchArray) => `Age: ${m[1]}` },
+    { re: /i\s+have\s+(?:a\s+)?(\d+)\s*(?:k|K)?\s+in\s+(?:my\s+)?(\w+(?:\s+\w+)?)\s*(?:account)?/i, extract: (m: RegExpMatchArray) => `Has $${m[1]}${m[1].includes('k') || m[1].includes('K') ? '' : 'k'} in ${m[2]}` },
+  ];
+
+  const existingContents = existingActions.map(a => a.content.toLowerCase());
+
+  for (const pat of preferencePatterns) {
+    const match = userMessage.match(pat.re);
+    if (match) {
+      const content = `Prefers ${pat.extract(match)}`;
+      const shortContent = content.slice(0, 100);
+      if (!existingContents.some(c => c.includes(shortContent.toLowerCase().slice(0, 20)))) {
+        inferred.push({ type: 'proposal', category: 'PREFERENCES', content: shortContent });
+      }
+    }
+  }
+
+  for (const pat of factPatterns) {
+    const match = userMessage.match(pat.re);
+    if (match) {
+      const content = pat.extract(match);
+      const shortContent = content.slice(0, 100);
+      if (!existingContents.some(c => c.includes(shortContent.toLowerCase().slice(0, 20)))) {
+        inferred.push({ type: 'save', category: 'ABOUT_ME', content: shortContent });
+      }
+    }
+  }
+
+  if (inferred.length > 0 && existingActions.length === 0) {
+    console.log("[MEMORY FALLBACK] AI missed markers, injecting:", JSON.stringify(inferred));
+    return inferred;
+  }
+  return existingActions;
+}
+
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -421,7 +482,8 @@ router.post("/chat", async (req, res) => {
     }, { timeout: 45_000 });
 
     const raw = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response. Please try again.";
-    const { cleanText, memoryActions, goalActions } = parseMarkers(raw);
+    const { cleanText, memoryActions: rawMemActions, goalActions } = parseMarkers(raw);
+    const memoryActions = inferMissingMemoryActions(validated.message, rawMemActions, validated.memoryMode);
     const { reply, suggestions } = parseSuggestions(cleanText);
 
     res.json({ reply, suggestions, memoryActions, goalActions });
@@ -482,7 +544,10 @@ router.post("/chat/stream", async (req, res) => {
     }
 
     clearTimeout(requestTimeout);
-    const { cleanText, memoryActions, goalActions } = parseMarkers(fullText);
+    console.log("[STREAM RAW]", fullText.slice(-500));
+    const { cleanText, memoryActions: rawMemActions, goalActions } = parseMarkers(fullText);
+    const memoryActions = inferMissingMemoryActions(validated.message, rawMemActions, validated.memoryMode);
+    console.log("[STREAM PARSED] memoryActions:", JSON.stringify(memoryActions), "goalActions:", JSON.stringify(goalActions));
     const { reply, suggestions } = parseSuggestions(cleanText);
     res.write(`data: ${JSON.stringify({ type: "done", reply, suggestions, memoryActions, goalActions })}\n\n`);
     res.end();
