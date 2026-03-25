@@ -271,17 +271,21 @@ export function WelcomeEntry() {
               </span>
             </div>
 
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 100,
-              border: `0.75px solid ${V.surfaceEdge}`,
-              backgroundColor: '#f0eeeb',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
+            <div
+              onClick={() => setShowIncognito(false)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 100,
+                border: `0.75px solid ${V.surfaceEdge}`,
+                backgroundColor: '#f0eeeb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                cursor: 'pointer',
+              }}
+            >
               <GlyphHideStroke size={14.5} color={V.contentPrimary} />
             </div>
           </div>
