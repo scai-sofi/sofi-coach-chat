@@ -478,7 +478,7 @@ The memory system operates in three tiers based on **who initiates** and **how s
 
 **Key rule:** Sensitivity overrides objectivity — a verifiable fact that is high-stakes (e.g., home address, medical info) uses Tier 2 (propose), not Tier 1 (auto-save).
 
-**Member 360 conflict:** When a Tier 1 auto-save for `ABOUT_ME` contradicts the SoFi profile, it escalates to a Member360ConflictCard (Tier 1→2 hybrid) with "Use what I said" / "Keep profile" resolution.
+**Member 360 conflict:** When a Tier 1 auto-save for `ABOUT_ME` contradicts the SoFi profile, it escalates to a Member360ConflictCard (Tier 1→2 hybrid) prompting "Update your profile to [value]?" with Update / Not now buttons.
 
 **MEMORY_UPDATE** corrects previously stored facts regardless of originating tier.
 
@@ -489,7 +489,7 @@ All proposal cards share a unified visual language.
 | Component | Background | Border | Radius | Icon | Body Text | Detail Text | Buttons |
 |---|---|---|---|---|---|---|---|
 | MemoryProposalCard (Tier 2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` | — | Remember / Not now |
-| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w500` (quote: `w400`) | Use what I said / Keep profile |
+| Member360ConflictCard (Tier 1→2) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.memory, size: 12)`, secondary | 12 `w500` `ls: 0.1` — "Update your profile to [value]?" | — | Update / Not now |
 | GoalProposalCard | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `Icon(Icons.gps_fixed, size: 12)`, secondary | 12 `w500` `ls: 0.1` | 12 `w400` secondary | Set up goal / Just chatting |
 | Confirmed (check) | surfaceTint | `Border.all(width: 1, color: surfaceEdgeLight)` | 16 | `CustomPaint` checkmark 12×12, bone600 | 12 `w500` `ls: 0.1` (secondary or primary) | — | — |
 

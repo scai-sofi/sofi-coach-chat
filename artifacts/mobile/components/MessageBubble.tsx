@@ -391,10 +391,8 @@ function Member360ConflictCard({ message }: { message: Message }) {
 
   if (conflict.resolved) {
     const resolvedLabel = conflict.resolved === 'user'
-      ? 'Updated with your info'
-      : conflict.resolved === 'profile'
-        ? 'Kept profile info'
-        : 'Skipped';
+      ? 'Profile updated'
+      : 'Skipped';
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
         <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
@@ -409,30 +407,22 @@ function Member360ConflictCard({ message }: { message: Message }) {
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
-        <View style={styles.proposalContentWrap}>
-          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
-            This differs from your SoFi profile
-          </Text>
-          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
-            You said: <Text style={styles.proposalQuote}>"{conflict.userValue}"</Text>
-          </Text>
-          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
-            Profile: <Text style={styles.proposalQuote}>"{conflict.profileValue}"</Text>
-          </Text>
-        </View>
+        <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
+          Update your profile to <Text style={styles.proposalQuote}>"{conflict.userValue}"</Text>?
+        </Text>
       </View>
       <View style={styles.proposalButtonsIndented}>
         <Pressable
           style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]}
           onPress={() => resolveMember360Conflict(message.id, 'user')}
         >
-          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Use what I said</Text>
+          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Update</Text>
         </Pressable>
         <Pressable
           style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]}
           onPress={() => resolveMember360Conflict(message.id, 'profile')}
         >
-          <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Keep profile</Text>
+          <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
     </View>

@@ -339,7 +339,7 @@ interface Milestone {
 - Member corrects a previously stored fact ("Actually, I make $130k now") → Coach finds best-matching active memory and replaces content → "Memory updated" chip shown inline
 
 **Member 360 conflict escalation:**
-- Tier 1 auto-save for `ABOUT_ME` contradicts SoFi profile data → escalates to a Member360ConflictCard showing both values → "Use what I said" / "Keep profile" resolution
+- Tier 1 auto-save for `ABOUT_ME` contradicts SoFi profile data → escalates to a Member360ConflictCard prompting "Update your profile to [value]?" → Update / Not now
 
 **Memory management:**
 - **Full disclosure** — Memory Center shows all memories grouped by category, each with source label ("AI inferred" or "You created") and date
