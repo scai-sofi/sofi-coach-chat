@@ -12,7 +12,8 @@ export function InputBar() {
   const [keyboardUp, setKeyboardUp] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const insets = useSafeAreaInsets();
-  const { sendMessage, isTyping, setInputFocused } = useCoach();
+  const { sendMessage, isTyping, setInputFocused, messages } = useCoach();
+  const hasActiveChat = messages.length > 0;
 
   useEffect(() => {
     if (isTyping) {
@@ -68,14 +69,16 @@ export function InputBar() {
           ) : null}
         </View>
       </View>
-      <View style={styles.disclaimer}>
-        <Text style={[styles.disclaimerText, { color: colors.contentSecondary }]}>
-          AI can make mistakes.{' '}
-          <Text style={styles.disclaimerLink}>Learn more</Text>
-          {'   '}
-          <Text style={styles.disclaimerLink}>Privacy policy</Text>
-        </Text>
-      </View>
+      {!hasActiveChat && (
+        <View style={styles.disclaimer}>
+          <Text style={[styles.disclaimerText, { color: colors.contentSecondary }]}>
+            AI can make mistakes.{' '}
+            <Text style={styles.disclaimerLink}>Learn more</Text>
+            {'   '}
+            <Text style={styles.disclaimerLink}>Privacy policy</Text>
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
