@@ -239,12 +239,13 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       width: '100%',
-      minHeight: '100vh',
+      height: '100vh',
       backgroundColor: V.surfaceBase,
       fontFamily: "'TTNorms', -apple-system, BlinkMacSystemFont, sans-serif",
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
+      overflow: 'hidden',
     }}>
       {children}
     </div>
