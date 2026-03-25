@@ -383,6 +383,62 @@ function MemoryProposalCard({ message }: { message: Message }) {
   );
 }
 
+function Member360ConflictCard({ message }: { message: Message }) {
+  const { colors } = useTheme();
+  const { resolveMember360Conflict } = useCoach();
+  const conflict = message.member360Conflict;
+  if (!conflict) return null;
+
+  if (conflict.resolved) {
+    const resolvedLabel = conflict.resolved === 'user'
+      ? 'Updated with your info'
+      : conflict.resolved === 'profile'
+        ? 'Kept profile info'
+        : 'Skipped';
+    return (
+      <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
+        <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+          <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
+        <Text style={[styles.confirmedText, { color: colors.contentSecondary }]}>{resolvedLabel}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
+      <View style={styles.proposalHeader}>
+        <Feather name="alert-circle" size={14} color={colors.warningDark || '#B45309'} style={styles.proposalIcon} />
+        <View style={styles.proposalContentWrap}>
+          <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
+            This differs from your SoFi profile
+          </Text>
+          <Text style={[styles.conflictDetail, { color: colors.contentSecondary }]}>
+            You said: <Text style={styles.conflictValue}>"{conflict.userValue}"</Text>
+          </Text>
+          <Text style={[styles.conflictDetail, { color: colors.contentSecondary }]}>
+            Profile: <Text style={styles.conflictValue}>"{conflict.profileValue}"</Text>
+          </Text>
+        </View>
+      </View>
+      <View style={styles.proposalButtonsIndented}>
+        <Pressable
+          style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]}
+          onPress={() => resolveMember360Conflict(message.id, 'user')}
+        >
+          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Use what I said</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]}
+          onPress={() => resolveMember360Conflict(message.id, 'profile')}
+        >
+          <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Keep profile</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 function GoalProposalCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { confirmGoal, dismissGoalProposal } = useCoach();
@@ -629,6 +685,15 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
           <MemoryProposalCard message={message} />
         )
       )}
+      {!streaming && message.member360Conflict && (
+        animate ? (
+          <FadeInView delay={100} duration={300}>
+            <Member360ConflictCard message={message} />
+          </FadeInView>
+        ) : (
+          <Member360ConflictCard message={message} />
+        )
+      )}
       {!streaming && message.goalProposal && (
         animate ? (
           <FadeInView delay={100} duration={300}>
@@ -709,6 +774,8 @@ const styles = StyleSheet.create({
   proposalText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18, flex: 1 },
   proposalQuote: { fontFamily: Fonts.regular },
   proposalDetail: { fontSize: 12, fontFamily: Fonts.regular, marginTop: 2, lineHeight: 16 },
+  conflictDetail: { fontSize: 12, fontFamily: Fonts.regular, marginTop: 4, lineHeight: 16 },
+  conflictValue: { fontFamily: Fonts.medium },
   proposalButtons: { flexDirection: 'row', gap: 8 },
   proposalButtonsIndented: { flexDirection: 'row', gap: 8, marginLeft: 22 },
   confirmBtn: {

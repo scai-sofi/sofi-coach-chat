@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone, GoalProposal } from '@/constants/types';
+import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone, GoalProposal, Member360Conflict } from '@/constants/types';
+import { detectMember360Conflict } from '@/constants/member360';
 import { SCENARIOS } from '@/constants/scenarios';
 import { generateAIResponse } from '@/constants/aiResponse';
 
@@ -69,6 +70,7 @@ interface CoachContextType extends CoachState {
   deleteSession: (id: string) => void;
   highlightedMemoryId: string | null;
   navigateToMemory: (memoryIds: string[]) => void;
+  resolveMember360Conflict: (messageId: string, resolution: 'user' | 'profile' | 'dismissed') => void;
 }
 
 const CoachContext = createContext<CoachContextType | null>(null);
@@ -284,6 +286,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     chips?: MessageChip[];
     memoryProposal?: Message['memoryProposal'];
     goalProposal?: Message['goalProposal'];
+    member360Conflict?: Message['member360Conflict'];
   };
 
   const applyMemoryAndGoalActions = useCallback((
@@ -296,6 +299,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     const updatedMemoryIds: string[] = [];
     let prioritiesProposal: MemoryProposal | undefined;
     let otherProposal: MemoryProposal | undefined;
+    let member360Conflict: Member360Conflict | undefined;
 
     if (currentMode !== 'off' && memActions && memActions.length > 0) {
       for (const action of memActions) {
@@ -351,11 +355,21 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
             });
           }
         } else if (action.type === 'save') {
-          newMemories.push({
-            id: uid(), category, content: action.content,
-            source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
-            createdAt: new Date(), updatedAt: new Date(),
-          });
+          const conflict = detectMember360Conflict(action.content, category);
+          if (conflict && !member360Conflict) {
+            member360Conflict = {
+              id: uid(),
+              field: conflict.field,
+              userValue: action.content,
+              profileValue: conflict.profileValue,
+            };
+          } else {
+            newMemories.push({
+              id: uid(), category, content: action.content,
+              source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE',
+              createdAt: new Date(), updatedAt: new Date(),
+            });
+          }
         }
       }
     }
@@ -428,6 +442,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       if (proposal) {
         result.memoryProposal = proposal;
       }
+    }
+
+    if (member360Conflict) {
+      result.member360Conflict = member360Conflict;
     }
 
     return result;
@@ -963,6 +981,39 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const resolveMember360Conflict = useCallback((messageId: string, resolution: 'user' | 'profile' | 'dismissed') => {
+    setMessages(prev => prev.map(m => {
+      if (m.id !== messageId || !m.member360Conflict) return m;
+      const conflict = m.member360Conflict;
+
+      if (resolution === 'user') {
+        const mem: Memory = {
+          id: uid(),
+          category: 'ABOUT_ME',
+          content: conflict.userValue,
+          source: 'IMPLICIT_CONFIRMED',
+          status: 'ACTIVE',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        setMemories(prev2 => [...prev2, mem]);
+      } else if (resolution === 'profile') {
+        const mem: Memory = {
+          id: uid(),
+          category: 'ABOUT_ME',
+          content: conflict.profileValue,
+          source: 'MEMBER_360',
+          status: 'ACTIVE',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        setMemories(prev2 => [...prev2, mem]);
+      }
+
+      return { ...m, member360Conflict: { ...conflict, resolved: resolution } };
+    }));
+  }, []);
+
   const confirmGoal = useCallback((messageId: string) => {
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.goalProposal) return m;
@@ -1110,7 +1161,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptDraftGoal, dismissDraftGoal,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
-      saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory,
+      saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory, resolveMember360Conflict,
     }}>
       {children}
     </CoachContext.Provider>

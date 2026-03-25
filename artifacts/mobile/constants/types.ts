@@ -1,5 +1,5 @@
 export type MemoryCategory = 'ABOUT_ME' | 'PREFERENCES' | 'PRIORITIES';
-export type MemorySource = 'EXPLICIT' | 'IMPLICIT_CONFIRMED';
+export type MemorySource = 'EXPLICIT' | 'IMPLICIT_CONFIRMED' | 'MEMBER_360';
 export type MemoryStatus = 'ACTIVE' | 'PAUSED' | 'DELETED';
 export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CUSTOM';
 export type GoalStatus = 'DRAFT' | 'ACTIVE' | 'ON_TRACK' | 'AT_RISK' | 'PAUSED' | 'COMPLETED';
@@ -57,6 +57,14 @@ export interface AutoUpdateGoal {
   currentAmount?: number;
 }
 
+export interface Member360Conflict {
+  id: string;
+  field: string;
+  userValue: string;
+  profileValue: string;
+  resolved?: 'user' | 'profile' | 'dismissed';
+}
+
 export interface Message {
   id: string;
   role: 'user' | 'ai' | 'system';
@@ -65,6 +73,7 @@ export interface Message {
   chips?: MessageChip[];
   memoryProposal?: MemoryProposal;
   goalProposal?: GoalProposal;
+  member360Conflict?: Member360Conflict;
   autoSaveMemory?: AutoSaveMemory;
   autoCreateGoal?: AutoCreateGoal;
   autoUpdateGoal?: AutoUpdateGoal;
