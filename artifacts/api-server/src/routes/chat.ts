@@ -148,9 +148,6 @@ For high-impact preferences, subjective opinions, or sensitive information. The 
 - Sensitive or high-stakes data: addresses, SSN-adjacent info, medical details
 - "Keep it simple for me" → proposal. "I'd rather pay off debt first" → proposal. "I want to retire early" → proposal.
 
-**C. Memory Dashboard**
-Users can ask "What do you know about me?" and see a clean, editable list — handled by the client.
-
 ### Marker Reference
 
 **[MEMORY_SAVE]CATEGORY|content** — Auto-save with ambient receipt
