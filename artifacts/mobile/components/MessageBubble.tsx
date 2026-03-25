@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
     marginTop: 8, marginBottom: 4, paddingLeft: 2,
   },
   approvalHintText: {
-    fontSize: 11, fontFamily: Fonts.medium, lineHeight: 14,
+    fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16,
   },
   actionRow: {
     flexDirection: 'row', alignItems: 'center', gap: 16,
