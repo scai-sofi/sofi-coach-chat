@@ -8,6 +8,7 @@ import { Fonts } from '@/constants/fonts';
 import { Message, MessageChip, SafetyTier } from '@/constants/types';
 import { useCoach } from '@/context/CoachContext';
 import { useToast } from '@/components/Toast';
+import { FlipIcon } from '@/components/icons';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 type IconName = FeatherIconName | 'brain';
@@ -694,15 +695,19 @@ function ActionFooter({ message }: { message: Message }) {
     <View>
       <View style={styles.actionRow}>
         <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
-          {copied ? (
-            <View style={styles.actionIconWrap}>
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
-              </Svg>
-            </View>
-          ) : (
-            <Image source={iconCopy} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
-          )}
+          <FlipIcon
+            front={<Image source={iconCopy} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />}
+            back={
+              <View style={styles.actionIconWrap}>
+                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                  <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
+                </Svg>
+              </View>
+            }
+            flipped={copied}
+            size={20}
+            duration={350}
+          />
         </Pressable>
         <Pressable style={styles.actionBtn} onPress={() => setThumbUp(!thumbUp)}>
           <Image source={thumbUp ? iconThumbsUpFilled : iconThumbsUp} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
