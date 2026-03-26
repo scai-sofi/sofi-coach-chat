@@ -411,15 +411,15 @@ function MorphingProposalCard({
           timerRef.current = setTimeout(() => {
             if (!mountedRef.current) return;
             RNAnimated.parallel([
-              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 200, useNativeDriver: false }),
-              RNAnimated.timing(checkScale, { toValue: 0.8, duration: 200, useNativeDriver: false }),
-              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 250, delay: 60, useNativeDriver: false }),
-              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 220, delay: 100, useNativeDriver: false }),
+              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+              RNAnimated.timing(checkScale, { toValue: 0.85, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 400, delay: 150, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 350, delay: 250, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
             ]).start(() => {
               if (!mountedRef.current) return;
               setPhase('done');
             });
-          }, 3000);
+          }, 1200);
         });
       });
     }
