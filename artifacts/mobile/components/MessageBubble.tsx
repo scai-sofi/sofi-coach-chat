@@ -802,29 +802,15 @@ function CopyButton({ color }: { color: string }) {
   );
 }
 
-function ActionFooter({ message, animate = false }: { message: Message; animate?: boolean }) {
+function ActionFooter({ message }: { message: Message }) {
   const { colors } = useTheme();
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
 
-  const rowOpacity = useRef(new RNAnimated.Value(animate ? 0 : 1)).current;
-  const rowSlide = useRef(new RNAnimated.Value(animate ? 6 : 0)).current;
-
-  useEffect(() => {
-    if (!animate) return;
-    const timer = setTimeout(() => {
-      RNAnimated.parallel([
-        RNAnimated.timing(rowOpacity, { toValue: 1, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-        RNAnimated.timing(rowSlide, { toValue: 0, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      ]).start();
-    }, 80);
-    return () => clearTimeout(timer);
-  }, [animate, rowOpacity, rowSlide]);
-
   return (
     <View>
-      <RNAnimated.View style={[styles.actionRow, { opacity: rowOpacity, transform: [{ translateY: rowSlide }] }]}>
+      <View style={styles.actionRow}>
         <CopyButton color={colors.contentBone600} />
         <ReactionButton
           active={thumbUp}
@@ -848,7 +834,7 @@ function ActionFooter({ message, animate = false }: { message: Message; animate?
             <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={colors.contentSecondary} />
           </Pressable>
         )}
-      </RNAnimated.View>
+      </View>
       {showProvenance && message.provenance && (
         <View style={[styles.provenanceCard, { backgroundColor: colors.surfaceTint }]}>
           <Text style={[styles.provenanceText, { color: colors.contentSecondary }]}>{message.provenance}</Text>
@@ -1018,7 +1004,7 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       )}
 
       {!streaming && (
-        <ActionFooter message={message} animate={animate} />
+        <ActionFooter message={message} />
       )}
 
       {!streaming && isLatest && message.suggestions && (
