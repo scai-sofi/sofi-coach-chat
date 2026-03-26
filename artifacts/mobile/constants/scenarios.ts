@@ -104,7 +104,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Nice — that's a solid foundation.**\n\nA $45,000 401k balance at your stage is great progress. That puts you ahead of the national median for your age group.\n\n**Quick Context**\n• **Current balance:** $45,000\n• **Provider:** Vanguard\n• **Typical growth at 7%:** Could become ~$200k in 20 years without adding another dollar\n• **With $500/month contributions:** Could reach ~$450k in 20 years\n\nAre you currently contributing, and do you know if your employer offers a match?",
           timestamp: new Date(now.getTime() - 410000),
-          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+          chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-mi-1'] }],
           suggestions: ["Yes, I get a 4% match", "I'm not sure about my match", "How much should I contribute?"],
         },
         { id: uid(), role: 'user', content: "I'd rather focus on paying off debt before investing more", timestamp: new Date(now.getTime() - 360000) },
@@ -118,7 +118,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Good to know — that gives me a clearer picture.**\n\nAt $130k/year, here's a quick financial health snapshot:\n\n**Income Breakdown (estimated)**\n• **Gross monthly:** ~$10,833\n• **After taxes (est.):** ~$7,800/month\n• **Current savings rate:** ~24% based on your spending patterns\n\n**How This Compares**\nA 24% savings rate at $130k is well above average. If you can maintain that while paying off debt, you'll be in excellent shape to ramp up investing once you're debt-free.\n\n**One Thing to Watch**\nAt this income level, you might be close to the Roth IRA income limit ($161k for single filers). Something to keep in mind as your income grows — I can help you plan around that when the time comes.",
           timestamp: new Date(now.getTime() - 290000),
-          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+          chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-mi-2'] }],
           member360Conflict: {
             id: uid(),
             field: 'Annual income',
@@ -131,13 +131,14 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.",
           timestamp: new Date(now.getTime() - 230000),
-          chips: [{ type: 'memory-updated', label: 'Memory updated' }],
+          chips: [{ type: 'memory-updated', label: 'Memory updated', memoryIds: ['mem-2'] }],
           suggestions: ["What should I focus on first?", "Show me my spending", "How are my goals doing?"],
         },
       ],
       memories: [
         ...SHARED_MEMORIES,
         { id: 'mem-mi-1', category: 'ABOUT_ME', content: 'Has 401k at Vanguard with $45,000 balance', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
+        { id: 'mem-mi-2', category: 'ABOUT_ME', content: 'Annual income is $130,000', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
         { id: 'mem-manual-1', category: 'PRIORITIES', content: 'Saving for a home down payment by 2028', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(3), updatedAt: daysAgo(3) },
       ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
@@ -153,7 +154,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Credit Card Payoff Plan**\n\nLet's get a plan together. Here's your current situation:\n\n**Your Card Details**\n• **Balance:** $4,200\n• **Interest rate:** 22.99% APR\n• **Minimum payment:** $84/month\n• **Daily interest accruing:** ~$2.64\n\n**The Cost of Minimum Payments**\nAt $84/month, you'd be paying for 7+ years and spend over $3,100 in interest — nearly doubling what you owe. Every month you accelerate saves you real money.\n\n**Option A — Aggressive (6 months)**\n• **Monthly payment:** $720\n• **Paid off by:** July\n• **Total interest paid:** ~$400\n• **Interest saved vs. minimum:** ~$2,800\n• **Impact on budget:** Leaves $800/month from your surplus\n\n**Option B — Balanced (12 months)**\n• **Monthly payment:** $380\n• **Paid off by:** January\n• **Total interest paid:** ~$700\n• **Interest saved vs. minimum:** ~$2,400\n• **Impact on budget:** Leaves $1,140/month from your surplus\n\n**My Take**\nOption A saves you $400 more in interest, but Option B gives you significantly more breathing room each month. Given your wedding savings coming up, the balanced approach might be the smarter play.\n\nWhich feels more doable for your monthly budget?",
           timestamp: new Date(now.getTime() - 60000),
-          chips: [{ type: 'memory-saved', label: 'Saved to memory' }],
+          chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-gd-1'] }],
           autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
           memoryProposal: { id: uid(), content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES' },
           safetyTier: 'actionable',
