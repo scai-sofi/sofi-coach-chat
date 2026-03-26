@@ -355,10 +355,8 @@ function MemoryProposalCard({ message }: { message: Message }) {
   if (proposal.confirmed) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-          <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-        <Text style={[styles.confirmedText, { color: colors.contentSecondary }]}>Saved to memory</Text>
+        <Feather name="cpu" size={12} color={colors.contentPrimary} />
+        <Text style={[styles.confirmedText, { color: colors.contentPrimary }]}>Saved to memory</Text>
       </View>
     );
   }
@@ -395,10 +393,8 @@ function Member360ConflictCard({ message }: { message: Message }) {
       : 'Skipped';
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-          <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-        <Text style={[styles.confirmedText, { color: colors.contentSecondary }]}>{resolvedLabel}</Text>
+        <Feather name="cpu" size={12} color={colors.contentPrimary} />
+        <Text style={[styles.confirmedText, { color: colors.contentPrimary }]}>{resolvedLabel}</Text>
       </View>
     );
   }
@@ -438,10 +434,8 @@ function GoalProposalCard({ message }: { message: Message }) {
   if (proposal.confirmed) {
     return (
       <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-          <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-        <Text style={[styles.confirmedTextPrimary, { color: colors.contentPrimary }]}>Goal created — check your goals panel</Text>
+        <Feather name="cpu" size={12} color={colors.contentPrimary} />
+        <Text style={[styles.confirmedText, { color: colors.contentPrimary }]}>Goal created — check your goals panel</Text>
       </View>
     );
   }
@@ -757,7 +751,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 8,
   },
   confirmedText: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
-  confirmedTextPrimary: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginBottom: 10 },
   proposalIcon: { marginTop: 2 },
   proposalContentWrap: { flex: 1 },
