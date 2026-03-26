@@ -1,5 +1,6 @@
 import React, { ComponentProps } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
@@ -12,10 +13,22 @@ import { AppBar } from '@/components/AppBar';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
+function BrainIcon({ size = 14, color = '#000' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M12 18v4" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+const BRAIN_ICON_KEY = 'brain';
+
 const ICON_MAP: Record<string, FeatherIconName> = {
   'sparkles': 'star',
   'user-check': 'user-check',
-  'brain': 'cpu',
   'target': 'target',
   'alert-triangle': 'alert-triangle',
   'party-popper': 'award',
@@ -95,7 +108,9 @@ export function ScenarioSwitcher() {
           >
             {orderedScenarios.map(scenario => {
               const isActive = activeScenario === scenario.id;
+              const isBrain = scenario.icon === BRAIN_ICON_KEY;
               const iconName: FeatherIconName = ICON_MAP[scenario.icon] || 'message-circle';
+              const iconColor = isActive ? colors.contentPrimaryInverse : colors.contentPrimary;
 
               return (
                 <Pressable
@@ -104,7 +119,10 @@ export function ScenarioSwitcher() {
                   onPress={() => { switchScenario(scenario.id); setActivePanel('none'); }}
                 >
                   <View style={[styles.iconWrap, { backgroundColor: colors.surfaceTint }, isActive && { backgroundColor: colors.inverseAlpha20 }]}>
-                    <Feather name={iconName} size={14} color={isActive ? colors.contentPrimaryInverse : colors.contentPrimary} />
+                    {isBrain
+                      ? <BrainIcon size={14} color={iconColor} />
+                      : <Feather name={iconName} size={14} color={iconColor} />
+                    }
                   </View>
                   <View style={styles.rowContent}>
                     <View style={styles.rowTitleRow}>

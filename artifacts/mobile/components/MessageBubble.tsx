@@ -10,11 +10,28 @@ import { useCoach } from '@/context/CoachContext';
 import { useToast } from '@/components/Toast';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
+type IconName = FeatherIconName | 'brain';
 
-function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string; icon: FeatherIconName }> {
+function BrainIcon({ size = 12, color = '#000', strokeWidth = 2 }: { size?: number; color?: string; strokeWidth?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M12 18v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function AppIcon({ name, size = 12, color = '#000', style }: { name: IconName; size?: number; color?: string; style?: any }) {
+  if (name === 'brain') return <BrainIcon size={size} color={color} strokeWidth={2} />;
+  return <Feather name={name} size={size} color={color} style={style} />;
+}
+
+function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string; icon: IconName }> {
   return {
-    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
-    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
+    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'brain' },
+    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'brain' },
     'conflict-resolved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'user' },
     'goal-created': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-progress': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
@@ -313,7 +330,7 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
 
   const chipContent = (
     <>
-      <Feather name={style.icon} size={12} color={style.color} />
+      <AppIcon name={style.icon} size={12} color={style.color} />
       <Text style={[styles.chipText, { color: style.color }]}>{chip.label}</Text>
       <Feather name="chevron-right" size={12} color={style.color} />
     </>
@@ -360,7 +377,7 @@ function MorphingProposalCard({
 }: {
   isExiting: boolean;
   confirmedLabel: string;
-  finalIcon: FeatherIconName;
+  finalIcon: IconName;
   memoryIds?: string[];
   children: React.ReactNode;
 }) {
@@ -462,7 +479,7 @@ function MorphingProposalCard({
           </Svg>
         </RNAnimated.View>
         <RNAnimated.View style={{ position: 'absolute', opacity: iconOpacity }}>
-          <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
+          <AppIcon name={finalIcon} size={12} color={colors.contentPrimary} />
         </RNAnimated.View>
       </View>
       <RNAnimated.View style={{ opacity: labelOpacity, transform: [{ translateX: labelSlide }] }}>
@@ -526,11 +543,11 @@ function MemoryProposalCard({ message }: { message: Message }) {
     <MorphingProposalCard
       isExiting={isExiting}
       confirmedLabel={exitLabel}
-      finalIcon="cpu"
+      finalIcon="brain"
       memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
     >
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
+        <View style={styles.proposalIcon}><BrainIcon size={12} color={colors.contentPrimary} /></View>
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
