@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef, ComponentProps } from 'react';
 import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Easing, Keyboard } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
-import ReAnimated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
+import ReAnimated, {
+  FadeIn, FadeOut, LinearTransition,
+  useSharedValue, useAnimatedStyle, withTiming, withDelay, Easing as REasing,
+} from 'react-native-reanimated';
 import { useTheme } from '@/context/ThemeContext';
 import type { AppTheme } from '@/constants/theme';
 import { Fonts } from '@/constants/fonts';
@@ -372,11 +375,19 @@ function MorphingProposalCard({
   const { showToast } = useToast();
 
   const [collapsed, setCollapsed] = useState(false);
-  const [showFinalIcon, setShowFinalIcon] = useState(false);
+  const [iconPhase, setIconPhase] = useState<'none' | 'done'>('none');
   const prevExiting = useRef(false);
   const mountedRef = useRef(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number | null>(null);
+
+  const checkOpacity = useSharedValue(1);
+  const iconOpacity = useSharedValue(0);
+  const chevronOpacity = useSharedValue(0);
+
+  const checkStyle = useAnimatedStyle(() => ({ opacity: checkOpacity.value }));
+  const iconStyle = useAnimatedStyle(() => ({ opacity: iconOpacity.value }));
+  const chevronStyle = useAnimatedStyle(() => ({ opacity: chevronOpacity.value }));
 
   useEffect(() => {
     return () => {
@@ -396,7 +407,12 @@ function MorphingProposalCard({
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
         if (!mountedRef.current) return;
-        setShowFinalIcon(true);
+        checkOpacity.value = withTiming(0, { duration: 280, easing: REasing.out(REasing.cubic) });
+        iconOpacity.value = withDelay(120, withTiming(1, { duration: 280, easing: REasing.out(REasing.cubic) }));
+        chevronOpacity.value = withDelay(200, withTiming(1, { duration: 250, easing: REasing.out(REasing.cubic) }));
+        setTimeout(() => {
+          if (mountedRef.current) setIconPhase('done');
+        }, 560);
       }, 900);
     }
     prevExiting.current = isExiting;
@@ -412,7 +428,7 @@ function MorphingProposalCard({
     }
   };
 
-  const isDone = collapsed && showFinalIcon;
+  const isDone = iconPhase === 'done';
 
   const chipRow = (
     <ReAnimated.View
@@ -420,35 +436,21 @@ function MorphingProposalCard({
       style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
     >
       <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center' }}>
-        {!showFinalIcon ? (
-          <ReAnimated.View
-            key="check"
-            entering={FadeIn.springify().damping(14).stiffness(120)}
-            exiting={FadeOut.duration(150)}
-            style={{ position: 'absolute' }}
-          >
-            <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-              <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-            </Svg>
-          </ReAnimated.View>
-        ) : (
-          <ReAnimated.View
-            key="icon"
-            entering={FadeIn.duration(200)}
-            style={{ position: 'absolute' }}
-          >
-            <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
-          </ReAnimated.View>
-        )}
+        <ReAnimated.View style={[{ position: 'absolute' }, checkStyle]}>
+          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+            <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </ReAnimated.View>
+        <ReAnimated.View style={[{ position: 'absolute' }, iconStyle]}>
+          <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
+        </ReAnimated.View>
       </View>
       <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
         {confirmedLabel}
       </Text>
-      {showFinalIcon && (
-        <ReAnimated.View entering={FadeIn.duration(200).delay(60)}>
-          <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
-        </ReAnimated.View>
-      )}
+      <ReAnimated.View style={chevronStyle}>
+        <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+      </ReAnimated.View>
     </ReAnimated.View>
   );
 
