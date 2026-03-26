@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, ComponentProps } from 'react';
-import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback, ComponentProps } from 'react';
+import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard, LayoutAnimation, Platform, UIManager } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -350,13 +350,41 @@ function SafetyBadge({ tier }: { tier: SafetyTier }) {
   );
 }
 
+function useExitAnimation(isExiting: boolean) {
+  const opacity = useRef(new RNAnimated.Value(1)).current;
+  const scale = useRef(new RNAnimated.Value(1)).current;
+  const height = useRef(new RNAnimated.Value(1)).current;
+  const [gone, setGone] = useState(false);
+  const prevExiting = useRef(false);
+
+  useEffect(() => {
+    if (isExiting && !prevExiting.current) {
+      RNAnimated.parallel([
+        RNAnimated.timing(opacity, { toValue: 0, duration: 220, useNativeDriver: false }),
+        RNAnimated.spring(scale, { toValue: 0.92, tension: 180, friction: 16, useNativeDriver: false }),
+      ]).start();
+      RNAnimated.timing(height, { toValue: 0, duration: 280, delay: 80, useNativeDriver: false }).start(() => {
+        setGone(true);
+      });
+    }
+    prevExiting.current = isExiting;
+  }, [isExiting, opacity, scale, height]);
+
+  return { opacity, scale, height, gone };
+}
+
 function MemoryProposalCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { confirmMemory, dismissMemoryProposal } = useCoach();
   const proposal = message.memoryProposal;
-  if (!proposal || proposal.confirmed) return null;
+  if (!proposal) return null;
 
-  return (
+  const isConfirmed = proposal.confirmed === true;
+  const { opacity, scale, height, gone } = useExitAnimation(isConfirmed);
+
+  if (gone) return null;
+
+  const cardContent = (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
@@ -365,14 +393,27 @@ function MemoryProposalCard({ message }: { message: Message }) {
         </Text>
       </View>
       <View style={styles.proposalButtonsIndented}>
-        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemory(message.id)}>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemory(message.id)} disabled={isConfirmed}>
           <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Remember</Text>
         </Pressable>
-        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryProposal(message.id)}>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryProposal(message.id)} disabled={isConfirmed}>
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
     </View>
+  );
+
+  if (!isConfirmed) return cardContent;
+
+  return (
+    <RNAnimated.View style={{
+      opacity,
+      transform: [{ scale }],
+      maxHeight: height.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }),
+      overflow: 'hidden',
+    }}>
+      {cardContent}
+    </RNAnimated.View>
   );
 }
 
@@ -380,9 +421,14 @@ function Member360ConflictCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { resolveMember360Conflict } = useCoach();
   const conflict = message.member360Conflict;
-  if (!conflict || conflict.resolved) return null;
+  if (!conflict) return null;
 
-  return (
+  const isResolved = !!conflict.resolved;
+  const { opacity, scale, height, gone } = useExitAnimation(isResolved);
+
+  if (gone) return null;
+
+  const cardContent = (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
@@ -394,17 +440,32 @@ function Member360ConflictCard({ message }: { message: Message }) {
         <Pressable
           style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]}
           onPress={() => resolveMember360Conflict(message.id, 'user')}
+          disabled={isResolved}
         >
           <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Update</Text>
         </Pressable>
         <Pressable
           style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]}
           onPress={() => resolveMember360Conflict(message.id, 'profile')}
+          disabled={isResolved}
         >
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
     </View>
+  );
+
+  if (!isResolved) return cardContent;
+
+  return (
+    <RNAnimated.View style={{
+      opacity,
+      transform: [{ scale }],
+      maxHeight: height.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }),
+      overflow: 'hidden',
+    }}>
+      {cardContent}
+    </RNAnimated.View>
   );
 }
 
@@ -412,11 +473,17 @@ function GoalProposalCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { confirmGoal, dismissGoalProposal } = useCoach();
   const proposal = message.goalProposal;
-  if (!proposal || proposal.confirmed) return null;
+  if (!proposal) return null;
+
+  const isConfirmed = proposal.confirmed === true;
+  const { opacity, scale, height, gone } = useExitAnimation(isConfirmed);
+
+  if (gone) return null;
 
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const showApproval = message.safetyTier === 'actionable';
-  return (
+
+  const cardContent = (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
       <View style={styles.proposalHeader}>
         <Feather name="target" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
@@ -434,14 +501,27 @@ function GoalProposalCard({ message }: { message: Message }) {
         </View>
       )}
       <View style={styles.proposalButtons}>
-        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmGoal(message.id)}>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmGoal(message.id)} disabled={isConfirmed}>
           <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
         </Pressable>
-        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissGoalProposal(message.id)}>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissGoalProposal(message.id)} disabled={isConfirmed}>
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Just chatting</Text>
         </Pressable>
       </View>
     </View>
+  );
+
+  if (!isConfirmed) return cardContent;
+
+  return (
+    <RNAnimated.View style={{
+      opacity,
+      transform: [{ scale }],
+      maxHeight: height.interpolate({ inputRange: [0, 1], outputRange: [0, 300] }),
+      overflow: 'hidden',
+    }}>
+      {cardContent}
+    </RNAnimated.View>
   );
 }
 
@@ -645,11 +725,13 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   const allChips = message.chips ?? [];
   const topChips = allChips.filter(c => !BOTTOM_CHIP_TYPES.has(c.type));
   const confirmedChips = !streaming ? getConfirmedChips(message) : [];
+  const prevConfirmedCount = useRef(confirmedChips.length);
+  const hasNewConfirmed = confirmedChips.length > prevConfirmedCount.current;
+  useEffect(() => { prevConfirmedCount.current = confirmedChips.length; }, [confirmedChips.length]);
   const existingBottomKeys = new Set(allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)).map(c => `${c.type}::${c.label}`));
-  const bottomChips = [
-    ...allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)),
-    ...confirmedChips.filter(c => !existingBottomKeys.has(`${c.type}::${c.label}`)),
-  ];
+  const dataChips = allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type));
+  const synthChips = confirmedChips.filter(c => !existingBottomKeys.has(`${c.type}::${c.label}`));
+  const bottomChips = [...dataChips, ...synthChips];
 
   const showSafety = !streaming && message.safetyTier && !(
     message.safetyTier === 'actionable' && message.goalProposal
@@ -694,7 +776,8 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       )}
       {bottomChips.length > 0 && !streaming && (
         <View style={styles.chipsRow}>
-          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
+          {dataChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
+          {synthChips.map((chip, i) => <ChipBadge key={`synth-${i}`} chip={chip} animate={chipAnimate || hasNewConfirmed} />)}
         </View>
       )}
 
