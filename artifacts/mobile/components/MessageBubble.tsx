@@ -419,7 +419,7 @@ function MorphingProposalCard({
               if (!mountedRef.current) return;
               setPhase('done');
             });
-          }, 1200);
+          }, 3000);
         });
       });
     }
