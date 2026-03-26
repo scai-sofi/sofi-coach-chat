@@ -502,7 +502,6 @@ function MorphingProposalCard({
         paddingHorizontal: paddingH,
         paddingVertical: paddingV,
       },
-      phase === 'morphing' && { alignSelf: 'stretch' as const },
     ]}>
       {phase === 'morphing' && (
         <RNAnimated.View style={{
