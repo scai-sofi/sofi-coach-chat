@@ -692,6 +692,12 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
           <GoalProposalCard message={message} />
         </AnimatedSlot>
       )}
+      {bottomChips.length > 0 && !streaming && (
+        <View style={styles.chipsRow}>
+          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
+        </View>
+      )}
+
       {!streaming && (
         <AnimatedSlot animate={animate} delay={200} soft>
           <ActionFooter message={message} />
@@ -702,12 +708,6 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
         <AnimatedSlot animate={animate} delay={400} duration={350}>
           <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
         </AnimatedSlot>
-      )}
-
-      {bottomChips.length > 0 && !streaming && (
-        <View style={styles.chipsRow}>
-          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
-        </View>
       )}
     </View>
   );
