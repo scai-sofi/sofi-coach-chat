@@ -645,10 +645,10 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   const allChips = message.chips ?? [];
   const topChips = allChips.filter(c => !BOTTOM_CHIP_TYPES.has(c.type));
   const confirmedChips = !streaming ? getConfirmedChips(message) : [];
-  const existingBottomLabels = new Set(allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)).map(c => c.label));
+  const existingBottomKeys = new Set(allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)).map(c => `${c.type}::${c.label}`));
   const bottomChips = [
     ...allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)),
-    ...confirmedChips.filter(c => !existingBottomLabels.has(c.label)),
+    ...confirmedChips.filter(c => !existingBottomKeys.has(`${c.type}::${c.label}`)),
   ];
 
   const showSafety = !streaming && message.safetyTier && !(
@@ -698,16 +698,16 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
         </AnimatedSlot>
       )}
 
-      {bottomChips.length > 0 && !streaming && (
-        <View style={styles.chipsRow}>
-          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
-        </View>
-      )}
-
       {!streaming && isLatest && message.suggestions && (
         <AnimatedSlot animate={animate} delay={400} duration={350}>
           <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
         </AnimatedSlot>
+      )}
+
+      {bottomChips.length > 0 && !streaming && (
+        <View style={styles.chipsRow}>
+          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
+        </View>
       )}
     </View>
   );
