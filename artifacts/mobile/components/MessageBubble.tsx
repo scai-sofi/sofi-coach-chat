@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback, ComponentProps } from 'react';
-import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard, LayoutAnimation, Platform, UIManager } from 'react-native';
+import React, { useState, useEffect, useRef, ComponentProps } from 'react';
+import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -350,42 +350,156 @@ function SafetyBadge({ tier }: { tier: SafetyTier }) {
   );
 }
 
-function useExitAnimation(isExiting: boolean) {
-  const opacity = useRef(new RNAnimated.Value(1)).current;
-  const scale = useRef(new RNAnimated.Value(1)).current;
-  const height = useRef(new RNAnimated.Value(1)).current;
-  const [gone, setGone] = useState(false);
+
+function MorphingProposalCard({
+  isExiting,
+  confirmedLabel,
+  finalIcon,
+  memoryIds,
+  children,
+}: {
+  isExiting: boolean;
+  confirmedLabel: string;
+  finalIcon: FeatherIconName;
+  memoryIds?: string[];
+  children: React.ReactNode;
+}) {
+  const { colors } = useTheme();
+  const { memories, navigateToMemory } = useCoach();
+  const { showToast } = useToast();
+
+  const morph = useRef(new RNAnimated.Value(0)).current;
+  const checkOpacity = useRef(new RNAnimated.Value(0)).current;
+  const iconOpacity = useRef(new RNAnimated.Value(0)).current;
+  const chevronOpacity = useRef(new RNAnimated.Value(0)).current;
+  const [phase, setPhase] = useState<'pending' | 'morphing' | 'check' | 'done'>('pending');
   const prevExiting = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      morph.stopAnimation();
+      checkOpacity.stopAnimation();
+      iconOpacity.stopAnimation();
+      chevronOpacity.stopAnimation();
+    };
+  }, [morph, checkOpacity, iconOpacity, chevronOpacity]);
 
   useEffect(() => {
     if (isExiting && !prevExiting.current) {
-      RNAnimated.parallel([
-        RNAnimated.timing(opacity, { toValue: 0, duration: 220, useNativeDriver: false }),
-        RNAnimated.spring(scale, { toValue: 0.92, tension: 180, friction: 16, useNativeDriver: false }),
-      ]).start();
-      RNAnimated.timing(height, { toValue: 0, duration: 280, delay: 80, useNativeDriver: false }).start(() => {
-        setGone(true);
+      setPhase('morphing');
+      RNAnimated.timing(morph, { toValue: 1, duration: 300, useNativeDriver: false }).start(() => {
+        if (!mountedRef.current) return;
+        setPhase('check');
+        RNAnimated.timing(checkOpacity, { toValue: 1, duration: 150, useNativeDriver: false }).start(() => {
+          if (!mountedRef.current) return;
+          timerRef.current = setTimeout(() => {
+            if (!mountedRef.current) return;
+            RNAnimated.parallel([
+              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
+              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 180, delay: 80, useNativeDriver: false }),
+              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 200, delay: 120, useNativeDriver: false }),
+            ]).start(() => {
+              if (!mountedRef.current) return;
+              setPhase('done');
+            });
+          }, 400);
+        });
       });
     }
     prevExiting.current = isExiting;
-  }, [isExiting, opacity, scale, height]);
+  }, [isExiting, morph, checkOpacity, iconOpacity, chevronOpacity]);
 
-  return { opacity, scale, height, gone };
+  const handleChipPress = () => {
+    if (!memoryIds || memoryIds.length === 0) return;
+    const anyAlive = memories.some(m => memoryIds.includes(m.id) && m.status !== 'DELETED');
+    if (anyAlive) {
+      navigateToMemory(memoryIds);
+    } else {
+      showToast({ message: 'This memory has been deleted.' });
+    }
+  };
+
+  if (phase === 'pending') {
+    return (
+      <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
+        {children}
+      </View>
+    );
+  }
+
+  const paddingH = morph.interpolate({ inputRange: [0, 1], outputRange: [12, 10] });
+  const paddingV = morph.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
+  const contentOpacity = morph.interpolate({ inputRange: [0, 0.3], outputRange: [1, 0], extrapolate: 'clamp' });
+  const labelOpacity = morph.interpolate({ inputRange: [0.5, 0.85], outputRange: [0, 1], extrapolate: 'clamp' });
+  const contentMaxH = morph.interpolate({ inputRange: [0, 1], outputRange: [200, 0] });
+
+  const chipContent = (
+    <>
+      <View style={{ width: 12, height: 12, justifyContent: 'center', alignItems: 'center' }}>
+        <RNAnimated.View style={{ position: 'absolute', opacity: checkOpacity }}>
+          <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
+            <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </RNAnimated.View>
+        <RNAnimated.View style={{ position: 'absolute', opacity: iconOpacity }}>
+          <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
+        </RNAnimated.View>
+      </View>
+      <RNAnimated.Text style={[styles.chipText, { color: colors.contentPrimary, opacity: labelOpacity }]}>
+        {confirmedLabel}
+      </RNAnimated.Text>
+      <RNAnimated.View style={{ opacity: chevronOpacity }}>
+        <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+      </RNAnimated.View>
+    </>
+  );
+
+  const morphCard = (
+    <RNAnimated.View style={[styles.morphCard, {
+      backgroundColor: colors.surfaceTint,
+      borderColor: colors.surfaceEdgeLight,
+      paddingHorizontal: paddingH,
+      paddingVertical: paddingV,
+    }]}>
+      <RNAnimated.View style={{ opacity: contentOpacity, maxHeight: contentMaxH, overflow: 'hidden' }}>
+        {children}
+      </RNAnimated.View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        {chipContent}
+      </View>
+    </RNAnimated.View>
+  );
+
+  if (phase === 'done' && memoryIds && memoryIds.length > 0) {
+    return (
+      <Pressable onPress={handleChipPress}>
+        {morphCard}
+      </Pressable>
+    );
+  }
+
+  return morphCard;
 }
 
 function MemoryProposalCard({ message }: { message: Message }) {
-  const { colors } = useTheme();
   const { confirmMemory, dismissMemoryProposal } = useCoach();
+  const { colors } = useTheme();
   const proposal = message.memoryProposal;
   if (!proposal) return null;
 
   const isConfirmed = proposal.confirmed === true;
-  const { opacity, scale, height, gone } = useExitAnimation(isConfirmed);
 
-  if (gone) return null;
-
-  const cardContent = (
-    <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
+  return (
+    <MorphingProposalCard
+      isExiting={isConfirmed}
+      confirmedLabel="Saved to memory"
+      finalIcon="cpu"
+      memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
+    >
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
@@ -400,20 +514,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
-    </View>
-  );
-
-  if (!isConfirmed) return cardContent;
-
-  return (
-    <RNAnimated.View style={{
-      opacity,
-      transform: [{ scale }],
-      maxHeight: height.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }),
-      overflow: 'hidden',
-    }}>
-      {cardContent}
-    </RNAnimated.View>
+    </MorphingProposalCard>
   );
 }
 
@@ -424,12 +525,15 @@ function Member360ConflictCard({ message }: { message: Message }) {
   if (!conflict) return null;
 
   const isResolved = !!conflict.resolved;
-  const { opacity, scale, height, gone } = useExitAnimation(isResolved);
+  const resolvedLabel = conflict.resolved === 'user' ? 'Profile updated' : 'Skipped';
 
-  if (gone) return null;
-
-  const cardContent = (
-    <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
+  return (
+    <MorphingProposalCard
+      isExiting={isResolved}
+      confirmedLabel={resolvedLabel}
+      finalIcon="cpu"
+      memoryIds={conflict.resolvedMemoryId ? [conflict.resolvedMemoryId] : undefined}
+    >
       <View style={styles.proposalHeader}>
         <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
@@ -452,20 +556,7 @@ function Member360ConflictCard({ message }: { message: Message }) {
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
-    </View>
-  );
-
-  if (!isResolved) return cardContent;
-
-  return (
-    <RNAnimated.View style={{
-      opacity,
-      transform: [{ scale }],
-      maxHeight: height.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }),
-      overflow: 'hidden',
-    }}>
-      {cardContent}
-    </RNAnimated.View>
+    </MorphingProposalCard>
   );
 }
 
@@ -476,15 +567,15 @@ function GoalProposalCard({ message }: { message: Message }) {
   if (!proposal) return null;
 
   const isConfirmed = proposal.confirmed === true;
-  const { opacity, scale, height, gone } = useExitAnimation(isConfirmed);
-
-  if (gone) return null;
-
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const showApproval = message.safetyTier === 'actionable';
 
-  const cardContent = (
-    <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
+  return (
+    <MorphingProposalCard
+      isExiting={isConfirmed}
+      confirmedLabel="Goal created"
+      finalIcon="target"
+    >
       <View style={styles.proposalHeader}>
         <Feather name="target" size={12} color={colors.contentSecondary} style={styles.proposalIcon} />
         <View style={styles.proposalContentWrap}>
@@ -508,20 +599,7 @@ function GoalProposalCard({ message }: { message: Message }) {
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Just chatting</Text>
         </Pressable>
       </View>
-    </View>
-  );
-
-  if (!isConfirmed) return cardContent;
-
-  return (
-    <RNAnimated.View style={{
-      opacity,
-      transform: [{ scale }],
-      maxHeight: height.interpolate({ inputRange: [0, 1], outputRange: [0, 300] }),
-      overflow: 'hidden',
-    }}>
-      {cardContent}
-    </RNAnimated.View>
+    </MorphingProposalCard>
   );
 }
 
@@ -655,32 +733,6 @@ function AnimatedSlot({ animate, delay = 100, duration = 300, soft = false, chil
     : <FadeInView delay={delay} duration={duration}>{children}</FadeInView>;
 }
 
-function getConfirmedChips(message: Message): MessageChip[] {
-  const chips: MessageChip[] = [];
-  if (message.memoryProposal?.confirmed) {
-    chips.push({
-      type: 'memory-saved',
-      label: 'Saved to memory',
-      memoryIds: message.memoryProposal.confirmedMemoryId
-        ? [message.memoryProposal.confirmedMemoryId]
-        : undefined,
-    });
-  }
-  if (message.member360Conflict?.resolved) {
-    const label = message.member360Conflict.resolved === 'user' ? 'Profile updated' : 'Skipped';
-    chips.push({
-      type: 'conflict-resolved',
-      label,
-      memoryIds: message.member360Conflict.resolvedMemoryId
-        ? [message.member360Conflict.resolvedMemoryId]
-        : undefined,
-    });
-  }
-  if (message.goalProposal?.confirmed) {
-    chips.push({ type: 'goal-created', label: 'Goal created' });
-  }
-  return chips;
-}
 
 export function MessageBubble({ message, isLatest }: { message: Message; isLatest: boolean }) {
   const { colors } = useTheme();
@@ -724,14 +776,7 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
 
   const allChips = message.chips ?? [];
   const topChips = allChips.filter(c => !BOTTOM_CHIP_TYPES.has(c.type));
-  const confirmedChips = !streaming ? getConfirmedChips(message) : [];
-  const prevConfirmedCount = useRef(confirmedChips.length);
-  const hasNewConfirmed = confirmedChips.length > prevConfirmedCount.current;
-  useEffect(() => { prevConfirmedCount.current = confirmedChips.length; }, [confirmedChips.length]);
-  const existingBottomKeys = new Set(allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)).map(c => `${c.type}::${c.label}`));
-  const dataChips = allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type));
-  const synthChips = confirmedChips.filter(c => !existingBottomKeys.has(`${c.type}::${c.label}`));
-  const bottomChips = [...dataChips, ...synthChips];
+  const bottomChips = allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type));
 
   const showSafety = !streaming && message.safetyTier && !(
     message.safetyTier === 'actionable' && message.goalProposal
@@ -776,8 +821,7 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       )}
       {bottomChips.length > 0 && !streaming && (
         <View style={styles.chipsRow}>
-          {dataChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
-          {synthChips.map((chip, i) => <ChipBadge key={`synth-${i}`} chip={chip} animate={chipAnimate || hasNewConfirmed} />)}
+          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
         </View>
       )}
 
@@ -832,6 +876,9 @@ const styles = StyleSheet.create({
   safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
     borderWidth: 0.75, borderRadius: 16, padding: 12,
+  },
+  morphCard: {
+    borderWidth: 0.75, borderRadius: 16, alignSelf: 'flex-start',
   },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginBottom: 10 },
   proposalIcon: { marginTop: 2 },
