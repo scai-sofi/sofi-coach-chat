@@ -368,50 +368,65 @@ function MorphingProposalCard({
   const { memories, navigateToMemory } = useCoach();
   const { showToast } = useToast();
 
-  const morph = useRef(new RNAnimated.Value(0)).current;
+  const collapse = useRef(new RNAnimated.Value(0)).current;
+  const checkScale = useRef(new RNAnimated.Value(0)).current;
   const checkOpacity = useRef(new RNAnimated.Value(0)).current;
   const iconOpacity = useRef(new RNAnimated.Value(0)).current;
+  const labelSlide = useRef(new RNAnimated.Value(8)).current;
+  const labelOpacity = useRef(new RNAnimated.Value(0)).current;
   const chevronOpacity = useRef(new RNAnimated.Value(0)).current;
   const [phase, setPhase] = useState<'pending' | 'morphing' | 'check' | 'done'>('pending');
   const prevExiting = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
 
+  const allAnims = [collapse, checkScale, checkOpacity, iconOpacity, labelSlide, labelOpacity, chevronOpacity];
+
   useEffect(() => {
     return () => {
       mountedRef.current = false;
       if (timerRef.current) clearTimeout(timerRef.current);
-      morph.stopAnimation();
-      checkOpacity.stopAnimation();
-      iconOpacity.stopAnimation();
-      chevronOpacity.stopAnimation();
+      allAnims.forEach(a => a.stopAnimation());
     };
-  }, [morph, checkOpacity, iconOpacity, chevronOpacity]);
+  }, allAnims);
 
   useEffect(() => {
     if (isExiting && !prevExiting.current) {
       setPhase('morphing');
-      RNAnimated.timing(morph, { toValue: 1, duration: 300, useNativeDriver: false }).start(() => {
+
+      RNAnimated.spring(collapse, {
+        toValue: 1, tension: 120, friction: 14, useNativeDriver: false,
+      }).start(() => {
         if (!mountedRef.current) return;
         setPhase('check');
-        RNAnimated.timing(checkOpacity, { toValue: 1, duration: 150, useNativeDriver: false }).start(() => {
+
+        RNAnimated.parallel([
+          RNAnimated.spring(checkScale, { toValue: 1, tension: 200, friction: 10, useNativeDriver: false }),
+          RNAnimated.timing(checkOpacity, { toValue: 1, duration: 120, useNativeDriver: false }),
+          RNAnimated.parallel([
+            RNAnimated.timing(labelOpacity, { toValue: 1, duration: 200, delay: 60, useNativeDriver: false }),
+            RNAnimated.spring(labelSlide, { toValue: 0, tension: 160, friction: 12, useNativeDriver: false }),
+          ]),
+        ]).start(() => {
           if (!mountedRef.current) return;
+
           timerRef.current = setTimeout(() => {
             if (!mountedRef.current) return;
             RNAnimated.parallel([
-              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
-              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 180, delay: 80, useNativeDriver: false }),
-              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 200, delay: 120, useNativeDriver: false }),
+              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 150, useNativeDriver: false }),
+              RNAnimated.timing(checkScale, { toValue: 0.6, duration: 150, useNativeDriver: false }),
+              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 200, delay: 60, useNativeDriver: false }),
+              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 180, delay: 100, useNativeDriver: false }),
             ]).start(() => {
               if (!mountedRef.current) return;
               setPhase('done');
             });
-          }, 400);
+          }, 500);
         });
       });
     }
     prevExiting.current = isExiting;
-  }, [isExiting, morph, checkOpacity, iconOpacity, chevronOpacity]);
+  }, [isExiting, ...allAnims]);
 
   const handleChipPress = () => {
     if (!memoryIds || memoryIds.length === 0) return;
@@ -431,31 +446,36 @@ function MorphingProposalCard({
     );
   }
 
-  const paddingH = morph.interpolate({ inputRange: [0, 1], outputRange: [12, 10] });
-  const paddingV = morph.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
-  const contentOpacity = morph.interpolate({ inputRange: [0, 0.3], outputRange: [1, 0], extrapolate: 'clamp' });
-  const labelOpacity = morph.interpolate({ inputRange: [0.5, 0.85], outputRange: [0, 1], extrapolate: 'clamp' });
-  const contentMaxH = morph.interpolate({ inputRange: [0, 1], outputRange: [200, 0] });
+  const paddingH = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 10] });
+  const paddingV = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
+  const contentOpacity = collapse.interpolate({ inputRange: [0, 0.25], outputRange: [1, 0], extrapolate: 'clamp' });
+  const contentMaxH = collapse.interpolate({ inputRange: [0, 0.6, 1], outputRange: [200, 40, 0] });
 
-  const chipContent = (
-    <>
-      <View style={{ width: 12, height: 12, justifyContent: 'center', alignItems: 'center' }}>
-        <RNAnimated.View style={{ position: 'absolute', opacity: checkOpacity }}>
-          <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-            <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  const chipRow = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center' }}>
+        <RNAnimated.View style={{
+          position: 'absolute',
+          opacity: checkOpacity,
+          transform: [{ scale: checkScale }],
+        }}>
+          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+            <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
         </RNAnimated.View>
         <RNAnimated.View style={{ position: 'absolute', opacity: iconOpacity }}>
           <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
         </RNAnimated.View>
       </View>
-      <RNAnimated.Text style={[styles.chipText, { color: colors.contentPrimary, opacity: labelOpacity }]}>
-        {confirmedLabel}
-      </RNAnimated.Text>
+      <RNAnimated.View style={{ opacity: labelOpacity, transform: [{ translateX: labelSlide }] }}>
+        <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
+          {confirmedLabel}
+        </Text>
+      </RNAnimated.View>
       <RNAnimated.View style={{ opacity: chevronOpacity }}>
         <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
       </RNAnimated.View>
-    </>
+    </View>
   );
 
   const morphCard = (
@@ -465,12 +485,16 @@ function MorphingProposalCard({
       paddingHorizontal: paddingH,
       paddingVertical: paddingV,
     }]}>
-      <RNAnimated.View style={{ opacity: contentOpacity, maxHeight: contentMaxH, overflow: 'hidden' }}>
-        {children}
-      </RNAnimated.View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        {chipContent}
-      </View>
+      {phase === 'morphing' && (
+        <RNAnimated.View style={{
+          opacity: contentOpacity,
+          maxHeight: contentMaxH,
+          overflow: 'hidden',
+        }}>
+          {children}
+        </RNAnimated.View>
+      )}
+      {chipRow}
     </RNAnimated.View>
   );
 
