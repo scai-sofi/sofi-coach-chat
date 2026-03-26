@@ -977,8 +977,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   const dismissMemoryProposal = useCallback((messageId: string) => {
     setMessages(prev => prev.map(m => {
-      if (m.id !== messageId) return m;
-      return { ...m, memoryProposal: undefined };
+      if (m.id !== messageId || !m.memoryProposal) return m;
+      return { ...m, memoryProposal: { ...m.memoryProposal, dismissed: true } };
     }));
   }, []);
 
@@ -1030,8 +1030,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   const dismissGoalProposal = useCallback((messageId: string) => {
     setMessages(prev => prev.map(m => {
-      if (m.id !== messageId) return m;
-      return { ...m, goalProposal: undefined };
+      if (m.id !== messageId || !m.goalProposal) return m;
+      return { ...m, goalProposal: { ...m.goalProposal, dismissed: true } };
     }));
   }, []);
 

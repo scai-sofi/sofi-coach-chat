@@ -516,11 +516,14 @@ function MemoryProposalCard({ message }: { message: Message }) {
   if (!proposal) return null;
 
   const isConfirmed = proposal.confirmed === true;
+  const isDismissed = proposal.dismissed === true;
+  const isExiting = isConfirmed || isDismissed;
+  const exitLabel = isConfirmed ? 'Saved to memory' : 'Skipped';
 
   return (
     <MorphingProposalCard
-      isExiting={isConfirmed}
-      confirmedLabel="Saved to memory"
+      isExiting={isExiting}
+      confirmedLabel={exitLabel}
       finalIcon="cpu"
       memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
     >
@@ -531,10 +534,10 @@ function MemoryProposalCard({ message }: { message: Message }) {
         </Text>
       </View>
       <View style={styles.proposalButtonsIndented}>
-        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemory(message.id)} disabled={isConfirmed}>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemory(message.id)} disabled={isExiting}>
           <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Remember</Text>
         </Pressable>
-        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryProposal(message.id)} disabled={isConfirmed}>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryProposal(message.id)} disabled={isExiting}>
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
         </Pressable>
       </View>
@@ -591,13 +594,16 @@ function GoalProposalCard({ message }: { message: Message }) {
   if (!proposal) return null;
 
   const isConfirmed = proposal.confirmed === true;
+  const isDismissed = proposal.dismissed === true;
+  const isExiting = isConfirmed || isDismissed;
+  const exitLabel = isConfirmed ? 'Goal created' : 'Skipped';
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const showApproval = message.safetyTier === 'actionable';
 
   return (
     <MorphingProposalCard
-      isExiting={isConfirmed}
-      confirmedLabel="Goal created"
+      isExiting={isExiting}
+      confirmedLabel={exitLabel}
       finalIcon="target"
     >
       <View style={styles.proposalHeader}>
@@ -616,10 +622,10 @@ function GoalProposalCard({ message }: { message: Message }) {
         </View>
       )}
       <View style={styles.proposalButtons}>
-        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmGoal(message.id)} disabled={isConfirmed}>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmGoal(message.id)} disabled={isExiting}>
           <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
         </Pressable>
-        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissGoalProposal(message.id)} disabled={isConfirmed}>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissGoalProposal(message.id)} disabled={isExiting}>
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Just chatting</Text>
         </Pressable>
       </View>
