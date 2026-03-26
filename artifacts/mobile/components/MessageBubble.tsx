@@ -388,7 +388,7 @@ function MorphingProposalCard({
   const collapse = useRef(new RNAnimated.Value(0)).current;
   const checkScale = useRef(new RNAnimated.Value(0)).current;
   const checkOpacity = useRef(new RNAnimated.Value(0)).current;
-  const iconOpacity = useRef(new RNAnimated.Value(0)).current;
+  const flipAnim = useRef(new RNAnimated.Value(0)).current;
   const labelSlide = useRef(new RNAnimated.Value(8)).current;
   const labelOpacity = useRef(new RNAnimated.Value(0)).current;
   const chevronOpacity = useRef(new RNAnimated.Value(0)).current;
@@ -397,7 +397,12 @@ function MorphingProposalCard({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
 
-  const allAnims = [collapse, checkScale, checkOpacity, iconOpacity, labelSlide, labelOpacity, chevronOpacity];
+  const allAnims = [collapse, checkScale, checkOpacity, flipAnim, labelSlide, labelOpacity, chevronOpacity];
+
+  const frontRotateY = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
+  const backRotateY = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
+  const frontFaceOpacity = flipAnim.interpolate({ inputRange: [0, 89, 90, 180], outputRange: [1, 1, 0, 0] });
+  const backFaceOpacity = flipAnim.interpolate({ inputRange: [0, 89, 90, 180], outputRange: [0, 0, 1, 1] });
 
   useEffect(() => {
     return () => {
@@ -428,11 +433,9 @@ function MorphingProposalCard({
 
           timerRef.current = setTimeout(() => {
             if (!mountedRef.current) return;
-            RNAnimated.parallel([
-              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-              RNAnimated.timing(checkScale, { toValue: 0.85, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 400, delay: 150, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-            ]).start(() => {
+            RNAnimated.timing(flipAnim, {
+              toValue: 180, duration: 500, easing: Easing.inOut(Easing.cubic), useNativeDriver: false,
+            }).start(() => {
               if (!mountedRef.current) return;
               setPhase('done');
             });
@@ -468,17 +471,21 @@ function MorphingProposalCard({
 
   const chipRow = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-      <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center', perspective: 400 }}>
         <RNAnimated.View style={{
           position: 'absolute',
-          opacity: checkOpacity,
-          transform: [{ scale: checkScale }],
+          opacity: RNAnimated.multiply(checkOpacity, frontFaceOpacity),
+          transform: [{ perspective: 400 }, { rotateY: frontRotateY }, { scale: checkScale }],
         }}>
           <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
             <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
         </RNAnimated.View>
-        <RNAnimated.View style={{ position: 'absolute', opacity: iconOpacity }}>
+        <RNAnimated.View style={{
+          position: 'absolute',
+          opacity: backFaceOpacity,
+          transform: [{ perspective: 400 }, { rotateY: backRotateY }],
+        }}>
           <AppIcon name={finalIcon} size={12} color={colors.contentPrimary} />
         </RNAnimated.View>
       </View>
