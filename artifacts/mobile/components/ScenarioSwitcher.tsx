@@ -100,14 +100,21 @@ export function ScenarioSwitcher() {
               return (
                 <Pressable
                   key={scenario.id}
-                  style={[styles.row, isActive && { backgroundColor: colors.contentPrimary }]}
+                  style={[styles.row, isActive && { backgroundColor: colors.contentPrimary }, scenario.notReady && !isActive && { opacity: 0.55 }]}
                   onPress={() => { switchScenario(scenario.id); setActivePanel('none'); }}
                 >
                   <View style={[styles.iconWrap, { backgroundColor: colors.surfaceTint }, isActive && { backgroundColor: colors.inverseAlpha20 }]}>
                     <Feather name={iconName} size={14} color={isActive ? colors.contentPrimaryInverse : colors.contentPrimary} />
                   </View>
                   <View style={styles.rowContent}>
-                    <Text style={[styles.rowTitle, { color: colors.contentPrimary }, isActive && { color: colors.contentPrimaryInverse }]} numberOfLines={1}>{scenario.title}</Text>
+                    <View style={styles.rowTitleRow}>
+                      <Text style={[styles.rowTitle, { color: colors.contentPrimary }, isActive && { color: colors.contentPrimaryInverse }]} numberOfLines={1}>{scenario.title}</Text>
+                      {scenario.notReady && !isActive && (
+                        <View style={[styles.notReadyBadge, { backgroundColor: colors.warningBg }]}>
+                          <Text style={[styles.notReadyText, { color: colors.warning }]}>WIP</Text>
+                        </View>
+                      )}
+                    </View>
                     <Text style={[styles.rowSubtitle, { color: colors.contentSecondary }, isActive && { color: colors.inverseAlpha60 }]} numberOfLines={1}>
                       {scenario.subtitle}
                     </Text>
@@ -180,6 +187,22 @@ const styles = StyleSheet.create({
   },
   rowContent: {
     flex: 1,
+  },
+  rowTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  notReadyBadge: {
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  notReadyText: {
+    fontSize: 10,
+    fontFamily: Fonts.bold,
+    lineHeight: 14,
+    letterSpacing: 0.3,
   },
   rowTitle: {
     fontSize: 14,

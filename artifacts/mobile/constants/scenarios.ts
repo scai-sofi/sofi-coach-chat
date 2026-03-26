@@ -154,6 +154,7 @@ function buildScenarios(): Scenario[] {
       title: 'Goal Discovery & Creation',
       subtitle: 'Suggested goal surfaces in Goals Center from natural conversation',
       icon: 'target',
+      notReady: true,
       messages: [
         { id: uid(), role: 'user', content: 'I really need to pay off my credit card. The balance is about $4,200', timestamp: new Date(now.getTime() - 120000) },
         {
@@ -182,6 +183,7 @@ function buildScenarios(): Scenario[] {
       title: 'Proactive Risk Alert',
       subtitle: 'Goal setback triggers memory proposal — connects priorities to recovery',
       icon: 'alert-triangle',
+      notReady: true,
       messages: [
         {
           id: uid(), role: 'system', content: 'AI inferred a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
@@ -202,6 +204,7 @@ function buildScenarios(): Scenario[] {
       title: 'Milestone Celebration',
       subtitle: 'Goal completion flow with celebration',
       icon: 'party-popper',
+      notReady: true,
       messages: [
         {
           id: uid(), role: 'system', content: 'Your Emergency Fund hit a milestone!', timestamp: new Date(now.getTime() - 120000), isProactive: true,
@@ -226,6 +229,7 @@ function buildScenarios(): Scenario[] {
       title: 'Weekly Financial Recap',
       subtitle: 'Proactive weekly summary with recommendations',
       icon: 'calendar-check',
+      notReady: true,
       messages: [
         {
           id: uid(), role: 'system', content: 'Your weekly financial summary is ready', timestamp: new Date(now.getTime() - 120000), isProactive: true,
@@ -248,6 +252,7 @@ function buildScenarios(): Scenario[] {
       title: 'Cross-Product Orchestration',
       subtitle: "Multi-product coordination — SoFi's unique advantage",
       icon: 'layers',
+      notReady: true,
       messages: [
         { id: uid(), role: 'user', content: 'I just got a $3,000 bonus at work. What should I do with it?', timestamp: new Date(now.getTime() - 120000) },
         {

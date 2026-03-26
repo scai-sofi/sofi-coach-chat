@@ -128,6 +128,7 @@ export interface Scenario {
   messages: Message[];
   memories: Memory[];
   goals: Goal[];
+  notReady?: boolean;
 }
 
 export const MEMORY_CATEGORY_LABELS: Record<MemoryCategory, string> = {
