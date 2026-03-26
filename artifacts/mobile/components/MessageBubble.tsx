@@ -422,7 +422,7 @@ function MorphingProposalCard({
       setPhase('morphing');
 
       RNAnimated.timing(collapse, {
-        toValue: 1, duration: 400, easing: Easing.inOut(Easing.cubic), useNativeDriver: false,
+        toValue: 1, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: false,
       }).start(() => {
         if (!mountedRef.current) return;
         setPhase('check');
@@ -471,36 +471,55 @@ function MorphingProposalCard({
   const paddingH = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 10] });
   const paddingV = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
   const contentOpacity = collapse.interpolate({ inputRange: [0, 0.25], outputRange: [1, 0], extrapolate: 'clamp' });
-  const contentMaxH = collapse.interpolate({ inputRange: [0, 1], outputRange: [200, 0] });
+  const contentMaxH = collapse.interpolate({ inputRange: [0, 0.6, 1], outputRange: [200, 40, 0] });
+  const contentMaxW = collapse.interpolate({ inputRange: [0, 1], outputRange: [500, 0] });
+
+  const isDone = phase === 'done';
 
   const chipRow = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
       <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center' }}>
-        <RNAnimated.View style={{
-          position: 'absolute',
-          opacity: frontFaceOpacity,
-          transform: [{ perspective: 400 }, { rotateY: frontRotateY }],
-        }}>
+        {isDone ? (
           <AppIcon name={finalIcon} size={12} color={colors.contentPrimary} />
-        </RNAnimated.View>
-        <RNAnimated.View style={{
-          position: 'absolute',
-          opacity: backFaceOpacity,
-          transform: [{ perspective: 400 }, { rotateY: backRotateY }],
-        }}>
-          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-            <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-          </Svg>
-        </RNAnimated.View>
+        ) : (
+          <>
+            <RNAnimated.View style={{
+              position: 'absolute',
+              opacity: frontFaceOpacity,
+              transform: [{ perspective: 400 }, { rotateY: frontRotateY }],
+            }}>
+              <AppIcon name={finalIcon} size={12} color={colors.contentPrimary} />
+            </RNAnimated.View>
+            <RNAnimated.View style={{
+              position: 'absolute',
+              opacity: backFaceOpacity,
+              transform: [{ perspective: 400 }, { rotateY: backRotateY }],
+            }}>
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </RNAnimated.View>
+          </>
+        )}
       </View>
-      <RNAnimated.View style={{ opacity: labelOpacity, transform: [{ translateX: labelSlide }] }}>
+      {isDone ? (
         <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
           {confirmedLabel}
         </Text>
-      </RNAnimated.View>
-      <RNAnimated.View style={{ opacity: chevronOpacity }}>
+      ) : (
+        <RNAnimated.View style={{ opacity: labelOpacity, transform: [{ translateX: labelSlide }] }}>
+          <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
+            {confirmedLabel}
+          </Text>
+        </RNAnimated.View>
+      )}
+      {isDone ? (
         <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
-      </RNAnimated.View>
+      ) : (
+        <RNAnimated.View style={{ opacity: chevronOpacity }}>
+          <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+        </RNAnimated.View>
+      )}
     </View>
   );
 
@@ -518,6 +537,7 @@ function MorphingProposalCard({
         <RNAnimated.View style={{
           opacity: contentOpacity,
           maxHeight: contentMaxH,
+          maxWidth: contentMaxW,
           overflow: 'hidden',
         }}>
           {children}
