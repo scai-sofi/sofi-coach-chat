@@ -808,33 +808,58 @@ function CopyButton({ color }: { color: string }) {
   );
 }
 
-function ActionFooter({ message }: { message: Message }) {
+function StaggerItem({ index, children }: { index: number; children: React.ReactNode }) {
+  const opacity = useRef(new RNAnimated.Value(0)).current;
+  const translateY = useRef(new RNAnimated.Value(4)).current;
+
+  useEffect(() => {
+    const delay = index * 60;
+    const timer = setTimeout(() => {
+      RNAnimated.parallel([
+        RNAnimated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
+        RNAnimated.timing(translateY, { toValue: 0, duration: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [opacity, translateY, index]);
+
+  return (
+    <RNAnimated.View style={{ opacity, transform: [{ translateY }] }}>
+      {children}
+    </RNAnimated.View>
+  );
+}
+
+function ActionFooter({ message, animate = false }: { message: Message; animate?: boolean }) {
   const { colors } = useTheme();
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
 
+  const wrap = (idx: number, child: React.ReactNode) =>
+    animate ? <StaggerItem index={idx}>{child}</StaggerItem> : <>{child}</>;
+
   return (
     <View>
       <View style={styles.actionRow}>
-        <CopyButton color={colors.contentBone600} />
-        <ReactionButton
+        {wrap(0, <CopyButton color={colors.contentBone600} />)}
+        {wrap(1, <ReactionButton
           active={thumbUp}
           onToggle={() => { setThumbUp(!thumbUp); if (thumbDown) setThumbDown(false); }}
           sourceOff={iconThumbsUp}
           sourceOn={iconThumbsUpFilled}
           tintColor={colors.contentBone600}
           tiltDeg={-12}
-        />
-        <ReactionButton
+        />)}
+        {wrap(2, <ReactionButton
           active={thumbDown}
           onToggle={() => { setThumbDown(!thumbDown); if (thumbUp) setThumbUp(false); }}
           sourceOff={iconThumbsDown}
           sourceOn={iconThumbsDownFilled}
           tintColor={colors.contentBone600}
           tiltDeg={12}
-        />
-        {message.provenance && (
+        />)}
+        {message.provenance && wrap(3,
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
             <Text style={{ fontSize: 12, color: colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
             <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={colors.contentSecondary} />
@@ -1010,13 +1035,11 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       )}
 
       {!streaming && (
-        <AnimatedSlot animate={animate} delay={200} soft>
-          <ActionFooter message={message} />
-        </AnimatedSlot>
+        <ActionFooter message={message} animate={animate} />
       )}
 
       {!streaming && isLatest && message.suggestions && (
-        <AnimatedSlot animate={animate} delay={400} duration={350}>
+        <AnimatedSlot animate={animate} delay={200} duration={350}>
           <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
         </AnimatedSlot>
       )}
