@@ -696,23 +696,41 @@ function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap:
 }
 
 const iconCopy = require('@/assets/images/icon-copy.png');
-const iconThumbsUp = require('@/assets/images/icon-thumbs-up.png');
-const iconThumbsUpFilled = require('@/assets/images/icon-thumbs-up-filled.png');
-const iconThumbsDown = require('@/assets/images/icon-thumbs-down.png');
-const iconThumbsDownFilled = require('@/assets/images/icon-thumbs-down-filled.png');
+
+function ThumbUpIcon({ size = 20, color, filled }: { size?: number; color: string; filled: boolean }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3m7-2V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14"
+        stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+        fill={filled ? color : 'none'}
+      />
+    </Svg>
+  );
+}
+
+function ThumbDownIcon({ size = 20, color, filled }: { size?: number; color: string; filled: boolean }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M17 2H19.67a2 2 0 0 1 2 1.7l1.38 9a2 2 0 0 1-2 2.3H14m0 0V19a3 3 0 0 1-3 3l-4-9V2h11M7 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"
+        stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+        fill={filled ? color : 'none'}
+      />
+    </Svg>
+  );
+}
 
 function ReactionButton({
   active,
   onToggle,
-  sourceOff,
-  sourceOn,
+  icon: IconComponent,
   tintColor,
   tiltDeg = 0,
 }: {
   active: boolean;
   onToggle: () => void;
-  sourceOff: any;
-  sourceOn: any;
+  icon: React.ComponentType<{ size?: number; color: string; filled: boolean }>;
   tintColor: string;
   tiltDeg?: number;
 }) {
@@ -774,7 +792,7 @@ function ReactionButton({
   return (
     <Pressable style={styles.actionBtn} onPress={onToggle}>
       <RNAnimated.View style={{ transform: [{ scale: scaleAnim }, { rotate }] }}>
-        <Image source={active ? sourceOn : sourceOff} style={[styles.actionIcon, { tintColor }]} />
+        <IconComponent size={20} color={tintColor} filled={active} />
       </RNAnimated.View>
     </Pressable>
   );
@@ -815,16 +833,14 @@ function ActionFooter({ message }: { message: Message }) {
         <ReactionButton
           active={thumbUp}
           onToggle={() => { setThumbUp(!thumbUp); if (thumbDown) setThumbDown(false); }}
-          sourceOff={iconThumbsUp}
-          sourceOn={iconThumbsUpFilled}
+          icon={ThumbUpIcon}
           tintColor={colors.contentBone600}
           tiltDeg={-12}
         />
         <ReactionButton
           active={thumbDown}
           onToggle={() => { setThumbDown(!thumbDown); if (thumbUp) setThumbUp(false); }}
-          sourceOff={iconThumbsDown}
-          sourceOn={iconThumbsDownFilled}
+          icon={ThumbDownIcon}
           tintColor={colors.contentBone600}
           tiltDeg={12}
         />
