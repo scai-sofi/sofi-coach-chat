@@ -132,7 +132,6 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority?",
           timestamp: new Date(now.getTime() - 230000),
           chips: [{ type: 'memory-updated', label: 'Memory updated' }],
-          memoryProposal: { id: uid(), content: 'Cooking at home is now a priority over dining out', category: 'PRIORITIES' },
         },
         { id: uid(), role: 'user', content: "Keep explanations simple for me — I don't need all the technical jargon", timestamp: new Date(now.getTime() - 180000) },
         {
