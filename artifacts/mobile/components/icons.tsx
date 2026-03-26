@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
+import { Animated as RNAnimated, Easing } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 export function ChevronLeftIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
@@ -232,5 +233,55 @@ export function FilterIcon({ size = 18, color = '#706f6e' }: { size?: number; co
         fill={color}
       />
     </Svg>
+  );
+}
+
+interface FlipIconProps {
+  front: React.ReactNode;
+  back: React.ReactNode;
+  flipped: boolean;
+  size?: number;
+  duration?: number;
+}
+
+export function FlipIcon({ front, back, flipped, size = 24, duration = 400 }: FlipIconProps) {
+  const flipAnim = useRef(new RNAnimated.Value(flipped ? 180 : 0)).current;
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    RNAnimated.timing(flipAnim, {
+      toValue: flipped ? 180 : 0,
+      duration,
+      easing: Easing.inOut(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [flipped, flipAnim, duration]);
+
+  const frontRotateY = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
+  const backRotateY = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
+  const frontOpacity = flipAnim.interpolate({ inputRange: [0, 89, 90, 180], outputRange: [1, 1, 0, 0] });
+  const backOpacity = flipAnim.interpolate({ inputRange: [0, 89, 90, 180], outputRange: [0, 0, 1, 1] });
+
+  return (
+    <RNAnimated.View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
+      <RNAnimated.View style={{
+        position: 'absolute',
+        opacity: frontOpacity,
+        transform: [{ perspective: 400 }, { rotateY: frontRotateY }],
+      }}>
+        {front}
+      </RNAnimated.View>
+      <RNAnimated.View style={{
+        position: 'absolute',
+        opacity: backOpacity,
+        transform: [{ perspective: 400 }, { rotateY: backRotateY }],
+      }}>
+        {back}
+      </RNAnimated.View>
+    </RNAnimated.View>
   );
 }

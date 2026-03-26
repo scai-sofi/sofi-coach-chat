@@ -16,6 +16,7 @@ import {
   SettingsMenuIcon,
   PencilMenuIcon,
   DeleteMenuIcon,
+  FlipIcon,
 } from '@/components/icons';
 
 export function ChatHeader() {
@@ -111,9 +112,12 @@ export function ChatHeader() {
         title={sessionTitle}
         subtitle={subtitle}
         leftAction={{
-          icon: !hasActiveChat
-            ? <DemoIcon size={20} color={colors.contentPrimary} />
-            : <CloseIcon size={24} color={colors.contentPrimary} />,
+          icon: <FlipIcon
+            front={<DemoIcon size={20} color={colors.contentPrimary} />}
+            back={<CloseIcon size={24} color={colors.contentPrimary} />}
+            flipped={hasActiveChat}
+            size={24}
+          />,
           onPress: () => {
             Keyboard.dismiss();
             if (!hasActiveChat) {
