@@ -684,6 +684,85 @@ const iconThumbsUpFilled = require('@/assets/images/icon-thumbs-up-filled.png');
 const iconThumbsDown = require('@/assets/images/icon-thumbs-down.png');
 const iconThumbsDownFilled = require('@/assets/images/icon-thumbs-down-filled.png');
 
+function ReactionButton({
+  active,
+  onToggle,
+  sourceOff,
+  sourceOn,
+  tintColor,
+  tiltDeg = 0,
+}: {
+  active: boolean;
+  onToggle: () => void;
+  sourceOff: any;
+  sourceOn: any;
+  tintColor: string;
+  tiltDeg?: number;
+}) {
+  const scaleAnim = useRef(new RNAnimated.Value(1)).current;
+  const rotateAnim = useRef(new RNAnimated.Value(0)).current;
+  const prevActive = useRef(active);
+
+  useEffect(() => {
+    if (prevActive.current === active) return;
+    prevActive.current = active;
+
+    if (active) {
+      scaleAnim.setValue(0.5);
+      rotateAnim.setValue(0);
+      RNAnimated.parallel([
+        RNAnimated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 4,
+          tension: 300,
+          useNativeDriver: true,
+        }),
+        RNAnimated.sequence([
+          RNAnimated.timing(rotateAnim, {
+            toValue: 1,
+            duration: 200,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+          RNAnimated.spring(rotateAnim, {
+            toValue: 0,
+            friction: 5,
+            tension: 180,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    } else {
+      RNAnimated.sequence([
+        RNAnimated.timing(scaleAnim, {
+          toValue: 0.85,
+          duration: 80,
+          useNativeDriver: true,
+        }),
+        RNAnimated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [active, scaleAnim, rotateAnim]);
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', `${tiltDeg}deg`],
+  });
+
+  return (
+    <Pressable style={styles.actionBtn} onPress={onToggle}>
+      <RNAnimated.View style={{ transform: [{ scale: scaleAnim }, { rotate }] }}>
+        <Image source={active ? sourceOn : sourceOff} style={[styles.actionIcon, { tintColor }]} />
+      </RNAnimated.View>
+    </Pressable>
+  );
+}
+
 function ActionFooter({ message }: { message: Message }) {
   const { colors } = useTheme();
   const [copied, setCopied] = useState(false);
@@ -709,12 +788,22 @@ function ActionFooter({ message }: { message: Message }) {
             duration={350}
           />
         </Pressable>
-        <Pressable style={styles.actionBtn} onPress={() => setThumbUp(!thumbUp)}>
-          <Image source={thumbUp ? iconThumbsUpFilled : iconThumbsUp} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
-        </Pressable>
-        <Pressable style={styles.actionBtn} onPress={() => setThumbDown(!thumbDown)}>
-          <Image source={thumbDown ? iconThumbsDownFilled : iconThumbsDown} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />
-        </Pressable>
+        <ReactionButton
+          active={thumbUp}
+          onToggle={() => { setThumbUp(!thumbUp); if (thumbDown) setThumbDown(false); }}
+          sourceOff={iconThumbsUp}
+          sourceOn={iconThumbsUpFilled}
+          tintColor={colors.contentBone600}
+          tiltDeg={-12}
+        />
+        <ReactionButton
+          active={thumbDown}
+          onToggle={() => { setThumbDown(!thumbDown); if (thumbUp) setThumbUp(false); }}
+          sourceOff={iconThumbsDown}
+          sourceOn={iconThumbsDownFilled}
+          tintColor={colors.contentBone600}
+          tiltDeg={12}
+        />
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
             <Text style={{ fontSize: 12, color: colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
