@@ -15,7 +15,7 @@ function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string;
   return {
     'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
     'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
-    'conflict-resolved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
+    'conflict-resolved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'user' },
     'goal-created': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-progress': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-risk': { bg: c.dangerChipBg, color: c.dangerChipText, icon: 'alert-triangle' },
@@ -531,11 +531,11 @@ function Member360ConflictCard({ message }: { message: Message }) {
     <MorphingProposalCard
       isExiting={isResolved}
       confirmedLabel={resolvedLabel}
-      finalIcon="cpu"
+      finalIcon="user"
       memoryIds={conflict.resolvedMemoryId ? [conflict.resolvedMemoryId] : undefined}
     >
       <View style={styles.proposalHeader}>
-        <Feather name="cpu" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
+        <Feather name="user" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Update your profile to <Text style={styles.proposalQuote}>"{conflict.userValue}"</Text>?
         </Text>
