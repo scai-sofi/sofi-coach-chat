@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, ComponentProps } from 'react';
-import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Keyboard } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Easing, Keyboard } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -394,19 +394,17 @@ function MorphingProposalCard({
     if (isExiting && !prevExiting.current) {
       setPhase('morphing');
 
-      RNAnimated.spring(collapse, {
-        toValue: 1, tension: 120, friction: 14, useNativeDriver: false,
+      RNAnimated.timing(collapse, {
+        toValue: 1, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: false,
       }).start(() => {
         if (!mountedRef.current) return;
         setPhase('check');
 
         RNAnimated.parallel([
-          RNAnimated.spring(checkScale, { toValue: 1, tension: 200, friction: 10, useNativeDriver: false }),
-          RNAnimated.timing(checkOpacity, { toValue: 1, duration: 120, useNativeDriver: false }),
-          RNAnimated.parallel([
-            RNAnimated.timing(labelOpacity, { toValue: 1, duration: 200, delay: 60, useNativeDriver: false }),
-            RNAnimated.spring(labelSlide, { toValue: 0, tension: 160, friction: 12, useNativeDriver: false }),
-          ]),
+          RNAnimated.timing(checkScale, { toValue: 1, duration: 180, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+          RNAnimated.timing(checkOpacity, { toValue: 1, duration: 150, useNativeDriver: false }),
+          RNAnimated.timing(labelOpacity, { toValue: 1, duration: 220, delay: 40, useNativeDriver: false }),
+          RNAnimated.timing(labelSlide, { toValue: 0, duration: 220, delay: 40, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
         ]).start(() => {
           if (!mountedRef.current) return;
 
@@ -414,14 +412,14 @@ function MorphingProposalCard({
             if (!mountedRef.current) return;
             RNAnimated.parallel([
               RNAnimated.timing(checkOpacity, { toValue: 0, duration: 150, useNativeDriver: false }),
-              RNAnimated.timing(checkScale, { toValue: 0.6, duration: 150, useNativeDriver: false }),
-              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 200, delay: 60, useNativeDriver: false }),
-              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 180, delay: 100, useNativeDriver: false }),
+              RNAnimated.timing(checkScale, { toValue: 0.8, duration: 150, useNativeDriver: false }),
+              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 200, delay: 40, useNativeDriver: false }),
+              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 180, delay: 80, useNativeDriver: false }),
             ]).start(() => {
               if (!mountedRef.current) return;
               setPhase('done');
             });
-          }, 500);
+          }, 450);
         });
       });
     }
