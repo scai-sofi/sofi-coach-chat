@@ -41,7 +41,7 @@ export function SearchBar({
           style={[styles.filterBtn, filterActive && { backgroundColor: colors.contentPrimary }]}
           onPress={onFilterPress}
         >
-          <FilterIcon size={18} color={filterActive ? colors.contentPrimaryInverse : colors.contentSecondary} />
+          <FilterIcon size={18} color={filterActive ? colors.contentPrimaryInverse : colors.contentPrimary} />
         </Pressable>
       )}
     </View>
