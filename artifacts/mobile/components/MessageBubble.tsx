@@ -785,64 +785,53 @@ function CopyButton({ color }: { color: string }) {
   );
 }
 
-function StaggerItem({ index, children }: { index: number; children: React.ReactNode }) {
-  const opacity = useRef(new RNAnimated.Value(0)).current;
-  const translateY = useRef(new RNAnimated.Value(4)).current;
-
-  useEffect(() => {
-    const delay = index * 60;
-    const timer = setTimeout(() => {
-      RNAnimated.parallel([
-        RNAnimated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
-        RNAnimated.timing(translateY, { toValue: 0, duration: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      ]).start();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [opacity, translateY, index]);
-
-  return (
-    <RNAnimated.View style={{ opacity, transform: [{ translateY }] }}>
-      {children}
-    </RNAnimated.View>
-  );
-}
-
 function ActionFooter({ message, animate = false }: { message: Message; animate?: boolean }) {
   const { colors } = useTheme();
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
 
-  const wrap = (idx: number, child: React.ReactNode) =>
-    animate ? <StaggerItem index={idx}>{child}</StaggerItem> : <>{child}</>;
+  const rowOpacity = useRef(new RNAnimated.Value(animate ? 0 : 1)).current;
+  const rowSlide = useRef(new RNAnimated.Value(animate ? 6 : 0)).current;
+
+  useEffect(() => {
+    if (!animate) return;
+    const timer = setTimeout(() => {
+      RNAnimated.parallel([
+        RNAnimated.timing(rowOpacity, { toValue: 1, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        RNAnimated.timing(rowSlide, { toValue: 0, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [animate, rowOpacity, rowSlide]);
 
   return (
     <View>
-      <View style={styles.actionRow}>
-        {wrap(0, <CopyButton color={colors.contentBone600} />)}
-        {wrap(1, <ReactionButton
+      <RNAnimated.View style={[styles.actionRow, { opacity: rowOpacity, transform: [{ translateY: rowSlide }] }]}>
+        <CopyButton color={colors.contentBone600} />
+        <ReactionButton
           active={thumbUp}
           onToggle={() => { setThumbUp(!thumbUp); if (thumbDown) setThumbDown(false); }}
           sourceOff={iconThumbsUp}
           sourceOn={iconThumbsUpFilled}
           tintColor={colors.contentBone600}
           tiltDeg={-12}
-        />)}
-        {wrap(2, <ReactionButton
+        />
+        <ReactionButton
           active={thumbDown}
           onToggle={() => { setThumbDown(!thumbDown); if (thumbUp) setThumbUp(false); }}
           sourceOff={iconThumbsDown}
           sourceOn={iconThumbsDownFilled}
           tintColor={colors.contentBone600}
           tiltDeg={12}
-        />)}
-        {message.provenance && wrap(3,
+        />
+        {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
             <Text style={{ fontSize: 12, color: colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
             <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={colors.contentSecondary} />
           </Pressable>
         )}
-      </View>
+      </RNAnimated.View>
       {showProvenance && message.provenance && (
         <View style={[styles.provenanceCard, { backgroundColor: colors.surfaceTint }]}>
           <Text style={[styles.provenanceText, { color: colors.contentSecondary }]}>{message.provenance}</Text>
