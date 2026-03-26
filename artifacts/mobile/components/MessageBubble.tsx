@@ -15,6 +15,8 @@ function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string;
   return {
     'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
     'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
+    'conflict-resolved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'cpu' },
+    'goal-created': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-progress': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-risk': { bg: c.dangerChipBg, color: c.dangerChipText, icon: 'alert-triangle' },
     'milestone': { bg: c.successBg, color: c.successDark, icon: 'star' },
@@ -22,6 +24,8 @@ function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string;
     'alert': { bg: c.dangerChipBg, color: c.dangerChipText, icon: 'alert-triangle' },
   };
 }
+
+const BOTTOM_CHIP_TYPES = new Set(['memory-saved', 'memory-updated', 'conflict-resolved', 'goal-created']);
 
 function getSafetyStyles(c: AppTheme): Record<SafetyTier, { bg: string; color: string; icon: FeatherIconName; text: string }> {
   return {
@@ -350,16 +354,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { confirmMemory, dismissMemoryProposal } = useCoach();
   const proposal = message.memoryProposal;
-  if (!proposal) return null;
-
-  if (proposal.confirmed) {
-    return (
-      <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Feather name="cpu" size={12} color={colors.contentPrimary} />
-        <Text style={[styles.confirmedText, { color: colors.contentPrimary }]}>Saved to memory</Text>
-      </View>
-    );
-  }
+  if (!proposal || proposal.confirmed) return null;
 
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
@@ -385,19 +380,7 @@ function Member360ConflictCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { resolveMember360Conflict } = useCoach();
   const conflict = message.member360Conflict;
-  if (!conflict) return null;
-
-  if (conflict.resolved) {
-    const resolvedLabel = conflict.resolved === 'user'
-      ? 'Profile updated'
-      : 'Skipped';
-    return (
-      <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Feather name="cpu" size={12} color={colors.contentPrimary} />
-        <Text style={[styles.confirmedText, { color: colors.contentPrimary }]}>{resolvedLabel}</Text>
-      </View>
-    );
-  }
+  if (!conflict || conflict.resolved) return null;
 
   return (
     <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
@@ -429,16 +412,7 @@ function GoalProposalCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { confirmGoal, dismissGoalProposal } = useCoach();
   const proposal = message.goalProposal;
-  if (!proposal) return null;
-
-  if (proposal.confirmed) {
-    return (
-      <View style={[styles.proposalCard, styles.confirmedCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        <Feather name="cpu" size={12} color={colors.contentPrimary} />
-        <Text style={[styles.confirmedText, { color: colors.contentPrimary }]}>Goal created — check your goals panel</Text>
-      </View>
-    );
-  }
+  if (!proposal || proposal.confirmed) return null;
 
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   const showApproval = message.safetyTier === 'actionable';
@@ -592,6 +566,30 @@ function FadeInView({ delay = 0, duration = 300, children }: { delay?: number; d
   );
 }
 
+function AnimatedSlot({ animate, delay = 100, duration = 300, soft = false, children }: {
+  animate: boolean; delay?: number; duration?: number; soft?: boolean; children: React.ReactNode;
+}) {
+  if (!animate) return <>{children}</>;
+  return soft
+    ? <SoftReveal delay={delay}>{children}</SoftReveal>
+    : <FadeInView delay={delay} duration={duration}>{children}</FadeInView>;
+}
+
+function getConfirmedChips(message: Message): MessageChip[] {
+  const chips: MessageChip[] = [];
+  if (message.memoryProposal?.confirmed) {
+    chips.push({ type: 'memory-saved', label: 'Saved to memory' });
+  }
+  if (message.member360Conflict?.resolved) {
+    const label = message.member360Conflict.resolved === 'user' ? 'Profile updated' : 'Skipped';
+    chips.push({ type: 'conflict-resolved', label });
+  }
+  if (message.goalProposal?.confirmed) {
+    chips.push({ type: 'goal-created', label: 'Goal created' });
+  }
+  return chips;
+}
+
 export function MessageBubble({ message, isLatest }: { message: Message; isLatest: boolean }) {
   const { colors } = useTheme();
   const { sendMessage } = useCoach();
@@ -632,11 +630,24 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   const animate = justFinished;
   const chipAnimate = streaming || justFinished;
 
+  const allChips = message.chips ?? [];
+  const topChips = allChips.filter(c => !BOTTOM_CHIP_TYPES.has(c.type));
+  const confirmedChips = !streaming ? getConfirmedChips(message) : [];
+  const existingBottomLabels = new Set(allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)).map(c => c.label));
+  const bottomChips = [
+    ...allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type)),
+    ...confirmedChips.filter(c => !existingBottomLabels.has(c.label)),
+  ];
+
+  const showSafety = !streaming && message.safetyTier && !(
+    message.safetyTier === 'actionable' && message.goalProposal
+  );
+
   return (
     <View style={styles.aiRow}>
-      {message.chips && message.chips.length > 0 && (
+      {topChips.length > 0 && (
         <View style={styles.chipsRow}>
-          {message.chips.map((chip, i) => <ChipBadge key={i} chip={chip} animate={chipAnimate} />)}
+          {topChips.map((chip, i) => <ChipBadge key={i} chip={chip} animate={chipAnimate} />)}
         </View>
       )}
 
@@ -648,63 +659,43 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
         ) : null}
       </View>
 
-      {!streaming && message.safetyTier && !(
-        message.safetyTier === 'actionable' && message.goalProposal
-      ) && (
-        animate ? (
-          <FadeInView delay={50} duration={250}>
-            <SafetyBadge tier={message.safetyTier} />
-          </FadeInView>
-        ) : (
-          <SafetyBadge tier={message.safetyTier} />
-        )
+      {showSafety && (
+        <AnimatedSlot animate={animate} delay={50} duration={250}>
+          <SafetyBadge tier={message.safetyTier!} />
+        </AnimatedSlot>
       )}
 
       {!streaming && message.memoryProposal && (
-        animate ? (
-          <FadeInView delay={100} duration={300}>
-            <MemoryProposalCard message={message} />
-          </FadeInView>
-        ) : (
+        <AnimatedSlot animate={animate}>
           <MemoryProposalCard message={message} />
-        )
+        </AnimatedSlot>
       )}
       {!streaming && message.member360Conflict && (
-        animate ? (
-          <FadeInView delay={100} duration={300}>
-            <Member360ConflictCard message={message} />
-          </FadeInView>
-        ) : (
+        <AnimatedSlot animate={animate}>
           <Member360ConflictCard message={message} />
-        )
+        </AnimatedSlot>
       )}
       {!streaming && message.goalProposal && (
-        animate ? (
-          <FadeInView delay={100} duration={300}>
-            <GoalProposalCard message={message} />
-          </FadeInView>
-        ) : (
+        <AnimatedSlot animate={animate}>
           <GoalProposalCard message={message} />
-        )
+        </AnimatedSlot>
       )}
       {!streaming && (
-        animate ? (
-          <SoftReveal delay={200}>
-            <ActionFooter message={message} />
-          </SoftReveal>
-        ) : (
+        <AnimatedSlot animate={animate} delay={200} soft>
           <ActionFooter message={message} />
-        )
+        </AnimatedSlot>
+      )}
+
+      {bottomChips.length > 0 && !streaming && (
+        <View style={styles.chipsRow}>
+          {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
+        </View>
       )}
 
       {!streaming && isLatest && message.suggestions && (
-        animate ? (
-          <FadeInView delay={400} duration={350}>
-            <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
-          </FadeInView>
-        ) : (
+        <AnimatedSlot animate={animate} delay={400} duration={350}>
           <SuggestionPills suggestions={message.suggestions} onTap={(s) => sendMessage(s)} />
-        )
+        </AnimatedSlot>
       )}
     </View>
   );
@@ -747,10 +738,6 @@ const styles = StyleSheet.create({
   proposalCard: {
     borderWidth: 0.75, borderRadius: 16, padding: 12,
   },
-  confirmedCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-  },
-  confirmedText: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
   proposalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginBottom: 10 },
   proposalIcon: { marginTop: 2 },
   proposalContentWrap: { flex: 1 },
