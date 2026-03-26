@@ -137,7 +137,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Got it — plain language from here on out.**\n\nI'll skip the financial jargon and give you clear, straightforward answers. If I ever need to use a technical term, I'll explain it in simple words.\n\nThis actually helps me give you better advice — focused on what matters, without the noise. Just let me know if you ever want more detail on something specific.",
           timestamp: new Date(now.getTime() - 170000),
-          memoryProposal: { id: uid(), content: 'Prefers simple explanations without financial jargon', category: 'PREFERENCES' },
+          chips: [{ type: 'memory-saved', label: 'Memory saved' }],
           suggestions: ["What should I focus on first?", "Show me my spending", "How are my goals doing?"],
         },
       ],
