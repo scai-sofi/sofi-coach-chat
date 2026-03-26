@@ -960,8 +960,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (memoryModeRef.current === 'off') return;
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.memoryProposal) return m;
+      const memId = uid();
       const mem: Memory = {
-        id: uid(),
+        id: memId,
         category: m.memoryProposal.category,
         content: m.memoryProposal.content,
         source: 'IMPLICIT_CONFIRMED',
@@ -970,7 +971,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         updatedAt: new Date(),
       };
       setMemories(prev2 => [...prev2, mem]);
-      return { ...m, memoryProposal: { ...m.memoryProposal, confirmed: true } };
+      return { ...m, memoryProposal: { ...m.memoryProposal, confirmed: true, confirmedMemoryId: memId } };
     }));
   }, []);
 
@@ -985,10 +986,13 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.member360Conflict) return m;
       const conflict = m.member360Conflict;
+      let resolvedMemoryId: string | undefined;
 
       if (resolution === 'user') {
+        const memId = uid();
+        resolvedMemoryId = memId;
         const mem: Memory = {
-          id: uid(),
+          id: memId,
           category: 'ABOUT_ME',
           content: conflict.userValue,
           source: 'IMPLICIT_CONFIRMED',
@@ -998,8 +1002,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         };
         setMemories(prev2 => [...prev2, mem]);
       } else if (resolution === 'profile') {
+        const memId = uid();
+        resolvedMemoryId = memId;
         const mem: Memory = {
-          id: uid(),
+          id: memId,
           category: 'ABOUT_ME',
           content: conflict.profileValue,
           source: 'MEMBER_360',
@@ -1010,7 +1016,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         setMemories(prev2 => [...prev2, mem]);
       }
 
-      return { ...m, member360Conflict: { ...conflict, resolved: resolution } };
+      return { ...m, member360Conflict: { ...conflict, resolved: resolution, resolvedMemoryId } };
     }));
   }, []);
 

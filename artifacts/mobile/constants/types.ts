@@ -19,6 +19,7 @@ export interface MemoryProposal {
   content: string;
   category: MemoryCategory;
   confirmed?: boolean;
+  confirmedMemoryId?: string;
   dismissed?: boolean;
 }
 
@@ -63,6 +64,7 @@ export interface Member360Conflict {
   userValue: string;
   profileValue: string;
   resolved?: 'user' | 'profile' | 'dismissed';
+  resolvedMemoryId?: string;
 }
 
 export interface Message {

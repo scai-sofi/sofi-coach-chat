@@ -295,8 +295,8 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
     ]).start();
   }, [fadeAnim, slideAnim, animate]);
 
-  const isMemoryChip = chip.type === 'memory-saved' || chip.type === 'memory-updated';
-  const hasMemoryIds = isMemoryChip && chip.memoryIds && chip.memoryIds.length > 0;
+  const isNavigable = (chip.type === 'memory-saved' || chip.type === 'memory-updated' || chip.type === 'conflict-resolved');
+  const hasMemoryIds = isNavigable && chip.memoryIds && chip.memoryIds.length > 0;
 
   const handlePress = () => {
     if (!hasMemoryIds) return;
@@ -578,11 +578,23 @@ function AnimatedSlot({ animate, delay = 100, duration = 300, soft = false, chil
 function getConfirmedChips(message: Message): MessageChip[] {
   const chips: MessageChip[] = [];
   if (message.memoryProposal?.confirmed) {
-    chips.push({ type: 'memory-saved', label: 'Saved to memory' });
+    chips.push({
+      type: 'memory-saved',
+      label: 'Saved to memory',
+      memoryIds: message.memoryProposal.confirmedMemoryId
+        ? [message.memoryProposal.confirmedMemoryId]
+        : undefined,
+    });
   }
   if (message.member360Conflict?.resolved) {
     const label = message.member360Conflict.resolved === 'user' ? 'Profile updated' : 'Skipped';
-    chips.push({ type: 'conflict-resolved', label });
+    chips.push({
+      type: 'conflict-resolved',
+      label,
+      memoryIds: message.member360Conflict.resolvedMemoryId
+        ? [message.member360Conflict.resolvedMemoryId]
+        : undefined,
+    });
   }
   if (message.goalProposal?.confirmed) {
     chips.push({ type: 'goal-created', label: 'Goal created' });
