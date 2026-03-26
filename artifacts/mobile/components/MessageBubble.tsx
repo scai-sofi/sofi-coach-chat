@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, ComponentProps } from 'react';
 import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Easing, Keyboard } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
+import ReAnimated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { useTheme } from '@/context/ThemeContext';
 import type { AppTheme } from '@/constants/theme';
 import { Fonts } from '@/constants/fonts';
@@ -351,6 +352,8 @@ function SafetyBadge({ tier }: { tier: SafetyTier }) {
 }
 
 
+const SPRING_MORPH = { damping: 22, stiffness: 180, mass: 0.8 };
+
 function MorphingProposalCard({
   isExiting,
   confirmedLabel,
@@ -368,63 +371,36 @@ function MorphingProposalCard({
   const { memories, navigateToMemory } = useCoach();
   const { showToast } = useToast();
 
-  const collapse = useRef(new RNAnimated.Value(0)).current;
-  const checkScale = useRef(new RNAnimated.Value(0)).current;
-  const checkOpacity = useRef(new RNAnimated.Value(0)).current;
-  const iconOpacity = useRef(new RNAnimated.Value(0)).current;
-  const labelSlide = useRef(new RNAnimated.Value(8)).current;
-  const labelOpacity = useRef(new RNAnimated.Value(0)).current;
-  const chevronOpacity = useRef(new RNAnimated.Value(0)).current;
-  const [phase, setPhase] = useState<'pending' | 'morphing' | 'check' | 'done'>('pending');
+  const [collapsed, setCollapsed] = useState(false);
+  const [showFinalIcon, setShowFinalIcon] = useState(false);
   const prevExiting = useRef(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
-
-  const allAnims = [collapse, checkScale, checkOpacity, iconOpacity, labelSlide, labelOpacity, chevronOpacity];
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
       mountedRef.current = false;
       if (timerRef.current) clearTimeout(timerRef.current);
-      allAnims.forEach(a => a.stopAnimation());
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, allAnims);
+  }, []);
 
   useEffect(() => {
     if (isExiting && !prevExiting.current) {
-      setPhase('morphing');
-
-      RNAnimated.timing(collapse, {
-        toValue: 1, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: false,
-      }).start(() => {
+      rafRef.current = requestAnimationFrame(() => {
         if (!mountedRef.current) return;
-        setPhase('check');
-
-        RNAnimated.parallel([
-          RNAnimated.timing(checkScale, { toValue: 1, duration: 250, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-          RNAnimated.timing(checkOpacity, { toValue: 1, duration: 200, useNativeDriver: false }),
-          RNAnimated.timing(labelOpacity, { toValue: 1, duration: 280, delay: 60, useNativeDriver: false }),
-          RNAnimated.timing(labelSlide, { toValue: 0, duration: 280, delay: 60, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-        ]).start(() => {
-          if (!mountedRef.current) return;
-
-          timerRef.current = setTimeout(() => {
-            if (!mountedRef.current) return;
-            RNAnimated.parallel([
-              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 200, useNativeDriver: false }),
-              RNAnimated.timing(checkScale, { toValue: 0.8, duration: 200, useNativeDriver: false }),
-              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 250, delay: 60, useNativeDriver: false }),
-              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 220, delay: 100, useNativeDriver: false }),
-            ]).start(() => {
-              if (!mountedRef.current) return;
-              setPhase('done');
-            });
-          }, 3000);
-        });
+        setCollapsed(true);
       });
+
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        if (!mountedRef.current) return;
+        setShowFinalIcon(true);
+      }, 900);
     }
     prevExiting.current = isExiting;
-  }, [isExiting, ...allAnims]);
+  }, [isExiting]);
 
   const handleChipPress = () => {
     if (!memoryIds || memoryIds.length === 0) return;
@@ -436,75 +412,83 @@ function MorphingProposalCard({
     }
   };
 
-  if (phase === 'pending') {
-    return (
-      <View style={[styles.proposalCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdgeLight }]}>
-        {children}
-      </View>
-    );
-  }
-
-  const paddingH = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 10] });
-  const paddingV = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
-  const contentOpacity = collapse.interpolate({ inputRange: [0, 0.25], outputRange: [1, 0], extrapolate: 'clamp' });
-  const contentMaxH = collapse.interpolate({ inputRange: [0, 0.6, 1], outputRange: [200, 40, 0] });
+  const isDone = collapsed && showFinalIcon;
 
   const chipRow = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+    <ReAnimated.View
+      entering={FadeIn.duration(220).delay(120)}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+    >
       <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center' }}>
-        <RNAnimated.View style={{
-          position: 'absolute',
-          opacity: checkOpacity,
-          transform: [{ scale: checkScale }],
-        }}>
-          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-            <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-          </Svg>
-        </RNAnimated.View>
-        <RNAnimated.View style={{ position: 'absolute', opacity: iconOpacity }}>
-          <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
-        </RNAnimated.View>
+        {!showFinalIcon ? (
+          <ReAnimated.View
+            key="check"
+            entering={FadeIn.springify().damping(14).stiffness(120)}
+            exiting={FadeOut.duration(150)}
+            style={{ position: 'absolute' }}
+          >
+            <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+              <Path d="M20 6L9 17L4 12" stroke={colors.contentPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+            </Svg>
+          </ReAnimated.View>
+        ) : (
+          <ReAnimated.View
+            key="icon"
+            entering={FadeIn.duration(200)}
+            style={{ position: 'absolute' }}
+          >
+            <Feather name={finalIcon} size={12} color={colors.contentPrimary} />
+          </ReAnimated.View>
+        )}
       </View>
-      <RNAnimated.View style={{ opacity: labelOpacity, transform: [{ translateX: labelSlide }] }}>
-        <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
-          {confirmedLabel}
-        </Text>
-      </RNAnimated.View>
-      <RNAnimated.View style={{ opacity: chevronOpacity }}>
-        <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
-      </RNAnimated.View>
-    </View>
-  );
-
-  const morphCard = (
-    <RNAnimated.View style={[styles.morphCard, {
-      backgroundColor: colors.surfaceTint,
-      borderColor: colors.surfaceEdgeLight,
-      paddingHorizontal: paddingH,
-      paddingVertical: paddingV,
-    }]}>
-      {phase === 'morphing' && (
-        <RNAnimated.View style={{
-          opacity: contentOpacity,
-          maxHeight: contentMaxH,
-          overflow: 'hidden',
-        }}>
-          {children}
-        </RNAnimated.View>
+      <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
+        {confirmedLabel}
+      </Text>
+      {showFinalIcon && (
+        <ReAnimated.View entering={FadeIn.duration(200).delay(60)}>
+          <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+        </ReAnimated.View>
       )}
-      {chipRow}
-    </RNAnimated.View>
+    </ReAnimated.View>
   );
 
-  if (phase === 'done' && memoryIds && memoryIds.length > 0) {
+  const morphContent = (
+    <ReAnimated.View
+      layout={LinearTransition.springify()
+        .damping(SPRING_MORPH.damping)
+        .stiffness(SPRING_MORPH.stiffness)
+        .mass(SPRING_MORPH.mass)}
+      style={[
+        {
+          borderWidth: 0.75,
+          borderRadius: 16,
+          backgroundColor: colors.surfaceTint,
+          borderColor: colors.surfaceEdgeLight,
+          overflow: 'hidden',
+        },
+        collapsed
+          ? { alignSelf: 'flex-start' as const, paddingHorizontal: 10, paddingVertical: 6 }
+          : { padding: 12 },
+      ]}
+    >
+      {!collapsed && (
+        <ReAnimated.View exiting={FadeOut.duration(160)}>
+          {children}
+        </ReAnimated.View>
+      )}
+      {collapsed && chipRow}
+    </ReAnimated.View>
+  );
+
+  if (isDone && memoryIds && memoryIds.length > 0) {
     return (
       <Pressable onPress={handleChipPress}>
-        {morphCard}
+        {morphContent}
       </Pressable>
     );
   }
 
-  return morphCard;
+  return morphContent;
 }
 
 function MemoryProposalCard({ message }: { message: Message }) {
