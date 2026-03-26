@@ -422,7 +422,7 @@ function MorphingProposalCard({
       setPhase('morphing');
 
       RNAnimated.timing(collapse, {
-        toValue: 1, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: false,
+        toValue: 1, duration: 400, easing: Easing.inOut(Easing.cubic), useNativeDriver: false,
       }).start(() => {
         if (!mountedRef.current) return;
         setPhase('check');
@@ -471,8 +471,7 @@ function MorphingProposalCard({
   const paddingH = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 10] });
   const paddingV = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
   const contentOpacity = collapse.interpolate({ inputRange: [0, 0.25], outputRange: [1, 0], extrapolate: 'clamp' });
-  const contentMaxH = collapse.interpolate({ inputRange: [0, 0.6, 1], outputRange: [200, 40, 0] });
-  const contentMaxW = collapse.interpolate({ inputRange: [0, 1], outputRange: [500, 0] });
+  const contentMaxH = collapse.interpolate({ inputRange: [0, 1], outputRange: [200, 0] });
 
   const chipRow = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -519,7 +518,6 @@ function MorphingProposalCard({
         <RNAnimated.View style={{
           opacity: contentOpacity,
           maxHeight: contentMaxH,
-          maxWidth: contentMaxW,
           overflow: 'hidden',
         }}>
           {children}
