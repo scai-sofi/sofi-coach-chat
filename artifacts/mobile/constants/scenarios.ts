@@ -97,7 +97,7 @@ function buildScenarios(): Scenario[] {
     {
       id: 'memory-lifecycle',
       title: 'Memory System',
-      subtitle: 'Three tiers: auto-save, proposals, manual — plus corrections and profile conflicts',
+      subtitle: 'Auto-save, proposals, corrections, and profile conflict detection',
       icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
@@ -129,15 +129,9 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: "Actually, that dining thing is outdated — I've been cooking more lately", timestamp: new Date(now.getTime() - 240000) },
         {
-          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority?",
+          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.",
           timestamp: new Date(now.getTime() - 230000),
           chips: [{ type: 'memory-updated', label: 'Memory updated' }],
-        },
-        { id: uid(), role: 'user', content: "Keep explanations simple for me — I don't need all the technical jargon", timestamp: new Date(now.getTime() - 180000) },
-        {
-          id: uid(), role: 'ai', content: "**Got it — plain language from here on out.**\n\nI'll skip the financial jargon and give you clear, straightforward answers. If I ever need to use a technical term, I'll explain it in simple words.\n\nThis actually helps me give you better advice — focused on what matters, without the noise. Just let me know if you ever want more detail on something specific.",
-          timestamp: new Date(now.getTime() - 170000),
-          chips: [{ type: 'memory-saved', label: 'Memory saved' }],
           suggestions: ["What should I focus on first?", "Show me my spending", "How are my goals doing?"],
         },
       ],
