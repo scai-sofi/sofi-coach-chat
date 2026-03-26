@@ -468,6 +468,7 @@ function MorphingProposalCard({
   const paddingV = collapse.interpolate({ inputRange: [0, 1], outputRange: [12, 6] });
   const contentOpacity = collapse.interpolate({ inputRange: [0, 0.25], outputRange: [1, 0], extrapolate: 'clamp' });
   const contentMaxH = collapse.interpolate({ inputRange: [0, 0.6, 1], outputRange: [200, 40, 0] });
+  const contentMaxW = collapse.interpolate({ inputRange: [0, 1], outputRange: [500, 0] });
 
   const chipRow = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -514,6 +515,7 @@ function MorphingProposalCard({
         <RNAnimated.View style={{
           opacity: contentOpacity,
           maxHeight: contentMaxH,
+          maxWidth: contentMaxW,
           overflow: 'hidden',
         }}>
           {children}
