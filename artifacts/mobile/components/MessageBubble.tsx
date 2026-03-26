@@ -395,31 +395,31 @@ function MorphingProposalCard({
       setPhase('morphing');
 
       RNAnimated.timing(collapse, {
-        toValue: 1, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: false,
+        toValue: 1, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: false,
       }).start(() => {
         if (!mountedRef.current) return;
         setPhase('check');
 
         RNAnimated.parallel([
-          RNAnimated.timing(checkScale, { toValue: 1, duration: 180, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-          RNAnimated.timing(checkOpacity, { toValue: 1, duration: 150, useNativeDriver: false }),
-          RNAnimated.timing(labelOpacity, { toValue: 1, duration: 220, delay: 40, useNativeDriver: false }),
-          RNAnimated.timing(labelSlide, { toValue: 0, duration: 220, delay: 40, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+          RNAnimated.timing(checkScale, { toValue: 1, duration: 250, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+          RNAnimated.timing(checkOpacity, { toValue: 1, duration: 200, useNativeDriver: false }),
+          RNAnimated.timing(labelOpacity, { toValue: 1, duration: 280, delay: 60, useNativeDriver: false }),
+          RNAnimated.timing(labelSlide, { toValue: 0, duration: 280, delay: 60, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
         ]).start(() => {
           if (!mountedRef.current) return;
 
           timerRef.current = setTimeout(() => {
             if (!mountedRef.current) return;
             RNAnimated.parallel([
-              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 150, useNativeDriver: false }),
-              RNAnimated.timing(checkScale, { toValue: 0.8, duration: 150, useNativeDriver: false }),
-              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 200, delay: 40, useNativeDriver: false }),
-              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 180, delay: 80, useNativeDriver: false }),
+              RNAnimated.timing(checkOpacity, { toValue: 0, duration: 200, useNativeDriver: false }),
+              RNAnimated.timing(checkScale, { toValue: 0.8, duration: 200, useNativeDriver: false }),
+              RNAnimated.timing(iconOpacity, { toValue: 1, duration: 250, delay: 60, useNativeDriver: false }),
+              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 220, delay: 100, useNativeDriver: false }),
             ]).start(() => {
               if (!mountedRef.current) return;
               setPhase('done');
             });
-          }, 450);
+          }, 3000);
         });
       });
     }
