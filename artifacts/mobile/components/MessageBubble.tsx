@@ -763,9 +763,53 @@ function ReactionButton({
   );
 }
 
+function CopyButton({ color }: { color: string }) {
+  const [copied, setCopied] = useState(false);
+  const popScale = useRef(new RNAnimated.Value(1)).current;
+  const popRotate = useRef(new RNAnimated.Value(0)).current;
+  const prevCopied = useRef(false);
+
+  useEffect(() => {
+    if (prevCopied.current === copied) return;
+    prevCopied.current = copied;
+    if (copied) {
+      popScale.setValue(0.5);
+      popRotate.setValue(0);
+      RNAnimated.parallel([
+        RNAnimated.spring(popScale, { toValue: 1, friction: 4, tension: 300, useNativeDriver: true }),
+        RNAnimated.sequence([
+          RNAnimated.timing(popRotate, { toValue: 1, duration: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+          RNAnimated.spring(popRotate, { toValue: 0, friction: 5, tension: 180, useNativeDriver: true }),
+        ]),
+      ]).start();
+    }
+  }, [copied, popScale, popRotate]);
+
+  const rotate = popRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-10deg'] });
+
+  return (
+    <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
+      <RNAnimated.View style={{ transform: [{ scale: popScale }, { rotate }] }}>
+        <FlipIcon
+          front={<Image source={iconCopy} style={[styles.actionIcon, { tintColor: color }]} />}
+          back={
+            <View style={styles.actionIconWrap}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                <Path d="M20 6L9 17L4 12" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </View>
+          }
+          flipped={copied}
+          size={20}
+          duration={350}
+        />
+      </RNAnimated.View>
+    </Pressable>
+  );
+}
+
 function ActionFooter({ message }: { message: Message }) {
   const { colors } = useTheme();
-  const [copied, setCopied] = useState(false);
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
@@ -773,21 +817,7 @@ function ActionFooter({ message }: { message: Message }) {
   return (
     <View>
       <View style={styles.actionRow}>
-        <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
-          <FlipIcon
-            front={<Image source={iconCopy} style={[styles.actionIcon, { tintColor: colors.contentBone600 }]} />}
-            back={
-              <View style={styles.actionIconWrap}>
-                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                  <Path d="M20 6L9 17L4 12" stroke={colors.contentBone600} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
-                </Svg>
-              </View>
-            }
-            flipped={copied}
-            size={20}
-            duration={350}
-          />
-        </Pressable>
+        <CopyButton color={colors.contentBone600} />
         <ReactionButton
           active={thumbUp}
           onToggle={() => { setThumbUp(!thumbUp); if (thumbDown) setThumbDown(false); }}
