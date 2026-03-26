@@ -477,12 +477,16 @@ function MorphingProposalCard({
   );
 
   const morphCard = (
-    <RNAnimated.View style={[styles.morphCard, {
-      backgroundColor: colors.surfaceTint,
-      borderColor: colors.surfaceEdgeLight,
-      paddingHorizontal: paddingH,
-      paddingVertical: paddingV,
-    }]}>
+    <RNAnimated.View style={[
+      styles.morphCard,
+      {
+        backgroundColor: colors.surfaceTint,
+        borderColor: colors.surfaceEdgeLight,
+        paddingHorizontal: paddingH,
+        paddingVertical: paddingV,
+      },
+      phase === 'morphing' && { alignSelf: 'stretch' as const },
+    ]}>
       {phase === 'morphing' && (
         <RNAnimated.View style={{
           opacity: contentOpacity,
