@@ -1,17 +1,8 @@
 import React from 'react';
 import { View, TextInput, Pressable, StyleSheet } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
-
-function FilterIcon({ size = 16, color = '#706f6e' }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <Path d="M2 4h12M4 8h8M6 12h4" stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
+import { SearchIcon, FilterIcon } from '@/components/icons';
 
 interface SearchBarProps {
   value: string;
@@ -34,7 +25,7 @@ export function SearchBar({
   return (
     <View style={styles.wrapper}>
       <View style={[styles.pill, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
-        <Feather name="search" size={16} color={colors.contentSecondary} />
+        <SearchIcon size={16} color={colors.contentSecondary} />
         <TextInput
           style={[styles.input, { color: colors.contentPrimary }]}
           placeholder={placeholder}
@@ -50,7 +41,7 @@ export function SearchBar({
           style={[styles.filterBtn, filterActive && { backgroundColor: colors.contentPrimary }]}
           onPress={onFilterPress}
         >
-          <FilterIcon size={16} color={filterActive ? colors.contentPrimaryInverse : colors.contentSecondary} />
+          <FilterIcon size={18} color={filterActive ? colors.contentPrimaryInverse : colors.contentSecondary} />
         </Pressable>
       )}
     </View>

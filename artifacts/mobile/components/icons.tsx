@@ -208,3 +208,29 @@ export function PlayMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; 
     </Svg>
   );
 }
+
+export function SearchIcon({ size = 16, color = '#706f6e' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7 2.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9ZM1 7a6 6 0 1 1 10.72 3.66l2.81 2.81a.75.75 0 1 1-1.06 1.06l-2.81-2.81A6 6 0 0 1 1 7Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+export function FilterIcon({ size = 18, color = '#706f6e' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size * 12 / 18} viewBox="0 0 18 12" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M0 1a1 1 0 0 1 1-1h16a1 1 0 1 1 0 2H1a1 1 0 0 1-1-1Zm3 5a1 1 0 0 1 1-1h10a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1Zm4 4a1 1 0 0 0 0 2h4a1 1 0 1 0 0-2H7Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
