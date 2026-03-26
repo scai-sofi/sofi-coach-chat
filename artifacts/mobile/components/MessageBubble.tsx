@@ -422,6 +422,7 @@ function MorphingProposalCard({
           RNAnimated.timing(checkOpacity, { toValue: 1, duration: 200, useNativeDriver: false }),
           RNAnimated.timing(labelOpacity, { toValue: 1, duration: 280, delay: 60, useNativeDriver: false }),
           RNAnimated.timing(labelSlide, { toValue: 0, duration: 280, delay: 60, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+          RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 280, delay: 80, useNativeDriver: false }),
         ]).start(() => {
           if (!mountedRef.current) return;
 
@@ -431,7 +432,6 @@ function MorphingProposalCard({
               RNAnimated.timing(checkOpacity, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
               RNAnimated.timing(checkScale, { toValue: 0.85, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
               RNAnimated.timing(iconOpacity, { toValue: 1, duration: 400, delay: 150, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-              RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 350, delay: 250, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
             ]).start(() => {
               if (!mountedRef.current) return;
               setPhase('done');
