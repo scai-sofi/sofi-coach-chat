@@ -388,7 +388,7 @@ function MorphingProposalCard({
 
   const collapse = useRef(new RNAnimated.Value(0)).current;
   const flipAnim = useRef(new RNAnimated.Value(0)).current;
-  const labelSlide = useRef(new RNAnimated.Value(8)).current;
+  const labelSlide = useRef(new RNAnimated.Value(0)).current;
   const labelOpacity = useRef(new RNAnimated.Value(0)).current;
   const chevronOpacity = useRef(new RNAnimated.Value(0)).current;
   const [phase, setPhase] = useState<'pending' | 'morphing' | 'check' | 'done'>('pending');
@@ -430,7 +430,6 @@ function MorphingProposalCard({
         RNAnimated.parallel([
           RNAnimated.timing(flipAnim, { toValue: 180, duration: 500, easing: Easing.inOut(Easing.cubic), useNativeDriver: false }),
           RNAnimated.timing(labelOpacity, { toValue: 1, duration: 280, delay: 60, useNativeDriver: false }),
-          RNAnimated.timing(labelSlide, { toValue: 0, duration: 280, delay: 60, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
           RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 280, delay: 80, useNativeDriver: false }),
         ]).start(() => {
           if (!mountedRef.current) return;
@@ -507,7 +506,7 @@ function MorphingProposalCard({
           {confirmedLabel}
         </Text>
       ) : (
-        <RNAnimated.View style={{ opacity: labelOpacity, transform: [{ translateX: labelSlide }] }}>
+        <RNAnimated.View style={{ opacity: labelOpacity }}>
           <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
             {confirmedLabel}
           </Text>
