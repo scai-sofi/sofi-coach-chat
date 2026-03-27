@@ -55,6 +55,7 @@ export function EmptyChat() {
   const progress = useSharedValue(0);
   const fullCardProgress = useSharedValue(0);
   const halfCardProgress = useSharedValue(0);
+  const sectionCollapse = useSharedValue(0);
 
   const floatPhase = useSharedValue(0);
   const breathePhase = useSharedValue(0);
@@ -75,11 +76,13 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      fullCardProgress.value = withDelay(150, withTiming(1, FADE_OUT));
       halfCardProgress.value = withDelay(120, withTiming(1, FADE_OUT));
+      fullCardProgress.value = withDelay(150, withTiming(1, FADE_OUT));
+      sectionCollapse.value = withDelay(200, withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) }));
       progress.value = withDelay(200, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
+      sectionCollapse.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) });
       fullCardProgress.value = withDelay(80, withTiming(0, FADE_IN));
       halfCardProgress.value = withDelay(140, withTiming(0, FADE_IN));
     }
@@ -117,6 +120,12 @@ export function EmptyChat() {
     };
   });
 
+  const suggestionsSectionStyle = useAnimatedStyle(() => ({
+    maxHeight: interpolate(sectionCollapse.value, [0, 1], [300, 0]),
+    opacity: interpolate(sectionCollapse.value, [0, 0.5], [1, 0], 'clamp'),
+    overflow: 'hidden' as const,
+  }));
+
   const fullCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
   }));
@@ -152,7 +161,7 @@ export function EmptyChat() {
         </Text>
       </Animated.View>
 
-      <View style={styles.suggestionsSection}>
+      <Animated.View style={[styles.suggestionsSection, suggestionsSectionStyle]}>
         <Animated.View style={fullCardAnimStyle}>
           <Pressable
             style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
@@ -177,7 +186,7 @@ export function EmptyChat() {
             </Pressable>
           ))}
         </Animated.View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
