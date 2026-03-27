@@ -84,6 +84,7 @@ export function InputBar() {
 
 const styles = StyleSheet.create({
   footer: {
+    backfaceVisibility: 'hidden',
   },
   inputRow: {
     paddingHorizontal: 16,
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 8,
     paddingVertical: 8,
+    backfaceVisibility: 'hidden',
   },
   input: {
     flex: 1,
