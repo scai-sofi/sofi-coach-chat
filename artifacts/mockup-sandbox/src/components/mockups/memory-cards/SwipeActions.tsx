@@ -13,26 +13,32 @@ import {
   useMemoryState,
 } from './_shared';
 
-function SwipeCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDelete: (id: string) => void; onTogglePause: (id: string) => void }) {
+function HybridCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDelete: (id: string) => void; onTogglePause: (id: string) => void }) {
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState(memory.content);
   const startX = useRef(0);
   const currentX = useRef(0);
+  const didSwipe = useRef(false);
 
-  const ACTION_THRESHOLD = 72;
-  const FULL_REVEAL = 192;
+  const ACTION_THRESHOLD = 56;
+  const FULL_REVEAL = 128;
   const isPaused = memory.status === 'PAUSED';
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    if (editing) return;
     startX.current = e.clientX;
     currentX.current = 0;
+    didSwipe.current = false;
     setIsDragging(true);
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, []);
+  }, [editing]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     const dx = e.clientX - startX.current;
+    if (Math.abs(dx) > 5) didSwipe.current = true;
     const clamped = Math.min(0, Math.max(-FULL_REVEAL, dx));
     currentX.current = clamped;
     setDragX(clamped);
@@ -53,6 +59,72 @@ function SwipeCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDele
     if (action === 'pause') onTogglePause(memory.id);
   };
 
+  const handleEditClick = () => {
+    if (dragX < 0) return;
+    setEditing(true);
+    setEditText(memory.content);
+  };
+
+  const handleSave = () => {
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditing(false);
+    setEditText(memory.content);
+  };
+
+  if (editing) {
+    return (
+      <div style={{
+        background: 'var(--sofi-surface-elevated)',
+        borderRadius: 20,
+        padding: 16,
+        border: '0.75px solid var(--sofi-border-subtle)',
+        boxShadow: '0 2px 8px var(--sofi-shadow-edge)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}>
+        <textarea
+          value={editText}
+          onChange={(e) => { if (e.target.value.length <= 300) setEditText(e.target.value); }}
+          autoFocus
+          style={{
+            color: 'var(--sofi-content-primary)',
+            fontSize: 16,
+            lineHeight: '20px',
+            fontWeight: 400,
+            background: 'none',
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            minHeight: 60,
+            width: '100%',
+          }}
+        />
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', paddingTop: 4 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, lineHeight: '20px', color: editText.trim().length > 0 ? 'var(--sofi-content-dimmed)' : 'var(--sofi-content-disabled2)' }}>
+            {editText.length}/300
+          </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={handleSave} style={{
+              borderRadius: 12, padding: '8px 16px', border: 'none', cursor: 'pointer',
+              background: editText.trim().length > 0 ? 'var(--sofi-content-brand)' : 'var(--sofi-surface-tint)',
+              color: editText.trim().length > 0 ? 'var(--sofi-white)' : 'var(--sofi-content-disabled2)',
+              fontSize: 14, fontWeight: 700, lineHeight: '20px',
+            }}>Save</button>
+            <button onClick={handleCancel} style={{
+              borderRadius: 12, padding: '8px 16px', cursor: 'pointer',
+              border: '1.5px solid var(--sofi-border-medium)', background: 'none',
+              color: 'var(--sofi-content-primary)', fontSize: 14, fontWeight: 700, lineHeight: '20px',
+            }}>Cancel</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden' }}>
       <div style={{
@@ -64,16 +136,6 @@ function SwipeCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDele
         pointerEvents: dragX < 0 ? 'auto' : 'none',
         transition: isDragging ? 'none' : 'opacity 0.2s ease',
       }}>
-        <button
-          onClick={() => handleAction('edit')}
-          style={{
-            width: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-            background: 'var(--sofi-content-brand)', border: 'none', cursor: 'pointer', color: 'var(--sofi-white)', fontSize: 11, fontWeight: 500, padding: 0,
-          }}
-        >
-          <PencilSvg size={14} color="white" />
-          <span>Edit</span>
-        </button>
         <button
           onClick={() => handleAction('pause')}
           style={{
@@ -126,6 +188,15 @@ function SwipeCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDele
           <span style={{ color: 'var(--sofi-content-secondary)', fontSize: 14, fontWeight: 500, lineHeight: '20px' }}>
             {isPaused ? 'Paused · not used in chat' : memory.date}
           </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); if (!didSwipe.current) handleEditClick(); }}
+            style={{
+              width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            }}
+          >
+            <PencilSvg size={13} color="var(--sofi-content-secondary)" />
+          </button>
         </div>
       </div>
     </div>
@@ -153,7 +224,7 @@ export function SwipeActions() {
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {mems.map(m => (
-                <SwipeCard key={m.id} memory={m} onDelete={deleteMemory} onTogglePause={togglePause} />
+                <HybridCard key={m.id} memory={m} onDelete={deleteMemory} onTogglePause={togglePause} />
               ))}
             </div>
           </div>
