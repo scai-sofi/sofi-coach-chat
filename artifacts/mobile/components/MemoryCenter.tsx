@@ -137,6 +137,8 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
             underlineColorAndroid="transparent"
             textAlignVertical="top"
             scrollEnabled={false}
+            cursorColor={colors.contentBone600}
+            selectionColor={colors.selectionColor}
           />
           <View style={styles.editToolRow}>
             <Text style={[styles.editCharCount, { color: colors.contentDimmed }]}>{editText.length}/{MAX_CHARS}</Text>
@@ -434,6 +436,8 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
                 multiline
                 placeholder="What do you want Coach to remember?"
                 placeholderTextColor={colors.contentDisabled}
+                cursorColor={colors.contentBone600}
+                selectionColor={colors.selectionColor}
               />
               <View style={styles.editToolRow}>
                 <Text style={[styles.editCharCount, { color: addText.trim().length > 0 ? colors.contentDimmed : colors.contentDisabled2 }]}>
