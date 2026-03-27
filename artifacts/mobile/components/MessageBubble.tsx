@@ -427,23 +427,10 @@ function MorphingProposalCard({
         if (!mountedRef.current) return;
         setPhase('check');
 
-        RNAnimated.parallel([
-          RNAnimated.timing(flipAnim, { toValue: 180, duration: 500, easing: Easing.inOut(Easing.cubic), useNativeDriver: false }),
-          RNAnimated.timing(labelOpacity, { toValue: 1, duration: 280, delay: 60, useNativeDriver: false }),
-          RNAnimated.timing(chevronOpacity, { toValue: 1, duration: 280, delay: 80, useNativeDriver: false }),
-        ]).start(() => {
+        timerRef.current = setTimeout(() => {
           if (!mountedRef.current) return;
-
-          timerRef.current = setTimeout(() => {
-            if (!mountedRef.current) return;
-            RNAnimated.timing(flipAnim, {
-              toValue: 360, duration: 500, easing: Easing.inOut(Easing.cubic), useNativeDriver: false,
-            }).start(() => {
-              if (!mountedRef.current) return;
-              setPhase('done');
-            });
-          }, 3000);
-        });
+          setPhase('done');
+        }, 2000);
       });
     }
     prevExiting.current = isExiting;
@@ -474,11 +461,12 @@ function MorphingProposalCard({
   const contentMaxW = collapse.interpolate({ inputRange: [0, 1], outputRange: [500, 0] });
 
   const isDone = phase === 'done';
+  const showStaticChip = phase === 'check' || phase === 'done';
 
   const chipRow = (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
       <View style={{ width: 14, height: 14, justifyContent: 'center', alignItems: 'center' }}>
-        {isDone ? (
+        {showStaticChip ? (
           <AppIcon name={finalIcon} size={12} color={colors.contentPrimary} />
         ) : (
           <>
@@ -501,7 +489,7 @@ function MorphingProposalCard({
           </>
         )}
       </View>
-      {isDone ? (
+      {showStaticChip ? (
         <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
           {confirmedLabel}
         </Text>
@@ -512,8 +500,10 @@ function MorphingProposalCard({
           </Text>
         </RNAnimated.View>
       )}
-      {isDone ? (
-        <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+      {showStaticChip ? (
+        memoryIds && memoryIds.length > 0 ? (
+          <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+        ) : null
       ) : (
         <RNAnimated.View style={{ opacity: chevronOpacity }}>
           <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
