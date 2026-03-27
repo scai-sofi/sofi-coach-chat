@@ -836,7 +836,8 @@ function CopyButton({ color, text }: { color: string; text: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
-    await Clipboard.setStringAsync(text);
+    const cleaned = text.replace(/\*\*/g, '');
+    await Clipboard.setStringAsync(cleaned);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [text]);
