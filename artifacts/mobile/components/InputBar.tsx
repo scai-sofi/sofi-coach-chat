@@ -1,19 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, TextInput, Pressable, Text, StyleSheet, Keyboard } from 'react-native';
+import { TextInput, Pressable, Text, StyleSheet, Keyboard } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
+import { View } from 'react-native';
 
 export function InputBar() {
   const { colors } = useTheme();
   const [text, setText] = useState('');
-  const [keyboardUp, setKeyboardUp] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const insets = useSafeAreaInsets();
   const { sendMessage, isTyping, setInputFocused, messages } = useCoach();
   const hasActiveChat = messages.length > 0;
+  const restPadding = Math.max(insets.bottom, 8);
+  const bottomPad = useSharedValue(restPadding);
 
   useEffect(() => {
     if (isTyping) {
@@ -23,10 +26,18 @@ export function InputBar() {
   }, [isTyping]);
 
   useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardWillShow', () => setKeyboardUp(true));
-    const hideSub = Keyboard.addListener('keyboardWillHide', () => setKeyboardUp(false));
+    const showSub = Keyboard.addListener('keyboardWillShow', () => {
+      bottomPad.value = withTiming(4, { duration: 250, easing: Easing.out(Easing.cubic) });
+    });
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => {
+      bottomPad.value = withTiming(restPadding, { duration: 300, easing: Easing.out(Easing.cubic) });
+    });
     return () => { showSub.remove(); hideSub.remove(); };
-  }, []);
+  }, [restPadding]);
+
+  const footerAnimStyle = useAnimatedStyle(() => ({
+    paddingBottom: bottomPad.value,
+  }));
 
   const handleSend = () => {
     if (!text.trim() || isTyping) return;
@@ -35,7 +46,7 @@ export function InputBar() {
   };
 
   return (
-    <View style={[styles.footer, { paddingBottom: keyboardUp ? 4 : Math.max(insets.bottom, 8), backgroundColor: colors.surfaceBase }]}>
+    <Animated.View style={[styles.footer, footerAnimStyle, { backgroundColor: colors.surfaceBase }]}>
       <View style={styles.inputRow}>
         <View style={[styles.inputPill, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
           <TextInput
@@ -78,7 +89,7 @@ export function InputBar() {
           </Text>
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 }
 
