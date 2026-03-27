@@ -721,14 +721,14 @@ function ThumbUpIcon({ size = 20, color, filled }: { size?: number; color: strin
 function ThumbDownIcon({ size = 20, color, filled }: { size?: number; color: string; filled: boolean }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
-      <G transform="translate(15, 3.33) scale(-1, -1)">
+      <G transform="translate(16.25, 13.7467) scale(-1, -1)">
         <Path
           d="M0.625 0.625H3.125V8.125C3.125 9.04548 2.37881 9.79167 1.45833 9.79167H0.625"
           stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
           fill={filled ? color : 'none'}
         />
       </G>
-      <G transform="translate(2.5, 3.33) rotate(180, 5.625, 7.2917)">
+      <G transform="translate(13.75, 17.9134) scale(-1, -1)">
         <Path
           d="M0.625 6.83183V12.2917C0.625 13.2121 1.37118 13.9583 2.29165 13.9583L6.73975 13.9584C7.81584 13.9584 8.77119 13.2698 9.11148 12.2489L10.533 7.98428C10.5939 7.80151 10.625 7.61012 10.625 7.41746C10.625 6.42751 9.82249 5.625 8.83254 5.625H6.8093C5.99609 5.625 5.39939 4.86076 5.59663 4.07183L6.16235 1.80894C6.31269 1.20756 5.85785 0.625 5.23795 0.625C4.95517 0.625 4.68699 0.750606 4.50596 0.967847L1.3976 4.69789C0.898387 5.29694 0.625 6.05204 0.625 6.83183Z"
           stroke={color} strokeWidth={1.25}
