@@ -207,13 +207,13 @@ function HybridCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDel
 }
 
 export function SwipeActions() {
-  const { search, setSearch, showFilters, setShowFilters, filterCat, setFilterCat, grouped, catCounts, deleteMemory, togglePause } = useMemoryState();
+  const { search, setSearch, filterCat, setFilterCat, grouped, deleteMemory, togglePause } = useMemoryState();
 
   return (
     <div style={{ width: '100%', height: '100vh', background: 'var(--sofi-surface-base)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <AppBarHeader onPlusPress={() => {}} />
-      <SearchBarUI value={search} onChange={setSearch} filterActive={showFilters || !!filterCat} onFilterPress={() => setShowFilters(!showFilters)} />
-      {(showFilters || filterCat) && <FilterChips filterCat={filterCat} setFilterCat={setFilterCat} catCounts={catCounts} />}
+      <SearchBarUI value={search} onChange={setSearch} />
+      <FilterChips filterCat={filterCat} setFilterCat={setFilterCat} />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 16px 40px' }}>
         {Object.entries(grouped).map(([cat, mems], idx) => (

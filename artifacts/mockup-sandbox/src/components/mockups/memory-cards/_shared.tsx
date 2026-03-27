@@ -141,9 +141,9 @@ export function AppBarHeader({ onPlusPress }: { onPlusPress?: () => void }) {
   );
 }
 
-export function SearchBarUI({ value, onChange, filterActive, onFilterPress }: { value: string; onChange: (v: string) => void; filterActive: boolean; onFilterPress: () => void }) {
+export function SearchBarUI({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px' }}>
       <div style={{
         flex: 1,
         height: 48,
@@ -174,58 +174,46 @@ export function SearchBarUI({ value, onChange, filterActive, onFilterPress }: { 
           }}
         />
       </div>
-      <button
-        onClick={onFilterPress}
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 12,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: filterActive ? 'var(--sofi-content-primary)' : 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: 0,
-        }}
-      >
-        <FilterSvg size={18} color={filterActive ? 'var(--sofi-content-primary-inverse)' : 'var(--sofi-content-primary)'} />
-      </button>
     </div>
   );
 }
 
-export function FilterChips({ filterCat, setFilterCat, catCounts }: { filterCat: string | null; setFilterCat: (c: string | null) => void; catCounts: Record<string, number> }) {
+function PillFilter({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
-    <div style={{ padding: '10px 16px 4px', display: 'flex', gap: 6, overflow: 'auto' }}>
-      {CATEGORY_ORDER.filter(cat => (catCounts[cat] || 0) > 0).map(cat => {
-        const selected = filterCat === cat;
-        return (
-          <button
-            key={cat}
-            onClick={() => setFilterCat(filterCat === cat ? null : cat)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '6px 12px',
-              borderRadius: 9999,
-              border: selected ? `1px solid var(--sofi-chip-selected-bg)` : '1px solid var(--sofi-chip-unselected-border)',
-              background: selected ? 'var(--sofi-chip-selected-bg)' : 'var(--sofi-chip-unselected-bg)',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 500, lineHeight: '20px', color: selected ? 'var(--sofi-content-primary-inverse)' : 'var(--sofi-content-primary)' }}>
-              {CATEGORY_LABELS[cat]}
-            </span>
-            <span style={{ fontSize: 12, fontWeight: 400, color: selected ? 'var(--sofi-inverse-alpha60)' : 'var(--sofi-content-secondary)' }}>
-              {catCounts[cat]}
-            </span>
-          </button>
-        );
-      })}
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '8px 16px',
+        borderRadius: 24,
+        border: selected ? '1px solid var(--sofi-chip-selected-bg)' : '1px solid var(--sofi-chip-unselected-border)',
+        background: selected ? 'var(--sofi-chip-selected-bg)' : 'var(--sofi-chip-unselected-bg)',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
+      }}
+    >
+      <span style={{ fontSize: 14, fontWeight: 500, lineHeight: '20px', color: selected ? 'var(--sofi-content-primary-inverse)' : 'var(--sofi-content-bone600)' }}>
+        {label}
+      </span>
+    </button>
+  );
+}
+
+export function FilterChips({ filterCat, setFilterCat }: { filterCat: string | null; setFilterCat: (c: string | null) => void }) {
+  return (
+    <div style={{ padding: '0 16px 16px', display: 'flex', gap: 8, overflow: 'auto' }}>
+      <PillFilter label="All" selected={filterCat === null} onClick={() => setFilterCat(null)} />
+      {CATEGORY_ORDER.map(cat => (
+        <PillFilter
+          key={cat}
+          label={CATEGORY_LABELS[cat]}
+          selected={filterCat === cat}
+          onClick={() => setFilterCat(filterCat === cat ? null : cat)}
+        />
+      ))}
     </div>
   );
 }
@@ -233,7 +221,6 @@ export function FilterChips({ filterCat, setFilterCat, catCounts }: { filterCat:
 export function useMemoryState() {
   const [memories, setMemories] = useState<Memory[]>(SAMPLE_MEMORIES);
   const [search, setSearch] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<string | null>(null);
 
   const visible = memories.filter(m => {
@@ -254,5 +241,5 @@ export function useMemoryState() {
   const deleteMemory = (id: string) => setMemories(prev => prev.filter(m => m.id !== id));
   const togglePause = (id: string) => setMemories(prev => prev.map(m => m.id === id ? { ...m, status: m.status === 'PAUSED' ? 'ACTIVE' as const : 'PAUSED' as const } : m));
 
-  return { memories, search, setSearch, showFilters, setShowFilters, filterCat, setFilterCat, visible, grouped, catCounts, deleteMemory, togglePause };
+  return { memories, search, setSearch, filterCat, setFilterCat, visible, grouped, catCounts, deleteMemory, togglePause };
 }

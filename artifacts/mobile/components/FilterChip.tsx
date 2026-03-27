@@ -7,10 +7,9 @@ interface FilterChipProps {
   label: string;
   selected: boolean;
   onPress: () => void;
-  count?: number;
 }
 
-export function FilterChip({ label, selected, onPress, count }: FilterChipProps) {
+export function FilterChip({ label, selected, onPress }: FilterChipProps) {
   const { colors } = useTheme();
 
   return (
@@ -25,23 +24,12 @@ export function FilterChip({ label, selected, onPress, count }: FilterChipProps)
       <Text
         style={[
           styles.label,
-          { color: colors.contentPrimary },
+          { color: colors.contentBone600 },
           selected && { color: colors.contentPrimaryInverse },
         ]}
       >
         {label}
       </Text>
-      {count != null && (
-        <Text
-          style={[
-            styles.count,
-            { color: colors.contentSecondary },
-            selected && { color: colors.inverseAlpha60 },
-          ]}
-        >
-          {count}
-        </Text>
-      )}
     </Pressable>
   );
 }
@@ -50,19 +38,15 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 9999,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 24,
     borderWidth: 1,
   },
   label: {
     fontSize: 14,
     fontFamily: Fonts.medium,
     lineHeight: 20,
-  },
-  count: {
-    fontSize: 12,
-    fontFamily: Fonts.regular,
   },
 });

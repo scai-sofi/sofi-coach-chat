@@ -1,25 +1,19 @@
 import React from 'react';
-import { View, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
-import { SearchIcon, FilterIcon } from '@/components/icons';
+import { SearchIcon } from '@/components/icons';
 
 interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
-  variant?: 'search' | 'search-filter';
-  filterActive?: boolean;
-  onFilterPress?: () => void;
 }
 
 export function SearchBar({
   value,
   onChangeText,
   placeholder = 'Search',
-  variant = 'search',
-  filterActive = false,
-  onFilterPress,
 }: SearchBarProps) {
   const { colors } = useTheme();
   return (
@@ -36,14 +30,6 @@ export function SearchBar({
           selectionColor={colors.selectionColor}
         />
       </View>
-      {variant === 'search-filter' && onFilterPress && (
-        <Pressable
-          style={[styles.filterBtn, filterActive && { backgroundColor: colors.contentPrimary }]}
-          onPress={onFilterPress}
-        >
-          <FilterIcon size={18} color={filterActive ? colors.contentPrimaryInverse : colors.contentPrimary} />
-        </Pressable>
-      )}
     </View>
   );
 }
@@ -52,7 +38,6 @@ const styles = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -72,12 +57,5 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     lineHeight: 20,
     paddingVertical: 0,
-  },
-  filterBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
