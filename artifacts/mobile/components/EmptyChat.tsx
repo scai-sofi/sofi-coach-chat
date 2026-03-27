@@ -21,6 +21,11 @@ const FLOAT_DURATION = 3200;
 const BREATHE_DURATION = 4000;
 const EASE_INOUT = Easing.bezier(0.45, 0, 0.55, 1);
 
+const ORB_FULL_W = 96;
+const ORB_FULL_H = 120;
+const SPHERE_H = 86;
+const SHADOW_H = ORB_FULL_H - SPHERE_H;
+
 const SUGGESTIONS = [
   {
     label: 'Support',
@@ -79,14 +84,14 @@ export function EmptyChat() {
     }
   }, [inputFocused]);
 
-  const orbAnimStyle = useAnimatedStyle(() => ({
+  const orbSectionStyle = useAnimatedStyle(() => ({
     transform: [
       { translateY: interpolate(progress.value, [0, 1], [0, -60]) },
       { scale: interpolate(progress.value, [0, 1], [1, 0.95]) },
     ],
   }));
 
-  const orbImageStyle = useAnimatedStyle(() => {
+  const sphereStyle = useAnimatedStyle(() => {
     const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
     const breatheScale = interpolate(breathePhase.value, [0, 1], [0.97, 1.03]);
     return {
@@ -94,6 +99,20 @@ export function EmptyChat() {
         { translateY: floatY },
         { scale: breatheScale },
       ],
+    };
+  });
+
+  const shadowStyle = useAnimatedStyle(() => {
+    const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
+    const scaleX = interpolate(floatY, [-5, 5], [1.08, 0.9]);
+    const scaleY = interpolate(floatY, [-5, 5], [1.12, 0.85]);
+    const shadowOpacity = interpolate(floatY, [-5, 5], [0.45, 0.85]);
+    return {
+      transform: [
+        { scaleX },
+        { scaleY },
+      ],
+      opacity: shadowOpacity,
     };
   });
 
@@ -115,13 +134,23 @@ export function EmptyChat() {
 
   return (
     <View style={styles.wrapper}>
-      <Animated.View style={[styles.orbSection, orbAnimStyle]}>
+      <Animated.View style={[styles.orbSection, orbSectionStyle]}>
         <View style={styles.orbCombo}>
-          <Animated.View style={orbImageStyle}>
+          <Animated.View style={sphereStyle}>
+            <View style={styles.sphereClip}>
+              <Image
+                source={require('@/assets/images/orb-combo.png')}
+                style={styles.orbFullImage}
+                resizeMode="cover"
+              />
+            </View>
+          </Animated.View>
+
+          <Animated.View style={[styles.shadowClip, shadowStyle]}>
             <Image
               source={require('@/assets/images/orb-combo.png')}
-              style={styles.orbComboImage}
-              resizeMode="contain"
+              style={[styles.orbFullImage, { marginTop: -SPHERE_H }]}
+              resizeMode="cover"
             />
           </Animated.View>
         </View>
@@ -173,10 +202,22 @@ const styles = StyleSheet.create({
   },
   orbCombo: {
     alignItems: 'center',
+    width: ORB_FULL_W,
+    height: ORB_FULL_H,
   },
-  orbComboImage: {
-    width: 96,
-    height: 120,
+  sphereClip: {
+    width: ORB_FULL_W,
+    height: SPHERE_H,
+    overflow: 'hidden',
+  },
+  shadowClip: {
+    width: ORB_FULL_W,
+    height: SHADOW_H,
+    overflow: 'hidden',
+  },
+  orbFullImage: {
+    width: ORB_FULL_W,
+    height: ORB_FULL_H,
   },
   greeting: {
     fontSize: 24,
