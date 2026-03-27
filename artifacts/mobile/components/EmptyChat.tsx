@@ -97,15 +97,6 @@ export function EmptyChat() {
     };
   });
 
-  const shadowStyle = useAnimatedStyle(() => {
-    const shadowScale = interpolate(floatPhase.value, [0, 1], [1.06, 0.92]);
-    const shadowOpacity = interpolate(floatPhase.value, [0, 1], [0.35, 0.55]);
-    return {
-      transform: [{ scaleX: shadowScale }],
-      opacity: shadowOpacity,
-    };
-  });
-
   const fullCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
     transform: [
@@ -127,16 +118,11 @@ export function EmptyChat() {
       <Animated.View style={[styles.orbSection, orbAnimStyle]}>
         <View style={styles.orbCombo}>
           <Animated.View style={orbImageStyle}>
-            <View style={styles.orbImageWrap}>
-              <Image
-                source={require('@/assets/images/orb-combo.png')}
-                style={styles.orbImage}
-                resizeMode="contain"
-              />
-            </View>
-          </Animated.View>
-          <Animated.View style={[styles.shadowContainer, shadowStyle]}>
-            <View style={[styles.shadow, { backgroundColor: colors.contentBrand }]} />
+            <Image
+              source={require('@/assets/images/orb-combo.png')}
+              style={styles.orbComboImage}
+              resizeMode="contain"
+            />
           </Animated.View>
         </View>
         <Text style={[styles.greeting, { color: colors.contentPrimary }]}>
@@ -188,24 +174,9 @@ const styles = StyleSheet.create({
   orbCombo: {
     alignItems: 'center',
   },
-  orbImageWrap: {
+  orbComboImage: {
     width: 96,
-    height: 96,
-    overflow: 'hidden',
-  },
-  orbImage: {
-    width: 96,
-    height: 96,
-  },
-  shadowContainer: {
-    marginTop: 6,
-    alignItems: 'center',
-  },
-  shadow: {
-    width: 56,
-    height: 6,
-    borderRadius: 28,
-    opacity: 0.2,
+    height: 120,
   },
   greeting: {
     fontSize: 24,
