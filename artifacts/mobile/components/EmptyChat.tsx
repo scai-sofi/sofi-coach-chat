@@ -54,7 +54,6 @@ export function EmptyChat() {
 
   const progress = useSharedValue(0);
   const cardsProgress = useSharedValue(0);
-  const sectionCollapse = useSharedValue(0);
 
   const floatPhase = useSharedValue(0);
   const breathePhase = useSharedValue(0);
@@ -76,11 +75,9 @@ export function EmptyChat() {
   useEffect(() => {
     if (inputFocused) {
       cardsProgress.value = withDelay(120, withTiming(1, FADE_OUT));
-      sectionCollapse.value = withDelay(200, withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) }));
       progress.value = withDelay(200, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
-      sectionCollapse.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) });
       cardsProgress.value = withDelay(80, withTiming(0, FADE_IN));
     }
   }, [inputFocused]);
@@ -117,14 +114,9 @@ export function EmptyChat() {
     };
   });
 
-  const suggestionsSectionStyle = useAnimatedStyle(() => ({
-    maxHeight: interpolate(sectionCollapse.value, [0, 1], [300, 0]),
-    opacity: interpolate(sectionCollapse.value, [0, 0.5], [1, 0], 'clamp'),
-    overflow: 'hidden' as const,
-  }));
-
   const cardsAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(cardsProgress.value, [0, 1], [1, 0]),
+    pointerEvents: cardsProgress.value > 0.5 ? 'none' : 'auto',
   }));
 
   return (
@@ -154,31 +146,29 @@ export function EmptyChat() {
         </Text>
       </Animated.View>
 
-      <Animated.View style={[styles.suggestionsSection, suggestionsSectionStyle]}>
-        <Animated.View style={cardsAnimStyle}>
-          <Pressable
-            style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
-            onPress={() => sendMessage(fullCard.text)}
-          >
-            <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
-            <Text style={[styles.cardText, { color: colors.contentPrimary }]}>{fullCard.text}</Text>
-          </Pressable>
+      <Animated.View style={[styles.suggestionsSection, cardsAnimStyle]}>
+        <Pressable
+          style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
+          onPress={() => sendMessage(fullCard.text)}
+        >
+          <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
+          <Text style={[styles.cardText, { color: colors.contentPrimary }]}>{fullCard.text}</Text>
+        </Pressable>
 
-          <View style={styles.halfRow}>
-            {halfCards.map((card, i) => (
-              <Pressable
-                key={i}
-                style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
-                onPress={() => sendMessage(card.text)}
-              >
-                <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
-                <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
-                  {card.text}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </Animated.View>
+        <View style={styles.halfRow}>
+          {halfCards.map((card, i) => (
+            <Pressable
+              key={i}
+              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
+              onPress={() => sendMessage(card.text)}
+            >
+              <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
+              <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
+                {card.text}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       </Animated.View>
     </View>
   );
@@ -187,7 +177,6 @@ export function EmptyChat() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
   },
   orbSection: {
@@ -222,8 +211,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   suggestionsSection: {
-    paddingBottom: 16,
-    paddingTop: 40,
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
+    gap: 12,
   },
   fullCard: {
     borderRadius: 16,
@@ -233,7 +225,6 @@ const styles = StyleSheet.create({
   halfRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 12,
   },
   halfCard: {
     flex: 1,
