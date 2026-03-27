@@ -266,7 +266,7 @@ export default function ChatScreen() {
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
       </KeyboardAvoidingView>
 
-      {messages.length === 0 && <SuggestionCards bottomOffset={inputBarHeight} />}
+      {messages.length === 0 && activePanel === 'none' && <SuggestionCards bottomOffset={inputBarHeight} />}
 
       {showMemory && (
         <MemoryCenter onClose={() => {
