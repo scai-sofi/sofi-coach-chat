@@ -8,7 +8,7 @@ import { ChatHeader } from '@/components/ChatHeader';
 import { MessageBubble } from '@/components/MessageBubble';
 import { TypingIndicator } from '@/components/TypingIndicator';
 import { InputBar } from '@/components/InputBar';
-import { EmptyChat } from '@/components/EmptyChat';
+import { EmptyChat, SuggestionCards } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
@@ -221,9 +221,7 @@ export default function ChatScreen() {
 
         <View style={styles.chatContent}>
           {messages.length === 0 ? (
-            <Pressable style={styles.flex} onPress={() => {
-              Keyboard.dismiss();
-            }}>
+            <Pressable style={styles.flex} onPress={() => Keyboard.dismiss()}>
               <EmptyChat />
             </Pressable>
           ) : (
@@ -267,6 +265,8 @@ export default function ChatScreen() {
 
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
       </KeyboardAvoidingView>
+
+      {messages.length === 0 && <SuggestionCards bottomOffset={inputBarHeight} />}
 
       {showMemory && (
         <MemoryCenter onClose={() => {

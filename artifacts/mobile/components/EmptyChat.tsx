@@ -15,7 +15,6 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
-const FADE_OUT = { duration: 250, easing: Easing.out(Easing.ease) };
 const FADE_IN = { duration: 300, easing: Easing.out(Easing.ease) };
 
 const FLOAT_DURATION = 3200;
@@ -47,14 +46,9 @@ const SUGGESTIONS = [
 
 export function EmptyChat() {
   const { colors } = useTheme();
-  const { sendMessage, inputFocused } = useCoach();
-
-  const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
-  const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
+  const { inputFocused } = useCoach();
 
   const progress = useSharedValue(0);
-  const cardsProgress = useSharedValue(0);
-
   const floatPhase = useSharedValue(0);
   const breathePhase = useSharedValue(0);
 
@@ -64,7 +58,6 @@ export function EmptyChat() {
       -1,
       true,
     );
-
     breathePhase.value = withRepeat(
       withTiming(1, { duration: BREATHE_DURATION, easing: EASE_INOUT }),
       -1,
@@ -74,11 +67,9 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      cardsProgress.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) });
-      progress.value = withDelay(100, withSpring(1, SPRING_CONFIG));
+      progress.value = withSpring(1, SPRING_CONFIG);
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
-      cardsProgress.value = withDelay(80, withTiming(0, FADE_IN));
     }
   }, [inputFocused]);
 
@@ -92,9 +83,7 @@ export function EmptyChat() {
     const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
     const breatheY = interpolate(breathePhase.value, [0, 1], [-2, 2]);
     return {
-      transform: [
-        { translateY: floatY + breatheY },
-      ],
+      transform: [{ translateY: floatY + breatheY }],
     };
   });
 
@@ -102,25 +91,17 @@ export function EmptyChat() {
     const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
     const breatheY = interpolate(breathePhase.value, [0, 1], [-2, 2]);
     const combinedY = floatY + breatheY;
-    const scaleX = interpolate(combinedY, [-7, 7], [1.08, 0.9]);
-    const scaleY = interpolate(combinedY, [-7, 7], [1.12, 0.85]);
-    const shadowOpacity = interpolate(combinedY, [-7, 7], [0.45, 0.85]);
     return {
       transform: [
-        { scaleX },
-        { scaleY },
+        { scaleX: interpolate(combinedY, [-7, 7], [1.08, 0.9]) },
+        { scaleY: interpolate(combinedY, [-7, 7], [1.12, 0.85]) },
       ],
-      opacity: shadowOpacity,
+      opacity: interpolate(combinedY, [-7, 7], [0.45, 0.85]),
     };
   });
 
-  const cardsAnimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(cardsProgress.value, [0, 1], [1, 0]),
-    pointerEvents: cardsProgress.value > 0.5 ? 'none' : 'auto',
-  }));
-
   return (
-    <View style={styles.wrapper}>
+    <View style={styles.orbWrapper}>
       <Animated.View style={[styles.orbSection, orbSectionStyle]}>
         <View style={styles.orbCombo}>
           <Animated.View style={sphereStyle}>
@@ -132,7 +113,6 @@ export function EmptyChat() {
               />
             </View>
           </Animated.View>
-
           <Animated.View style={[styles.shadowClip, shadowStyle]}>
             <Image
               source={require('@/assets/images/orb-combo.png')}
@@ -145,37 +125,62 @@ export function EmptyChat() {
           {"I'm Coach.\nHow can I help?"}
         </Text>
       </Animated.View>
-
-      <Animated.View style={[styles.suggestionsSection, cardsAnimStyle]}>
-        <Pressable
-          style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
-          onPress={() => sendMessage(fullCard.text)}
-        >
-          <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
-          <Text style={[styles.cardText, { color: colors.contentPrimary }]}>{fullCard.text}</Text>
-        </Pressable>
-
-        <View style={styles.halfRow}>
-          {halfCards.map((card, i) => (
-            <Pressable
-              key={i}
-              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
-              onPress={() => sendMessage(card.text)}
-            >
-              <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
-              <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
-                {card.text}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </Animated.View>
     </View>
   );
 }
 
+export function SuggestionCards({ bottomOffset = 0 }: { bottomOffset?: number }) {
+  const { colors } = useTheme();
+  const { sendMessage, inputFocused } = useCoach();
+
+  const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
+  const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
+
+  const cardsProgress = useSharedValue(0);
+
+  useEffect(() => {
+    if (inputFocused) {
+      cardsProgress.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) });
+    } else {
+      cardsProgress.value = withDelay(80, withTiming(0, FADE_IN));
+    }
+  }, [inputFocused]);
+
+  const cardsAnimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(cardsProgress.value, [0, 1], [1, 0]),
+    pointerEvents: cardsProgress.value > 0.5 ? 'none' as const : 'auto' as const,
+  }));
+
+  return (
+    <Animated.View style={[styles.suggestionsSection, { bottom: bottomOffset + 12 }, cardsAnimStyle]}>
+      <Pressable
+        style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
+        onPress={() => sendMessage(fullCard.text)}
+      >
+        <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
+        <Text style={[styles.cardText, { color: colors.contentPrimary }]}>{fullCard.text}</Text>
+      </Pressable>
+
+      <View style={styles.halfRow}>
+        {halfCards.map((card, i) => (
+          <Pressable
+            key={i}
+            style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
+            onPress={() => sendMessage(card.text)}
+          >
+            <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
+            <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
+              {card.text}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </Animated.View>
+  );
+}
+
 const styles = StyleSheet.create({
-  wrapper: {
+  orbWrapper: {
     flex: 1,
     paddingHorizontal: 16,
   },
@@ -212,9 +217,9 @@ const styles = StyleSheet.create({
   },
   suggestionsSection: {
     position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
     gap: 12,
   },
   fullCard: {
