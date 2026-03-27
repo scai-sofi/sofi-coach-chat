@@ -15,7 +15,8 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
-const EASE_OUT = { duration: 400, easing: Easing.bezier(0.16, 1, 0.3, 1) };
+const CARD_SPRING = { damping: 22, stiffness: 160, mass: 0.6 };
+const FADE_OUT = { duration: 200, easing: Easing.bezier(0.4, 0, 1, 1) };
 
 const FLOAT_DURATION = 3200;
 const BREATHE_DURATION = 4000;
@@ -74,20 +75,19 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      fullCardProgress.value = withTiming(1, { duration: 350, easing: Easing.bezier(0.4, 0, 0.2, 1) });
-      halfCardProgress.value = withDelay(80, withTiming(1, { duration: 300, easing: Easing.bezier(0.4, 0, 0.2, 1) }));
-      progress.value = withDelay(100, withSpring(1, SPRING_CONFIG));
+      halfCardProgress.value = withTiming(1, FADE_OUT);
+      fullCardProgress.value = withDelay(60, withTiming(1, FADE_OUT));
+      progress.value = withDelay(80, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
-      halfCardProgress.value = withDelay(120, withTiming(0, EASE_OUT));
-      fullCardProgress.value = withDelay(200, withTiming(0, EASE_OUT));
+      fullCardProgress.value = withDelay(150, withSpring(0, CARD_SPRING));
+      halfCardProgress.value = withDelay(220, withSpring(0, CARD_SPRING));
     }
   }, [inputFocused]);
 
   const orbSectionStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateY: interpolate(progress.value, [0, 1], [0, -60]) },
-      { scale: interpolate(progress.value, [0, 1], [1, 0.95]) },
+      { translateY: interpolate(progress.value, [0, 1], [0, -50]) },
     ],
   }));
 
@@ -120,16 +120,14 @@ export function EmptyChat() {
   const fullCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
     transform: [
-      { translateY: interpolate(fullCardProgress.value, [0, 1], [0, 20]) },
-      { scale: interpolate(fullCardProgress.value, [0, 1], [1, 0.97]) },
+      { translateY: interpolate(fullCardProgress.value, [0, 1], [0, -16]) },
     ],
   }));
 
   const halfCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(halfCardProgress.value, [0, 1], [1, 0]),
     transform: [
-      { translateY: interpolate(halfCardProgress.value, [0, 1], [0, 24]) },
-      { scale: interpolate(halfCardProgress.value, [0, 1], [1, 0.97]) },
+      { translateY: interpolate(halfCardProgress.value, [0, 1], [0, -12]) },
     ],
   }));
 
