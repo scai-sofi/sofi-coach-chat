@@ -695,7 +695,24 @@ function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap:
   );
 }
 
-const iconCopy = require('@/assets/images/icon-copy.png');
+function CopyIcon({ size = 20, color }: { size?: number; color: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <G transform="translate(3, 3)">
+        <Path
+          d="M3.125 10.625H8.125C9.50571 10.625 10.625 9.50571 10.625 8.125V3.125C10.625 1.74429 9.50571 0.625 8.125 0.625H3.125C1.74429 0.625 0.625 1.74429 0.625 3.125V8.125C0.625 9.50571 1.74429 10.625 3.125 10.625Z"
+          stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+        />
+      </G>
+      <G transform="translate(8, 8)">
+        <Path
+          d="M0.625 9.16667H6.66667C8.04738 9.16667 9.16667 8.04738 9.16667 6.66667V0.625"
+          stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+        />
+      </G>
+    </Svg>
+  );
+}
 
 function ThumbUpIcon({ size = 20, color, filled }: { size?: number; color: string; filled: boolean }) {
   return (
@@ -828,7 +845,7 @@ function CopyButton({ color }: { color: string }) {
   return (
     <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
       <FlipIcon
-        front={<Image source={iconCopy} style={[styles.actionIcon, { tintColor: color }]} />}
+        front={<CopyIcon size={20} color={color} />}
         back={
           <View style={styles.actionIconWrap}>
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
