@@ -60,6 +60,9 @@ function SwipeCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDele
         top: 0, right: 0, bottom: 0,
         display: 'flex',
         alignItems: 'stretch',
+        opacity: dragX < 0 ? 1 : 0,
+        pointerEvents: dragX < 0 ? 'auto' : 'none',
+        transition: isDragging ? 'none' : 'opacity 0.2s ease',
       }}>
         <button
           onClick={() => handleAction('edit')}
