@@ -300,14 +300,17 @@ Accessed via a brain icon in the chat header "more menu." Accessed via Coach Cha
 
 **Memory categories (prototype):**
 
+The original spec listed 6 categories (Preferences, Life Context, Financial Attitudes, Goal-Related, Explicit Facts, Other). The prototype consolidates these into 3 broader categories. The mapping:
 
-| Category    | Internal key   | Examples                                                           |
-| ----------- | -------------- | ------------------------------------------------------------------ |
-| About me    | `ABOUT_ME`     | "Self-employed, irregular income months", "Household income ~$120K"|
-| Preferences | `PREFERENCES`  | "Prefers detailed breakdowns over quick summaries"                 |
-| Priorities  | `PRIORITIES`   | "Building emergency fund is top priority", "Wants to retire by 55"|
+| Prototype category | Internal key   | Absorbs from original spec                  | Examples                                                                                              |
+| ------------------ | -------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| About me           | `ABOUT_ME`     | Life Context + Explicit Facts               | "Self-employed, irregular income months", "Household income ~$120K", "Expecting a baby in March"      |
+| Preferences        | `PREFERENCES`  | Preferences + Financial Attitudes + Other   | "Prefers detailed breakdowns over quick summaries", "Comfortable with moderate investment risk"        |
+| Priorities         | `PRIORITIES`   | Goal-Related                                | "Building emergency fund is top priority", "Wants to retire by 55", "Paying off credit card this year"|
 
-*Note: The original spec listed 6 categories (Preferences, Life Context, Financial Attitudes, Goal-Related, Explicit Facts, Other). The prototype consolidates these into 3 simpler categories for clarity. Final category taxonomy is an open design decision.*
+**Rationale:** The 6-category model created ambiguity at the boundaries — "Comfortable with moderate investment risk" could be classified as a Preference, a Financial Attitude, or even a Priority depending on context. The 3-category model groups by *what kind of thing it is about the member*: who they are (About Me), how they like to interact (Preferences), and what they're working toward (Priorities). This reduces classification errors and makes the Memory Center easier to scan.
+
+**Trade-off:** The 3-category model loses granularity that could be useful for backend retrieval (e.g., filtering only "Explicit Facts" for financial calculations). A hybrid approach — 3 user-facing categories with finer-grained backend tags — could preserve both benefits. Final category taxonomy is an open design decision.
 
 ---
 
@@ -500,7 +503,7 @@ The Replit prototype includes a scenario system (`ScenarioSwitcher` + `ScenarioF
 - **Memory Center & Goals Dashboard — modal vs. full screen** — Current design uses slide-over panels. On mobile, should these promote to full `PacificPage` screens?
   - *Decided by code — use full `PacificPage`.* No slide-over or `DraggableScrollableSheet` pattern exists from the chat module. All secondary panels (`ChatHistoryScreen`, `EditChatSessionScreen`) use `RouteTransition.slideUp` + `PacificPage`. The "slide-over" language in the spec is aspirational — V1 should follow the established pattern. The prototype implements full-screen panels with slide-up transitions.
 - **Memory category taxonomy** — The original spec lists 6 categories; the prototype consolidates to 3 (About Me, Preferences, Priorities). Which taxonomy ships?
-  - *Open decision — Product / UX.* The 3-category model is simpler for users and covers the primary use cases. The 6-category model provides finer granularity for backend classification. Recommend user-testing both before finalizing.
+  - *Open decision — Product / UX.* The 3-category model groups by member identity (who they are, how they prefer to interact, what they're working toward) and eliminates boundary ambiguity between the original 6. The 6-category model provides finer granularity for backend retrieval. Recommend either: (a) ship the 3-category model user-facing with finer backend tags, or (b) user-test both taxonomies before finalizing. See the mapping table under Memory Center for the full consolidation logic.
 - **Sensitive data policy edge cases** — If a member explicitly asks Coach to remember an exact salary figure or health information, what's the exact UX for the sensitivity flag and the Memory Center disclosure?
   - *Blocked on external — Compliance / Legal.* No sensitive data flag pattern exists in the codebase. The UI (flag icon on a memory row) is straightforward once Legal defines which categories require flagging and what the disclosure copy must say. This gates the Memory Center design.
 - **Memory edit guardrails** — Can members freely edit AI-inferred memory text, or only confirm/deny? What prevents gaming that degrades Coach quality?
