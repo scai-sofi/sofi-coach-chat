@@ -141,9 +141,9 @@ export function AppBarHeader({ onPlusPress }: { onPlusPress?: () => void }) {
   );
 }
 
-export function SearchBarUI({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function SearchBarUI({ value, onChange, filterActive, onFilterPress }: { value: string; onChange: (v: string) => void; filterActive: boolean; onFilterPress: () => void }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px' }}>
       <div style={{
         flex: 1,
         height: 48,
@@ -174,6 +174,23 @@ export function SearchBarUI({ value, onChange }: { value: string; onChange: (v: 
           }}
         />
       </div>
+      <button
+        onClick={onFilterPress}
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 12,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: filterActive ? 'var(--sofi-content-primary)' : 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: 0,
+        }}
+      >
+        <FilterSvg size={18} color={filterActive ? 'var(--sofi-content-primary-inverse)' : 'var(--sofi-content-primary)'} />
+      </button>
     </div>
   );
 }
@@ -221,6 +238,7 @@ export function FilterChips({ filterCat, setFilterCat }: { filterCat: string | n
 export function useMemoryState() {
   const [memories, setMemories] = useState<Memory[]>(SAMPLE_MEMORIES);
   const [search, setSearch] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<string | null>(null);
 
   const visible = memories.filter(m => {
@@ -241,5 +259,5 @@ export function useMemoryState() {
   const deleteMemory = (id: string) => setMemories(prev => prev.filter(m => m.id !== id));
   const togglePause = (id: string) => setMemories(prev => prev.map(m => m.id === id ? { ...m, status: m.status === 'PAUSED' ? 'ACTIVE' as const : 'PAUSED' as const } : m));
 
-  return { memories, search, setSearch, filterCat, setFilterCat, visible, grouped, catCounts, deleteMemory, togglePause };
+  return { memories, search, setSearch, showFilters, setShowFilters, filterCat, setFilterCat, visible, grouped, catCounts, deleteMemory, togglePause };
 }

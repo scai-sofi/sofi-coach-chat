@@ -109,14 +109,14 @@ function menuItemStyle(danger = false): React.CSSProperties {
 }
 
 export function OverflowMenu() {
-  const { search, setSearch, filterCat, setFilterCat, grouped, deleteMemory, togglePause } = useMemoryState();
+  const { search, setSearch, showFilters, setShowFilters, filterCat, setFilterCat, grouped, deleteMemory, togglePause } = useMemoryState();
 
   return (
     <div style={{ width: '100%', height: '100vh', background: 'var(--sofi-surface-base)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <style>{`@keyframes menuFadeIn { from { opacity: 0; transform: scale(0.95) translateY(-4px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
       <AppBarHeader onPlusPress={() => {}} />
-      <SearchBarUI value={search} onChange={setSearch} />
-      <FilterChips filterCat={filterCat} setFilterCat={setFilterCat} />
+      <SearchBarUI value={search} onChange={setSearch} filterActive={showFilters || !!filterCat} onFilterPress={() => setShowFilters(!showFilters)} />
+      {(showFilters || filterCat) && <FilterChips filterCat={filterCat} setFilterCat={setFilterCat} />}
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 16px 40px' }}>
         {Object.entries(grouped).map(([cat, mems], idx) => (

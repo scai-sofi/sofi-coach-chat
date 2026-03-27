@@ -219,6 +219,7 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
   }));
   const headerHeight = useAppBarHeight();
   const [search, setSearch] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [filterCat, setFilterCat] = useState<MemoryCategory | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -392,23 +393,28 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
         <SearchBar
           value={search}
           onChangeText={setSearch}
+          variant="search-filter"
+          filterActive={showFilters || !!filterCat}
+          onFilterPress={() => setShowFilters(!showFilters)}
         />
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
-          <FilterChip
-            label="All"
-            selected={filterCat === null}
-            onPress={() => setFilterCat(null)}
-          />
-          {MEMORY_CATEGORY_ORDER.map(cat => (
+        {(showFilters || filterCat) && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow} contentContainerStyle={styles.filterRowContent}>
             <FilterChip
-              key={cat}
-              label={MEMORY_CATEGORY_LABELS[cat]}
-              selected={filterCat === cat}
-              onPress={() => setFilterCat(filterCat === cat ? null : cat)}
+              label="All"
+              selected={filterCat === null}
+              onPress={() => setFilterCat(null)}
             />
-          ))}
-        </ScrollView>
+            {MEMORY_CATEGORY_ORDER.map(cat => (
+              <FilterChip
+                key={cat}
+                label={MEMORY_CATEGORY_LABELS[cat]}
+                selected={filterCat === cat}
+                onPress={() => setFilterCat(filterCat === cat ? null : cat)}
+              />
+            ))}
+          </ScrollView>
+        )}
 
         <ScrollView
           ref={scrollRef}
