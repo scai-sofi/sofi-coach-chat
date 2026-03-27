@@ -75,7 +75,7 @@ function SwipeCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDele
           onClick={() => handleAction('pause')}
           style={{
             width: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-            background: 'var(--sofi-warning)', border: 'none', cursor: 'pointer', color: '#000', fontSize: 11, fontWeight: 500, padding: 0,
+            background: '#f59e0b', border: 'none', cursor: 'pointer', color: '#000', fontSize: 11, fontWeight: 500, padding: 0,
           }}
         >
           {isPaused ? <PlaySvg size={14} color="#000" /> : <PauseSvg size={14} color="#000" />}
