@@ -152,7 +152,9 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
         </>
       ) : (
         <>
-          <Text style={[styles.memContent, { color: colors.contentPrimary }]}>{memory.content}</Text>
+          <Pressable onPress={handleEdit}>
+            <Text style={[styles.memContent, { color: colors.contentPrimary }]}>{memory.content}</Text>
+          </Pressable>
           <View style={styles.memMeta}>
             <Text style={[styles.memMetaText, { color: colors.contentSecondary }]}>
               {memory.status === 'PAUSED' ? 'Paused · not used in chat' : dateLabel}
