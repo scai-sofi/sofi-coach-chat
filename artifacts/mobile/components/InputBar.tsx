@@ -35,8 +35,7 @@ export function InputBar() {
   };
 
   return (
-    <View style={[styles.footer, { paddingBottom: keyboardUp ? 4 : Math.max(insets.bottom, 8) }]}>
-      <View style={[styles.footerBg, { backgroundColor: colors.surfaceBase }]} />
+    <View style={[styles.footer, { paddingBottom: keyboardUp ? 4 : Math.max(insets.bottom, 8), backgroundColor: colors.surfaceBase }]}>
       <View style={styles.inputRow}>
         <View style={[styles.inputPill, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
           <TextInput
@@ -85,14 +84,6 @@ export function InputBar() {
 
 const styles = StyleSheet.create({
   footer: {
-    backgroundColor: 'transparent',
-  },
-  footerBg: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
   },
   inputRow: {
     paddingHorizontal: 16,
