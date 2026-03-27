@@ -45,11 +45,11 @@ export function EmptyChat() {
   }, []);
 
   useEffect(() => {
-    lift.value = withSpring(inputFocused ? 1 : 0, { damping: 20, stiffness: 180, mass: 0.8 });
+    lift.value = withSpring(inputFocused ? 1 : 0, { damping: 24, stiffness: 120, mass: 1 });
   }, [inputFocused]);
 
   const orbSectionStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: interpolate(lift.value, [0, 1], [0, -50]) }],
+    transform: [{ translateY: interpolate(lift.value, [0, 1], [0, -30]) }],
   }));
 
   const sphereStyle = useAnimatedStyle(() => ({
@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: 16,
     gap: 12,
+    zIndex: -1,
   },
   fullCard: {
     borderRadius: 16,
