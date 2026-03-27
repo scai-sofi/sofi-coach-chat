@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    top: 24,
+    top: 0,
   },
   inputRow: {
     paddingHorizontal: 16,
