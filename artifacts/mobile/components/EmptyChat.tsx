@@ -74,8 +74,8 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      cardsProgress.value = withDelay(120, withTiming(1, FADE_OUT));
-      progress.value = withDelay(200, withSpring(1, SPRING_CONFIG));
+      cardsProgress.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) });
+      progress.value = withDelay(100, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
       cardsProgress.value = withDelay(80, withTiming(0, FADE_IN));
