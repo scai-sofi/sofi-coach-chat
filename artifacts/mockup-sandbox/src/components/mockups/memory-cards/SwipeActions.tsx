@@ -181,7 +181,10 @@ function HybridCard({ memory, onDelete, onTogglePause }: { memory: Memory; onDel
           gap: 12,
         }}
       >
-        <p style={{ color: 'var(--sofi-content-primary)', fontSize: 16, lineHeight: '20px', fontWeight: 400 }}>
+        <p
+          onClick={() => { if (!didSwipe.current && dragX === 0) handleEditClick(); }}
+          style={{ color: 'var(--sofi-content-primary)', fontSize: 16, lineHeight: '20px', fontWeight: 400, cursor: 'text' }}
+        >
           {memory.content}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
