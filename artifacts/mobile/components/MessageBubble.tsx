@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, ComponentProps } from 'react';
+import React, { useState, useEffect, useRef, useCallback, ComponentProps } from 'react';
 import { View, Text, Pressable, StyleSheet, Image, Animated as RNAnimated, Easing, Keyboard } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import Svg, { Path, G } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -829,11 +830,17 @@ function ReactionButton({
   );
 }
 
-function CopyButton({ color }: { color: string }) {
+function CopyButton({ color, text }: { color: string; text: string }) {
   const [copied, setCopied] = useState(false);
 
+  const handleCopy = useCallback(async () => {
+    await Clipboard.setStringAsync(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [text]);
+
   return (
-    <Pressable style={styles.actionBtn} onPress={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
+    <Pressable style={styles.actionBtn} onPress={handleCopy}>
       <FlipIcon
         front={<CopyIcon size={20} color={color} />}
         back={
@@ -860,7 +867,7 @@ function ActionFooter({ message }: { message: Message }) {
   return (
     <View>
       <View style={styles.actionRow}>
-        <CopyButton color={colors.contentBone600} />
+        <CopyButton color={colors.contentBone600} text={message.content || ''} />
         <ReactionButton
           active={thumbUp}
           onToggle={() => { setThumbUp(!thumbUp); if (thumbDown) setThumbDown(false); }}
