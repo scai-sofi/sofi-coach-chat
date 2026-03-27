@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { RenderedOrb } from './RenderedOrb';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -137,13 +138,7 @@ export function EmptyChat() {
       <Animated.View style={[styles.orbSection, orbSectionStyle]}>
         <View style={styles.orbCombo}>
           <Animated.View style={sphereStyle}>
-            <View style={styles.sphereClip}>
-              <Image
-                source={require('@/assets/images/orb-combo.png')}
-                style={styles.orbFullImage}
-                resizeMode="cover"
-              />
-            </View>
+            <RenderedOrb />
           </Animated.View>
 
           <Animated.View style={[styles.shadowClip, shadowStyle]}>
@@ -204,11 +199,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: ORB_FULL_W,
     height: ORB_FULL_H,
-  },
-  sphereClip: {
-    width: ORB_FULL_W,
-    height: SPHERE_H,
-    overflow: 'hidden',
   },
   shadowClip: {
     width: ORB_FULL_W,
