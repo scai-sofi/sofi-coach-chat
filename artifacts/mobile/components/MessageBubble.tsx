@@ -726,8 +726,11 @@ function ThumbDownIcon({ size = 20, color, filled }: { size?: number; color: str
     <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
       <G transform="translate(16.25, 13.7467) scale(-1, -1)">
         <Path
-          d="M0.625 0.625H3.125V8.125C3.125 9.04548 2.37881 9.79167 1.45833 9.79167H0.625"
-          stroke={color} strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round"
+          d={filled
+            ? "M0.625 9.79167V0.625H3.125V8.125C3.125 9.04548 2.37881 9.79167 1.45833 9.79167H0.625Z"
+            : "M0.625 0.625H3.125V8.125C3.125 9.04548 2.37881 9.79167 1.45833 9.79167H0.625"}
+          stroke={color} strokeWidth={1.25} strokeLinejoin="round"
+          strokeLinecap={filled ? undefined : "round"}
           fill={filled ? color : 'none'}
         />
       </G>
