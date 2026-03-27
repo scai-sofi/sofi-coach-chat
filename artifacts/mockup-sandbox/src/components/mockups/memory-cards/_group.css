@@ -4,10 +4,17 @@
   --sofi-surface-base: #0a0a0a;
   --sofi-surface-elevated: #1a1919;
   --sofi-surface-tint: #242323;
+  --sofi-surface-edge: rgba(250,248,245,0.10);
+  --sofi-surface-muted: #242323;
   --sofi-content-primary: #faf8f5;
+  --sofi-content-primary-inverse: #0a0a0a;
   --sofi-content-secondary: #858482;
+  --sofi-content-bone600: #adacaa;
   --sofi-content-dimmed: #585756;
+  --sofi-content-disabled: #3a3938;
+  --sofi-content-disabled2: #585756;
   --sofi-content-brand: #32b7d9;
+  --sofi-content-muted: #4d4c4b;
   --sofi-border-subtle: rgba(250,248,245,0.08);
   --sofi-border-medium: rgba(250,248,245,0.20);
   --sofi-danger: #fa2d25;
@@ -18,10 +25,17 @@
   --sofi-chip-unselected-bg: #1a1919;
   --sofi-chip-unselected-border: #4d4c4b;
   --sofi-chip-selected-bg: #ffffff;
-  --sofi-content-muted: #4d4c4b;
   --sofi-surface-toast: #3d3d3c;
+  --sofi-toast-text: #faf8f5;
+  --sofi-toast-action: #32b7d9;
+  --sofi-inverse-alpha60: rgba(0,0,0,0.6);
+  --sofi-selection-color: rgba(153,152,150,0.3);
 }
 
 * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
