@@ -297,6 +297,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    overflow: 'hidden',
   },
   flex: { flex: 1 },
   chatContent: {
