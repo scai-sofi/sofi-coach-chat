@@ -311,7 +311,7 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
     <ReAnimated.View style={[styles.panel, { backgroundColor: colors.surfaceBase }, slideStyle]}>
       <AppBar
         variant="back"
-        title="Coach memory"
+        title="Chat memory"
         onBack={handleClose}
         rightActions={memoryMode !== 'off' ? [
           {
