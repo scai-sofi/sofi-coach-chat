@@ -93,20 +93,21 @@ export function EmptyChat() {
 
   const sphereStyle = useAnimatedStyle(() => {
     const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
-    const breatheScale = interpolate(breathePhase.value, [0, 1], [0.97, 1.03]);
+    const breatheY = interpolate(breathePhase.value, [0, 1], [-2, 2]);
     return {
       transform: [
-        { translateY: floatY },
-        { scale: breatheScale },
+        { translateY: floatY + breatheY },
       ],
     };
   });
 
   const shadowStyle = useAnimatedStyle(() => {
     const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
-    const scaleX = interpolate(floatY, [-5, 5], [1.08, 0.9]);
-    const scaleY = interpolate(floatY, [-5, 5], [1.12, 0.85]);
-    const shadowOpacity = interpolate(floatY, [-5, 5], [0.45, 0.85]);
+    const breatheY = interpolate(breathePhase.value, [0, 1], [-2, 2]);
+    const combinedY = floatY + breatheY;
+    const scaleX = interpolate(combinedY, [-7, 7], [1.08, 0.9]);
+    const scaleY = interpolate(combinedY, [-7, 7], [1.12, 0.85]);
+    const shadowOpacity = interpolate(combinedY, [-7, 7], [0.45, 0.85]);
     return {
       transform: [
         { scaleX },
