@@ -14,89 +14,62 @@ import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
-const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
-const FADE_IN = { duration: 300, easing: Easing.out(Easing.ease) };
-
-const FLOAT_DURATION = 3200;
-const BREATHE_DURATION = 4000;
-const EASE_INOUT = Easing.bezier(0.45, 0, 0.55, 1);
-
-const ORB_FULL_W = 96;
-const ORB_FULL_H = 120;
+const ORB_W = 96;
+const ORB_H = 120;
 const SPHERE_H = 86;
-const SHADOW_H = ORB_FULL_H - SPHERE_H;
+const SHADOW_H = ORB_H - SPHERE_H;
 
 const SUGGESTIONS = [
-  {
-    label: 'Support',
-    text: 'I need help with my SoFi account.',
-    type: 'full' as const,
-  },
-  {
-    label: 'Credit score',
-    text: 'Why did my credit score change?',
-    type: 'half' as const,
-  },
-  {
-    label: 'Spending',
-    text: 'Review monthly spending.',
-    type: 'half' as const,
-  },
+  { label: 'Support', text: 'I need help with my SoFi account.', type: 'full' as const },
+  { label: 'Credit score', text: 'Why did my credit score change?', type: 'half' as const },
+  { label: 'Spending', text: 'Review monthly spending.', type: 'half' as const },
 ];
 
 export function EmptyChat() {
   const { colors } = useTheme();
   const { inputFocused } = useCoach();
 
-  const progress = useSharedValue(0);
-  const floatPhase = useSharedValue(0);
-  const breathePhase = useSharedValue(0);
+  const lift = useSharedValue(0);
+  const float = useSharedValue(0);
+  const breathe = useSharedValue(0);
 
   useEffect(() => {
-    floatPhase.value = withRepeat(
-      withTiming(1, { duration: FLOAT_DURATION, easing: EASE_INOUT }),
-      -1,
-      true,
+    float.value = withRepeat(
+      withTiming(1, { duration: 3200, easing: Easing.bezier(0.45, 0, 0.55, 1) }),
+      -1, true,
     );
-    breathePhase.value = withRepeat(
-      withTiming(1, { duration: BREATHE_DURATION, easing: EASE_INOUT }),
-      -1,
-      true,
+    breathe.value = withRepeat(
+      withTiming(1, { duration: 4000, easing: Easing.bezier(0.45, 0, 0.55, 1) }),
+      -1, true,
     );
   }, []);
 
   useEffect(() => {
-    if (inputFocused) {
-      progress.value = withSpring(1, SPRING_CONFIG);
-    } else {
-      progress.value = withSpring(0, SPRING_CONFIG);
-    }
+    lift.value = withSpring(inputFocused ? 1 : 0, { damping: 20, stiffness: 180, mass: 0.8 });
   }, [inputFocused]);
 
   const orbSectionStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: interpolate(progress.value, [0, 1], [0, -50]) },
-    ],
+    transform: [{ translateY: interpolate(lift.value, [0, 1], [0, -50]) }],
   }));
 
-  const sphereStyle = useAnimatedStyle(() => {
-    const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
-    const breatheY = interpolate(breathePhase.value, [0, 1], [-2, 2]);
-    return {
-      transform: [{ translateY: floatY + breatheY }],
-    };
-  });
+  const sphereStyle = useAnimatedStyle(() => ({
+    transform: [{
+      translateY:
+        interpolate(float.value, [0, 1], [-5, 5]) +
+        interpolate(breathe.value, [0, 1], [-2, 2]),
+    }],
+  }));
 
   const shadowStyle = useAnimatedStyle(() => {
-    const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
-    const breatheY = interpolate(breathePhase.value, [0, 1], [-2, 2]);
-    const combinedY = floatY + breatheY;
+    const y =
+      interpolate(float.value, [0, 1], [-5, 5]) +
+      interpolate(breathe.value, [0, 1], [-2, 2]);
     return {
       transform: [
-        { scaleX: interpolate(combinedY, [-7, 7], [1.08, 0.9]) },
-        { scaleY: interpolate(combinedY, [-7, 7], [1.12, 0.85]) },
+        { scaleX: interpolate(y, [-7, 7], [1.08, 0.9]) },
+        { scaleY: interpolate(y, [-7, 7], [1.12, 0.85]) },
       ],
-      opacity: interpolate(combinedY, [-7, 7], [0.45, 0.85]),
+      opacity: interpolate(y, [-7, 7], [0.45, 0.85]),
     };
   });
 
@@ -108,7 +81,7 @@ export function EmptyChat() {
             <View style={styles.sphereClip}>
               <Image
                 source={require('@/assets/images/orb-combo.png')}
-                style={styles.orbFullImage}
+                style={styles.orbImage}
                 resizeMode="cover"
               />
             </View>
@@ -116,7 +89,7 @@ export function EmptyChat() {
           <Animated.View style={[styles.shadowClip, shadowStyle]}>
             <Image
               source={require('@/assets/images/orb-combo.png')}
-              style={[styles.orbFullImage, { marginTop: -SPHERE_H }]}
+              style={[styles.orbImage, { marginTop: -SPHERE_H }]}
               resizeMode="cover"
             />
           </Animated.View>
@@ -136,26 +109,22 @@ export function SuggestionCards({ bottomOffset = 0 }: { bottomOffset?: number })
   const fullCard = SUGGESTIONS.find(s => s.type === 'full')!;
   const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
 
-  const cardsProgress = useSharedValue(0);
+  const fade = useSharedValue(0);
 
   useEffect(() => {
-    if (inputFocused) {
-      cardsProgress.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) });
-    } else {
-      cardsProgress.value = withDelay(80, withTiming(0, FADE_IN));
-    }
+    fade.value = inputFocused
+      ? withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) })
+      : withDelay(80, withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }));
   }, [inputFocused]);
 
-  const cardsAnimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(cardsProgress.value, [0, 1], [1, 0]),
-    transform: [
-      { translateY: interpolate(cardsProgress.value, [0, 1], [0, 10]) },
-    ],
-    pointerEvents: cardsProgress.value > 0.5 ? 'none' as const : 'auto' as const,
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(fade.value, [0, 1], [1, 0]),
+    transform: [{ translateY: interpolate(fade.value, [0, 1], [0, 10]) }],
+    pointerEvents: fade.value > 0.5 ? 'none' as const : 'auto' as const,
   }));
 
   return (
-    <Animated.View style={[styles.suggestionsSection, { bottom: bottomOffset + 12 }, cardsAnimStyle]}>
+    <Animated.View style={[styles.suggestionsSection, { bottom: bottomOffset + 12 }, animStyle]}>
       <Pressable
         style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
         onPress={() => sendMessage(fullCard.text)}
@@ -194,22 +163,22 @@ const styles = StyleSheet.create({
   },
   orbCombo: {
     alignItems: 'center',
-    width: ORB_FULL_W,
-    height: ORB_FULL_H,
+    width: ORB_W,
+    height: ORB_H,
   },
   sphereClip: {
-    width: ORB_FULL_W,
+    width: ORB_W,
     height: SPHERE_H,
     overflow: 'hidden',
   },
   shadowClip: {
-    width: ORB_FULL_W,
+    width: ORB_W,
     height: SHADOW_H,
     overflow: 'hidden',
   },
-  orbFullImage: {
-    width: ORB_FULL_W,
-    height: ORB_FULL_H,
+  orbImage: {
+    width: ORB_W,
+    height: ORB_H,
   },
   greeting: {
     fontSize: 24,
