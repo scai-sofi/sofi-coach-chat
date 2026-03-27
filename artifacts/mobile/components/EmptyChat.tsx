@@ -6,6 +6,7 @@ import Animated, {
   withTiming,
   withSpring,
   withDelay,
+  withRepeat,
   interpolate,
   Easing,
 } from 'react-native-reanimated';
@@ -15,6 +16,10 @@ import { useCoach } from '@/context/CoachContext';
 
 const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
 const EASE_OUT = { duration: 400, easing: Easing.bezier(0.16, 1, 0.3, 1) };
+
+const FLOAT_DURATION = 3200;
+const BREATHE_DURATION = 4000;
+const EASE_INOUT = Easing.bezier(0.45, 0, 0.55, 1);
 
 const SUGGESTIONS = [
   {
@@ -45,6 +50,23 @@ export function EmptyChat() {
   const fullCardProgress = useSharedValue(0);
   const halfCardProgress = useSharedValue(0);
 
+  const floatPhase = useSharedValue(0);
+  const breathePhase = useSharedValue(0);
+
+  useEffect(() => {
+    floatPhase.value = withRepeat(
+      withTiming(1, { duration: FLOAT_DURATION, easing: EASE_INOUT }),
+      -1,
+      true,
+    );
+
+    breathePhase.value = withRepeat(
+      withTiming(1, { duration: BREATHE_DURATION, easing: EASE_INOUT }),
+      -1,
+      true,
+    );
+  }, []);
+
   useEffect(() => {
     if (inputFocused) {
       fullCardProgress.value = withTiming(1, { duration: 350, easing: Easing.bezier(0.4, 0, 0.2, 1) });
@@ -63,6 +85,26 @@ export function EmptyChat() {
       { scale: interpolate(progress.value, [0, 1], [1, 0.95]) },
     ],
   }));
+
+  const orbImageStyle = useAnimatedStyle(() => {
+    const floatY = interpolate(floatPhase.value, [0, 1], [-5, 5]);
+    const breatheScale = interpolate(breathePhase.value, [0, 1], [0.97, 1.03]);
+    return {
+      transform: [
+        { translateY: floatY },
+        { scale: breatheScale },
+      ],
+    };
+  });
+
+  const shadowStyle = useAnimatedStyle(() => {
+    const shadowScale = interpolate(floatPhase.value, [0, 1], [1.06, 0.92]);
+    const shadowOpacity = interpolate(floatPhase.value, [0, 1], [0.35, 0.55]);
+    return {
+      transform: [{ scaleX: shadowScale }],
+      opacity: shadowOpacity,
+    };
+  });
 
   const fullCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
@@ -84,11 +126,18 @@ export function EmptyChat() {
     <View style={styles.wrapper}>
       <Animated.View style={[styles.orbSection, orbAnimStyle]}>
         <View style={styles.orbCombo}>
-          <Image
-            source={require('@/assets/images/orb-combo.png')}
-            style={styles.orbComboImage}
-            resizeMode="contain"
-          />
+          <Animated.View style={orbImageStyle}>
+            <View style={styles.orbImageWrap}>
+              <Image
+                source={require('@/assets/images/orb-combo.png')}
+                style={styles.orbImage}
+                resizeMode="contain"
+              />
+            </View>
+          </Animated.View>
+          <Animated.View style={[styles.shadowContainer, shadowStyle]}>
+            <View style={[styles.shadow, { backgroundColor: colors.contentBrand }]} />
+          </Animated.View>
         </View>
         <Text style={[styles.greeting, { color: colors.contentPrimary }]}>
           {"I'm Coach.\nHow can I help?"}
@@ -138,11 +187,25 @@ const styles = StyleSheet.create({
   },
   orbCombo: {
     alignItems: 'center',
-    gap: 12,
   },
-  orbComboImage: {
+  orbImageWrap: {
     width: 96,
-    height: 120,
+    height: 96,
+    overflow: 'hidden',
+  },
+  orbImage: {
+    width: 96,
+    height: 96,
+  },
+  shadowContainer: {
+    marginTop: 6,
+    alignItems: 'center',
+  },
+  shadow: {
+    width: 56,
+    height: 6,
+    borderRadius: 28,
+    opacity: 0.2,
   },
   greeting: {
     fontSize: 24,
