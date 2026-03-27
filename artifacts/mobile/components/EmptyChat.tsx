@@ -15,8 +15,8 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
-const FADE_OUT = { duration: 180, easing: Easing.out(Easing.ease) };
-const FADE_IN = { duration: 280, easing: Easing.out(Easing.ease) };
+const FADE_OUT = { duration: 250, easing: Easing.out(Easing.ease) };
+const FADE_IN = { duration: 300, easing: Easing.out(Easing.ease) };
 
 const FLOAT_DURATION = 3200;
 const BREATHE_DURATION = 4000;
@@ -75,13 +75,13 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      fullCardProgress.value = withTiming(1, FADE_OUT);
-      halfCardProgress.value = withDelay(40, withTiming(1, FADE_OUT));
-      progress.value = withSpring(1, SPRING_CONFIG);
+      fullCardProgress.value = withDelay(150, withTiming(1, FADE_OUT));
+      halfCardProgress.value = withDelay(120, withTiming(1, FADE_OUT));
+      progress.value = withDelay(200, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
-      fullCardProgress.value = withDelay(100, withTiming(0, FADE_IN));
-      halfCardProgress.value = withDelay(160, withTiming(0, FADE_IN));
+      fullCardProgress.value = withDelay(80, withTiming(0, FADE_IN));
+      halfCardProgress.value = withDelay(140, withTiming(0, FADE_IN));
     }
   }, [inputFocused]);
 
