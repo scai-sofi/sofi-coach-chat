@@ -324,7 +324,7 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
     if (anyAlive) {
       navigateToMemory(ids);
     } else {
-      showToast({ message: 'This memory has been deleted.' });
+      showToast({ message: 'This chat memory has been deleted.' });
     }
   };
 
@@ -443,7 +443,7 @@ function MorphingProposalCard({
     if (anyAlive) {
       navigateToMemory(memoryIds);
     } else {
-      showToast({ message: 'This memory has been deleted.' });
+      showToast({ message: 'This chat memory has been deleted.' });
     }
   };
 
@@ -557,7 +557,7 @@ function MemoryProposalCard({ message }: { message: Message }) {
   const isConfirmed = proposal.confirmed === true;
   const isDismissed = proposal.dismissed === true;
   const isExiting = isConfirmed || isDismissed;
-  const exitLabel = isConfirmed ? 'Saved to memory' : 'Skipped';
+  const exitLabel = isConfirmed ? 'Saved to chat memory' : 'Skipped';
 
   return (
     <MorphingProposalCard

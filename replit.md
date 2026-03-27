@@ -59,7 +59,8 @@ The system is designed to defensively handle varied AI output while guiding the 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
 - **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory, SettingsPanel) managed via a `PanelType` enum.
-- **Memory Privacy Mode:** 3-mode picker (`full` | `ask-first` | `off`) accessible from Settings panel. Controls whether AI receives memories, how saves are handled (auto vs proposal vs suppressed), and Memory Center display state. Goals are unaffected by memory mode.
+- **Chat Memory Naming Convention:** All user-facing text uses "chat memory" / "chat memories" (never just "memory") to clearly communicate that this feature only affects the chat experience and does not automatically consume or modify memory outside of chat conversations.
+- **Memory Privacy Mode:** 3-mode picker (`full` | `ask-first` | `off`) accessible from Settings panel. Controls whether AI receives chat memories, how saves are handled (auto vs proposal vs suppressed), and Memory Center display state. Goals are unaffected by chat memory mode.
 - **Chat Sessions:** In-memory management of sessions, each with `id`, `title`, `messages`, `memories`, `goals`. Includes auto-generation of titles and a `sessionVersionRef` for concurrency.
 - **Demo vs Live Mode:** Supports switching between pre-built demo scenarios and live AI interactions.
 
@@ -71,5 +72,6 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **expo-asset:** Asset preloading (e.g., GIF for typing indicator).
 - **react-native-reanimated:** For advanced animations, specifically color interpolation.
 - **react-native-svg:** For custom SVG icon rendering.
+- **expo-clipboard:** For copying AI response text to clipboard.
 - **@expo/vector-icons (Feather):** Provides a library of standard icons.
 - **pino/pino-http:** Logging for the API server.
