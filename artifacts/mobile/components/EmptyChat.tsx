@@ -53,8 +53,7 @@ export function EmptyChat() {
   const halfCards = SUGGESTIONS.filter(s => s.type === 'half');
 
   const progress = useSharedValue(0);
-  const fullCardProgress = useSharedValue(0);
-  const halfCardProgress = useSharedValue(0);
+  const cardsProgress = useSharedValue(0);
   const sectionCollapse = useSharedValue(0);
 
   const floatPhase = useSharedValue(0);
@@ -76,15 +75,13 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      halfCardProgress.value = withDelay(120, withTiming(1, FADE_OUT));
-      fullCardProgress.value = withDelay(150, withTiming(1, FADE_OUT));
+      cardsProgress.value = withDelay(120, withTiming(1, FADE_OUT));
       sectionCollapse.value = withDelay(200, withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) }));
       progress.value = withDelay(200, withSpring(1, SPRING_CONFIG));
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
       sectionCollapse.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) });
-      fullCardProgress.value = withDelay(80, withTiming(0, FADE_IN));
-      halfCardProgress.value = withDelay(140, withTiming(0, FADE_IN));
+      cardsProgress.value = withDelay(80, withTiming(0, FADE_IN));
     }
   }, [inputFocused]);
 
@@ -126,12 +123,8 @@ export function EmptyChat() {
     overflow: 'hidden' as const,
   }));
 
-  const fullCardAnimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
-  }));
-
-  const halfCardAnimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(halfCardProgress.value, [0, 1], [1, 0]),
+  const cardsAnimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(cardsProgress.value, [0, 1], [1, 0]),
   }));
 
   return (
@@ -162,7 +155,7 @@ export function EmptyChat() {
       </Animated.View>
 
       <Animated.View style={[styles.suggestionsSection, suggestionsSectionStyle]}>
-        <Animated.View style={fullCardAnimStyle}>
+        <Animated.View style={cardsAnimStyle}>
           <Pressable
             style={[styles.fullCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
             onPress={() => sendMessage(fullCard.text)}
@@ -170,21 +163,21 @@ export function EmptyChat() {
             <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{fullCard.label.toUpperCase()}</Text>
             <Text style={[styles.cardText, { color: colors.contentPrimary }]}>{fullCard.text}</Text>
           </Pressable>
-        </Animated.View>
 
-        <Animated.View style={[styles.halfRow, halfCardAnimStyle]}>
-          {halfCards.map((card, i) => (
-            <Pressable
-              key={i}
-              style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
-              onPress={() => sendMessage(card.text)}
-            >
-              <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
-              <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
-                {card.text}
-              </Text>
-            </Pressable>
-          ))}
+          <View style={styles.halfRow}>
+            {halfCards.map((card, i) => (
+              <Pressable
+                key={i}
+                style={[styles.halfCard, { backgroundColor: colors.surfaceElevated, boxShadow: `0px 2px 8px ${colors.contentStatusbar}0A` }]}
+                onPress={() => sendMessage(card.text)}
+              >
+                <Text style={[styles.cardLabel, { color: colors.contentSecondary }]}>{card.label.toUpperCase()}</Text>
+                <Text style={[styles.halfCardText, { color: colors.contentPrimary }]} numberOfLines={2}>
+                  {card.text}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </Animated.View>
       </Animated.View>
     </View>
@@ -229,7 +222,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   suggestionsSection: {
-    gap: 12,
     paddingBottom: 16,
     paddingTop: 40,
   },
@@ -241,6 +233,7 @@ const styles = StyleSheet.create({
   halfRow: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 12,
   },
   halfCard: {
     flex: 1,
