@@ -148,6 +148,9 @@ export function SuggestionCards({ bottomOffset = 0 }: { bottomOffset?: number })
 
   const cardsAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(cardsProgress.value, [0, 1], [1, 0]),
+    transform: [
+      { translateY: interpolate(cardsProgress.value, [0, 1], [0, 10]) },
+    ],
     pointerEvents: cardsProgress.value > 0.5 ? 'none' as const : 'auto' as const,
   }));
 
