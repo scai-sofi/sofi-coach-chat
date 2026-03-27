@@ -186,6 +186,7 @@ export default function ChatScreen() {
 
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
 
   useEffect(() => {
     if (activePanel === 'history') {
@@ -193,6 +194,9 @@ export default function ChatScreen() {
     }
     if (activePanel === 'settings') {
       setShowSettings(true);
+    }
+    if (activePanel === 'memory') {
+      setShowMemory(true);
     }
   }, [activePanel]);
 
@@ -264,7 +268,12 @@ export default function ChatScreen() {
         {activePanel === 'scenarios' && <ScenarioSwitcher />}
       </KeyboardAvoidingView>
 
-      {activePanel === 'memory' && <MemoryCenter />}
+      {showMemory && (
+        <MemoryCenter onClose={() => {
+          setShowMemory(false);
+          setActivePanel('none');
+        }} />
+      )}
       {activePanel === 'goals' && <GoalsDashboard />}
 
       {showHistory && (

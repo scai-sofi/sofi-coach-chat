@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Keyboard, KeyboardAvoidingView, Platform, Dimensions, Animated as RNAnimated } from 'react-native';
+import ReAnimated, { useSharedValue, useAnimatedStyle, withTiming, Easing as REasing, runOnJS } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
@@ -191,9 +192,29 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
   );
 }
 
-export function MemoryCenter() {
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SLIDE_DURATION = 300;
+const SLIDE_EASING = REasing.bezier(0.4, 0, 0.2, 1);
+
+export function MemoryCenter({ onClose }: { onClose: () => void }) {
   const { colors } = useTheme();
   const { memories, memoryMode, setActivePanel, pauseAllMemories, deleteAllMemories, highlightedMemoryId, addMemory } = useCoach();
+
+  const slideX = useSharedValue(SCREEN_WIDTH);
+
+  useEffect(() => {
+    slideX.value = withTiming(0, { duration: SLIDE_DURATION, easing: SLIDE_EASING });
+  }, []);
+
+  const handleClose = useCallback(() => {
+    slideX.value = withTiming(SCREEN_WIDTH, { duration: SLIDE_DURATION, easing: SLIDE_EASING }, () => {
+      runOnJS(onClose)();
+    });
+  }, [onClose, slideX]);
+
+  const slideStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: slideX.value }],
+  }));
   const headerHeight = useAppBarHeight();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -287,11 +308,11 @@ export function MemoryCenter() {
   }, []);
 
   return (
-    <View style={[styles.panel, { backgroundColor: colors.surfaceBase }]}>
+    <ReAnimated.View style={[styles.panel, { backgroundColor: colors.surfaceBase }, slideStyle]}>
       <AppBar
         variant="back"
         title="Coach memory"
-        onBack={() => setActivePanel('none')}
+        onBack={handleClose}
         rightActions={memoryMode !== 'off' ? [
           {
             icon: <PlusIcon size={20} color={showAddForm ? colors.contentDimmed : colors.contentPrimary} />,
@@ -462,7 +483,7 @@ export function MemoryCenter() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </ReAnimated.View>
   );
 }
 
