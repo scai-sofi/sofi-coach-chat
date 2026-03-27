@@ -15,8 +15,8 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 const SPRING_CONFIG = { damping: 20, stiffness: 180, mass: 0.8 };
-const CARD_SPRING = { damping: 22, stiffness: 160, mass: 0.6 };
-const FADE_OUT = { duration: 200, easing: Easing.bezier(0.4, 0, 1, 1) };
+const FADE_OUT = { duration: 180, easing: Easing.out(Easing.ease) };
+const FADE_IN = { duration: 280, easing: Easing.out(Easing.ease) };
 
 const FLOAT_DURATION = 3200;
 const BREATHE_DURATION = 4000;
@@ -75,13 +75,13 @@ export function EmptyChat() {
 
   useEffect(() => {
     if (inputFocused) {
-      halfCardProgress.value = withTiming(1, FADE_OUT);
-      fullCardProgress.value = withDelay(60, withTiming(1, FADE_OUT));
-      progress.value = withDelay(80, withSpring(1, SPRING_CONFIG));
+      fullCardProgress.value = withTiming(1, FADE_OUT);
+      halfCardProgress.value = withDelay(40, withTiming(1, FADE_OUT));
+      progress.value = withSpring(1, SPRING_CONFIG);
     } else {
       progress.value = withSpring(0, SPRING_CONFIG);
-      fullCardProgress.value = withDelay(150, withSpring(0, CARD_SPRING));
-      halfCardProgress.value = withDelay(220, withSpring(0, CARD_SPRING));
+      fullCardProgress.value = withDelay(100, withTiming(0, FADE_IN));
+      halfCardProgress.value = withDelay(160, withTiming(0, FADE_IN));
     }
   }, [inputFocused]);
 
@@ -119,16 +119,10 @@ export function EmptyChat() {
 
   const fullCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(fullCardProgress.value, [0, 1], [1, 0]),
-    transform: [
-      { translateY: interpolate(fullCardProgress.value, [0, 1], [0, -16]) },
-    ],
   }));
 
   const halfCardAnimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(halfCardProgress.value, [0, 1], [1, 0]),
-    transform: [
-      { translateY: interpolate(halfCardProgress.value, [0, 1], [0, -12]) },
-    ],
   }));
 
   return (
