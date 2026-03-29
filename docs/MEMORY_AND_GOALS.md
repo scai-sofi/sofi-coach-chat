@@ -277,7 +277,7 @@ Accessed via a brain icon in the chat header "more menu." Accessed via Coach Cha
 | Panel header            | `UnifiedChatAppBar` pattern with close + title                                          |
 | Search bar              | Text input with search icon, filters memory list in real-time                           |
 | Category filter chips   | "All" + per-category filter chips; pill-style, horizontally scrollable                  |
-| Memory row              | Card with edit / pause / delete actions — source label + date                           |
+| Memory row              | Card with source label, date, and edit / pause / delete actions                         |
 | Add memory              | "+" button in header to manually add new memories                                       |
 | Overflow menu           | Per-memory "..." menu with Edit / Pause (or Resume) / Delete actions                   |
 | Global "Delete all"     | Destructive action with confirmation overlay                                            |
@@ -299,6 +299,20 @@ The original spec listed 6 categories (Preferences, Life Context, Financial Atti
 **Rationale:** The 6-category model created ambiguity at the boundaries — "Comfortable with moderate investment risk" could be classified as a Preference, a Financial Attitude, or even a Priority depending on context. The 3-category model groups by *what kind of thing it is about the member*: who they are (About Me), how they like to interact (Preferences), and what they're working toward (Priorities). This reduces classification errors and makes the Memory Center easier to scan.
 
 **Trade-off:** The 3-category model loses granularity that could be useful for backend retrieval (e.g., filtering only "Explicit Facts" for financial calculations). A hybrid approach — 3 user-facing categories with finer-grained backend tags — could preserve both benefits. Final category taxonomy is an open design decision.
+
+**Memory card metadata:**
+
+Each memory card displays a source label and a date in its metadata row. The source label reflects provenance — how the memory was created — and updates to reflect edits:
+
+| Source (`MemorySource`) | Label (unedited)     | Label (after edit) | Date shown   |
+| ----------------------- | -------------------- | ------------------ | ------------ |
+| `EXPLICIT`              | "You created"        | "You updated"      | `updatedAt`  |
+| `IMPLICIT_CONFIRMED`    | "Coach learned"      | "You updated"      | `updatedAt`  |
+| `MEMBER_360`            | "From your profile"  | "You updated"      | `updatedAt`  |
+
+- **Date** always shows `updatedAt` (formatted as "Mon DD"). For unedited memories, `updatedAt` equals `createdAt`, so this naturally reflects creation date.
+- **Edit detection:** A memory is considered edited when `updatedAt` differs from `createdAt` by more than 1 second. Once edited, the label changes to "You updated" regardless of original source — the member now owns the content.
+- **Paused state** overrides both source and date: when a memory is paused, the metadata row shows "Paused · not used in chat" instead.
 
 ---
 
