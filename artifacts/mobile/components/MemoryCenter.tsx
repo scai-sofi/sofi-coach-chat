@@ -93,8 +93,9 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
     }
   }, [highlighted, highlightAnim]);
 
+  const wasEdited = memory.updatedAt.getTime() - memory.createdAt.getTime() > 1000;
   const dateLabel = memory.updatedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const sourceLabel = memory.source === 'EXPLICIT' ? 'You created' : memory.source === 'MEMBER_360' ? 'From your profile' : 'Coach learned';
+  const sourceLabel = wasEdited ? 'You updated' : memory.source === 'EXPLICIT' ? 'You created' : memory.source === 'MEMBER_360' ? 'From your profile' : 'Coach learned';
 
   const handleEdit = () => {
     setEditing(true);
