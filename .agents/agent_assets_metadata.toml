@@ -30,3 +30,9 @@ id = "DhPmUN2TMxy3GUhZlxFtt"
 uri = "file://attached_assets/coach-memory-goals_1774304545547.md"
 type = "text"
 title = "Phase 1 Design Plan (Companion Spec)"
+
+[[outputs]]
+id = "FEfPzXr5KRNX3jQA6UJOW"
+uri = "file://docs/MEMORY_AND_GOALS.md"
+type = "text"
+title = "Coach Memory & Goals — Phase 1 Design Plan (updated)"

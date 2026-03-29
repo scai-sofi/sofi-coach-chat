@@ -20,7 +20,7 @@ This document covers two distinct but tightly interconnected features. They can 
 - **Core value:** "The more we talk, the more helpful I become." Coach stops being a stateless search box and starts behaving like someone who actually knows the member.
 - **Access:** Coach Chat only. Memory is viewed and managed entirely within the chat surface — there is no standalone Settings entry point for memory. This keeps memory contextual and reinforces that it belongs to the Coach relationship, not the broader app.
 - **Who it's for:** Any Coach Chat user. The value compounds — passive users benefit from light personalization; engaged users who actively manage their memories get a meaningfully tailored experience.
-- **Prototype status:** Memory Center fully built with search, category filters, inline edit/pause/delete, manual add, and "Delete all" with confirmation. Memory mode controls (Full / Ask First / Off) live in Settings panel. User-facing terminology is "chat memory" / "chat memories" throughout.
+- **Prototype status:** Memory Center fully built with search, category filters, inline edit/pause/delete, manual add, and "Delete all" with confirmation. Trust spectrum controls (three modes mapping to skeptic / pragmatist / enthusiast attitudes) live in Settings panel. User-facing terminology is "chat memory" / "chat memories" throughout.
 
 ---
 
@@ -47,9 +47,13 @@ This document covers two distinct but tightly interconnected features. They can 
 
 **Design principles:**
 
-- **Cumulative value** — Every conversation should make the next one more useful. The member should feel the difference within three sessions.
-- **Goals as the gravity center** — Generic financial Q&A is commoditized. SoFi's differentiation is that the AI connects responses back to the member's stated goals and real financial state. ("You asked about dining spend — here's how it affects your emergency-fund goal.")
-- **Trust through transparency** — In regulated finance, a black-box memory is a liability. The member must always be able to see what the AI knows, why it said what it said, and delete anything instantly.
+- **Cumulative value** — Every conversation should make the next one more useful. The member should feel the difference within three sessions. This is the core promise: it's worth sharing context because the payoff compounds.
+- **Goals as the gravity center** — Generic financial Q&A is commoditized. SoFi's differentiation is that Coach connects responses back to the member's stated goals and real financial state. ("You asked about dining spend — here's how it affects your emergency-fund goal.")
+- **Trust through transparency** — In regulated finance, a black-box memory is a liability. The member must always be able to see what Coach knows, why it said what it said, and delete anything instantly.
+- **Invisible technology, obvious value** — Members don't care about "AI" or "intelligence." They care that Coach helped them avoid a fee, catch an opportunity, or stay on track. Feature value first, technology never.
+- **Guidance, not automation** — Coach presents options, not decisions. Even high-conviction recommendations show the reasoning and let the member choose. Members told us they want insights and education, not an autopilot they can't see into.
+- **Human handoff built in** — When confidence is low or complexity is high, the path to a human specialist is immediate and frictionless. Research showed easy human escalation is non-negotiable for trust.
+- **Warm, direct, shows its work** — Coach's tone is human and conversational, but never vague. It cites specific numbers, references actual data, and says "I'm not sure" when it isn't. The bar for a bank is higher than for a general-purpose AI.
 
 **Problems it solves:**
 
@@ -60,9 +64,9 @@ This document covers two distinct but tightly interconnected features. They can 
 
 **Why SoFi wins this:**
 
-No competitor has combined all three of: **structured goals + conversational memory + real financial data** in a single integrated experience. Cleo has goals and memory but shallow financial data. Origin has data, reasoning and conversational memory, but no clear goal tracking functionality. Monarch has goals and data but no memory.
+No competitor has combined all of: **structured goals + conversational memory + real financial data + calibrated proactive engagement** in a single integrated experience. Cleo has goals and memory but shallow financial data. Origin has data, reasoning and conversational memory, but no clear goal tracking functionality. Monarch has goals and data but no memory. None have a calibrated engagement framework that earns the right to nudge through consistent trust-building.
 
-SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, credit) under one roof — with real-time account data — enabling cross-product goal orchestration that no AI-first competitor can replicate.
+SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, credit) under one roof — with first-party, real-time account data — enabling cross-product coaching intelligence that no AI-first competitor can replicate. That combination is what makes this a moat, not a feature.
 
 ---
 
@@ -172,14 +176,14 @@ SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, cred
 
 *Memory + Goals · Every response passes through a goal-relevance check*
 
-When applicable, Coach's response includes one of four patterns:
+When applicable, Coach's response includes one of four patterns, each mapping to a tier of the 70/20/10 engagement framework:
 
-- **Next Step** — A concrete action the member can take now. *"Transfer $150 to your vault to stay on track this month."*
-- **Progress Delta** — How the topic connects to goal progress. *"Your dining spend is down 18% — you're $45 ahead on your savings goal."*
-- **Risk Alert** — A warning tied to goal health. *"This purchase would use 40% of your remaining monthly budget and put your debt payoff goal at risk."*
+- **Progress Delta** *(FYI tier)* — How the topic connects to goal progress. *"Your dining spend is down 18% — you're $45 ahead on your savings goal."* Low-stakes, builds trust.
+- **Next Step** *(Could-do tier)* — A concrete action the member can take now. *"Transfer $150 to your vault to stay on track this month."* Optimization nudge — Coach presents the option, member decides.
+- **Risk Alert** *(Must/Should-do tier)* — A warning tied to goal health. *"This purchase would use 40% of your remaining monthly budget and put your debt payoff goal at risk."* High-conviction, shows reasoning, offers choices.
 - **None** — Topic is unrelated to any active goal. No forced connection.
 
-*The "none" case matters: over-connecting everything to goals will feel patronizing.*
+*The "none" case matters: over-connecting everything to goals will feel patronizing. Coach earns the right to nudge through consistent trust-building, not by forcing every topic through a goal lens.*
 
 **Prototype coverage:** Returning Member (Session 4+) scenario demonstrates proactive weekly summaries and personalized insights that reference goals and memory context.
 
@@ -267,12 +271,12 @@ When applicable, Coach's response includes one of four patterns:
 **Response safety tiers:**
 
 
-| Tier | Type                  | Guardrail                                                           |
-| ---- | --------------------- | ------------------------------------------------------------------- |
-| 1    | Informational         | None — factual answers, balance lookups                             |
-| 2    | Suggestive            | Data provenance included; tagged as "suggestion"                    |
-| 3    | Actionable            | Confidence threshold required; "Why this" section; disclaimer shown |
-| 4    | Complex / high-stakes | AI provides framing, explicitly hands off to human advisor          |
+| Tier | Type                  | Guardrail                                                           | Engagement tier mapping |
+| ---- | --------------------- | ------------------------------------------------------------------- | ----------------------- |
+| 1    | Informational         | None — factual answers, balance lookups                             | FYI (trust-builder)     |
+| 2    | Suggestive            | Data provenance included; tagged as "suggestion"                    | FYI or Could-do         |
+| 3    | Actionable            | Confidence threshold required; "Why this" section; disclaimer shown; member always chooses the action | Could-do (optimization) |
+| 4    | Complex / high-stakes | Coach provides framing, explicitly offers human specialist path     | Must/Should-do (readiness moment) |
 
 
 ---
@@ -358,7 +362,7 @@ Accessed via the "more menu" icon in the chat header. Provides global memory con
 
 | Design element    | Prototype status |
 | ----------------- | ---------------- |
-| Memory mode toggle| Built — three modes: "Full chat memory" (auto), "Always ask me first", "Chat memory off" |
+| Trust spectrum    | Built — three modes mapping to member attitudes: "Full chat memory" (enthusiast / "Learn as we go"), "Always ask me first" (pragmatist / "I'll decide"), "Chat memory off" (skeptic / "Just answers") |
 | Dark mode toggle  | Built            |
 | Panel scaffold    | Built — slide-up panel with AppBar                                                       |
 
@@ -403,7 +407,7 @@ Rather than building new notification surfaces, proactive messaging reuses the e
 | Level               | Feature | Surface                 | Controls                                                                                                                  | Prototype status |
 | ------------------- | ------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | 1 — Global (Goals)  | Goals   | App Settings            | Goal tracking on/off, proactive notifications toggle (by type), notification frequency, Goals section with full list view | Not built        |
-| 1 — Global (Memory) | Memory  | Settings panel (in-chat) | Memory mode: Full / Ask First / Off                                                                                      | Built            |
+| 1 — Global (Memory) | Memory  | Settings panel (in-chat) | Trust spectrum: Just Answers (skeptic) / I'll Decide (pragmatist) / Learn As We Go (enthusiast)                          | Built            |
 | 2 — Category        | Memory  | Memory Center (in-chat) | Category filter chips for viewing; per-category toggle not yet built                                                     | Partial          |
 | 3 — Item            | Memory  | Memory Center           | Edit, pause/resume, delete via overflow menu on each memory card                                                         | Built            |
 | 4 — Session         | Memory  | Chat                    | Temporary Chat mode (no memory read/write), per-response "Don't use this" flag                                            | Not built        |
