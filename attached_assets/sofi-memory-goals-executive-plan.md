@@ -36,15 +36,34 @@ No competitor has combined structured goals, conversational memory, and real-tim
 
 ---
 
+## What Members Told Us
+
+User research and broader market data reveal a clear set of tensions that Coach Intelligence must navigate. These aren't edge cases — they're the core design constraints.
+
+| What we heard | Design implication |
+|---------------|-------------------|
+| **"Help me see around corners"** — Members want AI that solves real money problems: keeping up with policy changes, avoiding overspending, saving more. | Coach Intelligence must lead with tangible financial value, not AI novelty. Every output should answer "how does this help my money?" |
+| **Accuracy is non-negotiable** — The quality bar for AI from a bank is extremely high. Members expect data-grounded answers and easy escalation to a human when needed. | Every Coach Intelligence output must be traceable to real data. When confidence is low, Coach says so and offers a human path. |
+| **Coach = support, not destination** — Many members interpret "Ask Coach" as customer service chat. They see AI as an extension of support and education, not a standalone product. | Coach Intelligence should be embedded in existing flows, not require members to navigate to a separate AI surface. The best coaching happens where the member already is. |
+| **"Put it everywhere"** — Members want Coach accessible throughout the app so they don't have to navigate back and forth. | Cross-surface presence (Phase 3) isn't a nice-to-have — it's a member expectation. The phased rollout should acknowledge this tension: we're shipping chat-first for validation, not because members want it siloed. |
+| **Comfort levels vary widely** — Attitudes range from AI-skeptical to AI-enthusiastic, with experience level and generational factors driving the spread. Gen Z/Millennials show highest interest in AI for financial advice. | One-size-fits-all won't work. The trust spectrum must accommodate skeptics who want full control and enthusiasts who want Coach to just handle it. |
+| **Value over buzz** — Members prefer simple, useful features. Not everything needs to be branded as "AI." Market the feature value, not the technology. | "Coach Intelligence" is an internal framework name. Members should never see it. They should just notice that SoFi keeps getting more useful. |
+| **Human, not robotic** — AI should feel human yet be demonstrably accurate and know when to hand off. | Coach's tone is warm and direct. It shows its work (provenance, data sources). It never pretends to know something it doesn't. |
+| **Guidance, not autopilot** — Good fit for insights, education, and guidance. Strong aversion to fully automated proposals without transparency and control. | Coach Intelligence presents options, not decisions. Must/Should-do moments always show the reasoning and offer choices — never auto-execute. |
+
+---
+
 ## The Vision
 
-A member opens SoFi. Coach Intelligence already understands their priorities, remembers what they've shared, tracks their goals against real account data, and shapes every surface accordingly. Whether they're checking their balance, reviewing investments, or chatting with Coach, the experience feels like one continuous conversation — a deliberate, personalized path toward Getting Your Money Right.
+A member opens SoFi and the app already works harder for them. It remembers what they've shared with Coach, tracks their goals against real account data, and helps them see around corners — surfacing the insights, optimizations, and warnings that matter for *their* situation. Whether they're checking their balance, reviewing investments, or chatting with Coach, the experience feels like one continuous relationship with a financial partner that gets smarter over time.
+
+This isn't about AI for AI's sake. Members don't care that Coach Intelligence exists. They care that SoFi helped them avoid a fee, catch an opportunity, or stay on track for a goal they set three months ago. The technology is invisible; the value is obvious.
 
 Coach Intelligence is built on three ideas:
 
 1. **Memory and goals are the same system.** A goal is a memory that has been given a target, a timeline, and progress tracking. Instead of two separate features, there's one unified knowledge layer that feeds all of Coach Intelligence.
-2. **Trust scales with the member.** A single "trust dial" lets members choose how much Coach learns — from nothing to everything. The architecture is the same for everyone; the dial just controls how much of it is active.
-3. **Intelligence, not just information.** Memory and goals are inputs. The output is coaching — proactive insights, contextual recommendations, risk alerts, and celebrations that connect every interaction back to what the member actually cares about.
+2. **Trust scales with the member.** A trust spectrum accommodates everyone — from AI-skeptical members who want full control over what Coach remembers, to enthusiasts who want Coach to just handle it. The architecture is the same; the member's comfort level controls how much of it is active.
+3. **Solve real problems, not showcase technology.** Memory and goals are inputs. The output is tangible financial value — helping members see around corners, avoid overspending, save more, and stay on track. Every coaching moment must answer: "how does this help my money?"
 
 ---
 
@@ -152,43 +171,53 @@ Each tier draws on the same inputs (memory, goals, financial reality) but applie
 
 ## Core Design Principles
 
-**Cumulative value** — Every interaction makes the next one smarter. A member should feel Coach Intelligence getting better within three sessions.
+**Cumulative value** — Every interaction makes the next one smarter. A member should feel Coach getting better within three sessions. This is the core promise: it's worth sharing context because the payoff compounds.
 
-**Provenance always visible** — Every piece of knowledge shows where it came from: "You told Coach," "Coach inferred," or "From your account activity." The member never wonders how Coach knows something.
+**Invisible technology, obvious value** — "Coach Intelligence" is never visible to the member. They don't interact with a "personalization engine" — they just notice that SoFi keeps getting more useful. Feature value first, technology never.
 
-**Two layers, clearly separated** — "Things I've shared" (conversational memory, declared preferences, goals) stays distinct from "Things SoFi can see" (account data, transaction patterns). The member controls the first; the second exists regardless. This keeps Coach Intelligence feeling like a trusted relationship, not corporate surveillance.
+**Provenance always visible** — Every piece of knowledge shows where it came from: "You told Coach," "Coach inferred," or "From your account activity." Members trust what they can verify. In regulated finance, opacity is a liability.
+
+**Two layers, clearly separated** — "Things I've shared" (conversational memory, declared preferences, goals) stays distinct from "Things SoFi can see" (account data, transaction patterns). The member controls the first; the second exists regardless. This keeps the experience feeling like a trusted relationship, not corporate data collection.
 
 **Goals are promoted memories** — A casual intent ("I want to pay off my credit card") sits as a passive memory until the member or Coach promotes it to a tracked goal with a target, timeline, and linked account. One system, graduated commitment.
 
-**Coaching, not just answering** — Coach Intelligence works in two modes. *Reactively*, it makes every chat response smarter by grounding answers in the member's full context. *Proactively*, it surfaces insights, nudges, and interventions through a calibrated 70/20/10 engagement framework — FYIs that build trust (70%), optimization nudges (20%), and high-conviction interventions that protect the member's critical path (10%). Both modes draw from the same inputs; the difference is who initiates.
+**Guidance, not automation** — Coach presents options, not decisions. Even in high-conviction Must/Should-do moments, the member always sees the reasoning and chooses the action. No auto-execution, no opaque recommendations. Members told us they want insights and education, not an autopilot they can't see into.
+
+**Coaching, not just answering** — Coach works in two modes. *Reactively*, it makes every chat response smarter by grounding answers in the member's full context. *Proactively*, it surfaces insights, nudges, and interventions through a calibrated 70/20/10 engagement framework. Both modes draw from the same inputs; the difference is who initiates.
+
+**Human handoff built in** — Coach knows when to step aside. When confidence is low, when a question involves account-specific actions Coach can't take, or when the member asks to talk to a person, the path to a human specialist is immediate and frictionless. This isn't a fallback — it's a feature. Research showed that easy human escalation is non-negotiable for trust.
+
+**Warm, direct, shows its work** — Coach's tone is human and conversational, but never vague. It cites specific numbers, references the member's actual data, and says "I'm not sure" when it isn't. The bar for a bank is higher than for a general-purpose AI — members expect demonstrable accuracy, not confident guessing.
 
 **Respect "no" completely** — Intelligence off means intelligence off. No passive collection, no dark patterns, no nagging. Coach still works as a Q&A tool — just without the coaching layer.
 
 ---
 
-## The Trust Dial
+## The Trust Spectrum
 
-The single most important design decision: one global setting that scales Coach Intelligence to the member's comfort level.
+The single most important design decision: one setting that scales Coach to the member's comfort level. Research shows comfort with AI varies widely — from members who want full control over every piece of saved context to those who want Coach to just handle it. Instead of treating this as a binary, the trust spectrum meets each member where they are.
 
-| Mode | Behavior | Default? |
-|------|----------|----------|
-| **Off** | Coach doesn't save anything between sessions. Pure Q&A. No personalization anywhere. | No |
-| **Ask me first** | Coach proposes memories inline during conversation. Nothing saved without explicit approval. | **Yes — default for all members** |
-| **Automatic** | Coach saves relevant context from conversations automatically. Member can review and manage anytime. | No |
+| Mode | Who it's for | Behavior | Default? |
+|------|-------------|----------|----------|
+| **Just answers** | The skeptic — wants Coach to be useful right now, doesn't want it remembering anything | Coach doesn't save anything between sessions. Pure Q&A. No personalization anywhere. | No |
+| **I'll decide** | The pragmatist — sees the value of Coach remembering, but wants to approve each piece | Coach proposes memories inline during conversation. Nothing saved without explicit approval. | **Yes — default for all members** |
+| **Learn as we go** | The enthusiast — wants Coach to get smarter automatically, will review when they feel like it | Coach saves relevant context from conversations automatically. Member can review and manage anytime. | No |
 
-"Ask me first" is the default because it's the safe middle ground: members experience cumulative value through approve/deny cycles, trust builds naturally, and no one is surprised by what Coach remembers.
+"I'll decide" is the default because it maps to what research showed: members are open to AI with pragmatism. They see the potential, but they want to stay in control. The approve/deny cycle lets trust build naturally — every approval is an explicit signal that the member finds value in Coach remembering.
 
-Goals work in all three modes. Even with intelligence off, a member can manually create and track a goal. The trust dial governs whether Coach *learns from conversations* — not whether structured goal tracking is available.
+Goals work in all three modes. Even in "just answers" mode, a member can manually create and track a goal. The trust spectrum governs whether Coach *learns from conversations* — not whether structured goal tracking is available.
 
-**How the trust dial interacts with the engagement framework:**
+**How the trust spectrum interacts with the engagement framework:**
 
-| Trust Dial | Reactive output (chat) | Proactive output (70/20/10) |
-|------------|----------------------|----------------------------|
-| **Off** | Generic responses — no memory or goal context | No proactive engagement. Coach never initiates. |
-| **Ask me first** | Responses use approved memories and goals | Proactive engagement scales with what the member has approved. More approvals → richer FYIs, sharper nudges. |
-| **Automatic** | Full context — all memories and goals shape every response | Full engagement framework active. All three tiers fire based on the member's complete profile. |
+| Mode | Reactive output (chat) | Proactive output (70/20/10) |
+|------|----------------------|----------------------------|
+| **Just answers** | Generic responses — no memory or goal context | No proactive engagement. Coach never initiates. |
+| **I'll decide** | Responses use approved memories and goals | Proactive engagement scales with what the member has approved. More approvals → richer FYIs, sharper nudges. |
+| **Learn as we go** | Full context — all memories and goals shape every response | Full engagement framework active. All three tiers fire based on the member's complete profile. |
 
-The trust dial controls the *depth* of Coach Intelligence's inputs. The 70/20/10 framework controls the *intensity* of its proactive outputs. Both scale together: a member with a thin profile gets fewer, lighter-touch FYIs; a member with a rich profile gets the full range.
+The trust spectrum controls the *depth* of Coach's inputs. The 70/20/10 framework controls the *intensity* of its proactive outputs. Both scale together: a member with a thin profile gets fewer, lighter-touch FYIs; a member with a rich profile gets the full range.
+
+**Natural migration:** The system is designed so members naturally move along the spectrum as trust builds. A skeptic who starts with "just answers" and sees useful responses may try "I'll decide." A pragmatist who tires of approving every memory may switch to "learn as we go." The architecture never changes — only the member's comfort level dial.
 
 ---
 
@@ -230,6 +259,8 @@ This three-category model groups by *what kind of thing it is about the member*:
 
 ## Information Architecture
 
+**Key design constraint:** Research shows members see Coach as an extension of support and education, not a standalone destination. Many interpret "Ask Coach" as customer service chat. This means Coach Intelligence must be *embedded* — its outputs appear where members already are (Home feed, product pages, in-chat), not behind a navigation path to "the AI feature." The IA below reflects this: Coach Chat is the primary creation path, but the value radiates outward to every surface the member already visits.
+
 ### Member-Facing Surfaces
 
 | Surface | Coach Intelligence role | Phase |
@@ -243,7 +274,7 @@ This three-category model groups by *what kind of thing it is about the member*:
 
 | Level | What it controls | Surface | Phase |
 |-------|-----------------|---------|-------|
-| **Global — Trust Dial** | How Coach learns: Off / Ask First / Automatic | App Settings | 1 |
+| **Global — Trust Spectrum** | How Coach learns: Just Answers / I'll Decide / Learn As We Go | App Settings | 1 |
 | **Per-Category** | Toggle categories on/off (e.g., "Don't remember my financial details") | Profile Hub | 2 |
 | **Per-Item** | Edit, pause, resume, delete individual knowledge items | Profile Hub + Chat | 1 |
 | **Per-Surface** | Where Coach Intelligence is active (e.g., "Don't personalize Home feed") | App Settings | 3 |
@@ -260,7 +291,7 @@ This three-category model groups by *what kind of thing it is about the member*:
 **What ships:**
 - Memory Center with search, category filters, inline edit/pause/delete, manual add
 - Goals Dashboard with progress rings, milestones, suggested goals, confidence indicators
-- Three-mode trust dial (Off / Ask Me First / Automatic)
+- Three-mode trust spectrum (Just Answers / I'll Decide / Learn As We Go)
 - Chat History with search and monthly grouping
 - Reactive output: goal-aware and memory-aware chat responses grounded in member context
 - Proactive output (chat-scoped): weekly recaps (FYI tier), spending optimization tips (Could do tier), goal risk alerts and milestone celebrations (Must/Should do tier)
@@ -268,7 +299,7 @@ This three-category model groups by *what kind of thing it is about the member*:
 
 **Entry points:** Brain icon and clock icon in chat header; Settings accessible via overflow menu in chat header.
 
-**What this validates:** Do members want Coach to remember them? Do they engage with goals? Does cumulative personalization drive return usage? Does the trust dial give cautious members enough control?
+**What this validates:** Do members want Coach to remember them? Do they engage with goals? Does cumulative personalization drive return usage? Does the trust spectrum give skeptics enough control while letting enthusiasts opt in deeper?
 
 **Success criteria:**
 
@@ -321,7 +352,7 @@ This three-category model groups by *what kind of thing it is about the member*:
 - **The full 70/20/10 framework goes cross-surface.** In Phase 1, proactive engagement is limited to chat. In Phase 3, all three tiers — FYIs, Could dos, and Must/Should dos — reach the member through every surface: Home feed cards, product surface tooltips, and push notifications. The engagement framework becomes the unified language for how Coach Intelligence communicates everywhere.
 - **Home Feed powered by Coach Intelligence.** Knowledge items shape which cards appear. Goal progress widgets surface on the Home screen. FYI-tier insights (macro-to-micro translators, market pulse) and Could-do nudges (optimization ideas, smart chips) appear as Home cards. The Home screen stops being generic and starts feeling like a personalized coaching dashboard.
 - **Product surface integration.** Each product surface reads from Coach Intelligence. Invest sees risk tolerance and retirement timeline. Banking highlights spending patterns tied to goals. Lending frames refinance options against debt payoff goals. In-line contextual tips (Could-do tier) appear exactly where the member is already looking at their data.
-- **Inferred knowledge items.** Transaction patterns and product usage generate proposed memories ("You spend ~$400/month on dining — want me to remember this?"). Subject to the trust dial and approval flow. Coach Intelligence gets smarter even outside of conversations.
+- **Inferred knowledge items.** Transaction patterns and product usage generate proposed memories ("You spend ~$400/month on dining — want me to remember this?"). Subject to the trust spectrum and approval flow. Coach Intelligence gets smarter even outside of conversations.
 - **Per-surface toggles.** Members control where Coach Intelligence is active. Each surface can be independently enabled or disabled. Full transparency, full control.
 - **Must/Should-do moments beyond chat.** Critical path course-corrections and big milestone interventions surface via Home alert zone and push notifications — not just in-chat. These are the highest-conviction moments (10% tier), reserved for situations where inaction has real financial consequences.
 
@@ -363,10 +394,12 @@ SoFi is the only platform that combines all five rows. Others can do memory or g
 
 | Risk | Mitigation |
 |------|------------|
-| **Trust erosion** | "Ask me first" as default. Provenance on every item. Clear separation between shared context and institutional data. Coach Intelligence feels like a trusted relationship, not surveillance. |
+| **Trust erosion** | "I'll decide" as default. Provenance on every item. Clear separation between shared context and institutional data. Easy human escalation at any point. |
 | **Regulatory exposure** | Per-item deletion with <24hr purge SLA. Audit trail retained. No sensitive data stored without explicit consent. Safety tiers on all AI responses. |
-| **Feature complexity** | One system, not two. The trust dial is the only setting most members ever touch. Granular controls exist but aren't required. |
-| **Over-personalization** | "None" case in coaching outputs — Coach Intelligence doesn't force connections when topics are unrelated. Per-surface toggles let members limit where intelligence is active. |
+| **Feature complexity** | One system, not two. The trust spectrum is the only setting most members ever touch. Granular controls exist but aren't required. |
+| **Over-personalization** | "None" case in coaching outputs — Coach doesn't force connections when topics are unrelated. Per-surface toggles let members limit where intelligence is active. Guidance, never automation. |
+| **AI-as-buzzword backlash** | Never brand member-facing features as "AI" or "intelligence." Market the value: "Coach remembers," "your weekly brief," "goal progress." Technology is invisible; utility is the selling point. |
+| **Mental model mismatch** | Members see Coach as support/education, not a destination. All coaching outputs embed in existing flows — where the member already is — rather than requiring navigation to a separate AI surface. |
 | **Adoption failure** | Phase 1 validates demand inside Coach Chat before investing in cross-surface infrastructure. Each phase has independent success criteria and can ship alone. |
 
 ---
