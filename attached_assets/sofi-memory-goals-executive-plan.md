@@ -50,31 +50,32 @@ Coach Intelligence is built on three ideas:
 ## How Coach Intelligence Works
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   COACH INTELLIGENCE                     │
-│                                                         │
-│   ┌───────────┐   ┌───────────┐   ┌──────────────────┐  │
-│   │  MEMORY   │   │   GOALS   │   │ FINANCIAL REALITY│  │
-│   │           │   │           │   │                  │  │
-│   │ Facts     │   │ Tracked   │   │ Account data     │  │
-│   │ Prefs     │   │ Suggested │   │ Transactions     │  │
-│   │ Context   │   │ Completed │   │ Product usage    │  │
-│   └─────┬─────┘   └─────┬─────┘   └────────┬─────────┘  │
-│         │               │                   │            │
-│         └───────────────┼───────────────────┘            │
-│                         │                                │
-│                         ▼                                │
-│              ┌─────────────────────┐                     │
-│              │  COACHING OUTPUTS   │                     │
-│              │                     │                     │
-│              │ • Proactive insights│                     │
-│              │ • Risk alerts       │                     │
-│              │ • Milestone moments │                     │
-│              │ • Next-step actions │                     │
-│              │ • Cross-product recs│                     │
-│              └─────────────────────┘                     │
-│                         │                                │
-└─────────────────────────┼────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                        COACH INTELLIGENCE                            │
+│                                                                      │
+│   ┌───────────┐   ┌───────────┐   ┌──────────────────┐              │
+│   │  MEMORY   │   │   GOALS   │   │ FINANCIAL REALITY│              │
+│   │           │   │           │   │                  │              │
+│   │ Facts     │   │ Tracked   │   │ Account data     │              │
+│   │ Prefs     │   │ Suggested │   │ Transactions     │              │
+│   │ Context   │   │ Completed │   │ Product usage    │              │
+│   └─────┬─────┘   └─────┬─────┘   └────────┬─────────┘              │
+│         │               │                   │                        │
+│         └───────────────┼───────────────────┘                        │
+│                         │                                            │
+│                         ▼                                            │
+│   ┌──────────────────────────────────────────────────────────────┐   │
+│   │              ENGAGEMENT LAYER (70/20/10)                     │   │
+│   │                                                              │   │
+│   │  ┌──────────────┐  ┌──────────────┐  ┌───────────────────┐  │   │
+│   │  │ TRUST        │  │ OPTIMIZATION │  │ READINESS         │  │   │
+│   │  │ BUILDERS     │  │ IDEAS        │  │ MOMENTS           │  │   │
+│   │  │ "FYIs"       │  │ "Could dos"  │  │ "Must/Should dos" │  │   │
+│   │  │ (70%)        │  │ (20%)        │  │ (10%)             │  │   │
+│   │  └──────────────┘  └──────────────┘  └───────────────────┘  │   │
+│   └──────────────────────────────────────────────────────────────┘   │
+│                         │                                            │
+└─────────────────────────┼────────────────────────────────────────────┘
                           │
           ┌───────────────┼───────────────┐
           │               │               │
@@ -85,17 +86,60 @@ Coach Intelligence is built on three ideas:
     └───────────┘  └────────────┘  └────────────┘
 ```
 
-**Inputs** — What Coach Intelligence knows:
+### Inputs — What Coach Intelligence knows
+
 - **Memory:** Facts, preferences, life context, financial attitudes — accumulated from conversations, manual entry, and (later) inferred from behavior
 - **Goals:** Structured commitments with targets, timelines, linked accounts, and progress tracking — created through conversation or directly
 - **Financial Reality:** Real-time account balances, transaction patterns, product usage — the member's actual financial state across all SoFi products
 
-**Outputs** — What Coach Intelligence does with it:
-- **Proactive insights:** "Your dining spend is down 18% this month — you're $45 ahead on your savings goal"
-- **Risk alerts:** "Your credit card balance increased $800 this week — your debt payoff goal is at risk"
-- **Milestone celebrations:** "You hit 75% of your emergency fund target — at this rate, you'll reach it by August"
-- **Next-step actions:** "Transfer $150 to your vault to stay on track this month"
-- **Cross-product recommendations:** "You got a $3,000 bonus — here's how to split it across your emergency fund, investments, and credit card"
+### Outputs — The 70/20/10 Engagement Framework
+
+Coach Intelligence translates its inputs into coaching outputs through a calibrated engagement framework. Not every insight carries the same weight — the framework ensures the right intensity at the right moment, so the member's experience feels helpful rather than overwhelming.
+
+#### Trust-Builders — "FYIs" (70%)
+
+Educational or advisory insights that serve as low-stakes, high-value touchpoints, anchoring the member's relationship with SoFi as their financial home base. These build trust through consistent, useful context — not by asking the member to do anything.
+
+| Format | Example |
+|--------|---------|
+| **Macro-to-micro translator** | A rate change occurs → Coach explains how it impacts *this member's* mortgage or savings yield |
+| **Insights tooltip** | Coach tooltips embedded within trends, modules, or rows — timely, contextually relevant education |
+| **Weekly brief — Market & Money Pulse** | A personalized weekly summary connecting market movements to the member's portfolio and goals |
+
+*Why 70%: Trust is the foundation. Most interactions should make the member smarter about their own money without asking anything of them. This is how Coach earns the right to nudge.*
+
+#### Optimization Ideas — "Could dos" (20%)
+
+Precision nudges designed to capture incremental gains or stop value leaks within a member's current financial flow. These are efficiency plays where a feature engagement or product activation occurs as a logical byproduct of making the member's money work harder.
+
+| Format | Example |
+|--------|---------|
+| **Home Insights — Optimizations** | "You have $2,400 sitting in checking earning 0.01% — moving it to your vault would earn $86/year" |
+| **Smart chips on welcome screen** | Quick-action suggestions based on recent activity and goal state |
+| **In-line contextual tips** | Insights and actions appearing exactly where the member is already looking at their data |
+| **Weekly brief — Optimization Ideas** | Personalized suggestions for making money work harder, tied to current account state |
+
+*Why 20%: These nudges only land when trust is already established. Coach Intelligence earns the right to suggest through consistent FYIs first. Each "could do" connects directly to the member's stated priorities — never generic upselling.*
+
+#### Readiness Moments — "Must/Should dos" (10%)
+
+High-conviction, high-urgency interventions reserved for critical path course corrections or major life milestones. Surfaced only when the member is on a path toward a negative outcome or entering a transformative life stage that requires structural change. These act as protective guardrails that keep the member on the critical path to their long-term financial goals.
+
+| Format | Example |
+|--------|---------|
+| **Critical path course-correction** | "Your debt-to-income ratio has been trending up for 3 months — at this pace, it will impact your credit within 60 days. Here are three options." |
+| **Big milestones** | Coach detects a fundamental shift in the member's reality (new job, new baby, home purchase) and surfaces structural recommendations |
+
+*Why 10%: These are the moments that matter most — and the easiest to get wrong. Overusing urgency erodes trust. Coach Intelligence reserves high-intensity interventions for situations where inaction has real financial consequences, backed by data the member can verify.*
+
+#### How the tiers connect
+
+The 70/20/10 ratio is a design guardrail, not a rigid formula. The key principle: **Coach Intelligence earns intensity through consistency.** A member who has received weeks of useful FYIs trusts a "could do" nudge. A member who trusts "could do" nudges will act on a "must do" moment. Skip the trust-building, and the high-conviction interventions feel like spam.
+
+Each tier draws on the same inputs (memory, goals, financial reality) but applies different thresholds:
+- **FYIs** fire on any relevant context — low threshold, high frequency
+- **Could dos** fire when there's a quantifiable optimization — medium threshold, moderate frequency
+- **Must/Should dos** fire only on high-conviction triggers with verifiable data — high threshold, rare frequency
 
 ---
 
@@ -109,7 +153,7 @@ Coach Intelligence is built on three ideas:
 
 **Goals are promoted memories** — A casual intent ("I want to pay off my credit card") sits as a passive memory until the member or Coach promotes it to a tracked goal with a target, timeline, and linked account. One system, graduated commitment.
 
-**Coaching, not just answering** — Coach Intelligence doesn't wait to be asked. It connects insights across memory, goals, and financial reality to surface the right guidance at the right moment — inside chat or outside it.
+**Coaching, not just answering** — Coach Intelligence doesn't wait to be asked. Through a calibrated 70/20/10 engagement framework, it delivers the right intensity at the right moment — from low-stakes FYIs that build trust (70%), to optimization nudges that make money work harder (20%), to high-conviction interventions that protect the member's critical path (10%).
 
 **Respect "no" completely** — Intelligence off means intelligence off. No passive collection, no dark patterns, no nagging. Coach still works as a Q&A tool — just without the coaching layer.
 

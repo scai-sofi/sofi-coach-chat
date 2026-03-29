@@ -1,0 +1,23 @@
+Engagement Framework
+To achieve the objective, we propose a 70/20/10 engagement framework:
+1. Trust-Builders – “FYIs” (70%): Educational or advisory insights that serve as low-stakes, high-value touchpoints, anchoring the member’s relationship with SoFi as their "financial home base". 
+[Disclaimer: all UI examples below are WIP/for illustrative purposes only for now]
+Macro-to-micro translator: whenever a change occurs in the macro-economic environment, Coach explains how this had impacted member’s personal financial situation
+Insights tooltip: coach tooltips embedded within trends, modules or rows to provide timely, contextually relevant insights or education
+Weekly brief - market & money pulse: 
+
+
+2. Optimization ideas – “Could dos”(20%): Precision nudges designed to capture incremental gains or stop "value leaks" within a member's current financial flow. These are efficiency plays where a feature engagement or product activation may occur as a logical byproduct of making the member's money work harder.
+[Disclaimer: all UI examples below are WIP/for illustrative purposes only for now]
+Home Insights - Optimizations
+Smart chips on welcome screen
+In-line contextual tips: These insights and actions should appear exactly where the user is already looking at their data.
+Weekly brief - optimization ideas
+
+
+3. Readiness Moments – “Must/Should dos” (10%): High-conviction, high-urgency interventions reserved for Critical Path Course Corrections or Major Life Milestones. These are surfaced only when the member is on a path toward a negative outcome or is entering a transformative life stage that requires structural change. These triggers act as protective guardrails that ensure the member stays on the critical path to their long-term financial goals.
+
+
+[Disclaimer: all UI examples below are WIP/for illustrative purposes only for now]
+Critical path course-correction: these triggers intervene when a member is on a trajectory toward a “Financial Cliff”. (e.g., a debt-to-income ratio trending toward a cliff or a consistent drop in credit health).
+Big milestones: these triggers occur when the system detects/suspects a fundamental shift in the member's reality. 
