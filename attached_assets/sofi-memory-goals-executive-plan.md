@@ -8,14 +8,15 @@
 
 ## Executive Summary
 
-**Coach Intelligence** is a foundational layer of the SoFi ecosystem that utilizes artificial intelligence to translate a member's real-time financial reality into a continuous, trust-based coaching journey. By weaving a coherent coaching narrative across multiple touchpoints — inside and outside the Chat — the framework ensures that every interaction a member has with SoFi Coach feels like a deliberate, personalized step toward Getting Your Money Right.
+**Coach Intelligence** is the foundational layer that translates a member's financial reality into a continuous, trust-based coaching journey. It weaves a coherent coaching narrative across every SoFi touchpoint — inside and outside Chat — so that every interaction feels like a deliberate, personalized step toward Getting Your Money Right.
 
-Coach Intelligence is powered by two core inputs:
+Coach Intelligence is powered by three inputs:
 
 - **Memory** — What Coach knows about the member: their context, preferences, life circumstances, and financial attitudes.
 - **Goals** — What the member is working toward: structured commitments with targets, timelines, and real-time progress tracking.
+- **Financial Reality** — The member's actual financial state: real-time account balances, transaction patterns, and product usage across all SoFi products.
 
-These inputs feed a unified intelligence layer that produces **proactive insights, personalized guidance, risk alerts, milestone celebrations, and cross-surface recommendations** — not just reactive answers to questions.
+These inputs produce two kinds of output. *Reactively*, Coach Intelligence makes every chat response smarter by grounding answers in the member's full context. *Proactively*, it surfaces insights, nudges, and interventions through a calibrated 70/20/10 engagement framework — trust-building FYIs (70%), optimization nudges (20%), and high-conviction interventions that protect the member's critical path (10%).
 
 The plan ships in three phases. Phase 1 (validated prototype, ready to ship) proves the core value inside Coach Chat. Phase 2 unifies memory and goals into a single knowledge model and elevates Coach Intelligence to app level. Phase 3 extends the intelligence layer across every SoFi surface.
 
@@ -72,19 +73,16 @@ Coach Intelligence is built on three ideas:
 │   │ Personalized chat │  │  ┌────────┐  ┌──────────┐  ┌─────────┐ │    │
 │   │ responses shaped  │  │  │ FYIs   │  │ Could dos│  │Must dos │ │    │
 │   │ by member context │  │  │ (70%)  │  │  (20%)   │  │ (10%)   │ │    │
-│   │                   │  │  └────────┘  └──────────┘  └─────────┘ │    │
 │   └────────┬─────────┘  └──────────────────┬───────────────────────┘    │
 │            │                               │                            │
 └────────────┼───────────────────────────────┼────────────────────────────┘
-             │                               │
-             ▼                               │
-       ┌───────────┐         ┌───────────────┼───────────────┐
-       │Coach Chat │         │               │               │
-       │(reactive) │         ▼               ▼               ▼
-       └───────────┘   ┌───────────┐  ┌────────────┐  ┌────────────┐
-                       │Coach Chat │  │ Home Feed  │  │  Product   │
-                       │(proactive)│  │            │  │  Surfaces  │
-                       └───────────┘  └────────────┘  └────────────┘
+             │               ┌───────────────┼───────────────┐
+             │               │               │               │
+             ▼               ▼               ▼               ▼
+       ┌─────────────┐  ┌────────────┐  ┌────────────┐
+       │ Coach Chat  │  │ Home Feed  │  │  Product   │
+       │ (both)      │  │            │  │  Surfaces  │
+       └─────────────┘  └────────────┘  └────────────┘
 ```
 
 ### Inputs — What Coach Intelligence knows
@@ -100,8 +98,6 @@ Coach Intelligence produces two kinds of output:
 **1. Personalized chat responses** — When a member asks Coach a question, Coach Intelligence shapes the answer using everything it knows: memory, goals, and financial reality. Instead of generic advice, the response is grounded in the member's actual situation. This is the *reactive* output — the member initiates, and Coach Intelligence makes the answer smarter.
 
 **2. Proactive engagement** — Coach Intelligence doesn't wait to be asked. It surfaces insights, nudges, and interventions across every touchpoint — chat, Home feed, product surfaces, notifications. This is the *proactive* output, governed by the 70/20/10 Engagement Framework below.
-
----
 
 ### The 70/20/10 Engagement Framework
 
@@ -184,6 +180,16 @@ The single most important design decision: one global setting that scales Coach 
 
 Goals work in all three modes. Even with intelligence off, a member can manually create and track a goal. The trust dial governs whether Coach *learns from conversations* — not whether structured goal tracking is available.
 
+**How the trust dial interacts with the engagement framework:**
+
+| Trust Dial | Reactive output (chat) | Proactive output (70/20/10) |
+|------------|----------------------|----------------------------|
+| **Off** | Generic responses — no memory or goal context | No proactive engagement. Coach never initiates. |
+| **Ask me first** | Responses use approved memories and goals | Proactive engagement scales with what the member has approved. More approvals → richer FYIs, sharper nudges. |
+| **Automatic** | Full context — all memories and goals shape every response | Full engagement framework active. All three tiers fire based on the member's complete profile. |
+
+The trust dial controls the *depth* of Coach Intelligence's inputs. The 70/20/10 framework controls the *intensity* of its proactive outputs. Both scale together: a member with a thin profile gets fewer, lighter-touch FYIs; a member with a rich profile gets the full range.
+
 ---
 
 ## The Unified Knowledge Model
@@ -256,7 +262,8 @@ This three-category model groups by *what kind of thing it is about the member*:
 - Goals Dashboard with progress rings, milestones, suggested goals, confidence indicators
 - Three-mode trust dial (Off / Ask Me First / Automatic)
 - Chat History with search and monthly grouping
-- Coach Intelligence outputs: proactive weekly recaps, goal-aware responses, risk alerts, milestone celebrations
+- Reactive output: goal-aware and memory-aware chat responses grounded in member context
+- Proactive output (chat-scoped): weekly recaps (FYI tier), spending optimization tips (Could do tier), goal risk alerts and milestone celebrations (Must/Should do tier)
 - Seven demo scenarios covering cold start, memory lifecycle, goal discovery, risk alerts, milestone celebration, weekly recap
 
 **Entry points:** Brain icon and clock icon in chat header; Settings accessible via overflow menu in chat header.
@@ -311,11 +318,12 @@ This three-category model groups by *what kind of thing it is about the member*:
 **Scope:** Coach Intelligence powers a coherent coaching narrative across all SoFi surfaces — every touchpoint feels like a deliberate step toward Getting Your Money Right.
 
 **What changes:**
-- **Home Feed powered by Coach Intelligence.** Knowledge items shape which cards appear. Goal progress widgets surface on the Home screen. Contextual recommendations reference member priorities. The Home screen stops being generic and starts feeling like a personalized coaching dashboard.
-- **Product surface integration.** Each product surface reads from Coach Intelligence. Invest sees risk tolerance and retirement timeline. Banking highlights spending patterns tied to goals. Lending frames refinance options against debt payoff goals. The member feels recognized across the entire app, not just in chat.
+- **The full 70/20/10 framework goes cross-surface.** In Phase 1, proactive engagement is limited to chat. In Phase 3, all three tiers — FYIs, Could dos, and Must/Should dos — reach the member through every surface: Home feed cards, product surface tooltips, and push notifications. The engagement framework becomes the unified language for how Coach Intelligence communicates everywhere.
+- **Home Feed powered by Coach Intelligence.** Knowledge items shape which cards appear. Goal progress widgets surface on the Home screen. FYI-tier insights (macro-to-micro translators, market pulse) and Could-do nudges (optimization ideas, smart chips) appear as Home cards. The Home screen stops being generic and starts feeling like a personalized coaching dashboard.
+- **Product surface integration.** Each product surface reads from Coach Intelligence. Invest sees risk tolerance and retirement timeline. Banking highlights spending patterns tied to goals. Lending frames refinance options against debt payoff goals. In-line contextual tips (Could-do tier) appear exactly where the member is already looking at their data.
 - **Inferred knowledge items.** Transaction patterns and product usage generate proposed memories ("You spend ~$400/month on dining — want me to remember this?"). Subject to the trust dial and approval flow. Coach Intelligence gets smarter even outside of conversations.
 - **Per-surface toggles.** Members control where Coach Intelligence is active. Each surface can be independently enabled or disabled. Full transparency, full control.
-- **Proactive alerts beyond chat.** Goal risk alerts and milestone celebrations surface via Home alert zone and push notifications. Coach Intelligence reaches the member at the right moment, not just when they open chat.
+- **Must/Should-do moments beyond chat.** Critical path course-corrections and big milestone interventions surface via Home alert zone and push notifications — not just in-chat. These are the highest-conviction moments (10% tier), reserved for situations where inaction has real financial consequences.
 
 **What this validates:** Does cross-surface personalization increase engagement or feel invasive? Do members opt in to personalization beyond chat? Does Coach Intelligence measurably improve financial outcomes?
 
@@ -344,9 +352,10 @@ This three-category model groups by *what kind of thing it is about the member*:
 | **Goals** | No | No | Yes (gamified) | No | Yes (cleanest UI) | **Yes** |
 | **Memory** | Yes (best controls) | Yes (project-scoped) | Yes (shallow) | Yes (multi-agent) | No | **Yes** |
 | **Financial Data** | No | No | Shallow (read-only) | Deep (SEC-regulated) | Deep (aggregation) | **Deep (owned, real-time)** |
+| **Proactive Engagement** | No | No | Notifications only | No | Alerts only | **Calibrated 70/20/10 framework** |
 | **Cross-Product Intelligence** | No | No | No | No | No | **Yes** |
 
-SoFi is the only platform that combines all four columns. The multi-product ecosystem (banking, investing, lending, credit) under one roof — with first-party, real-time account data — enables a coaching intelligence that no AI-first competitor can replicate. Others can do memory or goals. Only SoFi can weave them into a coherent financial coaching narrative across an entire product ecosystem.
+SoFi is the only platform that combines all five rows. Others can do memory or goals. Others can send notifications. But no competitor has a calibrated engagement framework — one that earns the right to nudge through consistent trust-building — powered by first-party, real-time data across a multi-product financial ecosystem. That combination is what makes Coach Intelligence a moat, not a feature.
 
 ---
 
@@ -366,6 +375,8 @@ SoFi is the only platform that combines all four columns. The multi-product ecos
 
 **North Star:** *Goal-Adjusted Financial Improvement Score* — a composite measuring whether members with active Coach Intelligence (goals + memory enabled) are making measurable financial progress (debt reduction velocity, savings growth rate, spending alignment with stated priorities) compared to members without.
 
+### Knowledge layer metrics
+
 | Metric | Phase 1 Target | Phase 3 Target |
 |--------|---------------|----------------|
 | Memory adoption (3+ items at 30d) | >60% | >75% |
@@ -374,6 +385,16 @@ SoFi is the only platform that combines all four columns. The multi-product ecos
 | Coach Chat return rate (7d) | +15pp | +20pp |
 | Cross-surface intelligence opt-in | N/A | >50% |
 | Incorrect memory rate (member-flagged) | <5% | <3% |
+
+### Engagement framework metrics
+
+| Metric | Phase 1 Target | Phase 3 Target |
+|--------|---------------|----------------|
+| FYI engagement rate (opened or expanded) | >25% | >40% |
+| Could-do nudge action rate (member acts on suggestion) | >10% | >18% |
+| Must/Should-do response rate (member engages within 48h) | >50% | >65% |
+| Proactive engagement dismissal rate | <40% | <30% |
+| Engagement tier ratio (actual vs. 70/20/10 target) | Within ±15pp | Within ±10pp |
 
 ---
 
