@@ -1,9 +1,10 @@
-# Coach Memory & Goals — Design Plan
+# Coach Memory & Goals — Phase 1 Design Plan
 
-**Features:** Coach Chat Memory · Goals
+**Scope:** Coach Chat Memory + Goals (chat-scoped)
 **Feature area:** Memory → Coach Chat only · Goals → Coach Chat + App Settings
 **Designer:** Cloris Cai
 **Status:** Prototype complete — UX polish in progress
+**Parent doc:** *SoFi Personalization Platform — Memory & Goals (Executive Design Plan)*
 
 ---
 

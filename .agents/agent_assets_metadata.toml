@@ -18,3 +18,15 @@ id = "FK_BlL5UYZJQxBInLehOn"
 uri = "file://artifacts/mobile/WHY_LIVE_PROTOTYPE.md"
 type = "text"
 title = "Why a Live AI Prototype — Not Just Figma"
+
+[[outputs]]
+id = "7rncyG6x2-PYyz_WtJlxH"
+uri = "file://attached_assets/sofi-memory-goals-executive-plan.md"
+type = "text"
+title = "SoFi Memory & Goals — Executive Design Plan"
+
+[[outputs]]
+id = "DhPmUN2TMxy3GUhZlxFtt"
+uri = "file://attached_assets/coach-memory-goals_1774304545547.md"
+type = "text"
+title = "Phase 1 Design Plan (Companion Spec)"
