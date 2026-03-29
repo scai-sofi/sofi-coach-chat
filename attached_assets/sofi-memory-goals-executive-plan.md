@@ -50,40 +50,41 @@ Coach Intelligence is built on three ideas:
 ## How Coach Intelligence Works
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                        COACH INTELLIGENCE                            │
-│                                                                      │
-│   ┌───────────┐   ┌───────────┐   ┌──────────────────┐              │
-│   │  MEMORY   │   │   GOALS   │   │ FINANCIAL REALITY│              │
-│   │           │   │           │   │                  │              │
-│   │ Facts     │   │ Tracked   │   │ Account data     │              │
-│   │ Prefs     │   │ Suggested │   │ Transactions     │              │
-│   │ Context   │   │ Completed │   │ Product usage    │              │
-│   └─────┬─────┘   └─────┬─────┘   └────────┬─────────┘              │
-│         │               │                   │                        │
-│         └───────────────┼───────────────────┘                        │
-│                         │                                            │
-│                         ▼                                            │
-│   ┌──────────────────────────────────────────────────────────────┐   │
-│   │              ENGAGEMENT LAYER (70/20/10)                     │   │
-│   │                                                              │   │
-│   │  ┌──────────────┐  ┌──────────────┐  ┌───────────────────┐  │   │
-│   │  │ TRUST        │  │ OPTIMIZATION │  │ READINESS         │  │   │
-│   │  │ BUILDERS     │  │ IDEAS        │  │ MOMENTS           │  │   │
-│   │  │ "FYIs"       │  │ "Could dos"  │  │ "Must/Should dos" │  │   │
-│   │  │ (70%)        │  │ (20%)        │  │ (10%)             │  │   │
-│   │  └──────────────┘  └──────────────┘  └───────────────────┘  │   │
-│   └──────────────────────────────────────────────────────────────┘   │
-│                         │                                            │
-└─────────────────────────┼────────────────────────────────────────────┘
-                          │
-          ┌───────────────┼───────────────┐
-          │               │               │
-          ▼               ▼               ▼
-    ┌───────────┐  ┌────────────┐  ┌────────────┐
-    │Coach Chat │  │ Home Feed  │  │  Product   │
-    │           │  │            │  │  Surfaces  │
-    └───────────┘  └────────────┘  └────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          COACH INTELLIGENCE                              │
+│                                                                          │
+│   ┌───────────┐   ┌───────────┐   ┌──────────────────┐                  │
+│   │  MEMORY   │   │   GOALS   │   │ FINANCIAL REALITY│                  │
+│   │           │   │           │   │                  │                  │
+│   │ Facts     │   │ Tracked   │   │ Account data     │                  │
+│   │ Prefs     │   │ Suggested │   │ Transactions     │                  │
+│   │ Context   │   │ Completed │   │ Product usage    │                  │
+│   └─────┬─────┘   └─────┬─────┘   └────────┬─────────┘                  │
+│         │               │                   │                            │
+│         └───────────────┼───────────────────┘                            │
+│                         │                                                │
+│              ┌──────────┴──────────┐                                     │
+│              │                     │                                     │
+│              ▼                     ▼                                     │
+│   ┌──────────────────┐  ┌──────────────────────────────────────────┐    │
+│   │    REACTIVE       │  │      PROACTIVE ENGAGEMENT (70/20/10)    │    │
+│   │                   │  │                                          │    │
+│   │ Personalized chat │  │  ┌────────┐  ┌──────────┐  ┌─────────┐ │    │
+│   │ responses shaped  │  │  │ FYIs   │  │ Could dos│  │Must dos │ │    │
+│   │ by member context │  │  │ (70%)  │  │  (20%)   │  │ (10%)   │ │    │
+│   │                   │  │  └────────┘  └──────────┘  └─────────┘ │    │
+│   └────────┬─────────┘  └──────────────────┬───────────────────────┘    │
+│            │                               │                            │
+└────────────┼───────────────────────────────┼────────────────────────────┘
+             │                               │
+             ▼                               │
+       ┌───────────┐         ┌───────────────┼───────────────┐
+       │Coach Chat │         │               │               │
+       │(reactive) │         ▼               ▼               ▼
+       └───────────┘   ┌───────────┐  ┌────────────┐  ┌────────────┐
+                       │Coach Chat │  │ Home Feed  │  │  Product   │
+                       │(proactive)│  │            │  │  Surfaces  │
+                       └───────────┘  └────────────┘  └────────────┘
 ```
 
 ### Inputs — What Coach Intelligence knows
@@ -92,9 +93,19 @@ Coach Intelligence is built on three ideas:
 - **Goals:** Structured commitments with targets, timelines, linked accounts, and progress tracking — created through conversation or directly
 - **Financial Reality:** Real-time account balances, transaction patterns, product usage — the member's actual financial state across all SoFi products
 
-### Outputs — The 70/20/10 Engagement Framework
+### Outputs — How Coach Intelligence delivers value
 
-Coach Intelligence translates its inputs into coaching outputs through a calibrated engagement framework. Not every insight carries the same weight — the framework ensures the right intensity at the right moment, so the member's experience feels helpful rather than overwhelming.
+Coach Intelligence produces two kinds of output:
+
+**1. Personalized chat responses** — When a member asks Coach a question, Coach Intelligence shapes the answer using everything it knows: memory, goals, and financial reality. Instead of generic advice, the response is grounded in the member's actual situation. This is the *reactive* output — the member initiates, and Coach Intelligence makes the answer smarter.
+
+**2. Proactive engagement** — Coach Intelligence doesn't wait to be asked. It surfaces insights, nudges, and interventions across every touchpoint — chat, Home feed, product surfaces, notifications. This is the *proactive* output, governed by the 70/20/10 Engagement Framework below.
+
+---
+
+### The 70/20/10 Engagement Framework
+
+Proactive engagement follows a calibrated ratio that ensures the right intensity at the right moment. Not every insight carries the same weight — the framework prevents Coach from overwhelming members while building the trust required for higher-stakes interventions.
 
 #### Trust-Builders — "FYIs" (70%)
 
@@ -153,7 +164,7 @@ Each tier draws on the same inputs (memory, goals, financial reality) but applie
 
 **Goals are promoted memories** — A casual intent ("I want to pay off my credit card") sits as a passive memory until the member or Coach promotes it to a tracked goal with a target, timeline, and linked account. One system, graduated commitment.
 
-**Coaching, not just answering** — Coach Intelligence doesn't wait to be asked. Through a calibrated 70/20/10 engagement framework, it delivers the right intensity at the right moment — from low-stakes FYIs that build trust (70%), to optimization nudges that make money work harder (20%), to high-conviction interventions that protect the member's critical path (10%).
+**Coaching, not just answering** — Coach Intelligence works in two modes. *Reactively*, it makes every chat response smarter by grounding answers in the member's full context. *Proactively*, it surfaces insights, nudges, and interventions through a calibrated 70/20/10 engagement framework — FYIs that build trust (70%), optimization nudges (20%), and high-conviction interventions that protect the member's critical path (10%). Both modes draw from the same inputs; the difference is who initiates.
 
 **Respect "no" completely** — Intelligence off means intelligence off. No passive collection, no dark patterns, no nagging. Coach still works as a Q&A tool — just without the coaching layer.
 
