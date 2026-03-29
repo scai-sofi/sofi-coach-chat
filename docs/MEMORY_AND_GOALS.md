@@ -3,7 +3,7 @@
 **Scope:** Coach Chat Memory + Goals (chat-scoped)
 **Feature area:** Memory → Coach Chat only · Goals → Coach Chat + App Settings
 **Designer:** Cloris Cai
-**Status:** Prototype complete — UX polish in progress
+**Status:** Phase 1 requirements — design complete
 **Parent doc:** *Coach Intelligence — Executive Design Plan*
 
 ---
@@ -20,7 +20,7 @@ This document covers two distinct but tightly interconnected features. They can 
 - **Core value:** "The more we talk, the more helpful I become." Coach stops being a stateless search box and starts behaving like someone who actually knows the member.
 - **Access:** Coach Chat only. Memory is viewed and managed entirely within the chat surface — there is no standalone Settings entry point for memory. This keeps memory contextual and reinforces that it belongs to the Coach relationship, not the broader app.
 - **Who it's for:** Any Coach Chat user. The value compounds — passive users benefit from light personalization; engaged users who actively manage their memories get a meaningfully tailored experience.
-- **Prototype status:** Memory Center fully built with search, category filters, inline edit/pause/delete, manual add, and "Delete all" with confirmation. Trust spectrum controls (three modes mapping to skeptic / pragmatist / enthusiast attitudes) live in Settings panel. User-facing terminology is "chat memory" / "chat memories" throughout.
+- **User-facing terminology:** "chat memory" / "chat memories" throughout.
 
 ---
 
@@ -30,7 +30,6 @@ This document covers two distinct but tightly interconnected features. They can 
 - **Core value:** Goals give Coach's responses a persistent target to aim at. Without goals, Coach answers questions. With goals, Coach connects every answer to something the member actually cares about.
 - **Access:** Goals can be created and reviewed from Coach Chat (conversational, contextual) and from app Settings (direct, structured). This dual entry point ensures goals are reachable even for members who don't regularly use Coach Chat. **Save Up goals are directly linked to SoFi Banking's existing Vault feature** — creating a Save Up goal either connects to an existing Vault or prompts the member to create one, making the goal tangible and actionable rather than abstract tracking.
 - **Who it's for:** Members with a specific financial intention — an emergency fund, a debt payoff plan, a savings target — who want accountability and progress visibility without leaving the app.
-- **Prototype status:** Goals Dashboard built with progress rings, monthly targets, estimated completion dates, linked accounts, confidence indicators (On Track / At Risk), and milestone tracking. Supports "Suggested" (draft) goals that the user can "Set up" or "Dismiss" from the dashboard.
 
 ---
 
@@ -138,8 +137,6 @@ SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, cred
 
 *The first 30 days determine long-term retention. Coach must demonstrate cumulative value early.*
 
-**Prototype coverage:** Cold Start Onboarding scenario is fully implemented — demonstrates first-time experience, auto-saving memories, and goal discovery flow.
-
 ---
 
 ### 2. Memory Lifecycle
@@ -153,8 +150,6 @@ SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, cred
 - **Pause** — Member toggles a memory to Paused; Coach stops referencing it but retains it
 - **Delete** — Member permanently removes a memory; purge completes within 24 hours; audit log retained for compliance
 
-**Prototype coverage:** Memory Lifecycle scenario implemented — includes Member 360 profile conflict detection, manual memory corrections, inline edit/pause/delete in Memory Center.
-
 ---
 
 ### 3. Goal Discovery from Conversation
@@ -167,8 +162,6 @@ SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, cred
 - For Save Up goals, Coach proposes linking to an existing Vault or creating a new one; the Vault becomes the live source of truth for progress
 - Member taps "Set up goal"; goal appears in Goals Dashboard with progress ring, confidence indicator, milestone markers
 - Coach may surface an Insight-to-Action card if a product move would accelerate the goal
-
-**Prototype coverage:** Goal Discovery & Creation scenario fully implemented — turns a chat mention of debt into a suggested goal in the Goals Dashboard. Suggested goals can be accepted ("Set up") or dismissed.
 
 ---
 
@@ -185,8 +178,6 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 
 *The "none" case matters: over-connecting everything to goals will feel patronizing. Coach earns the right to nudge through consistent trust-building, not by forcing every topic through a goal lens.*
 
-**Prototype coverage:** Returning Member (Session 4+) scenario demonstrates proactive weekly summaries and personalized insights that reference goals and memory context.
-
 ---
 
 ### 5. Proactive Risk Alert
@@ -197,8 +188,6 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 - When confidence drops below threshold, Coach sends a push notification and pre-loads the chat with context
 - The alert includes: goal name, root cause ("Your credit card balance increased $800 this week"), and 2–3 recovery options
 - Member selects a recovery path; Coach adjusts the goal's estimated completion date and saves a relevant memory
-
-**Prototype coverage:** Proactive Risk Alert scenario fully implemented — demonstrates AI identifying a goal "At Risk" and proposing budget adjustments.
 
 ---
 
@@ -211,25 +200,9 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 - Coach shows journey timeline (past milestones + upcoming) and forward projection ("At this rate, you'll hit your target by August")
 - Member can share the milestone, adjust the goal target, or continue the conversation
 
-**Prototype coverage:** Milestone Celebration scenario implemented — demonstrates UI feedback for hitting 75% of a goal.
-
 ---
 
-### 7. Cross-Product Orchestration
-
-*Memory + Goals · Coach connects a life event to action across SoFi products*
-
-- Member mentions a windfall or income change ("I just got a $3,000 bonus")
-- Coach identifies relevant products: checking (liquidity), savings (emergency fund gap), invest (long-term), credit (high-interest balance)
-- Coach presents a split-allocation Insight-to-Action card: e.g., "$1,000 → Emergency Fund, $1,500 → Invest, $500 → Credit Card"
-- Member reviews the breakdown; Coach adjusts individual amounts on request
-- Member approves; Coach logs the decision as a memory and updates goal progress
-
-**Prototype coverage:** Not yet implemented as a standalone scenario. The Returning Member scenario partially covers this through income conflict detection and cross-product context.
-
----
-
-### 8. Weekly Financial Recap
+### 7. Weekly Financial Recap
 
 *Memory + Goals · Coach proactively summarizes the member's financial week*
 
@@ -237,7 +210,19 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 - Highlights areas of progress and areas where spending exceeded expectations
 - Provides actionable next steps for the coming week
 
-**Prototype coverage:** Weekly Financial Recap scenario fully implemented as a standalone scenario.
+---
+
+### Future: Cross-Product Orchestration
+
+*Phase 2 · Memory + Goals · Coach connects a life event to action across SoFi products*
+
+- Member mentions a windfall or income change ("I just got a $3,000 bonus")
+- Coach identifies relevant products: checking (liquidity), savings (emergency fund gap), invest (long-term), credit (high-interest balance)
+- Coach presents a split-allocation Insight-to-Action card: e.g., "$1,000 → Emergency Fund, $1,500 → Invest, $500 → Credit Card"
+- Member reviews the breakdown; Coach adjusts individual amounts on request
+- Member approves; Coach logs the decision as a memory and updates goal progress
+
+*Deferred to Phase 2: requires cross-product API orchestration and compliance review for multi-product recommendations.*
 
 ---
 
@@ -248,24 +233,22 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 *Package: `sofi_x_package` · `lib/modules/chat/`*
 
 
-| Design element            | Production widget                                                                       | Prototype status |
-| ------------------------- | --------------------------------------------------------------------------------------- | ---------------- |
-| User message bubble       | `ChatBubble.user()` / `ChatOutboundMessageWidget`                                       | Built            |
-| AI message block          | `ChatBubble.bot()` / `ChatStreamingMessageWidget`                                       | Built            |
-| Memory proposal prompt    | New renderable type routed through `DynamicChatWidget`                                  | Built            |
-| "Memory saved" chip       | `ChatPillsWidget` / `PacificPillsWidget` — new confirmed-memory pill variant            | Built            |
-| Goal proposal card        | New `ChatCashCoachAction*Builder` — follow pattern of `ChatCashCoachActionVaultBuilder` | Built            |
-| Insight-to-Action card    | Existing `ChatCashCoachAction*Builder` variants (fund, savings, invest, card)           | Built            |
-| "Why this recommendation" | New expandable row type routed through `DynamicChatWidget`                              | Built            |
-| System banner (dark)      | `ChatStatusContainer` — new dark variant                                                | Built            |
-| System banner (light)     | `ChatStatusContainer` / `ChatDisclaimerFooterWidget`                                    | Built            |
-| Suggestion chips          | `ChatPillsWidget` / `PacificPillsWidget`                                                | Built            |
-| Safety tier badge         | `PacificStatusPill` — new placement in `ChatBubble`                                     | Not built        |
-| Temporary Chat indicator  | `UnifiedChatAppBar` — new persistent chip in header                                     | Not built        |
-| Orb animation             | Floating sphere with continuous float + breathe motion                                  | Built            |
-| Suggestion cards          | 3-card layout (1 full-width + 2 half-width) with keyboard-aware fade animation          | Built            |
-| Data provenance           | Expandable "Provenance" section showing source data for AI responses                    | Built            |
-| Member 360 conflict       | Inline UI for resolving profile data conflicts (e.g., income changes)                   | Built            |
+| Design element            | Production widget                                                                       |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| User message bubble       | `ChatBubble.user()` / `ChatOutboundMessageWidget`                                       |
+| AI message block          | `ChatBubble.bot()` / `ChatStreamingMessageWidget`                                       |
+| Memory proposal prompt    | New renderable type routed through `DynamicChatWidget`                                  |
+| "Memory saved" chip       | `ChatPillsWidget` / `PacificPillsWidget` — new confirmed-memory pill variant            |
+| Goal proposal card        | New `ChatCashCoachAction*Builder` — follow pattern of `ChatCashCoachActionVaultBuilder` |
+| Insight-to-Action card    | Existing `ChatCashCoachAction*Builder` variants (fund, savings, invest, card)           |
+| "Why this recommendation" | New expandable row type routed through `DynamicChatWidget`                              |
+| System banner (dark)      | `ChatStatusContainer` — new dark variant                                                |
+| System banner (light)     | `ChatStatusContainer` / `ChatDisclaimerFooterWidget`                                    |
+| Suggestion chips          | `ChatPillsWidget` / `PacificPillsWidget`                                                |
+| Safety tier badge         | `PacificStatusPill` — new placement in `ChatBubble`                                     |
+| Temporary Chat indicator  | `UnifiedChatAppBar` — new persistent chip in header                                     |
+| Data provenance           | Expandable "Provenance" section showing source data for AI responses                    |
+| Member 360 conflict       | Inline UI for resolving profile data conflicts (e.g., income changes)                   |
 
 
 **Response safety tiers:**
@@ -288,26 +271,26 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 Accessed via a brain icon in the chat header "more menu." Accessed via Coach Chat only — no Settings entry point.
 
 
-| Design element          | Production widget                                                                       | Prototype status |
-| ----------------------- | --------------------------------------------------------------------------------------- | ---------------- |
-| Panel scaffold          | `ChatScaffold` / `UnifiedChatScreen` pattern                                            | Built            |
-| Panel header            | `UnifiedChatAppBar` pattern with close + title                                          | Built            |
-| Search bar              | Text input with search icon, filters memory list in real-time                           | Built            |
-| Category filter chips   | "All" + per-category filter chips; pill-style, horizontally scrollable                  | Built            |
-| Memory row              | Card with edit / pause / delete actions — source label + date                           | Built            |
-| Add memory              | "+" button in header to manually add new memories                                       | Built            |
-| Overflow menu           | Per-memory "..." menu with Edit / Pause (or Resume) / Delete actions                   | Built            |
-| Global "Delete all"     | Destructive action with confirmation overlay                                            | Built            |
-| Version history         | Expandable row — prior versions with timestamps                                         | Not built        |
-| Category toggle controls| Per-category toggle + retention window selector                                         | Not built        |
-| Footer                  | Active count + privacy note                                                             | Not built        |
+| Design element          | Production widget                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------------- |
+| Panel scaffold          | `ChatScaffold` / `UnifiedChatScreen` pattern                                            |
+| Panel header            | `UnifiedChatAppBar` pattern with close + title                                          |
+| Search bar              | Text input with search icon, filters memory list in real-time                           |
+| Category filter chips   | "All" + per-category filter chips; pill-style, horizontally scrollable                  |
+| Memory row              | Card with edit / pause / delete actions — source label + date                           |
+| Add memory              | "+" button in header to manually add new memories                                       |
+| Overflow menu           | Per-memory "..." menu with Edit / Pause (or Resume) / Delete actions                   |
+| Global "Delete all"     | Destructive action with confirmation overlay                                            |
+| Version history         | Expandable row — prior versions with timestamps                                         |
+| Category toggle controls| Per-category toggle + retention window selector                                         |
+| Footer                  | Active count + privacy note                                                             |
 
 
-**Memory categories (prototype):**
+**Memory categories:**
 
-The original spec listed 6 categories (Preferences, Life Context, Financial Attitudes, Goal-Related, Explicit Facts, Other). The prototype consolidates these into 3 broader categories. The mapping:
+The original spec listed 6 categories (Preferences, Life Context, Financial Attitudes, Goal-Related, Explicit Facts, Other). The design consolidates these into 3 broader categories. The mapping:
 
-| Prototype category | Internal key   | Absorbs from original spec                  | Examples                                                                                              |
+| Category           | Internal key   | Absorbs from original spec                  | Examples                                                                                              |
 | ------------------ | -------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | About me           | `ABOUT_ME`     | Life Context + Explicit Facts               | "Self-employed, irregular income months", "Household income ~$120K", "Expecting a baby in March"      |
 | Preferences        | `PREFERENCES`  | Preferences + Financial Attitudes + Other   | "Prefers detailed breakdowns over quick summaries", "Comfortable with moderate investment risk"        |
@@ -326,22 +309,21 @@ The original spec listed 6 categories (Preferences, Life Context, Financial Atti
 Two entry points: a new item under the "more menu" icon in the chat header, and a dedicated Goals section in app Settings. Both surfaces show the same goal state; goals created or edited in either place sync immediately.
 
 
-| Design element          | Production widget                                                                         | Prototype status |
-| ----------------------- | ----------------------------------------------------------------------------------------- | ---------------- |
-| Panel scaffold          | `ChatScaffold` / `UnifiedChatScreen` pattern                                              | Built            |
-| Goal card               | `PacificCard` + `PacificProgressMeter` (circular) — Save Up shows linked Vault name       | Built            |
-| Confidence indicator    | `PacificStatusPill` — On Track / At Risk / Paused / Completed                             | Built            |
-| Goal metadata           | `PacificRow` — monthly target, completion date, linked account; Vault balance for Save Up | Built            |
-| Suggested goal card     | Draft goal with "Set up" / "Dismiss" actions                                              | Built            |
-| Milestone row           | `PacificRow` — badge icons unreached (outlined) → reached (filled)                        | Built            |
-| Monthly trend sparkline | `PacificLineGraph` (from `sofi_coach_dashboard`)                                          | Not built        |
-| Blockers row            | `PacificRow` — AI-identified risks inline ("Spending spike in dining")                    | Not built        |
-| Scenario simulation     | New — "What if I increase by $X/month?" projection panel                                  | Not built        |
-| Goal action             | `ChatPillsWidget` pill — "Ask about this goal" opens chat pre-seeded with goal context    | Not built        |
-| Completed section       | `PacificRow` with divider separator — completion date + final achievement                 | Not built        |
+| Design element          | Production widget                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| Panel scaffold          | `ChatScaffold` / `UnifiedChatScreen` pattern                                              |
+| Goal card               | `PacificCard` + `PacificProgressMeter` (circular) — Save Up shows linked Vault name       |
+| Confidence indicator    | `PacificStatusPill` — On Track / At Risk / Paused / Completed                             |
+| Goal metadata           | `PacificRow` — monthly target, completion date, linked account; Vault balance for Save Up |
+| Suggested goal card     | Draft goal with "Set up" / "Dismiss" actions                                              |
+| Milestone row           | `PacificRow` — badge icons unreached (outlined) → reached (filled)                        |
+| Monthly trend sparkline | `PacificLineGraph` (from `sofi_coach_dashboard`)                                          |
+| Blockers row            | `PacificRow` — AI-identified risks inline ("Spending spike in dining")                    |
+| Goal action             | `ChatPillsWidget` pill — "Ask about this goal" opens chat pre-seeded with goal context    |
+| Completed section       | `PacificRow` with divider separator — completion date + final achievement                 |
 
 
-**Goal types (prototype):**
+**Goal types:**
 
 
 | Goal type        | Internal key       | Label     |
@@ -355,33 +337,12 @@ Two entry points: a new item under the "more menu" icon in the chat header, and 
 
 ### Settings Panel
 
-*Not in original spec — added during prototyping*
-
 Accessed via the "more menu" icon in the chat header. Provides global memory controls.
 
-
-| Design element    | Prototype status |
-| ----------------- | ---------------- |
-| Trust spectrum    | Built — three modes mapping to member attitudes: "Full chat memory" (enthusiast / "Learn as we go"), "Always ask me first" (pragmatist / "I'll decide"), "Chat memory off" (skeptic / "Just answers") |
-| Dark mode toggle  | Built            |
-| Panel scaffold    | Built — slide-up panel with AppBar                                                       |
-
-
----
-
-### Chat History
-
-*Not in original spec — added during prototyping*
-
-Accessed via the clock icon in the chat header. Groups past conversations by month.
-
-
-| Design element       | Prototype status |
-| -------------------- | ---------------- |
-| Searchable history   | Built            |
-| Monthly grouping     | Built            |
-| Load previous session| Built            |
-| New chat action      | Built            |
+| Design element    | Description |
+| ----------------- | ----------- |
+| Trust spectrum    | Three modes mapping to member attitudes: "Full chat memory" (enthusiast / "Learn as we go"), "Always ask me first" (pragmatist / "I'll decide"), "Chat memory off" (skeptic / "Just answers") |
+| Panel scaffold    | Slide-up panel with AppBar |
 
 ---
 
@@ -397,20 +358,18 @@ Rather than building new notification surfaces, proactive messaging reuses the e
 | Milestone notification | Goal milestone reached                    | `ItemAlert` (INFORMATIONAL) in home alert zone + push → `AnimatedRenderable` in-chat celebratory message                          |
 | Risk alert             | Notable deviation from goal on-track pace | `ItemAlert` (CAUTIONARY or INFORMATIONAL) in home alert zone + push → chat pre-loaded with root cause and recovery action buttons |
 
-**Prototype coverage:** Both milestone and risk alert flows are demonstrated through dedicated scenarios with scripted chat interactions.
-
 ---
 
 ### Control Hierarchy
 
 
-| Level               | Feature | Surface                 | Controls                                                                                                                  | Prototype status |
-| ------------------- | ------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| 1 — Global (Goals)  | Goals   | App Settings            | Goal tracking on/off, proactive notifications toggle (by type), notification frequency, Goals section with full list view | Not built        |
-| 1 — Global (Memory) | Memory  | Settings panel (in-chat) | Trust spectrum: Just Answers (skeptic) / I'll Decide (pragmatist) / Learn As We Go (enthusiast)                          | Built            |
-| 2 — Category        | Memory  | Memory Center (in-chat) | Category filter chips for viewing; per-category toggle not yet built                                                     | Partial          |
-| 3 — Item            | Memory  | Memory Center           | Edit, pause/resume, delete via overflow menu on each memory card                                                         | Built            |
-| 4 — Session         | Memory  | Chat                    | Temporary Chat mode (no memory read/write), per-response "Don't use this" flag                                            | Not built        |
+| Level               | Feature | Surface                 | Controls                                                                                                                  |
+| ------------------- | ------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 1 — Global (Goals)  | Goals   | App Settings            | Goal tracking on/off, proactive notifications toggle (by type), notification frequency, Goals section with full list view |
+| 1 — Global (Memory) | Memory  | Settings panel (in-chat) | Trust spectrum: Just Answers (skeptic) / I'll Decide (pragmatist) / Learn As We Go (enthusiast)                          |
+| 2 — Category        | Memory  | Memory Center (in-chat) | Category filter chips for viewing; per-category toggle                                                                   |
+| 3 — Item            | Memory  | Memory Center           | Edit, pause/resume, delete via overflow menu on each memory card                                                         |
+| 4 — Session         | Memory  | Chat                    | Temporary Chat mode (no memory read/write), per-response "Don't use this" flag                                            |
 
 
 ---
@@ -427,61 +386,6 @@ Rather than building new notification surfaces, proactive messaging reuses the e
 | Goal cards and Insight-to-Action cards                          | `PacificCard`                             |
 | Suggestion chips                                                | `PacificChip` (selectable, pill variant)  |
 
-
----
-
-## Prototype Scenarios
-
-The Replit prototype includes a scenario system (`ScenarioSwitcher` + `ScenarioFab`) that demonstrates each major user flow with scripted data. Testers can switch between scenarios to exercise different features.
-
-| # | Scenario                     | Covers flows           | Key features demonstrated                                           |
-|---|------------------------------|------------------------|---------------------------------------------------------------------|
-| 1 | Cold Start Onboarding        | 1, 2                   | First-time greeting, auto-saving memories, goal discovery           |
-| 2 | Returning Member (Session 4+)| 4, 7                   | Proactive weekly summary, personalized insights, profile conflicts  |
-| 3 | Memory Lifecycle             | 2                      | Member 360 conflict detection, manual memory corrections            |
-| 4 | Goal Discovery & Creation    | 3                      | Chat mention → suggested goal → accept in dashboard                 |
-| 5 | Proactive Risk Alert         | 5                      | Goal "At Risk" detection, budget adjustment proposals               |
-| 6 | Milestone Celebration        | 6                      | 75% milestone hit, celebratory UI feedback                          |
-| 7 | Weekly Financial Recap       | 8                      | Spending summary vs. goals, actionable next steps                   |
-
----
-
-## Prototype Architecture
-
-**Stack:** React Native (Expo) + Express API server
-
-**Key files:**
-
-| File                                       | Purpose                                                    |
-| ------------------------------------------ | ---------------------------------------------------------- |
-| `artifacts/mobile/app/index.tsx`           | Main chat screen — orchestrates all panels and overlays     |
-| `artifacts/mobile/components/EmptyChat.tsx`| Orb animation + suggestion cards (split exports)            |
-| `artifacts/mobile/components/InputBar.tsx` | Chat input with animated keyboard padding                   |
-| `artifacts/mobile/components/MemoryCenter.tsx` | Full Memory Center panel with search, filters, CRUD    |
-| `artifacts/mobile/components/GoalsDashboard.tsx` | Goals Dashboard with progress rings and milestones   |
-| `artifacts/mobile/components/ChatHistory.tsx` | Searchable chat history grouped by month                |
-| `artifacts/mobile/components/SettingsPanel.tsx` | Global memory mode and dark mode controls              |
-| `artifacts/mobile/components/MessageBubble.tsx` | Chat message rendering with markdown support           |
-| `artifacts/mobile/constants/types.ts`      | Type definitions for Memory, Goal, Message, etc.           |
-| `artifacts/mobile/constants/scenarios.ts`  | Scripted scenario data for all 7 demo flows                |
-| `artifacts/mobile/constants/theme.ts`      | Light/dark theme tokens                                    |
-| `artifacts/mobile/context/CoachContext.tsx` | Global state management for chat, memory, goals, panels    |
-| `artifacts/api-server/`                    | Express API server (scenario data, mock endpoints)         |
-
-**Design tokens (light mode):**
-
-| Token            | Value     |
-| ---------------- | --------- |
-| surfaceBase      | `#faf8f5` |
-| contentBone600   | `#5c5b5a` |
-| selectionColor   | `#5c5b5a` (light) / `#adacaa` (dark) |
-
-**Typography:** TT Norms Pro (Regular, Medium, Bold)
-
-**Animation details:**
-- Orb: continuous float (3200ms) + breathe (4000ms) using `translateY` only (no scale — prevents blur)
-- Suggestion cards: fade 150ms out / 300ms in (80ms delay), 10px `translateY` recess on hide, `zIndex: -1` behind input bar
-- Input bar padding: animated with `react-native-reanimated` (`withTiming`, ease-out cubic) to prevent bounce on keyboard retract
 
 ---
 
@@ -513,8 +417,7 @@ The Replit prototype includes a scenario system (`ScenarioSwitcher` + `ScenarioF
   - *Blocked on external — Compliance / Legal.* No sensitive data flag pattern exists in the codebase. The UI (flag icon on a memory row) is straightforward once Legal defines which categories require flagging and what the disclosure copy must say. This gates the Memory Center design.
 - **Memory edit guardrails** — Can members freely edit AI-inferred memory text, or only confirm/deny? What prevents gaming that degrades Coach quality?
   - *Open decision — Product / UX.* No existing precedent. Recommend confirm/deny only for AI-inferred memories and free-text edit for member-entered memories. Needs product sign-off before Memory Center rows can be specced. The prototype currently allows free-text editing of all memories.
-- **Scenario simulation depth** — "What if I increase contribution by $X?" — is this a simple linear projection or does it account for interest, inflation, account type? Who scopes this?
-  - *Blocked on external — Product + Engineering.* `PacificLineGraph` is ready for output display. V1 linear projection is achievable frontend-only; compound/inflation requires a backend service. Scope decision needed before the Goals Dashboard "What if" panel can be designed.
+- **Scenario simulation depth** *(Phase 2)* — "What if I increase contribution by $X?" — is this a simple linear projection or does it account for interest, inflation, account type? V1 linear projection is achievable frontend-only; compound/inflation requires a backend service.
 
 ---
 
@@ -523,7 +426,6 @@ The Replit prototype includes a scenario system (`ScenarioSwitcher` + `ScenarioF
 
 | Resource                               | Link                                                                                               |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Replit prototype                       | [https://coach-memory-goals.replit.app](https://coach-memory-goals.replit.app)                     |
 | Figma                                  |                                                                                                    |
 | Jira epic                              | [https://sofiinc.atlassian.net/browse/RDMEMB-661](https://sofiinc.atlassian.net/browse/RDMEMB-661) |
 | Flutter package (planned)              | `flutter/feature_packages/sofi_ai_chat_memory_goals`                                               |
