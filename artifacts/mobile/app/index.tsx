@@ -6,7 +6,6 @@ import {
   ScrollView,
   Pressable,
   StatusBar,
-  Platform,
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -59,21 +58,10 @@ const COLORS = {
   pillText: '#006280',
 };
 
-const cardShadowStyle: ViewStyle = Platform.select({
-  ios: {
-    shadowColor: '#0a0a0a',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-  },
-  android: {
-    elevation: 3,
-  },
-  default: {
-    // @ts-expect-error boxShadow works on web — dropShadow-down-2
-    boxShadow: '0px 0px 1px 0px rgba(10,10,10,0.16), 0px 2px 8px 0px rgba(10,10,10,0.04), 0px 4px 16px 0px rgba(10,10,10,0.02)',
-  },
-}) ?? {};
+const cardShadowStyle: ViewStyle = {
+  // @ts-expect-error boxShadow works across all platforms — dropShadow-down-2
+  boxShadow: '0px 0px 1px 0px rgba(10,10,10,0.16), 0px 2px 8px 0px rgba(10,10,10,0.04), 0px 4px 16px 0px rgba(10,10,10,0.02)',
+};
 
 const HEADER_ROW_HEIGHT = 44;
 
