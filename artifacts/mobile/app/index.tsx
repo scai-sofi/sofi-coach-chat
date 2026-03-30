@@ -511,10 +511,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -20,
-    paddingTop: 16,
+    paddingTop: 20,
     paddingHorizontal: 16,
     paddingBottom: 8,
     gap: 12,
+    overflow: 'visible',
   },
   accountCard: {
     backgroundColor: COLORS.white,
@@ -563,10 +564,10 @@ const styles = StyleSheet.create({
   },
   shortcutsSection: {
     backgroundColor: COLORS.surfaceBase,
-    paddingVertical: 12,
   },
   shortcutsScroll: {
     paddingHorizontal: 16,
+    paddingVertical: 12,
     gap: 12,
   },
   shortcutCard: {
