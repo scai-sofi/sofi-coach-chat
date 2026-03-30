@@ -49,25 +49,26 @@ const COLORS = {
   divider: 'rgba(10,10,10,0.1)',
   askCoachBg: 'rgba(0,70,97,0.2)',
   askCoachText: 'rgba(255,255,255,0.7)',
-  cardShadow1: 'rgba(18,18,17,0.1)',
-  cardShadow2: 'rgba(18,18,17,0.06)',
+  shadowEdge: 'rgba(10,10,10,0.16)',
+  shadowMid: 'rgba(10,10,10,0.04)',
+  shadowFar: 'rgba(10,10,10,0.02)',
   dotInactive: 'rgba(255,255,255,0.3)',
   pillText: '#006280',
 };
 
 const cardShadowStyle: ViewStyle = Platform.select({
   ios: {
-    shadowColor: '#121211',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
+    shadowColor: '#0a0a0a',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
   },
   android: {
     elevation: 2,
   },
   default: {
-    // @ts-expect-error boxShadow works on web
-    boxShadow: '0px 0px 1px 0px rgba(18,18,17,0.1), 0px 6px 12px -6px rgba(18,18,17,0.06)',
+    // @ts-expect-error boxShadow works on web — dropShadow-down-2
+    boxShadow: '0px 0px 1px 0px rgba(10,10,10,0.16), 0px 2px 8px 0px rgba(10,10,10,0.04), 0px 4px 16px 0px rgba(10,10,10,0.02)',
   },
 }) ?? {};
 
