@@ -1,0 +1,11 @@
+<svg viewBox="0 0 334 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="3" y="1" width="328" height="10" rx="5" fill="url(#csb)"/>
+<circle cx="261" cy="6" r="5.5" fill="white" stroke="#70706E"/>
+<defs>
+<linearGradient id="csb" x1="3" y1="6" x2="331" y2="6" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FA2D25"/>
+<stop offset="0.63" stop-color="#FFCC00"/>
+<stop offset="1" stop-color="#1BC245"/>
+</linearGradient>
+</defs>
+</svg>

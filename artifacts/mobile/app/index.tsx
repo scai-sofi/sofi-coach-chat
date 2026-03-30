@@ -29,6 +29,7 @@ import TabInvestSvg from '@/assets/svg/tab-invest.svg';
 import TabLoansSvg from '@/assets/svg/tab-loans.svg';
 import ChartSpendingSvg from '@/assets/svg/chart-spending.svg';
 import ChartNetworthSvg from '@/assets/svg/chart-networth.svg';
+import CreditScoreBarSvg from '@/assets/svg/credit-score-bar.svg';
 import IconPersonalLoansSvg from '@/assets/svg/icon-personal-loans.svg';
 import IconLifeInsuranceSvg from '@/assets/svg/icon-life-insurance.svg';
 import IconSlrSvg from '@/assets/svg/icon-slr.svg';
@@ -179,31 +180,81 @@ export default function HomeScreen() {
           </View>
           <View style={styles.insightsCards}>
             <View style={[styles.insightCard, cardShadowStyle]}>
-              <Text style={styles.insightLabel}>Spending</Text>
-              <Text style={styles.insightAmount}>
-                <Text style={styles.insightAmountPrefix}>$</Text>
-                1,282
-                <Text style={styles.insightAmountCents}>.12</Text>
-              </Text>
-              <View style={styles.insightStatusRow}>
-                <View style={[styles.cautionDot, { backgroundColor: COLORS.cautionSurface }]} />
-                <Text style={[styles.insightStatus, { color: COLORS.caution }]}>Pacing high this month</Text>
+              <View style={styles.insightTextBlock}>
+                <Text style={styles.insightLabel}>Spending</Text>
+                <View style={styles.insightDataBlock}>
+                  <View style={styles.marqueeRow}>
+                    <View style={styles.dollarWrap}>
+                      <Text style={styles.dollarSign}>$</Text>
+                    </View>
+                    <View style={styles.digitsRow}>
+                      <Text style={styles.insightDigits}>1</Text>
+                      <Text style={styles.insightComma}>,</Text>
+                      <Text style={styles.insightDigits}>282</Text>
+                      <View style={styles.centsWrap}>
+                        <Text style={styles.insightCents}>.12</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <Text style={styles.insightCaution}>Pacing high this month</Text>
+                </View>
               </View>
-              <View style={styles.chartWrap}>
-                <ChartSpendingSvg width="100%" height={38} preserveAspectRatio="none" />
+              <View style={styles.chartAbsolute}>
+                <ChartSpendingSvg width="100%" height={37} preserveAspectRatio="none" />
               </View>
             </View>
-            <View style={[styles.insightCard, cardShadowStyle]}>
-              <Text style={styles.insightLabel}>Net Worth</Text>
-              <Text style={styles.insightAmount}>
-                <Text style={styles.insightAmountPrefix}>$</Text>
-                1,278,220
-                <Text style={styles.insightAmountCents}>.50</Text>
-              </Text>
-              <Text style={styles.insightSubtext}>2 SoFi | 13 external</Text>
-              <View style={styles.chartWrap}>
-                <ChartNetworthSvg width="100%" height={38} preserveAspectRatio="none" />
+            <View style={[styles.insightCardSquare, cardShadowStyle]}>
+              <View style={styles.insightTextBlock}>
+                <Text style={styles.insightLabel}>Net Worth</Text>
+                <View style={styles.insightDataBlock}>
+                  <View style={styles.marqueeRow}>
+                    <View style={styles.dollarWrap}>
+                      <Text style={styles.dollarSign}>$</Text>
+                    </View>
+                    <View style={styles.digitsRow}>
+                      <Text style={styles.insightDigits}>1</Text>
+                      <Text style={styles.insightComma}>,</Text>
+                      <Text style={styles.insightDigits}>278</Text>
+                      <Text style={styles.insightComma}>,</Text>
+                      <Text style={styles.insightDigits}>220</Text>
+                      <View style={styles.centsWrap}>
+                        <Text style={styles.insightCents}>.50</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.subtextRow}>
+                    <Text style={styles.insightSubtextMedium}>2 SoFi</Text>
+                    <View style={styles.subtextDivider} />
+                    <Text style={styles.insightSubtextMedium}>13 external</Text>
+                  </View>
+                </View>
               </View>
+              <View style={styles.chartAbsolute}>
+                <ChartNetworthSvg width="100%" height={32} preserveAspectRatio="none" />
+              </View>
+            </View>
+          </View>
+
+          <View style={[styles.creditScoreCard, cardShadowStyle]}>
+            <View style={styles.creditScoreContent}>
+              <View style={styles.creditScoreLeft}>
+                <Text style={styles.insightLabel}>Credit Score</Text>
+                <View style={styles.insightDataBlock}>
+                  <Text style={styles.creditScoreNumber}>732</Text>
+                  <View style={styles.subtextRow}>
+                    <Text style={styles.insightSubtextMedium}>Good</Text>
+                    <View style={styles.subtextDivider} />
+                    <Text style={styles.insightSubtextMedium}>Updated Jul 25</Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.creditScoreRight}>
+                <Text style={styles.creditScoreStatus}>Holding steady</Text>
+                <Text style={styles.creditScoreDesc}>No changes to your score within the past 7 days.</Text>
+              </View>
+            </View>
+            <View style={styles.creditBarWrap}>
+              <CreditScoreBarSvg width="100%" height={12} preserveAspectRatio="none" />
             </View>
           </View>
         </View>
@@ -572,61 +623,149 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 16,
+    height: 173,
+    overflow: 'hidden',
+  },
+  insightCardSquare: {
+    width: 173,
+    height: 173,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    overflow: 'hidden',
+  },
+  insightTextBlock: {
+    gap: 4,
   },
   insightLabel: {
     fontFamily: Fonts.medium,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.6,
     color: COLORS.secondaryText,
     textTransform: 'uppercase' as const,
   },
-  insightAmount: {
+  insightDataBlock: {
+    gap: 0,
+  },
+  marqueeRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 1,
+  },
+  dollarWrap: {
+    paddingBottom: 2,
+  },
+  dollarSign: {
     fontFamily: Fonts.medium,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: -0.16,
+    color: COLORS.primaryText,
+  },
+  digitsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  insightDigits: {
+    fontFamily: Fonts.bold,
     fontSize: 24,
     lineHeight: 28,
-    letterSpacing: -0.4,
-    color: COLORS.primaryText,
-    marginTop: 4,
-  },
-  insightAmountPrefix: {
-    fontFamily: Fonts.medium,
-    fontSize: 16,
-    lineHeight: 28,
+    letterSpacing: -0.48,
     color: COLORS.primaryText,
   },
-  insightAmountCents: {
-    fontFamily: Fonts.medium,
-    fontSize: 16,
-    lineHeight: 28,
-    color: COLORS.primaryText,
-  },
-  insightStatusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
-  },
-  cautionDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  insightStatus: {
+  insightComma: {
     fontFamily: Fonts.regular,
+    fontSize: 24,
+    lineHeight: 28,
+    letterSpacing: -0.48,
+    color: COLORS.primaryText,
+  },
+  centsWrap: {
+    paddingBottom: 9,
+  },
+  insightCents: {
+    fontFamily: Fonts.bold,
     fontSize: 12,
     lineHeight: 16,
     letterSpacing: 0.12,
+    color: COLORS.primaryText,
   },
-  insightSubtext: {
-    fontFamily: Fonts.regular,
+  insightCaution: {
+    fontFamily: Fonts.medium,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.12,
+    color: COLORS.caution,
+  },
+  subtextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  subtextDivider: {
+    width: 0.5,
+    height: 10,
+    backgroundColor: COLORS.secondaryText,
+  },
+  insightSubtextMedium: {
+    fontFamily: Fonts.medium,
     fontSize: 12,
     lineHeight: 16,
     letterSpacing: 0.12,
     color: COLORS.secondaryText,
-    marginTop: 4,
   },
-  chartWrap: {
-    marginTop: 8,
+  chartAbsolute: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  creditScoreCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    height: 173,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    overflow: 'hidden',
+    marginTop: 16,
+    justifyContent: 'space-between',
+  },
+  creditScoreContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  creditScoreLeft: {
+    gap: 4,
+  },
+  creditScoreRight: {
+    width: 149,
+    paddingTop: 27,
+  },
+  creditScoreNumber: {
+    fontFamily: Fonts.bold,
+    fontSize: 24,
+    lineHeight: 32,
+    letterSpacing: -0.72,
+    color: COLORS.primaryText,
+  },
+  creditScoreStatus: {
+    fontFamily: Fonts.medium,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: -0.16,
+    color: COLORS.primaryText,
+  },
+  creditScoreDesc: {
+    fontFamily: Fonts.medium,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.12,
+    color: COLORS.secondaryText,
+    marginTop: 1,
+  },
+  creditBarWrap: {
     overflow: 'hidden',
   },
   tabBar: {
