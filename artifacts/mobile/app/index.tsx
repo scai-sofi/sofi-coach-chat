@@ -18,6 +18,7 @@ import { Fonts } from '@/constants/fonts';
 import ProfileIconSvg from '@/assets/svg/profile-icon.svg';
 import NotificationBellSvg from '@/assets/svg/notification-bell.svg';
 import PlusBadgeLogoSvg from '@/assets/svg/plus-badge-logo.svg';
+import PlusBadgeTextSvg from '@/assets/svg/plus-badge-text.svg';
 import CoachGlyph1Svg from '@/assets/svg/coach-glyph-1.svg';
 import CoachGlyph2Svg from '@/assets/svg/coach-glyph-2.svg';
 import CaretExpandSvg from '@/assets/svg/caret-expand.svg';
@@ -86,8 +87,8 @@ export default function HomeScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.plusBadge}
             >
-              <PlusBadgeLogoSvg width={14} height={14} />
-              <Text style={styles.plusBadgeTextLabel}>PLUS</Text>
+              <PlusBadgeLogoSvg width={10} height={10} />
+              <PlusBadgeTextSvg width={14} height={15} />
             </LinearGradient>
           </View>
           <View style={styles.headerRight}>
@@ -301,13 +302,6 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     paddingHorizontal: 8,
     gap: 4,
-  },
-  plusBadgeTextLabel: {
-    fontFamily: Fonts.bold,
-    fontSize: 9,
-    lineHeight: 12,
-    color: '#ffffff',
-    letterSpacing: 1,
   },
   headerRight: {
     flexDirection: 'row',
