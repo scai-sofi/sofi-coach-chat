@@ -18,7 +18,6 @@ import { Fonts } from '@/constants/fonts';
 import ProfileIconSvg from '@/assets/svg/profile-icon.svg';
 import NotificationBellSvg from '@/assets/svg/notification-bell.svg';
 import PlusBadgeLogoSvg from '@/assets/svg/plus-badge-logo.svg';
-import PlusBadgeTextSvg from '@/assets/svg/plus-badge-text.svg';
 import CoachGlyph1Svg from '@/assets/svg/coach-glyph-1.svg';
 import CoachGlyph2Svg from '@/assets/svg/coach-glyph-2.svg';
 import CaretExpandSvg from '@/assets/svg/caret-expand.svg';
@@ -93,7 +92,7 @@ export default function HomeScreen() {
               style={styles.plusBadge}
             >
               <PlusBadgeLogoSvg width={10} height={10} />
-              <PlusBadgeTextSvg width={14} height={15} />
+              <Text style={styles.plusBadgeText}>Plus</Text>
             </LinearGradient>
           </View>
           <Pressable
@@ -110,7 +109,7 @@ export default function HomeScreen() {
           </Pressable>
           <View style={styles.headerRight}>
             <Pressable hitSlop={12}>
-              <NotificationBellSvg width={20} height={20} />
+              <NotificationBellSvg width={24} height={24} />
             </Pressable>
           </View>
         </View>
@@ -379,10 +378,19 @@ const styles = StyleSheet.create({
   plusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: 50,
     height: 22,
-    borderRadius: 11,
-    paddingHorizontal: 8,
-    gap: 4,
+    borderRadius: 100,
+    paddingLeft: 6,
+    gap: 2,
+  },
+  plusBadgeText: {
+    color: '#ffffff',
+    fontFamily: Fonts.medium,
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 0.12,
+    lineHeight: 16,
   },
   headerRight: {
     flexDirection: 'row',
