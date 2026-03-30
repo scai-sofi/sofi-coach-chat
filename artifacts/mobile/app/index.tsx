@@ -170,7 +170,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.shortcutsSection}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shortcutsScroll}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ overflow: 'visible' }} contentContainerStyle={styles.shortcutsScroll}>
             <ShortcutCard icon={<IconPersonalLoansSvg width={20} height={20} />} title="Personal loans" subtitle="See rates in 1 min" />
             <ShortcutCard icon={<IconLifeInsuranceSvg width={18} height={20} />} title="Life insurance" subtitle="Starts at $5/mo" />
             <ShortcutCard icon={<IconSlrSvg width={24} height={24} />} title="Serious savings" subtitle="Student loan refis" />
@@ -601,6 +601,7 @@ const styles = StyleSheet.create({
   },
   shortcutsSection: {
     backgroundColor: COLORS.surfaceBase,
+    overflow: 'visible',
   },
   shortcutsScroll: {
     paddingHorizontal: 16,
