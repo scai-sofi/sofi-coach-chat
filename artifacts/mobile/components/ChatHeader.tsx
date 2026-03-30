@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Keyboard } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 import { AppBar, useAppBarHeight } from '@/components/AppBar';
 import { OverflowMenu } from '@/components/OverflowMenu';
 import {
-  DemoIcon,
-  CloseIcon,
   ClockIcon,
   MoreIcon,
   ChatNewIcon,
@@ -16,17 +15,32 @@ import {
   SettingsMenuIcon,
   PencilMenuIcon,
   DeleteMenuIcon,
-  FlipIcon,
+  ChevronDownIcon,
 } from '@/components/icons';
 
 export function ChatHeader() {
   const { colors } = useTheme();
+  const router = useRouter();
   const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle, goals } = useCoach();
   const draftGoalCount = goals.filter(g => g.status === 'DRAFT').length;
   const [menuOpen, setMenuOpen] = useState(false);
   const headerHeight = useAppBarHeight();
 
   const hasActiveChat = messages.length > 0 || chatMode === 'demo';
+
+  const dismissChat = () => {
+    Keyboard.dismiss();
+    setMenuOpen(false);
+    if (hasActiveChat) {
+      saveAndClose();
+    }
+    setActivePanel('none');
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  };
 
   const subtitle = chatMode === 'demo' ? (
     <View style={styles.agentStatus}>
@@ -112,20 +126,8 @@ export function ChatHeader() {
         title={sessionTitle}
         subtitle={subtitle}
         leftAction={{
-          icon: <FlipIcon
-            front={<DemoIcon size={20} color={colors.contentPrimary} />}
-            back={<CloseIcon size={24} color={colors.contentPrimary} />}
-            flipped={hasActiveChat}
-            size={24}
-          />,
-          onPress: () => {
-            Keyboard.dismiss();
-            if (!hasActiveChat) {
-              setActivePanel('scenarios');
-            } else {
-              saveAndClose();
-            }
-          },
+          icon: <ChevronDownIcon size={24} color={colors.contentPrimary} />,
+          onPress: dismissChat,
         }}
         rightActions={rightActions}
       />

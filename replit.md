@@ -56,6 +56,11 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **Pacific Color Mapper Skill:** `.agents/skills/pacific-color-mapper/SKILL.md` — authoritative hex lookup for all 181 Pacific semantic tokens, full primitive hex scales, CSS/TypeScript bootstrap, Figma MCP workflow. Source of truth for all Pacific color lookups.
 - **Color Migration:** All prototype→Pacific mappings (with Tailwind flags), alpha/opacity primitives, and the surfaceEdge distinction are in `docs/DESIGN_SYSTEM_MAP.md` §1.1. Several prototype colors (success/warning/info) used Tailwind CSS hex values, NOT Pacific.
 
+### Navigation & Routing
+- **Home Screen (`app/index.tsx`):** SoFi Home — the app's entry point. Pixel-perfect implementation of the Figma design (node 425:34261). Features teal header with profile/Plus badge/bell, frosted "Ask Coach" pill, greeting carousel, account cards (Banking/Invest/Crypto), product shortcuts row, Coach insights section (Spending + Net Worth), and bottom tab bar.
+- **Chat Screen (`app/chat.tsx`):** Coach Chat — presented as a modal (slide-from-bottom). Accessible via the "Ask Coach" pill on Home. ChevronDown icon in header dismisses back to Home. `beforeRemove` listener resets `activePanel` on gesture dismiss.
+- **Route Config (`app/_layout.tsx`):** Stack with `index` (Home) and `chat` (modal presentation, vertical gesture enabled).
+
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
 - **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory, SettingsPanel) managed via a `PanelType` enum.

@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Vector">
+<path d="M3.13803 13C3.13803 12.5892 3.47108 12.2561 3.88191 12.2561H7.27163C7.68246 12.2561 8.01551 12.5892 8.01551 13C8.01551 13.4108 7.68246 13.7439 7.27163 13.7439H3.88191C3.47108 13.7439 3.13803 13.4108 3.13803 13Z" fill="var(--fill-0, #5C5B5A)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3 0C1.34315 0 0 1.34315 0 3V14C0 15.6569 1.34315 17 3 17H18C19.6569 17 21 15.6569 21 14V3C21 1.34315 19.6569 0 18 0H3ZM19 4V3C19 2.44772 18.5523 2 18 2H3C2.44772 2 2 2.44772 2 3V4H19ZM2 6H19V14C19 14.5523 18.5523 15 18 15H3C2.44772 15 2 14.5523 2 14V6Z" fill="var(--fill-0, #5C5B5A)"/>
+</g>
+</svg>
