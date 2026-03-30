@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { Fonts } from '@/constants/fonts';
 import {
   ProfileIcon,
@@ -97,14 +98,16 @@ export default function HomeScreen() {
         </View>
 
         <Pressable
-          style={styles.askCoachPill}
           onPress={() => router.push('/chat')}
+          style={styles.askCoachPillOuter}
         >
-          <View style={styles.coachGlyphWrap}>
-            <CoachGlyph1 size={10} />
-            <CoachGlyph2 size={8} />
-          </View>
-          <Text style={styles.askCoachText}>Ask Coach</Text>
+          <BlurView intensity={20} tint="dark" style={styles.askCoachPill}>
+            <View style={styles.coachGlyphWrap}>
+              <CoachGlyph1 size={10} />
+              <CoachGlyph2 size={8} />
+            </View>
+            <Text style={styles.askCoachText}>Ask Coach</Text>
+          </BlurView>
         </Pressable>
 
         <View style={styles.greetingSection}>
@@ -310,17 +313,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  askCoachPillOuter: {
+    alignSelf: 'center',
+    marginTop: 4,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
   askCoachPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'center',
     backgroundColor: COLORS.askCoachBg,
     height: 36,
-    borderRadius: 32,
     paddingLeft: 12,
     paddingRight: 16,
     gap: 8,
-    marginTop: 4,
   },
   coachGlyphWrap: {
     width: 16,
