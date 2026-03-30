@@ -30,9 +30,9 @@ import TabLoansSvg from '@/assets/svg/tab-loans.svg';
 import ChartSpendingSvg from '@/assets/svg/chart-spending.svg';
 import ChartNetworthSvg from '@/assets/svg/chart-networth.svg';
 import IconPersonalLoansSvg from '@/assets/svg/icon-personal-loans.svg';
-import IconSofiTravelSvg from '@/assets/svg/icon-sofi-travel.svg';
-import IconFinancialPlannerSvg from '@/assets/svg/icon-financial-planner.svg';
-import IconCareerNetworkingSvg from '@/assets/svg/icon-career-networking.svg';
+import IconLifeInsuranceSvg from '@/assets/svg/icon-life-insurance.svg';
+import IconSlrSvg from '@/assets/svg/icon-slr.svg';
+import IconExploreAllSvg from '@/assets/svg/icon-explore-all.svg';
 
 const COLORS = {
   teal: '#00a2c7',
@@ -163,10 +163,10 @@ export default function HomeScreen() {
 
         <View style={styles.shortcutsSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shortcutsScroll}>
-            <ShortcutCard icon={<IconPersonalLoansSvg width={32} height={32} />} line1="Personal" line2="loans" />
-            <ShortcutCard icon={<IconSofiTravelSvg width={32} height={32} />} line1="SoFi" line2="Travel" />
-            <ShortcutCard icon={<IconFinancialPlannerSvg width={32} height={32} />} line1="Financial" line2="Planner" />
-            <ShortcutCard icon={<IconCareerNetworkingSvg width={32} height={32} />} line1="Career" line2="Networking" />
+            <ShortcutCard icon={<IconPersonalLoansSvg width={24} height={24} />} title="Personal loans" subtitle="See rates in 1 min" />
+            <ShortcutCard icon={<IconLifeInsuranceSvg width={24} height={24} />} title="Life insurance" subtitle="Starts at $5/mo" />
+            <ShortcutCard icon={<IconSlrSvg width={24} height={24} />} title="Serious savings" subtitle="Student loan refis" />
+            <ExploreCard />
           </ScrollView>
         </View>
 
@@ -259,19 +259,35 @@ function AccountCard({
 
 function ShortcutCard({
   icon,
-  line1,
-  line2,
+  title,
+  subtitle,
 }: {
   icon: React.ReactNode;
-  line1: string;
-  line2: string;
+  title: string;
+  subtitle: string;
 }) {
   return (
     <View style={[styles.shortcutCard, cardShadowStyle]}>
-      {icon}
-      <View>
-        <Text style={styles.shortcutLine1}>{line1}</Text>
-        <Text style={styles.shortcutLine2}>{line2}</Text>
+      <View style={styles.shortcutIconTextRow}>
+        {icon}
+        <View>
+          <Text style={styles.shortcutTitle}>{title}</Text>
+          <Text style={styles.shortcutSubtitle}>{subtitle}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ExploreCard() {
+  return (
+    <View style={[styles.exploreCard, cardShadowStyle]}>
+      <View style={styles.exploreIconTextRow}>
+        <IconExploreAllSvg width={18} height={18} />
+        <View>
+          <Text style={styles.shortcutTitle}>Explore all</Text>
+          <Text style={styles.exploreSubtitle}>See more products</Text>
+        </View>
       </View>
     </View>
   );
@@ -478,22 +494,47 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
     height: 56,
   },
-  shortcutLine1: {
+  shortcutIconTextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  shortcutTitle: {
     fontFamily: Fonts.medium,
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.primaryText,
   },
-  shortcutLine2: {
+  shortcutSubtitle: {
     fontFamily: Fonts.regular,
     fontSize: 12,
     lineHeight: 16,
-    letterSpacing: 0.1,
+    letterSpacing: 0.12,
+    color: COLORS.secondaryText,
+  },
+  exploreCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    height: 56,
+  },
+  exploreIconTextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  exploreSubtitle: {
+    fontFamily: Fonts.regular,
+    fontSize: 10,
+    lineHeight: 14,
+    letterSpacing: 0.2,
     color: COLORS.secondaryText,
   },
   insightsSection: {
