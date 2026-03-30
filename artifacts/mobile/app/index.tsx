@@ -14,25 +14,24 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Fonts } from '@/constants/fonts';
-import {
-  ProfileIcon,
-  BellIcon,
-  CoachGlyph1,
-  CoachGlyph2,
-  CaretExpandIcon,
-  TabHomeIcon,
-  TabBankingIcon,
-  TabCreditCardIcon,
-  TabInvestIcon,
-  TabLoansIcon,
-  PlusBadgeLogo,
-  SpendingChart,
-  NetWorthChart,
-  PersonalLoansIcon,
-  SoFiTravelIcon,
-  FinancialPlannerIcon,
-  CareerNetworkingIcon,
-} from '@/components/HomeIcons';
+
+import ProfileIconSvg from '@/assets/svg/profile-icon.svg';
+import NotificationBellSvg from '@/assets/svg/notification-bell.svg';
+import PlusBadgeLogoSvg from '@/assets/svg/plus-badge-logo.svg';
+import CoachGlyph1Svg from '@/assets/svg/coach-glyph-1.svg';
+import CoachGlyph2Svg from '@/assets/svg/coach-glyph-2.svg';
+import CaretExpandSvg from '@/assets/svg/caret-expand.svg';
+import TabHomeSvg from '@/assets/svg/tab-home.svg';
+import TabBankingSvg from '@/assets/svg/tab-banking.svg';
+import TabCreditCardSvg from '@/assets/svg/tab-credit-card.svg';
+import TabInvestSvg from '@/assets/svg/tab-invest.svg';
+import TabLoansSvg from '@/assets/svg/tab-loans.svg';
+import ChartSpendingSvg from '@/assets/svg/chart-spending.svg';
+import ChartNetworthSvg from '@/assets/svg/chart-networth.svg';
+import IconPersonalLoansSvg from '@/assets/svg/icon-personal-loans.svg';
+import IconSofiTravelSvg from '@/assets/svg/icon-sofi-travel.svg';
+import IconFinancialPlannerSvg from '@/assets/svg/icon-financial-planner.svg';
+import IconCareerNetworkingSvg from '@/assets/svg/icon-career-networking.svg';
 
 const COLORS = {
   teal: '#00a2c7',
@@ -50,6 +49,7 @@ const COLORS = {
   askCoachBg: 'rgba(0,70,97,0.2)',
   askCoachText: 'rgba(255,255,255,0.7)',
   cardShadow1: 'rgba(18,18,17,0.1)',
+  cardShadow2: 'rgba(18,18,17,0.06)',
   dotInactive: 'rgba(255,255,255,0.3)',
   homeIndicator: '#1a1919',
 };
@@ -78,7 +78,7 @@ export default function HomeScreen() {
       <View style={styles.tealBg}>
         <View style={[styles.headerRow, { paddingTop: insets.top }]}>
           <View style={styles.headerLeft}>
-            <ProfileIcon size={20} color="#ffffff" />
+            <ProfileIconSvg width={20} height={20} />
             <LinearGradient
               colors={['#151035', '#201749', '#330072']}
               locations={[0, 0.316, 0.632]}
@@ -86,13 +86,13 @@ export default function HomeScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.plusBadge}
             >
-              <PlusBadgeLogo size={14} />
+              <PlusBadgeLogoSvg width={14} height={14} />
               <Text style={styles.plusBadgeTextLabel}>PLUS</Text>
             </LinearGradient>
           </View>
           <View style={styles.headerRight}>
             <Pressable hitSlop={12}>
-              <BellIcon size={20} color="#ffffff" />
+              <NotificationBellSvg width={20} height={20} />
             </Pressable>
           </View>
         </View>
@@ -103,8 +103,8 @@ export default function HomeScreen() {
         >
           <BlurView intensity={20} tint="dark" style={styles.askCoachPill}>
             <View style={styles.coachGlyphWrap}>
-              <CoachGlyph1 size={10} />
-              <CoachGlyph2 size={8} />
+              <CoachGlyph1Svg width={10} height={10} />
+              <CoachGlyph2Svg width={8} height={9} />
             </View>
             <Text style={styles.askCoachText}>Ask Coach</Text>
           </BlurView>
@@ -157,10 +157,10 @@ export default function HomeScreen() {
 
         <View style={styles.shortcutsSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shortcutsScroll}>
-            <ShortcutCard icon={<PersonalLoansIcon size={32} />} line1="Personal" line2="loans" />
-            <ShortcutCard icon={<SoFiTravelIcon size={32} />} line1="SoFi" line2="Travel" />
-            <ShortcutCard icon={<FinancialPlannerIcon size={32} />} line1="Financial" line2="Planner" />
-            <ShortcutCard icon={<CareerNetworkingIcon size={32} />} line1="Career" line2="Networking" />
+            <ShortcutCard icon={<IconPersonalLoansSvg width={32} height={32} />} line1="Personal" line2="loans" />
+            <ShortcutCard icon={<IconSofiTravelSvg width={32} height={32} />} line1="SoFi" line2="Travel" />
+            <ShortcutCard icon={<IconFinancialPlannerSvg width={32} height={32} />} line1="Financial" line2="Planner" />
+            <ShortcutCard icon={<IconCareerNetworkingSvg width={32} height={32} />} line1="Career" line2="Networking" />
           </ScrollView>
         </View>
 
@@ -180,7 +180,7 @@ export default function HomeScreen() {
                 <Text style={[styles.insightStatus, { color: COLORS.caution }]}>Pacing high this month</Text>
               </View>
               <View style={styles.chartWrap}>
-                <SpendingChart width={150} height={38} />
+                <ChartSpendingSvg width={150} height={38} />
               </View>
             </View>
             <View style={[styles.insightCard, cardShadowStyle]}>
@@ -188,7 +188,7 @@ export default function HomeScreen() {
               <Text style={styles.insightAmount}>$1,278,220.50</Text>
               <Text style={styles.insightSubtext}>2 SoFi | 13 external</Text>
               <View style={styles.chartWrap}>
-                <NetWorthChart width={150} height={38} />
+                <ChartNetworthSvg width={150} height={38} />
               </View>
             </View>
           </View>
@@ -197,11 +197,11 @@ export default function HomeScreen() {
 
       <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
         <View style={styles.tabBarInner}>
-          <TabItem icon={<TabHomeIcon size={20} color={COLORS.tabSelected} />} label="Home" active />
-          <TabItem icon={<TabBankingIcon size={20} color={COLORS.tabUnselected} />} label="Banking" />
-          <TabItem icon={<TabCreditCardIcon size={20} color={COLORS.tabUnselected} />} label="Credit card" />
-          <TabItem icon={<TabInvestIcon size={20} color={COLORS.tabUnselected} />} label="Invest" />
-          <TabItem icon={<TabLoansIcon size={20} color={COLORS.tabUnselected} />} label="Loans" />
+          <TabItem icon={<TabHomeSvg width={20} height={20} />} label="Home" active />
+          <TabItem icon={<TabBankingSvg width={20} height={20} />} label="Banking" />
+          <TabItem icon={<TabCreditCardSvg width={20} height={17} />} label="Credit card" />
+          <TabItem icon={<TabInvestSvg width={20} height={20} />} label="Invest" />
+          <TabItem icon={<TabLoansSvg width={20} height={20} />} label="Loans" />
         </View>
         <View style={styles.homeIndicator} />
       </View>
@@ -233,7 +233,7 @@ function AccountCard({
         </View>
         <View style={styles.accountCardRight}>
           {balance && <Text style={styles.accountBalance}>{balance}</Text>}
-          {showCaret && <CaretExpandIcon size={13} color="#70706E" />}
+          {showCaret && <CaretExpandSvg width={13} height={8} />}
           {actionText && (
             <Text style={[styles.accountAction, { color: actionColor }]}>{actionText}</Text>
           )}
@@ -532,8 +532,8 @@ const styles = StyleSheet.create({
   },
   insightAmount: {
     fontFamily: Fonts.medium,
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 24,
+    lineHeight: 28,
     letterSpacing: -0.4,
     color: COLORS.primaryText,
     marginTop: 4,
