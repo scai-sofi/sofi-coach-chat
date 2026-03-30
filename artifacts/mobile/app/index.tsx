@@ -33,6 +33,9 @@ import IconPersonalLoansSvg from '@/assets/svg/icon-personal-loans.svg';
 import IconLifeInsuranceSvg from '@/assets/svg/icon-life-insurance.svg';
 import IconSlrSvg from '@/assets/svg/icon-slr.svg';
 import IconExploreAllSvg from '@/assets/svg/icon-explore-all.svg';
+import GlyphRewardsSvg from '@/assets/svg/glyph-rewards.svg';
+import GlyphReferSvg from '@/assets/svg/glyph-refer.svg';
+import GlyphArrowRightSvg from '@/assets/svg/glyph-arrow-right.svg';
 
 const COLORS = {
   teal: '#00a2c7',
@@ -130,12 +133,14 @@ export default function HomeScreen() {
             <Text style={styles.greetingText}>Good morning, Olivia</Text>
             <View style={styles.pillRow}>
               <View style={styles.rewardPill}>
+                <GlyphRewardsSvg width={14.5} height={13} />
                 <Text style={styles.rewardPillText}>250 pts</Text>
-                <Text style={styles.rewardPillArrow}> →</Text>
+                <GlyphArrowRightSvg width={10} height={8} />
               </View>
               <View style={styles.rewardPill}>
+                <GlyphReferSvg width={14.5} height={13.75} />
                 <Text style={styles.rewardPillText}>Get $75</Text>
-                <Text style={styles.rewardPillArrow}> →</Text>
+                <GlyphArrowRightSvg width={10} height={8} />
               </View>
             </View>
           </View>
@@ -484,12 +489,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   rewardPillText: {
-    fontFamily: Fonts.bold,
-    fontSize: 12,
-    lineHeight: 16,
-    color: COLORS.pillText,
-  },
-  rewardPillArrow: {
     fontFamily: Fonts.bold,
     fontSize: 12,
     lineHeight: 16,
