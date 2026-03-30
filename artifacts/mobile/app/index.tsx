@@ -93,7 +93,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.headerRight}>
             <Pressable style={styles.headerIconBtn} hitSlop={12}>
-              <NotificationBellSvg width={20} height={20} />
+              <NotificationBellSvg width={24} height={24} />
             </Pressable>
           </View>
         </View>
