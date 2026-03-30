@@ -99,10 +99,10 @@ export default function HomeScreen() {
             onPress={() => router.push('/chat')}
             style={styles.askCoachPillOuter}
           >
-            <BlurView intensity={20} tint="dark" style={styles.askCoachPill}>
+            <BlurView intensity={10} tint="dark" style={styles.askCoachPill}>
               <View style={styles.coachGlyphWrap}>
-                <CoachGlyph1Svg width={10} height={10} />
-                <CoachGlyph2Svg width={8} height={9} />
+                <CoachGlyph1Svg width={14.5} height={15} style={{ position: 'absolute' }} />
+                <CoachGlyph2Svg width={11} height={12} style={{ position: 'absolute', transform: [{ rotate: '4.72deg' }] }} />
               </View>
               <Text style={styles.askCoachText}>Ask Coach</Text>
             </BlurView>
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.askCoachBg,
-    height: 36,
+    paddingVertical: 8,
     paddingLeft: 12,
     paddingRight: 16,
     gap: 8,
