@@ -150,20 +150,21 @@ export default function HomeScreen() {
         <View style={styles.accountsSection}>
           <AccountCard
             title="Banking"
-            subtitle="SoFi Checking and Savings"
-            balance="$7,282.12"
+            count={2}
+            subtitle="0 transactions"
+            balance="$27,282.12"
             showCaret
           />
           <AccountCard
             title="Invest"
-            subtitle="Active Investing"
-            actionText="Start investing"
+            subtitle="Start trading for $1"
+            actionText="Get up to $1,000"
             actionColor={COLORS.accent}
           />
           <AccountCard
             title="Crypto"
-            subtitle="Active Investing"
-            actionText="Get started"
+            subtitle="Win $1000 in BTC"
+            actionText="Explore"
             actionColor={COLORS.accent}
           />
         </View>
@@ -282,6 +283,7 @@ export default function HomeScreen() {
 
 function AccountCard({
   title,
+  count,
   subtitle,
   balance,
   showCaret,
@@ -289,6 +291,7 @@ function AccountCard({
   actionColor,
 }: {
   title: string;
+  count?: number;
   subtitle: string;
   balance?: string;
   showCaret?: boolean;
@@ -299,7 +302,15 @@ function AccountCard({
     <View style={[styles.accountCard, cardShadowStyle]}>
       <View style={styles.accountCardTop}>
         <View style={styles.accountCardLeft}>
-          <Text style={styles.accountTitle}>{title}</Text>
+          <View style={styles.accountTitleRow}>
+            <Text style={styles.accountTitle}>{title}</Text>
+            {count != null && (
+              <View style={styles.accountCountBadge}>
+                <Text style={styles.accountCountDot}>·</Text>
+                <Text style={styles.accountCountNum}>{count}</Text>
+              </View>
+            )}
+          </View>
           <Text style={styles.accountSubtitle}>{subtitle}</Text>
         </View>
         <View style={styles.accountCardRight}>
@@ -531,6 +542,11 @@ const styles = StyleSheet.create({
   accountCardLeft: {
     flex: 1,
   },
+  accountTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   accountTitle: {
     fontFamily: Fonts.medium,
     fontSize: 18,
@@ -538,12 +554,32 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
     color: COLORS.primaryText,
   },
+  accountCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 4,
+    paddingTop: 4,
+  },
+  accountCountDot: {
+    fontFamily: Fonts.regular,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.12,
+    color: COLORS.secondaryText,
+  },
+  accountCountNum: {
+    fontFamily: Fonts.medium,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.12,
+    color: COLORS.secondaryText,
+  },
   accountSubtitle: {
     fontFamily: Fonts.medium,
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.secondaryText,
-    marginTop: 2,
+    marginTop: 1,
   },
   accountCardRight: {
     flexDirection: 'row',
@@ -559,8 +595,9 @@ const styles = StyleSheet.create({
   },
   accountAction: {
     fontFamily: Fonts.medium,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: -0.16,
   },
   shortcutsSection: {
     backgroundColor: COLORS.surfaceBase,
