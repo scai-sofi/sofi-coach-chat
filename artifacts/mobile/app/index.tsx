@@ -354,7 +354,7 @@ function TabItem({ icon, label, active }: { icon: React.ReactNode; label: string
   const color = active ? COLORS.tabSelected : COLORS.tabUnselected;
   return (
     <View style={styles.tabItem}>
-      {icon}
+      <View style={styles.tabIconWrap}>{icon}</View>
       <Text style={[styles.tabLabel, { color }]}>{label}</Text>
     </View>
   );
@@ -803,21 +803,28 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceBase,
     borderTopWidth: 1,
     borderTopColor: COLORS.divider,
   },
   tabBarInner: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
     height: 52,
+    paddingHorizontal: 16,
   },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
     width: 65,
     gap: 2,
+  },
+  tabIconWrap: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tabLabel: {
     fontFamily: Fonts.medium,
