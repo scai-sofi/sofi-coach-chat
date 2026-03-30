@@ -72,16 +72,19 @@ const cardShadowStyle: ViewStyle = Platform.select({
   },
 }) ?? {};
 
+const HEADER_ROW_HEIGHT = 44;
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const headerHeight = insets.top + HEADER_ROW_HEIGHT;
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      <View style={styles.tealBg}>
-        <View style={[styles.headerRow, { paddingTop: insets.top }]}>
+      <View style={[styles.fixedHeader, { paddingTop: insets.top }]}>
+        <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
             <ProfileIconSvg width={20} height={20} />
             <LinearGradient
@@ -113,26 +116,6 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </View>
-
-        <View style={styles.greetingSection}>
-          <Text style={styles.greetingText}>Good morning, Olivia</Text>
-          <View style={styles.pillRow}>
-            <View style={styles.rewardPill}>
-              <Text style={styles.rewardPillText}>250 pts</Text>
-              <Text style={styles.rewardPillArrow}> →</Text>
-            </View>
-            <View style={styles.rewardPill}>
-              <Text style={styles.rewardPillText}>Get $75</Text>
-              <Text style={styles.rewardPillArrow}> →</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.dotsRow}>
-          <View style={styles.dotActive} />
-          <View style={styles.dotInactive} />
-          <View style={styles.dotInactive} />
-        </View>
       </View>
 
       <ScrollView
@@ -140,6 +123,28 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 52 + insets.bottom + 16 }]}
         showsVerticalScrollIndicator={false}
       >
+        <View style={[styles.tealScrollSection, { paddingTop: headerHeight }]}>
+          <View style={styles.greetingSection}>
+            <Text style={styles.greetingText}>Good morning, Olivia</Text>
+            <View style={styles.pillRow}>
+              <View style={styles.rewardPill}>
+                <Text style={styles.rewardPillText}>250 pts</Text>
+                <Text style={styles.rewardPillArrow}> →</Text>
+              </View>
+              <View style={styles.rewardPill}>
+                <Text style={styles.rewardPillText}>Get $75</Text>
+                <Text style={styles.rewardPillArrow}> →</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.dotsRow}>
+            <View style={styles.dotActive} />
+            <View style={styles.dotInactive} />
+            <View style={styles.dotInactive} />
+          </View>
+        </View>
+
         <View style={styles.accountsSection}>
           <AccountCard
             title="Banking"
@@ -358,10 +363,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.surfaceBase,
   },
-  tealBg: {
+  fixedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.teal,
+    zIndex: 10,
+  },
+  tealScrollSection: {
     backgroundColor: COLORS.teal,
     paddingBottom: 40,
-    zIndex: 1,
   },
   headerRow: {
     flexDirection: 'row',
@@ -482,15 +494,13 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: -30,
   },
-  scrollContent: {
-    paddingTop: 0,
-  },
+  scrollContent: {},
   accountsSection: {
     backgroundColor: COLORS.surfaceBase,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    marginTop: -20,
     paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 8,
