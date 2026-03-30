@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    height: 44,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -421,10 +421,12 @@ const styles = StyleSheet.create({
   },
   askCoachPillCenter: {
     position: 'absolute',
-    bottom: 2,
+    bottom: 0,
     left: 0,
     right: 0,
+    height: 44,
     alignItems: 'center',
+    justifyContent: 'center',
     pointerEvents: 'box-none',
   },
   askCoachPillOuter: {
