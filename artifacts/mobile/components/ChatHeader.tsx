@@ -140,7 +140,11 @@ export function ChatHeader() {
           icon: <CloseIcon size={24} color={colors.contentPrimary} />,
           onPress: dismissChat,
         }}
-        leftExtra={<DemoIcon size={20} color={colors.contentPrimary} />}
+        leftExtra={
+          <Pressable onPress={() => { Keyboard.dismiss(); setActivePanel('scenarios'); }} hitSlop={8} style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+            <DemoIcon size={20} color={colors.contentPrimary} />
+          </Pressable>
+        }
         rightActions={rightActions}
       />
 

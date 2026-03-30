@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     paddingRight: 4,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 20,
   },
   centerZone: {
     flex: 1,
