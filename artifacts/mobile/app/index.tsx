@@ -53,19 +53,23 @@ const COLORS = {
   cardShadow2: 'rgba(18,18,17,0.06)',
   dotInactive: 'rgba(255,255,255,0.3)',
   homeIndicator: '#1a1919',
+  pillText: '#006280',
 };
 
 const cardShadowStyle: ViewStyle = Platform.select({
   ios: {
-    shadowColor: COLORS.cardShadow1,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.8,
+    shadowColor: '#121211',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
     shadowRadius: 6,
   },
   android: {
     elevation: 2,
   },
-  default: {},
+  default: {
+    // @ts-expect-error boxShadow works on web
+    boxShadow: '0px 0px 1px 0px rgba(18,18,17,0.1), 0px 6px 12px -6px rgba(18,18,17,0.06)',
+  },
 }) ?? {};
 
 export default function HomeScreen() {
@@ -91,6 +95,18 @@ export default function HomeScreen() {
               <PlusBadgeTextSvg width={14} height={15} />
             </LinearGradient>
           </View>
+          <Pressable
+            onPress={() => router.push('/chat')}
+            style={styles.askCoachPillOuter}
+          >
+            <BlurView intensity={20} tint="dark" style={styles.askCoachPill}>
+              <View style={styles.coachGlyphWrap}>
+                <CoachGlyph1Svg width={10} height={10} />
+                <CoachGlyph2Svg width={8} height={9} />
+              </View>
+              <Text style={styles.askCoachText}>Ask Coach</Text>
+            </BlurView>
+          </Pressable>
           <View style={styles.headerRight}>
             <Pressable hitSlop={12}>
               <NotificationBellSvg width={20} height={20} />
@@ -98,27 +114,16 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <Pressable
-          onPress={() => router.push('/chat')}
-          style={styles.askCoachPillOuter}
-        >
-          <BlurView intensity={20} tint="dark" style={styles.askCoachPill}>
-            <View style={styles.coachGlyphWrap}>
-              <CoachGlyph1Svg width={10} height={10} />
-              <CoachGlyph2Svg width={8} height={9} />
-            </View>
-            <Text style={styles.askCoachText}>Ask Coach</Text>
-          </BlurView>
-        </Pressable>
-
         <View style={styles.greetingSection}>
           <Text style={styles.greetingText}>Good morning, Olivia</Text>
           <View style={styles.pillRow}>
             <View style={styles.rewardPill}>
-              <Text style={styles.rewardPillText}>250 pts →</Text>
+              <Text style={styles.rewardPillText}>250 pts</Text>
+              <Text style={styles.rewardPillArrow}> →</Text>
             </View>
             <View style={styles.rewardPill}>
-              <Text style={styles.rewardPillText}>Get $75 →</Text>
+              <Text style={styles.rewardPillText}>Get $75</Text>
+              <Text style={styles.rewardPillArrow}> →</Text>
             </View>
           </View>
         </View>
@@ -288,7 +293,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    height: 52,
+    paddingBottom: 8,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -308,8 +313,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   askCoachPillOuter: {
-    alignSelf: 'center',
-    marginTop: 4,
     borderRadius: 32,
     overflow: 'hidden',
   },
@@ -350,27 +353,35 @@ const styles = StyleSheet.create({
   pillRow: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 12,
+    marginTop: 10,
   },
   rewardPill: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    height: 28,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
+    backgroundColor: '#edf8fc',
+    height: 24,
+    borderRadius: 100,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 4,
   },
   rewardPillText: {
-    fontFamily: Fonts.medium,
+    fontFamily: Fonts.bold,
     fontSize: 12,
     lineHeight: 16,
-    letterSpacing: 0.1,
-    color: COLORS.white,
+    color: COLORS.pillText,
+  },
+  rewardPillArrow: {
+    fontFamily: Fonts.bold,
+    fontSize: 12,
+    lineHeight: 16,
+    color: COLORS.pillText,
   },
   dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     marginTop: 16,
   },
   dotActive: {
@@ -396,7 +407,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingTop: 20,
+    paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 8,
     gap: 12,
@@ -405,13 +416,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.divider,
   },
   accountCardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    minHeight: 40,
   },
   accountCardLeft: {
     flex: 1,
@@ -458,20 +468,17 @@ const styles = StyleSheet.create({
   shortcutCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.divider,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
     height: 56,
   },
   shortcutLine1: {
     fontFamily: Fonts.medium,
-    fontSize: 12,
-    lineHeight: 16,
-    letterSpacing: 0.1,
+    fontSize: 14,
+    lineHeight: 20,
     color: COLORS.primaryText,
   },
   shortcutLine2: {
@@ -514,9 +521,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.divider,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
   },
   insightLabel: {
     fontFamily: Fonts.medium,
