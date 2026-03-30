@@ -63,11 +63,11 @@ const cardShadowStyle: ViewStyle = Platform.select({
   ios: {
     shadowColor: '#0a0a0a',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.12,
     shadowRadius: 8,
   },
   android: {
-    elevation: 2,
+    elevation: 3,
   },
   default: {
     // @ts-expect-error boxShadow works on web — dropShadow-down-2
