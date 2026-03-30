@@ -146,27 +146,29 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.accountsSection}>
-          <AccountCard
-            title="Banking"
-            count={2}
-            subtitle="0 transactions"
-            balance="$27,282.12"
-            showCaret
-          />
-          <AccountCard
-            title="Invest"
-            subtitle="Start trading for $1"
-            actionText="Get up to $1,000"
-            actionColor={COLORS.accent}
-          />
-          <AccountCard
-            title="Crypto"
-            subtitle="Win $1000 in BTC"
-            actionText="Explore"
-            actionColor={COLORS.accent}
-          />
-        </View>
+        <View style={styles.boneArea}>
+          <View style={styles.boneTopCurve} />
+          <View style={styles.accountsCards}>
+            <AccountCard
+              title="Banking"
+              count={2}
+              subtitle="0 transactions"
+              balance="$27,282.12"
+              showCaret
+            />
+            <AccountCard
+              title="Invest"
+              subtitle="Start trading for $1"
+              actionText="Get up to $1,000"
+              actionColor={COLORS.accent}
+            />
+            <AccountCard
+              title="Crypto"
+              subtitle="Win $1000 in BTC"
+              actionText="Explore"
+              actionColor={COLORS.accent}
+            />
+          </View>
 
         <View style={styles.shortcutsSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shortcutsScroll}>
@@ -263,6 +265,7 @@ export default function HomeScreen() {
               <CreditScoreBarSvg width="100%" height={12} preserveAspectRatio="none" />
             </View>
           </View>
+        </View>
         </View>
       </ScrollView>
 
@@ -515,16 +518,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {},
-  accountsSection: {
+  boneArea: {
     backgroundColor: COLORS.surfaceBase,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     marginTop: -20,
-    paddingTop: 20,
+  },
+  boneTopCurve: {
+    height: 20,
+    backgroundColor: COLORS.teal,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  accountsCards: {
+    paddingTop: 4,
     paddingHorizontal: 16,
     paddingBottom: 8,
     gap: 12,
-    overflow: 'visible',
   },
   accountCard: {
     backgroundColor: COLORS.white,
@@ -598,7 +606,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.16,
   },
   shortcutsSection: {
-    backgroundColor: COLORS.surfaceBase,
   },
   shortcutsScroll: {
     paddingHorizontal: 16,
@@ -654,7 +661,6 @@ const styles = StyleSheet.create({
     color: COLORS.secondaryText,
   },
   insightsSection: {
-    backgroundColor: COLORS.surfaceBase,
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 24,
