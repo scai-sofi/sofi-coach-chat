@@ -362,6 +362,7 @@ const styles = StyleSheet.create({
   tealBg: {
     backgroundColor: COLORS.teal,
     paddingBottom: 40,
+    zIndex: 1,
   },
   headerRow: {
     flexDirection: 'row',
