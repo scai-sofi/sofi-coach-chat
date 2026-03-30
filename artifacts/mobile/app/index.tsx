@@ -5,17 +5,33 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  Image,
   StatusBar,
-  Dimensions,
   Platform,
+  ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Fonts } from '@/constants/fonts';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+import {
+  ProfileIcon,
+  BellIcon,
+  CoachGlyph1,
+  CoachGlyph2,
+  CaretExpandIcon,
+  TabHomeIcon,
+  TabBankingIcon,
+  TabCreditCardIcon,
+  TabInvestIcon,
+  TabLoansIcon,
+  PlusBadgeLogo,
+  SpendingChart,
+  NetWorthChart,
+  PersonalLoansIcon,
+  SoFiTravelIcon,
+  FinancialPlannerIcon,
+  CareerNetworkingIcon,
+} from '@/components/HomeIcons';
 
 const COLORS = {
   teal: '#00a2c7',
@@ -33,29 +49,22 @@ const COLORS = {
   askCoachBg: 'rgba(0,70,97,0.2)',
   askCoachText: 'rgba(255,255,255,0.7)',
   cardShadow1: 'rgba(18,18,17,0.1)',
-  cardShadow2: 'rgba(18,18,17,0.06)',
   dotInactive: 'rgba(255,255,255,0.3)',
   homeIndicator: '#1a1919',
 };
 
-const profileIcon = require('../assets/images/profile-icon.png');
-const plusBadgeLogo = require('../assets/images/plus-badge-logo.png');
-const plusBadgeText = require('../assets/images/plus-badge-text.png');
-const bellIcon = require('../assets/images/notification-bell.png');
-const coachGlyph1 = require('../assets/images/coach-glyph-1.png');
-const coachGlyph2 = require('../assets/images/coach-glyph-2.png');
-const caretExpand = require('../assets/images/caret-expand.png');
-const tabHome = require('../assets/images/tab-home.png');
-const tabBanking = require('../assets/images/tab-banking.png');
-const tabCreditCard = require('../assets/images/tab-credit-card.png');
-const tabInvest = require('../assets/images/tab-invest.png');
-const tabLoans = require('../assets/images/tab-loans.png');
-const chartSpending = require('../assets/images/chart-spending.png');
-const chartNetworth = require('../assets/images/chart-networth.png');
-const iconPersonalLoans = require('../assets/images/icon-personal-loans.png');
-const iconSofiTravel = require('../assets/images/icon-sofi-travel.png');
-const iconFinancialPlanner = require('../assets/images/icon-financial-planner.png');
-const iconCareerNetworking = require('../assets/images/icon-career-networking.png');
+const cardShadowStyle: ViewStyle = Platform.select({
+  ios: {
+    shadowColor: COLORS.cardShadow1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+  },
+  android: {
+    elevation: 2,
+  },
+  default: {},
+}) ?? {};
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -68,7 +77,7 @@ export default function HomeScreen() {
       <View style={styles.tealBg}>
         <View style={[styles.headerRow, { paddingTop: insets.top }]}>
           <View style={styles.headerLeft}>
-            <Image source={profileIcon} style={styles.profileIcon} />
+            <ProfileIcon size={20} color="#ffffff" />
             <LinearGradient
               colors={['#151035', '#201749', '#330072']}
               locations={[0, 0.316, 0.632]}
@@ -76,13 +85,13 @@ export default function HomeScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.plusBadge}
             >
-              <Image source={plusBadgeLogo} style={styles.plusBadgeLogo} resizeMode="contain" />
-              <Image source={plusBadgeText} style={styles.plusBadgeTextIcon} resizeMode="contain" />
+              <PlusBadgeLogo size={14} />
+              <Text style={styles.plusBadgeTextLabel}>PLUS</Text>
             </LinearGradient>
           </View>
           <View style={styles.headerRight}>
             <Pressable hitSlop={12}>
-              <Image source={bellIcon} style={styles.bellIcon} />
+              <BellIcon size={20} color="#ffffff" />
             </Pressable>
           </View>
         </View>
@@ -92,8 +101,8 @@ export default function HomeScreen() {
           onPress={() => router.push('/chat')}
         >
           <View style={styles.coachGlyphWrap}>
-            <Image source={coachGlyph1} style={styles.coachGlyph1} resizeMode="contain" />
-            <Image source={coachGlyph2} style={styles.coachGlyph2} resizeMode="contain" />
+            <CoachGlyph1 size={10} />
+            <CoachGlyph2 size={8} />
           </View>
           <Text style={styles.askCoachText}>Ask Coach</Text>
         </Pressable>
@@ -111,7 +120,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.dotsRow}>
-          <View style={[styles.dotActive]} />
+          <View style={styles.dotActive} />
           <View style={styles.dotInactive} />
           <View style={styles.dotInactive} />
         </View>
@@ -145,10 +154,10 @@ export default function HomeScreen() {
 
         <View style={styles.shortcutsSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shortcutsScroll}>
-            <ShortcutCard icon={iconPersonalLoans} line1="Personal" line2="loans" />
-            <ShortcutCard icon={iconSofiTravel} line1="SoFi" line2="Travel" />
-            <ShortcutCard icon={iconFinancialPlanner} line1="Financial" line2="Planner" />
-            <ShortcutCard icon={iconCareerNetworking} line1="Career" line2="Networking" />
+            <ShortcutCard icon={<PersonalLoansIcon size={32} />} line1="Personal" line2="loans" />
+            <ShortcutCard icon={<SoFiTravelIcon size={32} />} line1="SoFi" line2="Travel" />
+            <ShortcutCard icon={<FinancialPlannerIcon size={32} />} line1="Financial" line2="Planner" />
+            <ShortcutCard icon={<CareerNetworkingIcon size={32} />} line1="Career" line2="Networking" />
           </ScrollView>
         </View>
 
@@ -160,20 +169,24 @@ export default function HomeScreen() {
             </Pressable>
           </View>
           <View style={styles.insightsCards}>
-            <View style={[styles.insightCard, styles.cardShadow]}>
+            <View style={[styles.insightCard, cardShadowStyle]}>
               <Text style={styles.insightLabel}>Spending</Text>
               <Text style={styles.insightAmount}>$1,282.12</Text>
               <View style={styles.insightStatusRow}>
                 <View style={[styles.cautionDot, { backgroundColor: COLORS.cautionSurface }]} />
                 <Text style={[styles.insightStatus, { color: COLORS.caution }]}>Pacing high this month</Text>
               </View>
-              <Image source={chartSpending} style={styles.chartImage} resizeMode="contain" />
+              <View style={styles.chartWrap}>
+                <SpendingChart width={150} height={38} />
+              </View>
             </View>
-            <View style={[styles.insightCard, styles.cardShadow]}>
+            <View style={[styles.insightCard, cardShadowStyle]}>
               <Text style={styles.insightLabel}>Net Worth</Text>
               <Text style={styles.insightAmount}>$1,278,220.50</Text>
               <Text style={styles.insightSubtext}>2 SoFi | 13 external</Text>
-              <Image source={chartNetworth} style={styles.chartImage} resizeMode="contain" />
+              <View style={styles.chartWrap}>
+                <NetWorthChart width={150} height={38} />
+              </View>
             </View>
           </View>
         </View>
@@ -181,11 +194,11 @@ export default function HomeScreen() {
 
       <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
         <View style={styles.tabBarInner}>
-          <TabItem icon={tabHome} label="Home" active />
-          <TabItem icon={tabBanking} label="Banking" />
-          <TabItem icon={tabCreditCard} label="Credit card" />
-          <TabItem icon={tabInvest} label="Invest" />
-          <TabItem icon={tabLoans} label="Loans" />
+          <TabItem icon={<TabHomeIcon size={20} color={COLORS.tabSelected} />} label="Home" active />
+          <TabItem icon={<TabBankingIcon size={20} color={COLORS.tabUnselected} />} label="Banking" />
+          <TabItem icon={<TabCreditCardIcon size={20} color={COLORS.tabUnselected} />} label="Credit card" />
+          <TabItem icon={<TabInvestIcon size={20} color={COLORS.tabUnselected} />} label="Invest" />
+          <TabItem icon={<TabLoansIcon size={20} color={COLORS.tabUnselected} />} label="Loans" />
         </View>
         <View style={styles.homeIndicator} />
       </View>
@@ -209,7 +222,7 @@ function AccountCard({
   actionColor?: string;
 }) {
   return (
-    <View style={[styles.accountCard, styles.cardShadow]}>
+    <View style={[styles.accountCard, cardShadowStyle]}>
       <View style={styles.accountCardTop}>
         <View style={styles.accountCardLeft}>
           <Text style={styles.accountTitle}>{title}</Text>
@@ -217,9 +230,7 @@ function AccountCard({
         </View>
         <View style={styles.accountCardRight}>
           {balance && <Text style={styles.accountBalance}>{balance}</Text>}
-          {showCaret && (
-            <Image source={caretExpand} style={styles.caretIcon} tintColor={COLORS.secondaryText} resizeMode="contain" />
-          )}
+          {showCaret && <CaretExpandIcon size={13} color="#70706E" />}
           {actionText && (
             <Text style={[styles.accountAction, { color: actionColor }]}>{actionText}</Text>
           )}
@@ -234,13 +245,13 @@ function ShortcutCard({
   line1,
   line2,
 }: {
-  icon: any;
+  icon: React.ReactNode;
   line1: string;
   line2: string;
 }) {
   return (
-    <View style={[styles.shortcutCard, styles.cardShadow]}>
-      <Image source={icon} style={styles.shortcutIcon} resizeMode="contain" />
+    <View style={[styles.shortcutCard, cardShadowStyle]}>
+      {icon}
       <View>
         <Text style={styles.shortcutLine1}>{line1}</Text>
         <Text style={styles.shortcutLine2}>{line2}</Text>
@@ -249,11 +260,11 @@ function ShortcutCard({
   );
 }
 
-function TabItem({ icon, label, active }: { icon: any; label: string; active?: boolean }) {
+function TabItem({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) {
   const color = active ? COLORS.tabSelected : COLORS.tabUnselected;
   return (
     <View style={styles.tabItem}>
-      <Image source={icon} style={styles.tabIcon} tintColor={color} resizeMode="contain" />
+      {icon}
       <Text style={[styles.tabLabel, { color }]}>{label}</Text>
     </View>
   );
@@ -280,10 +291,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  profileIcon: {
-    width: 20,
-    height: 20,
-  },
   plusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -292,21 +299,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     gap: 4,
   },
-  plusBadgeLogo: {
-    width: 14,
-    height: 14,
-  },
-  plusBadgeTextIcon: {
-    width: 22,
-    height: 10,
+  plusBadgeTextLabel: {
+    fontFamily: Fonts.bold,
+    fontSize: 9,
+    lineHeight: 12,
+    color: '#ffffff',
+    letterSpacing: 1,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  bellIcon: {
-    width: 20,
-    height: 22,
   },
   askCoachPill: {
     flexDirection: 'row',
@@ -323,21 +325,8 @@ const styles = StyleSheet.create({
   coachGlyphWrap: {
     width: 16,
     height: 16,
-    position: 'relative',
-  },
-  coachGlyph1: {
-    width: 10,
-    height: 10,
-    position: 'absolute',
-    top: 0,
-    right: 0,
-  },
-  coachGlyph2: {
-    width: 8,
-    height: 8,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   askCoachText: {
     fontFamily: Fonts.medium,
@@ -419,18 +408,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.divider,
   },
-  cardShadow: Platform.select({
-    web: {
-      boxShadow: '0px 0px 1px rgba(18,18,17,0.1), 0px 6px 12px -6px rgba(18,18,17,0.06)',
-    },
-    default: {
-      shadowColor: COLORS.cardShadow1,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.8,
-      shadowRadius: 6,
-      elevation: 2,
-    },
-  }) as any,
   accountCardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -465,10 +442,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.16,
     color: COLORS.primaryText,
   },
-  caretIcon: {
-    width: 16,
-    height: 16,
-  },
   accountAction: {
     fontFamily: Fonts.medium,
     fontSize: 14,
@@ -493,11 +466,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     height: 56,
-  },
-  shortcutIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
   },
   shortcutLine1: {
     fontFamily: Fonts.medium,
@@ -589,10 +557,9 @@ const styles = StyleSheet.create({
     color: COLORS.secondaryText,
     marginTop: 4,
   },
-  chartImage: {
-    width: '100%',
-    height: 40,
+  chartWrap: {
     marginTop: 8,
+    overflow: 'hidden',
   },
   tabBar: {
     position: 'absolute',
@@ -614,10 +581,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 65,
     gap: 2,
-  },
-  tabIcon: {
-    width: 22,
-    height: 22,
   },
   tabLabel: {
     fontFamily: Fonts.medium,

@@ -16,6 +16,7 @@ import {
   PencilMenuIcon,
   DeleteMenuIcon,
   ChevronDownIcon,
+  DemoIcon,
 } from '@/components/icons';
 
 export function ChatHeader() {
@@ -87,6 +88,11 @@ export function ChatHeader() {
       onPress: () => { setActivePanel('settings'); setMenuOpen(false); },
     },
     {
+      label: 'Demo scenarios',
+      icon: <DemoIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('scenarios'); setMenuOpen(false); },
+    },
+    {
       label: 'Rename',
       icon: <PencilMenuIcon size={24} color={colors.contentPrimary} />,
       onPress: () => setMenuOpen(false),
@@ -117,6 +123,11 @@ export function ChatHeader() {
       label: 'Settings',
       icon: <SettingsMenuIcon size={24} color={colors.contentPrimary} />,
       onPress: () => { setActivePanel('settings'); setMenuOpen(false); },
+    },
+    {
+      label: 'Demo scenarios',
+      icon: <DemoIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('scenarios'); setMenuOpen(false); },
     },
   ];
 
