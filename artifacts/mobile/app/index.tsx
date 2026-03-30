@@ -138,9 +138,8 @@ export default function HomeScreen() {
             <View style={styles.dotInactive} />
             <View style={styles.dotInactive} />
           </View>
-        </View>
 
-        <View style={styles.accountsSection}>
+          <View style={styles.accountsSection}>
           <AccountCard
             title="Banking"
             count={2}
@@ -160,18 +159,18 @@ export default function HomeScreen() {
             actionText="Explore"
             actionColor={COLORS.accent}
           />
-        </View>
+          </View>
 
-        <View style={styles.shortcutsSection}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ overflow: 'visible' }} contentContainerStyle={styles.shortcutsScroll}>
-            <ShortcutCard icon={<IconPersonalLoansSvg width={20} height={20} />} title="Personal loans" subtitle="See rates in 1 min" />
-            <ShortcutCard icon={<IconLifeInsuranceSvg width={18} height={20} />} title="Life insurance" subtitle="Starts at $5/mo" />
-            <ShortcutCard icon={<IconSlrSvg width={24} height={24} />} title="Serious savings" subtitle="Student loan refis" />
-            <ExploreCard />
-          </ScrollView>
-        </View>
+          <View style={styles.shortcutsSection}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ overflow: 'visible' }} contentContainerStyle={styles.shortcutsScroll}>
+              <ShortcutCard icon={<IconPersonalLoansSvg width={20} height={20} />} title="Personal loans" subtitle="See rates in 1 min" />
+              <ShortcutCard icon={<IconLifeInsuranceSvg width={18} height={20} />} title="Life insurance" subtitle="Starts at $5/mo" />
+              <ShortcutCard icon={<IconSlrSvg width={24} height={24} />} title="Serious savings" subtitle="Student loan refis" />
+              <ExploreCard />
+            </ScrollView>
+          </View>
 
-        <View style={styles.insightsSection}>
+          <View style={styles.insightsSection}>
           <View style={styles.insightsHeader}>
             <Text style={styles.insightsTitle}>Coach insights</Text>
             <Pressable hitSlop={8}>
@@ -257,6 +256,7 @@ export default function HomeScreen() {
               <CreditScoreBarSvg width="100%" height={12} preserveAspectRatio="none" />
             </View>
           </View>
+        </View>
         </View>
       </ScrollView>
 
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
   },
   tealScrollSection: {
     backgroundColor: COLORS.teal,
-    paddingBottom: 40,
+    paddingBottom: 0,
   },
   headerRow: {
     flexDirection: 'row',
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceBase,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: -20,
+    marginTop: 20,
     paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 8,
