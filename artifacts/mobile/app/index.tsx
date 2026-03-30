@@ -78,7 +78,7 @@ export default function HomeScreen() {
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
             <View style={styles.headerIconBtn}>
-              <ProfileIconSvg width={24} height={24} />
+              <ProfileIconSvg width={20} height={20} />
             </View>
             <LinearGradient
               colors={['#151035', '#201749', '#330072']}
