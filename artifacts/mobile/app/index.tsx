@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
   askCoachPillCenter: {
     position: 'absolute',
-    bottom: 8,
+    bottom: 2,
     left: 0,
     right: 0,
     alignItems: 'center',
