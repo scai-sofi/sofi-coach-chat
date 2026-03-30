@@ -77,7 +77,9 @@ export default function HomeScreen() {
       <View style={[styles.fixedHeader, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
-            <ProfileIconSvg width={20} height={20} />
+            <View style={styles.headerIconBtn}>
+              <ProfileIconSvg width={20} height={20} />
+            </View>
             <LinearGradient
               colors={['#151035', '#201749', '#330072']}
               locations={[0, 0.316, 0.632]}
@@ -90,8 +92,8 @@ export default function HomeScreen() {
             </LinearGradient>
           </View>
           <View style={styles.headerRight}>
-            <Pressable hitSlop={12}>
-              <NotificationBellSvg width={24} height={24} />
+            <Pressable style={styles.headerIconBtn} hitSlop={12}>
+              <NotificationBellSvg width={20} height={20} />
             </Pressable>
           </View>
         </View>
@@ -164,8 +166,8 @@ export default function HomeScreen() {
           <View style={styles.shortcutsSection}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ overflow: 'visible' }} contentContainerStyle={styles.shortcutsScroll}>
               <ShortcutCard icon={<IconPersonalLoansSvg width={20} height={20} />} title="Personal loans" subtitle="See rates in 1 min" />
-              <ShortcutCard icon={<IconLifeInsuranceSvg width={18} height={20} />} title="Life insurance" subtitle="Starts at $5/mo" />
-              <ShortcutCard icon={<IconSlrSvg width={24} height={24} />} title="Serious savings" subtitle="Student loan refis" />
+              <ShortcutCard icon={<IconLifeInsuranceSvg width={20} height={20} />} title="Life insurance" subtitle="Starts at $5/mo" />
+              <ShortcutCard icon={<IconSlrSvg width={20} height={20} />} title="Serious savings" subtitle="Student loan refis" />
               <ExploreCard />
             </ScrollView>
           </View>
@@ -264,7 +266,7 @@ export default function HomeScreen() {
         <View style={styles.tabBarInner}>
           <TabItem icon={<TabHomeSvg width={20} height={20} />} label="Home" active />
           <TabItem icon={<TabBankingSvg width={20} height={20} />} label="Banking" />
-          <TabItem icon={<TabCreditCardSvg width={20} height={17} />} label="Credit card" />
+          <TabItem icon={<TabCreditCardSvg width={20} height={20} />} label="Credit card" />
           <TabItem icon={<TabInvestSvg width={20} height={20} />} label="Invest" />
           <TabItem icon={<TabLoansSvg width={20} height={20} />} label="Loans" />
         </View>
@@ -343,7 +345,7 @@ function ExploreCard() {
   return (
     <View style={[styles.exploreCard, cardShadowStyle]}>
       <View style={styles.exploreIconTextRow}>
-        <IconExploreAllSvg width={18} height={18} />
+        <IconExploreAllSvg width={20} height={20} />
         <View>
           <Text style={styles.shortcutTitle}>Explore all</Text>
           <Text style={styles.exploreSubtitle}>See more products</Text>
@@ -412,6 +414,13 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerIconBtn: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
   },
   askCoachPillCenter: {
     position: 'absolute',
