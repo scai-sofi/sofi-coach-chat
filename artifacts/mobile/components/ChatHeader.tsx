@@ -15,7 +15,7 @@ import {
   SettingsMenuIcon,
   PencilMenuIcon,
   DeleteMenuIcon,
-  ChevronDownIcon,
+  CloseIcon,
   DemoIcon,
 } from '@/components/icons';
 
@@ -137,9 +137,10 @@ export function ChatHeader() {
         title={sessionTitle}
         subtitle={subtitle}
         leftAction={{
-          icon: <ChevronDownIcon size={24} color={colors.contentPrimary} />,
+          icon: <CloseIcon size={24} color={colors.contentPrimary} />,
           onPress: dismissChat,
         }}
+        leftExtra={<DemoIcon size={20} color={colors.contentPrimary} />}
         rightActions={rightActions}
       />
 

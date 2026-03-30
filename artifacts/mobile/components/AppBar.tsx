@@ -20,6 +20,7 @@ interface StandardAppBarProps extends AppBarBaseProps {
   title: string;
   subtitle?: React.ReactNode;
   leftAction?: AppBarAction;
+  leftExtra?: React.ReactNode;
   rightActions?: AppBarAction[];
 }
 
@@ -83,6 +84,7 @@ export function AppBar(props: AppBarProps) {
               {standardProps.leftAction.icon}
             </Pressable>
           )}
+          {standardProps.leftExtra}
         </View>
         <View style={styles.centerZone}>
           <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>{standardProps.title}</Text>
@@ -133,6 +135,7 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 4,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   centerZone: {
     flex: 1,

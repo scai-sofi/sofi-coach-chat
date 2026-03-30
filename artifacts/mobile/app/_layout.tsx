@@ -26,10 +26,8 @@ function RootLayoutNav() {
       <Stack.Screen
         name="chat"
         options={{
-          presentation: 'modal',
-          animation: 'slide_from_bottom',
+          animation: 'default',
           gestureEnabled: true,
-          gestureDirection: 'vertical',
         }}
       />
     </Stack>
