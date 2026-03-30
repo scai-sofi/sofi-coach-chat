@@ -98,23 +98,25 @@ export default function HomeScreen() {
               <Text style={styles.plusBadgeText}>Plus</Text>
             </LinearGradient>
           </View>
-          <Pressable
-            onPress={() => router.push('/chat')}
-            style={styles.askCoachPillOuter}
-          >
-            <BlurView intensity={10} tint="dark" style={styles.askCoachPill}>
-              <View style={styles.coachGlyphWrap}>
-                <CoachGlyph1Svg width={14.5} height={15} style={{ position: 'absolute' }} />
-                <CoachGlyph2Svg width={11} height={12} style={{ position: 'absolute', transform: [{ rotate: '4.72deg' }] }} />
-              </View>
-              <Text style={styles.askCoachText}>Ask Coach</Text>
-            </BlurView>
-          </Pressable>
           <View style={styles.headerRight}>
             <Pressable hitSlop={12}>
               <NotificationBellSvg width={24} height={24} />
             </Pressable>
           </View>
+        </View>
+        <View style={styles.askCoachPillCenter}>
+          <Pressable
+            onPress={() => router.push('/chat')}
+            style={styles.askCoachPillOuter}
+          >
+            <BlurView intensity={10} tint="dark" style={styles.askCoachPill}>
+            <View style={styles.coachGlyphWrap}>
+              <CoachGlyph1Svg width={14.5} height={15} style={{ position: 'absolute' }} />
+              <CoachGlyph2Svg width={11} height={12} style={{ position: 'absolute', transform: [{ rotate: '4.72deg' }] }} />
+            </View>
+            <Text style={styles.askCoachText}>Ask Coach</Text>
+            </BlurView>
+          </Pressable>
         </View>
       </View>
 
@@ -407,6 +409,14 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  askCoachPillCenter: {
+    position: 'absolute',
+    bottom: 8,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    pointerEvents: 'box-none',
   },
   askCoachPillOuter: {
     borderRadius: 32,
