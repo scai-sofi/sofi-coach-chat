@@ -52,7 +52,6 @@ const COLORS = {
   cardShadow1: 'rgba(18,18,17,0.1)',
   cardShadow2: 'rgba(18,18,17,0.06)',
   dotInactive: 'rgba(255,255,255,0.3)',
-  homeIndicator: '#1a1919',
   pillText: '#006280',
 };
 
@@ -275,7 +274,6 @@ export default function HomeScreen() {
           <TabItem icon={<TabInvestSvg width={20} height={20} />} label="Invest" />
           <TabItem icon={<TabLoansSvg width={20} height={20} />} label="Loans" />
         </View>
-        <View style={styles.homeIndicator} />
       </View>
     </View>
   );
@@ -868,14 +866,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     letterSpacing: 0.1,
-  },
-  homeIndicator: {
-    width: 134,
-    height: 5,
-    borderRadius: 100,
-    backgroundColor: COLORS.homeIndicator,
-    alignSelf: 'center',
-    marginTop: 4,
-    marginBottom: 8,
   },
 });
