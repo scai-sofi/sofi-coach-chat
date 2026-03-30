@@ -163,8 +163,8 @@ export default function HomeScreen() {
 
         <View style={styles.shortcutsSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shortcutsScroll}>
-            <ShortcutCard icon={<IconPersonalLoansSvg width={24} height={24} />} title="Personal loans" subtitle="See rates in 1 min" />
-            <ShortcutCard icon={<IconLifeInsuranceSvg width={24} height={24} />} title="Life insurance" subtitle="Starts at $5/mo" />
+            <ShortcutCard icon={<IconPersonalLoansSvg width={20} height={20} />} title="Personal loans" subtitle="See rates in 1 min" />
+            <ShortcutCard icon={<IconLifeInsuranceSvg width={18} height={20} />} title="Life insurance" subtitle="Starts at $5/mo" />
             <ShortcutCard icon={<IconSlrSvg width={24} height={24} />} title="Serious savings" subtitle="Student loan refis" />
             <ExploreCard />
           </ScrollView>
