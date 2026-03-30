@@ -180,21 +180,29 @@ export default function HomeScreen() {
           <View style={styles.insightsCards}>
             <View style={[styles.insightCard, cardShadowStyle]}>
               <Text style={styles.insightLabel}>Spending</Text>
-              <Text style={styles.insightAmount}>$1,282.12</Text>
+              <Text style={styles.insightAmount}>
+                <Text style={styles.insightAmountPrefix}>$</Text>
+                1,282
+                <Text style={styles.insightAmountCents}>.12</Text>
+              </Text>
               <View style={styles.insightStatusRow}>
                 <View style={[styles.cautionDot, { backgroundColor: COLORS.cautionSurface }]} />
                 <Text style={[styles.insightStatus, { color: COLORS.caution }]}>Pacing high this month</Text>
               </View>
               <View style={styles.chartWrap}>
-                <ChartSpendingSvg width={150} height={38} />
+                <ChartSpendingSvg width="100%" height={38} preserveAspectRatio="none" />
               </View>
             </View>
             <View style={[styles.insightCard, cardShadowStyle]}>
               <Text style={styles.insightLabel}>Net Worth</Text>
-              <Text style={styles.insightAmount}>$1,278,220.50</Text>
+              <Text style={styles.insightAmount}>
+                <Text style={styles.insightAmountPrefix}>$</Text>
+                1,278,220
+                <Text style={styles.insightAmountCents}>.50</Text>
+              </Text>
               <Text style={styles.insightSubtext}>2 SoFi | 13 external</Text>
               <View style={styles.chartWrap}>
-                <ChartNetworthSvg width={150} height={38} />
+                <ChartNetworthSvg width="100%" height={38} preserveAspectRatio="none" />
               </View>
             </View>
           </View>
@@ -339,7 +347,7 @@ const styles = StyleSheet.create({
   },
   greetingSection: {
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 20,
     paddingHorizontal: 16,
   },
   greetingText: {
@@ -404,7 +412,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   accountsSection: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceBase,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 16,
@@ -458,7 +466,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   shortcutsSection: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surfaceBase,
     paddingVertical: 12,
   },
   shortcutsScroll: {
@@ -529,6 +537,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: COLORS.secondaryText,
+    textTransform: 'uppercase' as const,
   },
   insightAmount: {
     fontFamily: Fonts.medium,
@@ -537,6 +546,18 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
     color: COLORS.primaryText,
     marginTop: 4,
+  },
+  insightAmountPrefix: {
+    fontFamily: Fonts.medium,
+    fontSize: 16,
+    lineHeight: 28,
+    color: COLORS.primaryText,
+  },
+  insightAmountCents: {
+    fontFamily: Fonts.medium,
+    fontSize: 16,
+    lineHeight: 28,
+    color: COLORS.primaryText,
   },
   insightStatusRow: {
     flexDirection: 'row',
