@@ -145,12 +145,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   rightZone: {
-    width: 104,
+    minWidth: 104,
     paddingRight: 16,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 20,
+    gap: 16,
   },
   iconBtn: {
     width: 24,

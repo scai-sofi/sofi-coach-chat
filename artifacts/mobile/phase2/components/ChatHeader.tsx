@@ -48,8 +48,21 @@ export function ChatHeader() {
 
   const rightActions = [
     {
-      icon: <ClockIcon size={20} color={colors.contentPrimary} />,
-      onPress: () => { Keyboard.dismiss(); setActivePanel('history'); },
+      icon: (
+        <View>
+          <GoalsMenuIcon size={20} color={colors.contentPrimary} />
+          {draftGoalCount > 0 && (
+            <View style={[styles.headerBadge, { backgroundColor: colors.contentBrand }]}>
+              <Text style={[styles.headerBadgeText, { color: colors.whiteOnDark }]}>{draftGoalCount}</Text>
+            </View>
+          )}
+        </View>
+      ),
+      onPress: () => { Keyboard.dismiss(); setActivePanel('goals'); },
+    },
+    {
+      icon: <MemoryMenuIcon size={20} color={colors.contentPrimary} />,
+      onPress: () => { Keyboard.dismiss(); setActivePanel('memory'); },
     },
     {
       icon: <MoreIcon size={20} color={menuOpen ? colors.contentDimmed : colors.contentPrimary} />,
@@ -64,19 +77,9 @@ export function ChatHeader() {
       onPress: () => { startLiveChat(); setMenuOpen(false); },
     },
     {
-      label: 'Chat memory',
-      icon: <MemoryMenuIcon size={24} color={colors.contentPrimary} />,
-      onPress: () => { setActivePanel('memory'); setMenuOpen(false); },
-    },
-    {
-      label: 'Goals',
-      icon: <GoalsMenuIcon size={24} color={colors.contentPrimary} />,
-      onPress: () => { setActivePanel('goals'); setMenuOpen(false); },
-      badge: draftGoalCount > 0 ? (
-        <View style={[styles.goalsBadge, { backgroundColor: colors.contentBrand }]}>
-          <Text style={[styles.goalsBadgeText, { color: colors.whiteOnDark }]}>{draftGoalCount}</Text>
-        </View>
-      ) : undefined,
+      label: 'Chat history',
+      icon: <ClockIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('history'); setMenuOpen(false); },
     },
     {
       label: 'Settings',
@@ -96,19 +99,9 @@ export function ChatHeader() {
     },
   ] : [
     {
-      label: 'Chat memory',
-      icon: <MemoryMenuIcon size={24} color={colors.contentPrimary} />,
-      onPress: () => { setActivePanel('memory'); setMenuOpen(false); },
-    },
-    {
-      label: 'Goals',
-      icon: <GoalsMenuIcon size={24} color={colors.contentPrimary} />,
-      onPress: () => { setActivePanel('goals'); setMenuOpen(false); },
-      badge: draftGoalCount > 0 ? (
-        <View style={[styles.goalsBadge, { backgroundColor: colors.contentBrand }]}>
-          <Text style={[styles.goalsBadgeText, { color: colors.whiteOnDark }]}>{draftGoalCount}</Text>
-        </View>
-      ) : undefined,
+      label: 'Chat history',
+      icon: <ClockIcon size={24} color={colors.contentPrimary} />,
+      onPress: () => { setActivePanel('history'); setMenuOpen(false); },
     },
     {
       label: 'Settings',
@@ -162,18 +155,20 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     letterSpacing: 0.1,
   },
-  goalsBadge: {
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
+  headerBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    minWidth: 14,
+    height: 14,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 5,
-    marginRight: 8,
+    paddingHorizontal: 3,
   },
-  goalsBadgeText: {
-    fontSize: 11,
+  headerBadgeText: {
+    fontSize: 9,
     fontFamily: Fonts.medium,
-    lineHeight: 14,
+    lineHeight: 12,
   },
 });
