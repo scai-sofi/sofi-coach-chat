@@ -72,7 +72,7 @@ export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
   }));
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents={visible ? 'auto' : 'none'}>
+    <View style={[StyleSheet.absoluteFill, { zIndex: 100 }]} pointerEvents={visible ? 'auto' : 'none'}>
       <Animated.View style={[styles.scrim, scrimStyle]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
