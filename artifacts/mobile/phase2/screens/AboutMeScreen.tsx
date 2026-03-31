@@ -71,7 +71,7 @@ function sourceLabel(source: string): string {
   if (source === 'EXPLICIT') return 'You told Coach';
   if (source === 'IMPLICIT_CONFIRMED') return 'Coach learned';
   if (source === 'MEMBER_360') return 'From your profile';
-  return 'You added';
+  return 'You added manually';
 }
 
 export default function AboutMeScreen() {
