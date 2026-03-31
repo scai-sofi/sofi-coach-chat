@@ -65,8 +65,9 @@ function buildScenarios(): Scenario[] {
       icon: 'sparkles',
       messages: [
         {
-          id: uid(), role: 'ai', content: "**Welcome to SoFi Coach**\n\nHey — I'm Coach, your AI financial advisor. I can analyze your spending, set goals, coordinate across your SoFi accounts, and connect you with human experts when needed.\n\nAs we talk, I'll learn your preferences and financial context. You're always in control — everything I remember can be viewed, edited, or deleted in the Memory Center.\n\nWhat would you like to explore first?",
+          id: uid(), role: 'ai', content: "**Welcome to SoFi Coach**\n\nHey — I'm Coach, your personal financial coach. I can analyze your spending, set goals, and connect you with human experts when needed.\n\nAs we talk, I'll learn your preferences and financial context. You're always in control — everything I remember can be viewed, edited, or deleted in the Memory Center.\n\nWhat would you like to explore first?",
           timestamp: new Date(now.getTime() - 300000),
+          safetyTier: 'informational',
           suggestions: ['What\'s my financial snapshot?', 'Help me set a goal', 'Show my spending breakdown'],
         },
         { id: uid(), role: 'user', content: "What's my financial snapshot?", timestamp: new Date(now.getTime() - 240000) },
@@ -77,7 +78,6 @@ function buildScenarios(): Scenario[] {
           autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
           chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-cs-1'] }],
           suggestions: ['Help me pay off the credit card', 'How can I save more?', 'Tell me about investing'],
-          provenance: 'Based on your SoFi Checking, Savings, and Credit Card account data. Balances as of today.',
         },
         { id: uid(), role: 'user', content: 'I want to pay off the credit card first, then start investing', timestamp: new Date(now.getTime() - 180000) },
         {
@@ -119,13 +119,13 @@ function buildScenarios(): Scenario[] {
             { type: 'goal-risk', label: 'Credit Card needs attention' },
           ],
           safetyTier: 'suggestive',
-          provenance: 'Based on your SoFi Checking and Credit Card transaction data from this billing cycle. Spending categories are auto-classified.',
           suggestions: ['Cancel that subscription', 'Tell me about the credit card', 'Show my goals dashboard'],
         },
         { id: uid(), role: 'user', content: "Good to know. By the way, I got a raise — I'm making $145k now", timestamp: new Date(now.getTime() - 180000) },
         {
           id: uid(), role: 'ai', content: "**Congrats on the raise!**\n\nThat's a meaningful jump — here's what it changes:\n\n**Updated Picture**\n• **New gross monthly:** ~$12,083 (was ~$9,583)\n• **After taxes (est.):** ~$8,750/month\n• **Current spending:** ~$4,680/month\n• **New savings capacity:** ~$4,070/month (up from ~$2,820)\n\n**What This Unlocks**\nWith $1,250 more per month, you could:\n• **Accelerate credit card payoff** — clear it 3 months sooner\n• **Max out emergency fund** — hit $12k by next quarter\n• **Start investing** — even $500/month compounds significantly over time\n\nThe key is capturing this raise before lifestyle creep sets in. Want me to model an allocation plan for the extra income?",
           timestamp: new Date(now.getTime() - 170000),
+          safetyTier: 'suggestive',
           autoSaveMemory: { content: 'Annual income increased to $145,000', category: 'ABOUT_ME' },
           chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-rm-1'] }],
           member360Conflict: {
@@ -154,6 +154,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Nice — that's a solid foundation.**\n\nA $45,000 401k balance at your stage is great progress. That puts you ahead of the national median for your age group.\n\n**Quick Context**\n• **Current balance:** $45,000\n• **Provider:** Vanguard\n• **Typical growth at 7%:** Could become ~$200k in 20 years without adding another dollar\n• **With $500/month contributions:** Could reach ~$450k in 20 years\n\nAre you currently contributing, and do you know if your employer offers a match?",
           timestamp: new Date(now.getTime() - 410000),
+          safetyTier: 'informational',
           chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-mi-1'] }],
           suggestions: ["Yes, I get a 4% match", "I'm not sure about my match", "How much should I contribute?"],
         },
@@ -161,6 +162,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**That's a thoughtful approach.**\n\nPrioritizing debt payoff before ramping up investments is a valid strategy — especially if you're carrying high-interest debt like credit cards.\n\n**The General Framework**\n\n• **Step 1:** Get the employer match (it's free money)\n• **Step 2:** Pay off high-interest debt (anything over ~7% APR)\n• **Step 3:** Build emergency fund to 3 months\n• **Step 4:** Max out retirement contributions\n\n**Where You Stand**\nWith $45k already in your 401k and an emergency fund in progress, you're in a great position. Clearing debt first means your future investment dollars work harder — they're not fighting against interest payments.\n\nOnce the debt is gone, you'll have significant monthly cash flow to redirect into investing.",
           timestamp: new Date(now.getTime() - 350000),
+          safetyTier: 'suggestive',
           memoryProposal: { id: uid(), content: 'Prioritizes debt payoff before increasing investments', category: 'PREFERENCES' },
           suggestions: ["Show me my debt overview", "What's a good payoff strategy?", "How much am I spending on interest?"],
         },
@@ -168,6 +170,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Good to know — that gives me a clearer picture.**\n\nAt $130k/year, here's a quick financial health snapshot:\n\n**Income Breakdown (estimated)**\n• **Gross monthly:** ~$10,833\n• **After taxes (est.):** ~$7,800/month\n• **Current savings rate:** ~24% based on your spending patterns\n\n**How This Compares**\nA 24% savings rate at $130k is well above average. If you can maintain that while paying off debt, you'll be in excellent shape to ramp up investing once you're debt-free.\n\n**One Thing to Watch**\nAt this income level, you might be close to the Roth IRA income limit ($161k for single filers). Something to keep in mind as your income grows — I can help you plan around that when the time comes.",
           timestamp: new Date(now.getTime() - 290000),
+          safetyTier: 'informational',
           chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-mi-2'] }],
           member360Conflict: {
             id: uid(),
@@ -181,6 +184,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.",
           timestamp: new Date(now.getTime() - 230000),
+          safetyTier: 'informational',
           chips: [{ type: 'memory-updated', label: 'Memory updated', memoryIds: ['mem-2'] }],
           suggestions: ["What should I focus on first?", "Show me my spending", "How are my goals doing?"],
         },
@@ -230,11 +234,12 @@ function buildScenarios(): Scenario[] {
       notReady: true,
       messages: [
         {
-          id: uid(), role: 'system', content: 'AI inferred a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
+          id: uid(), role: 'system', content: 'Coach detected a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
           id: uid(), role: 'ai', content: "**Credit Card Payoff — Risk Alert**\n\nI wanted to give you a heads-up — your confidence score dropped from 82% to 58% this week. Here's the full picture:\n\n**What Happened**\n• **Last 2 payments:** $380 each (target was $420, shortfall of $80 total)\n• **New charge:** $340 added to the balance\n• **Net impact:** $420 further from your goal than planned\n\n**Where This Puts You**\n• **Current balance:** $1,260 remaining\n• **Original payoff date:** 4 months from now\n• **Projected payoff at current pace:** ~5.5 months (6 weeks late)\n• **Extra interest cost if delayed:** ~$48\n\n**Why This Matters for Your Priorities**\nI know paying off this card is a priority for you, especially with the wedding in October 2027. Staying on track here frees up $380/month that can flow straight into wedding savings once you're done.\n\n**Your Options**\n\n• **Option A — Catch up this month:** Bump payment to $520 (+$140 over your usual). Gets you back to 78% confidence and on track for the original date.\n\n• **Option B — Extend timeline:** Add 2 months to your deadline. Monthly payment drops to $350, giving you $70/month more breathing room. Confidence resets to 72%.\n\nNo need to panic — both paths get you to debt-free. It comes down to whether you'd prefer a short push or a steadier pace.\n\nWhat feels right for your budget this month?",
           timestamp: new Date(now.getTime() - 60000),
+          safetyTier: 'actionable',
           chips: [{ type: 'goal-risk', label: 'Credit Card at risk' }],
           memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'ABOUT_ME' },
           suggestions: ['Increase this month\'s payment', 'Extend my deadline', 'Show me the full picture'],
@@ -254,8 +259,9 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Your Emergency Fund hit a milestone!', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "**Emergency Fund — 75% Milestone!**\n\nYou just hit **75% of your Emergency Fund goal!** That's $9,000 out of $12,000.\n\n**Your Journey**\n• **25% ($3,000)** — reached 60 days ago\n• **50% ($6,000)** — reached 20 days ago\n• **75% ($9,000)** — reached today\n• **100% ($12,000)** — on track for ~2 months from now\n\n**What's Working**\nYou've been contributing $460/month — that's $10 above your $450 target, every single month. That consistency is exactly why you're 2 weeks ahead of schedule.\n\n**The Home Stretch**\n• **Remaining:** $3,000\n• **At your current pace:** ~6.5 months to go\n• **Interest earned so far:** ~$150 at 4.00% APY\n• **What $12,000 covers:** 3 full months of essential expenses\n\n**By the Numbers**\nYou've saved $9,000 in about 5 months — that's a 24% savings rate dedicated just to this goal. For context, the average American saves about 4.7% of income total. You're crushing it.\n\nJust $3,000 to go. You've got this!",
+          id: uid(), role: 'ai', content: "**Emergency Fund — 75% Milestone!**\n\nYou just hit **75% of your Emergency Fund goal!** That's $9,000 out of $12,000.\n\n**Your Journey**\n• **25% ($3,000)** — reached 60 days ago\n• **50% ($6,000)** — reached 20 days ago\n• **75% ($9,000)** — reached today\n• **100% ($12,000)** — on track for ~6 months from now\n\n**What's Working**\nYou've been contributing $460/month — that's $10 above your $450 target, every single month. That consistency is exactly why you're 2 weeks ahead of schedule.\n\n**The Home Stretch**\n• **Remaining:** $3,000\n• **At your current pace:** ~6.5 months to go\n• **Interest earned so far:** ~$150 at 4.00% APY\n• **What $12,000 covers:** 3 full months of essential expenses\n\n**By the Numbers**\nYou've saved $9,000 in about 5 months — that's a 24% savings rate dedicated just to this goal. For context, the average American saves about 4.7% of income total. You're crushing it.\n\nJust $3,000 to go. You've got this!",
           timestamp: new Date(now.getTime() - 60000),
+          safetyTier: 'informational',
           chips: [{ type: 'milestone', label: '75% milestone reached!' }],
           suggestions: ['Show my goals dashboard', 'What should I do when I reach 100%?', 'Can I increase my contribution?'],
         },
@@ -281,6 +287,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Your Week in Review**\n\n**Spending Summary**\nYou spent **$892** this week — down 8% from last week ($970) and 5% below your 4-week average ($938).\n\n• **Groceries:** $165 — on budget, consistent with your meal-planning habit\n• **Dining:** $95 — your best week this month (avg was $121). The cooking-at-home shift is paying off\n• **Transportation:** $52 — stable, right at your weekly norm\n• **Shopping:** $580 — one-time monitor purchase (excluded, your baseline spend was $312)\n\n**Goals Update**\n• **Emergency Fund:** $8,400 of $12,000 (70%) — on track, 2 weeks ahead of schedule\n• **Credit Card:** $2,940 of $4,200 (70%) — needs attention, last payment was $40 below target\n\n**Something Worth Looking At**\nI spotted a $14.99/month streaming subscription you haven't used in 6 weeks. Canceling it would free up $180/year — that's nearly half a month's emergency fund contribution, just from one unused service.\n\n**This Week's Win**\nYour baseline spending (excluding the monitor) was $312 — well below your typical $380. That's $68 saved in a single week through small, consistent choices.\n\nWant me to dig into any of these?",
           timestamp: new Date(now.getTime() - 60000),
+          safetyTier: 'informational',
           chips: [
             { type: 'goal-progress', label: 'Emergency Fund on track' },
             { type: 'goal-risk', label: 'Credit Card needs attention' },
@@ -302,6 +309,7 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Your $3,000 Bonus — Optimized Allocation**\n\nCongrats! Here's how I'd split this based on your goals, interest rates, and financial picture:\n\n**1. Credit Card Payoff — $1,260**\n• **Impact:** Clears your entire remaining balance\n• **Why:** Eliminates 22.99% APR — every dollar here is a guaranteed 23% return. This is mathematically your best move.\n• **After:** $0 debt, freeing up $380/month from your payoff plan\n\n**2. Emergency Fund — $1,200**\n• **Impact:** Brings you from $8,400 → $9,600 (80% of goal)\n• **Why:** Jumps you 6 weeks ahead of schedule. At this pace, you'd hit $12,000 about 2 months early.\n• **Earning:** This $1,200 earns ~$48/year at 4.00% APY\n\n**3. SoFi Invest — $540**\n• **Impact:** Starts building your investment portfolio\n• **Why:** With debt eliminated and a strong emergency fund, this is the right time to start growing wealth long-term\n• **Suggested allocation:** Conservative portfolio (70% bonds, 30% index funds) — matches your risk preference\n\n**The Big Picture**\nThis single allocation eliminates your most expensive debt, fast-tracks your safety net, and starts your investment journey — all in one move. Plus, the $380/month freed from debt payments gives you ongoing firepower.\n\nWant me to set up all three transfers?",
           timestamp: new Date(now.getTime() - 60000),
+          safetyTier: 'actionable',
           chips: [{ type: 'handoff', label: 'Cross-product recommendation' }],
           memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'ABOUT_ME' },
           suggestions: ['Set up all three transfers', 'Adjust the split', 'Tell me more about the invest option'],
