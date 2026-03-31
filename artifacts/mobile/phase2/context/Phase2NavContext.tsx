@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type Phase2Screen = 'home' | 'chat' | 'about-me' | 'my-finances' | 'goals-profile' | 'preferences';
+export type Phase2Screen = 'home' | 'chat' | 'about-me' | 'my-finances' | 'goals-profile' | 'preferences' | 'ai-usage';
 
 const PROFILE_SCREENS: Phase2Screen[] = ['about-me', 'my-finances', 'goals-profile', 'preferences'];
 
@@ -31,6 +31,7 @@ export function Phase2NavProvider({ children }: { children: React.ReactNode }) {
 
   const goBack = useCallback(() => {
     setScreen(prev => {
+      if (prev === 'ai-usage') return 'preferences';
       if (PROFILE_SCREENS.includes(prev)) {
         setShouldOpenDrawer(true);
       }

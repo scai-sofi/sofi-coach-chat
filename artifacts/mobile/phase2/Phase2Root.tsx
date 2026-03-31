@@ -9,6 +9,7 @@ import AboutMeScreen from './screens/AboutMeScreen';
 import MyFinancesScreen from './screens/MyFinancesScreen';
 import GoalsProfileScreen from './screens/GoalsProfileScreen';
 import PreferencesScreen from './screens/PreferencesScreen';
+import AiUsageScreen from './screens/AiUsageScreen';
 
 function Phase2Navigator() {
   const { screen } = usePhase2Nav();
@@ -24,6 +25,8 @@ function Phase2Navigator() {
       return <GoalsProfileScreen />;
     case 'preferences':
       return <PreferencesScreen />;
+    case 'ai-usage':
+      return <AiUsageScreen />;
     default:
       return <HomeScreen />;
   }
