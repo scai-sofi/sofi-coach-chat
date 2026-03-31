@@ -149,6 +149,11 @@ SoFi's unique moat: a multi-product ecosystem (banking, investing, lending, cred
 - **Correction** — Member taps a memory row, edits inline, saves; prior version is retained in history
 - **Pause** — Member toggles a memory to Paused; Coach stops referencing it but retains it
 - **Delete** — Member permanently removes a memory; purge completes within 24 hours; audit log retained for compliance
+- **Delete via conversation** — Member asks Coach to forget something using natural language ("delete this memory", "forget this", "I don't want you to remember this", "erase that", etc.). Coach uses word-overlap matching to identify the relevant memory from the member's active memories. Three response paths:
+  - **Specific match found:** Coach quotes the matched memory and presents a Memory Deletion Card with [Delete] / [Keep it] buttons. On confirm, the memory is deleted and a "Memory deleted" chip appears (uses the same MorphingProposalCard pattern as memory proposals).
+  - **No specific match:** Coach lists all active memories (numbered) and asks which one to delete. Suggestion pills offer quick selection.
+  - **Bulk delete:** Member says "delete all memories" or "forget everything" → Coach clears all memories immediately and confirms with an "All memories deleted" chip.
+  - **No memories exist:** Coach responds that there's nothing to delete and explains how memories are created.
 
 ---
 
@@ -241,6 +246,7 @@ When applicable, Coach's response includes one of four patterns, each mapping to
 | "Memory saved" chip       | `ChatPillsWidget` / `PacificPillsWidget` — new confirmed-memory pill variant            |
 | Goal proposal card        | New `ChatCashCoachAction*Builder` — follow pattern of `ChatCashCoachActionVaultBuilder` |
 | Insight-to-Action card    | Existing `ChatCashCoachAction*Builder` variants (fund, savings, invest, card)           |
+| Memory deletion card      | New `MemoryDeletionCard` — reuses `MorphingProposalCard` pattern; [Delete] / [Keep it]; morphs to "Memory deleted" chip |
 | "Why this recommendation" | New expandable row type routed through `DynamicChatWidget`                              |
 | System banner (dark)      | `ChatStatusContainer` — new dark variant                                                |
 | System banner (light)     | `ChatStatusContainer` / `ChatDisclaimerFooterWidget`                                    |
