@@ -9,11 +9,11 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
 import { usePhase2Nav } from '../context/Phase2NavContext';
 import { useCoach } from '../context/CoachContext';
 import { ProfileDrawer } from '../components/ProfileDrawer';
 import { ScenarioSwitcher } from '../components/ScenarioSwitcher';
+import { DemoIcon } from '../components/icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Fonts } from '../constants/fonts';
@@ -106,7 +106,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.headerRight}>
             <Pressable style={styles.headerIconBtn} onPress={() => setActivePanel('scenarios')} hitSlop={12}>
-              <Feather name="play-circle" size={22} color="#ffffff" />
+              <DemoIcon size={24} color="#ffffff" />
             </Pressable>
             <Pressable style={styles.headerIconBtn} hitSlop={12}>
               <NotificationBellSvg width={24} height={24} />
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 20,
   },
   headerIconBtn: {
     width: 24,
