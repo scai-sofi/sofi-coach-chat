@@ -53,14 +53,13 @@ export function PhaseSwitcherFab() {
     ],
   }));
 
-  const isPhase1 = protoPhase === 'phase1';
-  const label = isPhase1 ? 'P1' : 'P2';
-  const bgColor = isPhase1 ? '#1a1919' : '#00a2c7';
+  const otherLabel = protoPhase === 'phase1' ? 'P2' : 'P1';
+  const bgColor = protoPhase === 'phase1' ? '#1a1919' : '#00a2c7';
 
   return (
     <GestureDetector gesture={composed}>
       <Animated.View style={[styles.fab, { backgroundColor: bgColor }, animatedStyle]}>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.label}>Switch to {otherLabel}</Text>
       </Animated.View>
     </GestureDetector>
   );
@@ -71,9 +70,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     left: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    paddingHorizontal: 14,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: 'rgba(0,0,0,0.25)',
@@ -85,8 +84,8 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
 });
