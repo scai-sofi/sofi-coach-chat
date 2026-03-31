@@ -142,7 +142,7 @@ function buildScenarios(): Scenario[] {
     {
       id: 'memory-lifecycle',
       title: 'Memory System',
-      subtitle: 'Auto-save, proposals, and corrections',
+      subtitle: 'Auto-save, proposals, corrections, and deletion',
       icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
@@ -164,7 +164,13 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.",
           timestamp: new Date(now.getTime() - 230000),
           chips: [{ type: 'memory-updated', label: 'Memory updated', memoryIds: ['mem-2'] }],
-          suggestions: ["What should I focus on first?", "Show me my spending", "How are my goals doing?"],
+        },
+        { id: uid(), role: 'user', content: "Actually, I don't want you to remember about my 401k — I'd rather manage that privately", timestamp: new Date(now.getTime() - 180000) },
+        {
+          id: uid(), role: 'ai', content: "Completely understood — your privacy comes first. I found the memory you're referring to:\n\n> \"Has 401k at Vanguard with $45,000 balance\"\n\nWould you like me to delete it? Once removed, I won't reference your 401k details in future conversations.",
+          timestamp: new Date(now.getTime() - 170000),
+          memoryDeletion: { memoryId: 'mem-mi-1', memoryContent: 'Has 401k at Vanguard with $45,000 balance' },
+          suggestions: ["What else do you remember?", "Show me my spending", "How are my goals doing?"],
         },
       ],
       memories: [
