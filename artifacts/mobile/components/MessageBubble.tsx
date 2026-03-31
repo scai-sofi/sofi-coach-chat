@@ -651,6 +651,41 @@ function GoalProposalCard({ message }: { message: Message }) {
   );
 }
 
+function MemoryDeletionCard({ message }: { message: Message }) {
+  const { confirmMemoryDeletion, dismissMemoryDeletion } = useCoach();
+  const { colors } = useTheme();
+  const deletion = message.memoryDeletion;
+  if (!deletion) return null;
+
+  const isConfirmed = deletion.confirmed === true;
+  const isDismissed = deletion.dismissed === true;
+  const isExiting = isConfirmed || isDismissed;
+  const exitLabel = isConfirmed ? 'Memory deleted' : 'Kept';
+
+  return (
+    <MorphingProposalCard
+      isExiting={isExiting}
+      confirmedLabel={exitLabel}
+      finalIcon="brain"
+    >
+      <View style={styles.proposalHeader}>
+        <Feather name="trash-2" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
+        <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
+          Delete this memory: <Text style={styles.proposalQuote}>"{deletion.memoryContent}"</Text>?
+        </Text>
+      </View>
+      <View style={styles.proposalButtonsIndented}>
+        <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemoryDeletion(message.id)} disabled={isExiting}>
+          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Delete</Text>
+        </Pressable>
+        <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryDeletion(message.id)} disabled={isExiting}>
+          <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Keep it</Text>
+        </Pressable>
+      </View>
+    </MorphingProposalCard>
+  );
+}
+
 function SuggestionPills({ suggestions, onTap }: { suggestions: string[]; onTap: (s: string) => void }) {
   const { colors } = useTheme();
   if (!suggestions || suggestions.length === 0) return null;
@@ -1021,6 +1056,11 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
       {!streaming && message.goalProposal && (
         <AnimatedSlot animate={animate}>
           <GoalProposalCard message={message} />
+        </AnimatedSlot>
+      )}
+      {!streaming && message.memoryDeletion && (
+        <AnimatedSlot animate={animate}>
+          <MemoryDeletionCard message={message} />
         </AnimatedSlot>
       )}
       {bottomChips.length > 0 && !streaming && (

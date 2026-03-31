@@ -71,6 +71,8 @@ interface CoachContextType extends CoachState {
   highlightedMemoryId: string | null;
   navigateToMemory: (memoryIds: string[]) => void;
   resolveMember360Conflict: (messageId: string, resolution: 'user' | 'profile' | 'dismissed') => void;
+  confirmMemoryDeletion: (messageId: string) => void;
+  dismissMemoryDeletion: (messageId: string) => void;
 }
 
 const CoachContext = createContext<CoachContextType | null>(null);
@@ -894,6 +896,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         updateGoalSettings(response.autoUpdateGoal);
       }
 
+      if (response.memoryDeletion?.memoryId === '__ALL__' && response.memoryDeletion?.confirmed) {
+        setMemories(prev => prev.map(m => ({ ...m, status: 'DELETED' as const })));
+      }
+
       let demoGoalQueued = false;
       if (response.goalProposal) {
         const gp = response.goalProposal;
@@ -934,6 +940,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         timestamp: new Date(),
         chips: filteredChips.length > 0 ? filteredChips : undefined,
         memoryProposal: memOff ? undefined : response.memoryProposal,
+        memoryDeletion: response.memoryDeletion,
         suggestions: response.suggestions,
         provenance: response.provenance,
       };
@@ -977,6 +984,28 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.memoryProposal) return m;
       return { ...m, memoryProposal: { ...m.memoryProposal, dismissed: true } };
+    }));
+  }, []);
+
+  const confirmMemoryDeletion = useCallback((messageId: string) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id !== messageId || !m.memoryDeletion) return m;
+      const deletion = m.memoryDeletion;
+      setMemories(mems => mems.map(mem =>
+        mem.id === deletion.memoryId ? { ...mem, status: 'DELETED' as const } : mem
+      ));
+      return {
+        ...m,
+        memoryDeletion: { ...deletion, confirmed: true },
+        chips: [...(m.chips || []), { type: 'memory-deleted' as const, label: 'Memory deleted' }],
+      };
+    }));
+  }, []);
+
+  const dismissMemoryDeletion = useCallback((messageId: string) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id !== messageId || !m.memoryDeletion) return m;
+      return { ...m, memoryDeletion: { ...m.memoryDeletion, dismissed: true } };
     }));
   }, []);
 
@@ -1166,6 +1195,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       acceptDraftGoal, dismissDraftGoal,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
       saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory, resolveMember360Conflict,
+      confirmMemoryDeletion, dismissMemoryDeletion,
     }}>
       {children}
     </CoachContext.Provider>

@@ -3,7 +3,7 @@ export type MemorySource = 'EXPLICIT' | 'IMPLICIT_CONFIRMED' | 'MEMBER_360';
 export type MemoryStatus = 'ACTIVE' | 'PAUSED' | 'DELETED';
 export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CUSTOM';
 export type GoalStatus = 'DRAFT' | 'ACTIVE' | 'ON_TRACK' | 'AT_RISK' | 'PAUSED' | 'COMPLETED';
-export type ChipType = 'memory-saved' | 'goal-progress' | 'goal-risk' | 'memory-updated' | 'milestone' | 'alert' | 'handoff' | 'conflict-resolved' | 'goal-created';
+export type ChipType = 'memory-saved' | 'goal-progress' | 'goal-risk' | 'memory-updated' | 'memory-deleted' | 'milestone' | 'alert' | 'handoff' | 'conflict-resolved' | 'goal-created';
 export type MemoryMode = 'full' | 'ask-first' | 'off';
 export type PanelType = 'none' | 'memory' | 'goals' | 'scenarios' | 'history' | 'settings';
 
@@ -57,6 +57,13 @@ export interface AutoUpdateGoal {
   currentAmount?: number;
 }
 
+export interface MemoryDeletion {
+  memoryId: string;
+  memoryContent: string;
+  confirmed?: boolean;
+  dismissed?: boolean;
+}
+
 export interface Member360Conflict {
   id: string;
   field: string;
@@ -75,6 +82,7 @@ export interface Message {
   memoryProposal?: MemoryProposal;
   goalProposal?: GoalProposal;
   member360Conflict?: Member360Conflict;
+  memoryDeletion?: MemoryDeletion;
   autoSaveMemory?: AutoSaveMemory;
   autoCreateGoal?: AutoCreateGoal;
   autoUpdateGoal?: AutoUpdateGoal;

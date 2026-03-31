@@ -12,6 +12,69 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
   const prefersDetail = store.memories.some(m => m.content.toLowerCase().includes('detailed breakdown'));
   const hasGoals = store.goals.filter(g => g.status !== 'COMPLETED' && g.status !== 'PAUSED').length > 0;
 
+  const deletePatterns = [
+    'delete this memory', 'delete that memory', 'delete memory', 'remove this memory', 'remove that memory',
+    'forget this', 'forget that', 'forget about',
+    "don't remember", "dont remember", "stop remembering",
+    "don't want you to remember", "dont want you to remember",
+    "remove what you know about", "delete what you know",
+    "i don't want you to know", "i dont want you to know",
+    "erase this", "erase that",
+  ];
+  const isDeletionIntent = deletePatterns.some(p => input.includes(p));
+
+  if (isDeletionIntent) {
+    const activeMemories = store.memories.filter(m => m.status === 'ACTIVE');
+
+    if (activeMemories.length === 0) {
+      return {
+        content: "I don't have any memories saved right now, so there's nothing to delete. If I learn something from our conversations in the future, you can always ask me to forget it.",
+      };
+    }
+
+    const inputWords = input.replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+    const scored = activeMemories.map(m => {
+      const memWords = m.content.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+      const overlap = inputWords.filter(w => w.length > 3 && memWords.some(mw => mw.includes(w))).length;
+      return { memory: m, score: overlap };
+    }).sort((a, b) => b.score - a.score);
+
+    const bestMatch = scored[0];
+
+    if (bestMatch.score > 0) {
+      return {
+        content: `I found a memory that seems to match what you're referring to:\n\n> "${bestMatch.memory.content}"\n\nWould you like me to delete this memory? Once removed, I won't reference it in future conversations.`,
+        memoryDeletion: {
+          memoryId: bestMatch.memory.id,
+          memoryContent: bestMatch.memory.content,
+        },
+      };
+    }
+
+    const memoryList = activeMemories
+      .map((m, i) => `${i + 1}. "${m.content}"`)
+      .join('\n');
+
+    return {
+      content: `I have ${activeMemories.length} memories saved. Which one would you like me to delete?\n\n${memoryList}\n\nJust let me know which one, or you can say "delete all" to clear everything.`,
+      suggestions: activeMemories.length <= 3
+        ? [...activeMemories.map(m => `Delete "${m.content.slice(0, 30)}${m.content.length > 30 ? '...' : ''}"`), 'Delete all memories']
+        : ['Delete all memories'],
+    };
+  }
+
+  if (input.includes('delete all memories') || input.includes('clear all memories') || input.includes('forget everything')) {
+    return {
+      content: "**All Memories Cleared**\n\nDone — I've deleted all saved memories. I'm starting fresh with no prior context from our conversations.\n\nYou can always build new memories naturally as we chat, or adjust your memory settings in Preferences.",
+      memoryDeletion: {
+        memoryId: '__ALL__',
+        memoryContent: 'All memories',
+        confirmed: true,
+      },
+      chips: [{ type: 'memory-deleted', label: 'All memories deleted' }],
+    };
+  }
+
   if (input.includes('outdated') || input.includes('that dining thing')) {
     return {
       content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and credit card payoff.\n\nSince you're making this a consistent habit, would you like me to also remember that cooking at home is a priority? That way I can factor it into future spending advice and recipe-vs-restaurant decisions.",
