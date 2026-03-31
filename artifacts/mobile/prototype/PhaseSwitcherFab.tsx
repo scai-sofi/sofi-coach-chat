@@ -11,6 +11,11 @@ import { usePrototype } from './PrototypeContext';
 
 const SPRING_CONFIG = { damping: 15 };
 
+const PHASE_META = {
+  phase1: { badge: 'P1', subtitle: 'Memory Center', bg: '#1a1919' },
+  phase2: { badge: 'P2', subtitle: 'Profile', bg: '#00a2c7' },
+} as const;
+
 export function PhaseSwitcherFab() {
   const { protoPhase, togglePhase } = usePrototype();
   const translateX = useSharedValue(0);
@@ -25,7 +30,7 @@ export function PhaseSwitcherFab() {
   const panGesture = Gesture.Pan()
     .onStart(() => {
       isDragging.value = true;
-      scale.value = withSpring(1.1, SPRING_CONFIG);
+      scale.value = withSpring(1.05, SPRING_CONFIG);
     })
     .onUpdate((e) => {
       translateX.value = offsetX.value + e.translationX;
@@ -53,16 +58,22 @@ export function PhaseSwitcherFab() {
     ],
   }));
 
-  const isPhase1 = protoPhase === 'phase1';
-  const label = isPhase1 ? 'P1' : 'P2';
-  const subtitle = isPhase1 ? 'Memory' : 'Profile';
-  const bgColor = isPhase1 ? '#1a1919' : '#00a2c7';
+  const meta = PHASE_META[protoPhase];
+  const otherPhase = protoPhase === 'phase1' ? 'phase2' : 'phase1';
+  const otherMeta = PHASE_META[otherPhase];
 
   return (
     <GestureDetector gesture={composed}>
-      <Animated.View style={[styles.fab, { backgroundColor: bgColor }, animatedStyle]}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+      <Animated.View style={[styles.fab, { backgroundColor: meta.bg }, animatedStyle]}>
+        <View style={styles.row}>
+          <View style={styles.badgeCircle}>
+            <Text style={[styles.badgeText, { color: meta.bg }]}>{meta.badge}</Text>
+          </View>
+          <View style={styles.textCol}>
+            <Text style={styles.subtitle}>{meta.subtitle}</Text>
+            <Text style={styles.hint}>Tap for {otherMeta.badge} · {otherMeta.subtitle}</Text>
+          </View>
+        </View>
       </Animated.View>
     </GestureDetector>
   );
@@ -73,30 +84,49 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     left: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: 'rgba(0,0,0,0.25)',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingLeft: 8,
+    paddingRight: 14,
+    shadowColor: 'rgba(0,0,0,0.3)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 12,
     elevation: 8,
     zIndex: 9999,
   },
-  label: {
-    color: '#ffffff',
-    fontSize: 13,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  badgeCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    fontSize: 12,
     fontWeight: '800',
-    letterSpacing: 0.5,
-    lineHeight: 15,
+    letterSpacing: 0.3,
+  },
+  textCol: {
+    flexDirection: 'column',
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.75)',
-    fontSize: 8,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-    lineHeight: 10,
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+    lineHeight: 16,
+  },
+  hint: {
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: 10,
+    fontWeight: '500',
+    lineHeight: 13,
   },
 });
