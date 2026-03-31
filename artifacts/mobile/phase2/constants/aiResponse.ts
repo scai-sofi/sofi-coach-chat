@@ -1,4 +1,4 @@
-import { Message, Memory, Goal, SafetyTier, MemoryCategory, GoalType } from './types';
+import { Message, Memory, Goal, MemoryCategory, GoalType } from './types';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
@@ -29,8 +29,6 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
         targetAmount: 4200, targetDate: new Date(Date.now() + 365 * 86400000),
         monthlyContribution: 380, linkedAccount: 'SoFi Credit Card',
       },
-      safetyTier: 'actionable' as SafetyTier,
-      safetyMessage: 'Actionable — needs your approval',
       suggestions: ['Set up Option A', 'Set up Option B', 'Help me prioritize my debts'],
     };
   }
@@ -177,8 +175,6 @@ export function generateAIResponse(userInput: string, store: StoreState): Partia
     return {
       content: "**Financial Planner Session — Setup**\n\nI'll connect you with a SoFi Certified Financial Planner — it's completely free for SoFi members.\n\n**What to Expect**\n• **Duration:** 30-minute video or phone session\n• **Cost:** $0 (included with your SoFi membership)\n• **Scheduling:** Usually available within 2–3 business days\n\n**What They'll Cover**\n• A full review of your investment picture and asset allocation\n• Personalized rebalancing strategy based on your risk profile\n• Tax-optimization recommendations (tax-loss harvesting, account types)\n• Long-term planning aligned with your goals (wedding, retirement)\n\n**What I'll Share (With Your Permission)**\nI can send the planner your relevant financial context — goals, savings progress, risk preference, and spending patterns — so they can jump right in without starting from scratch.\n\nWant me to go ahead and schedule this?",
       chips: [{ type: 'handoff', label: 'Connecting to specialist' }],
-      safetyTier: 'handoff' as SafetyTier,
-      safetyMessage: 'Complex — human advisor recommended',
     };
   }
 

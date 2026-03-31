@@ -936,8 +936,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         memoryProposal: memOff ? undefined : response.memoryProposal,
         suggestions: response.suggestions,
         provenance: response.provenance,
-        safetyTier: response.safetyTier,
-        safetyMessage: response.safetyMessage,
       };
 
       setMessages(prev => {

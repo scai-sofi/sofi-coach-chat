@@ -73,7 +73,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Your Financial Snapshot**\n\nI've pulled together your full picture from My Finances — your SoFi accounts plus your linked external accounts:\n\n**SoFi Accounts**\n• **SoFi Money:** $27,282.12\n• **SoFi Invest:** $45,120.50\n• **SoFi Credit Card:** $4,200 balance at 22.99% APR\n\n**External Accounts (13 linked via Plaid)**\n• **Vanguard 401k:** $45,000\n• **Chase checking:** $3,218.40\n• **+ 11 others** — see your My Finances tab for the full breakdown\n\n**Key Numbers**\n• **Monthly income:** ~$7,400 (after tax — no state income tax in TX)\n• **Monthly spending:** ~$4,680\n• **Savings rate:** ~18%\n• **Net worth:** ~$1,278,220 across all accounts\n\n**Quick Take**\nYou have a healthy income-to-spending ratio. The main opportunity is that credit card — at 22.99% APR it's costing you roughly $80/month in interest alone. Addressing that would free up real cash flow for your down payment savings.",
           timestamp: new Date(now.getTime() - 230000),
-          safetyTier: 'informational',
           autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
           chips: [{ type: 'memory-saved', label: 'Saved to About Me', memoryIds: ['mem-cs-1'] }],
           suggestions: ['Help me pay off the credit card', 'How can I save more?', 'Tell me about investing'],
@@ -83,7 +82,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Smart prioritization — debt first, then save.**\n\nThat's a solid approach. Clearing the credit card at 22.99% APR is effectively a guaranteed 23% return on every dollar you put toward it. No savings account can match that.\n\n**Your Payoff Plan — Balanced (10 months)**\n• **Monthly payment:** $420\n• **Total interest paid:** ~$380\n• **Paid off by:** " + new Date(Date.now() + 300 * 86400000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + "\n• **Monthly cash freed after payoff:** $420 → straight into down payment savings\n\n**After the Card Is Gone**\nWith $420/month freed up plus your existing savings capacity, you could be putting $800+/month toward a down payment — that compounds fast in a high-yield account at 4.00% APY.\n\nI can set this up as a tracked goal linked directly to your SoFi Credit Card — so I'll monitor your actual payments and alert you if you fall behind. Want me to set it up?",
           timestamp: new Date(now.getTime() - 170000),
-          safetyTier: 'actionable',
           memoryProposal: { id: uid(), content: 'Wants to pay off credit card before saving for a home', category: 'PRIORITIES' },
           goalProposal: {
             id: uid(),
@@ -119,7 +117,6 @@ function buildScenarios(): Scenario[] {
             { type: 'goal-progress', label: 'Emergency Fund on track' },
             { type: 'goal-risk', label: 'Credit Card trending behind' },
           ],
-          safetyTier: 'suggestive',
           provenance: 'Spending from SoFi Money transactions this week. Goal trajectories calculated from actual contributions vs. targets over the last 90 days. Subscription usage from SoFi Relay linked accounts.',
           suggestions: ['Cancel that subscription', 'Tell me about the credit card trajectory', 'Open My Goals'],
         },
@@ -127,7 +124,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Congrats on the raise, Olivia!**\n\nThat's a meaningful jump — here's what it changes:\n\n**Updated Picture**\n• **New gross monthly:** ~$11,250 (was ~$9,583)\n• **After taxes (est.):** ~$8,650/month (no state income tax in TX)\n• **Current spending:** ~$4,680/month\n• **New savings capacity:** ~$3,970/month (up from ~$2,820)\n\n**What This Unlocks**\nWith ~$1,150 more per month, you could:\n• **Accelerate credit card payoff** — clear it 3 months sooner\n• **Max out emergency fund** — hit $12k by next quarter\n• **Boost down payment savings** — start building toward your goal\n\nThe key is capturing this raise before lifestyle creep sets in.\n\n**⚠️ Profile Notice**\nYour About Me tab shows $115k from your SoFi profile. I've noted the $135k you just shared — you can verify or update this in your About Me tab.\n\nWant me to model an allocation plan for the extra income?",
           timestamp: new Date(now.getTime() - 170000),
-          safetyTier: 'suggestive',
           autoSaveMemory: { content: 'Annual income increased to $135,000', category: 'ABOUT_ME' },
           chips: [{ type: 'memory-saved', label: 'Saved to About Me', memoryIds: ['mem-rm-1'] }],
           member360Conflict: {
@@ -157,7 +153,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Nice — that's a solid foundation.**\n\nA $45,000 401k balance at 31 is great progress. That puts you ahead of the national median for your age group.\n\n**Quick Context**\n• **Current balance:** $45,000\n• **Provider:** Vanguard\n• **Typical growth at 7%:** Could become ~$340k by age 50 without adding another dollar\n• **With $500/month contributions:** Could reach ~$680k by age 50\n\nI've saved this to your About Me tab — labeled \"You told Coach.\" You can edit or remove it from your Profile anytime.\n\nAre you currently contributing through Stripe, and do you know if they offer a match?",
           timestamp: new Date(now.getTime() - 410000),
-          safetyTier: 'informational',
           chips: [{ type: 'memory-saved', label: 'Saved to About Me', memoryIds: ['mem-mi-1'] }],
           provenance: 'Balance from what you shared. Growth projections use a 7% historical average annual return.',
           suggestions: ["Yes, Stripe matches 50% up to 6%", "I'm not sure about my match", "How much should I contribute?"],
@@ -166,7 +161,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**That's a thoughtful approach.**\n\nPrioritizing debt payoff before ramping up investments is a valid strategy — especially with your credit card at 22.99% APR.\n\n**The General Framework**\n\n• **Step 1:** Get the employer match (it's free money)\n• **Step 2:** Pay off high-interest debt (anything over ~7% APR)\n• **Step 3:** Build emergency fund to 3 months\n• **Step 4:** Max out retirement contributions\n\n**Where You Stand**\nWith $45k already in your 401k and an emergency fund in progress, you're in a great position. Clearing the credit card first means your future investment dollars work harder — they're not fighting against interest payments.\n\nOnce the debt is gone, you'll have significant monthly cash flow to redirect into down payment savings.\n\nI'd like to remember this preference — \"Prioritizes debt payoff before investing.\" This would go in your Preferences tab. Approve?",
           timestamp: new Date(now.getTime() - 350000),
-          safetyTier: 'suggestive',
           memoryProposal: { id: uid(), content: 'Prioritizes debt payoff before increasing investments', category: 'PREFERENCES' },
           provenance: 'Based on your SoFi Credit Card APR (22.99%) and current Emergency Fund goal progress.',
           suggestions: ["Approve", "Skip this one", "Show me my debt overview"],
@@ -200,8 +194,6 @@ function buildScenarios(): Scenario[] {
           chips: [{ type: 'memory-saved', label: 'Saved to About Me', memoryIds: ['mem-gd-1'] }],
           autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
           memoryProposal: { id: uid(), content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES' },
-          safetyTier: 'actionable',
-          safetyMessage: 'Actionable — needs your approval',
           provenance: 'Balance and APR from your SoFi Credit Card account (real-time). Payoff projections use standard amortization. Monthly surplus from your SoFi Money spending patterns.',
           suggestions: ['Promote to tracked goal (Option B)', 'Promote to tracked goal (Option A)', 'Just remember it for now'],
         },
@@ -228,7 +220,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Credit Card Payoff — Trajectory Deviation**\n\nHey Olivia, I've been continuously monitoring your Credit Card Payoff goal since you promoted it 10 weeks ago. Over the last 3 weeks, your trajectory has shifted — here's what the trend shows:\n\n**3-Week Trajectory**\n• **Week 1:** Payment of $400 (target $420) — minor, confidence held at 76%\n• **Week 2:** Payment of $380 + $180 new charge — confidence dropped to 64%\n• **Week 3:** Payment of $360 + $160 new charge — confidence now at 58%\n\nThis isn't a single missed payment — it's a pattern shift I wanted to flag before it compounds further.\n\n**Where This Puts You**\n• **Current balance:** $1,260 remaining (was tracking to $980 by now)\n• **Original payoff date:** 4 months from now\n• **Projected at current trend:** ~5.5 months (6 weeks late)\n• **Extra interest cost if trend continues:** ~$48\n\n**Why This Matters for Your Priorities**\nYour Preferences tab says you want to redirect this cash flow into down payment savings. Every week the card carries a balance costs ~$5.57 in interest — that's money not going toward your house.\n\n**Your Options**\n\n• **Option A — Catch up:** Bump payment to $520 for 2 months. Gets confidence back to 78% and restores your original timeline.\n\n• **Option B — Adjust the goal:** Extend deadline by 2 months in My Goals. Monthly target drops to $350, giving you breathing room. I'll recalibrate the trajectory monitoring accordingly.\n\nBoth paths get you to debt-free. Want me to update your goal in My Goals?",
           timestamp: new Date(now.getTime() - 60000),
-          safetyTier: 'actionable',
           chips: [{ type: 'goal-risk', label: 'Credit Card trajectory deviation' }],
           memoryProposal: { id: uid(), content: 'Credit card spending increased — 3-week trend of under-target payments', category: 'ABOUT_ME' },
           provenance: 'Payment history from your SoFi Credit Card account over the last 3 weeks. Confidence score recalculated weekly from actual vs. target contributions. Goal target from My Goals. Priority reference from Preferences tab.',
@@ -250,7 +241,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Emergency Fund — 75% Milestone! 🎉**\n\nOlivia, you just hit **75% of your Emergency Fund goal!** That's $9,000 out of $12,000.\n\n**Your Journey (tracked in My Goals)**\n• **25% ($3,000)** — reached 60 days ago\n• **50% ($6,000)** — reached 20 days ago\n• **75% ($9,000)** — reached today\n• **100% ($12,000)** — on track for ~6 months from now\n\n**What's Working**\nYour SoFi Money Vault contributions have been $460/month — $10 above your $450 target, every single month. That consistency is exactly why you're 2 weeks ahead of schedule.\n\n**The Home Stretch**\n• **Remaining:** $3,000\n• **At your current pace:** ~6.5 months to go\n• **Interest earned so far:** ~$150 at 4.00% APY\n• **What $12,000 covers:** ~3 months of essential expenses at your spending level\n\n**What Happens at 100%**\nWhen you hit your target, this goal will be marked complete and archived as a memory in your About Me tab — \"Built $12k emergency fund.\" The goal itself moves to your completed section in My Goals.\n\n**💡 Next Goal Promotion**\nYou've mentioned saving for a down payment several times. Once this goal completes, I can promote that intent into a new tracked goal — linked to a dedicated SoFi Money Vault. That $460/month flows straight into your next priority without missing a beat.\n\nWant me to set up the down payment goal now so it's ready when your emergency fund completes?",
           timestamp: new Date(now.getTime() - 60000),
-          safetyTier: 'informational',
           chips: [{ type: 'milestone', label: '75% milestone reached!' }],
           provenance: 'Vault balance and contributions from your SoFi Money account. Milestone calculated from actual deposits vs. goal target in My Goals. Down payment intent referenced 3 times across About Me and chat history.',
           suggestions: ['Set up down payment goal now', 'Wait until emergency fund completes', 'Show My Goals'],
@@ -274,7 +264,6 @@ function buildScenarios(): Scenario[] {
         {
           id: uid(), role: 'ai', content: "**Your $3,000 Bonus — Optimized Across Your SoFi Products**\n\nCongrats, Olivia! I've mapped this against your active goals in My Goals — each linked to a specific SoFi product surface:\n\n**1. Credit Card Payoff — $1,260 → SoFi Credit Card**\n• **Goal link:** Credit Card Payoff goal (currently at 70%)\n• **Impact:** Clears your entire remaining balance — goal completes!\n• **Why:** Eliminates 22.99% APR — every dollar here is a guaranteed 23% return\n• **After:** Goal archives to About Me as \"Paid off $4,200 credit card debt.\" $380/month freed.\n• **Product surface:** Completion badge appears on your Credit Card product page\n\n**2. Emergency Fund — $1,200 → SoFi Money Vault**\n• **Goal link:** Emergency Fund goal (currently at 70%)\n• **Impact:** Jumps from $8,400 → $9,600 (80%), 6 weeks ahead of schedule\n• **Where:** Deposited directly into your linked SoFi Money Vault at 4.00% APY\n• **Product surface:** Progress ring updates on your Money product page\n\n**3. Long-Term Growth — $540 → SoFi Invest**\n• **Impact:** Seeds your investment portfolio\n• **Why:** With debt eliminated and emergency fund nearly complete, this is the right time\n• **Suggested allocation:** Diversified index portfolio — matches your risk preference\n• **💡 Goal opportunity:** Want to promote this into a tracked \"Start Investing\" goal in My Goals?\n\n**The Big Picture**\nThis single move touches 3 SoFi products, completes 1 goal, accelerates another, and opens a new one. Plus, the $380/month freed from Credit Card payments can flow directly into your down payment goal.\n\nWant me to execute all three moves?",
           timestamp: new Date(now.getTime() - 60000),
-          safetyTier: 'actionable',
           chips: [{ type: 'handoff', label: 'Cross-product recommendation' }],
           memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'ABOUT_ME' },
           provenance: 'SoFi Money, Credit Card, and Invest account data (real-time). Goal progress from My Goals. APR and APY rates as of today. Risk preference from My Preferences.',
@@ -284,51 +273,6 @@ function buildScenarios(): Scenario[] {
       memories: [...SHARED_MEMORIES],
       goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
     },
-    {
-      id: 'tiered-safety',
-      title: 'Recommendation Safety Tiers',
-      subtitle: 'All 4 tiers — Profile context sharing in handoff',
-      icon: 'shield-check',
-      messages: [
-        { id: uid(), role: 'user', content: 'What\'s my checking balance?', timestamp: new Date(now.getTime() - 300000) },
-        {
-          id: uid(), role: 'ai', content: "**SoFi Money — Current Balance**\n\nYour balance is **$27,282.12** as of right now.\n\n**Account Activity**\n• **Pending transactions:** 2 charges totaling $127.80 (settling tomorrow)\n• **Available after pending:** $27,154.32\n• **Last deposit:** $4,790.00 — 3 days ago (Stripe payroll)\n\n**Quick Context**\nThis covers roughly 6 months of essential expenses based on your spending patterns. You're in very strong shape.\n\nYou can see your full account breakdown — SoFi and external — in your My Finances tab.",
-          timestamp: new Date(now.getTime() - 290000),
-          safetyTier: 'informational',
-          safetyMessage: 'Informational',
-          provenance: 'Balance and pending transactions from your SoFi Money account, updated in real time. Payroll deposit identified from Stripe direct deposit records.',
-        },
-        { id: uid(), role: 'user', content: 'Any tips on reducing my dining spending?', timestamp: new Date(now.getTime() - 240000) },
-        {
-          id: uid(), role: 'ai', content: "**Dining Spending — Reduction Tips**\n\nBased on your recent spending patterns in My Finances, here are three strategies ranked by potential impact:\n\n**1. Meal Prep on Sundays** (saves ~$200/month)\nMembers who batch-cook save an average of $200/month on dining. You're already trending this direction — your About Me notes a cooking-at-home shift, and your dining is down 21% over 3 months.\n\n**2. Set a $100 Weekly Dining Cap** (saves ~$80/month)\nYou've been averaging about $120/week on dining. A $100 cap is a realistic stretch goal — not so tight it feels punishing, but enough to save $80+/month ($960/year).\n\n**3. Turn On SoFi Relay Alerts** (behavioral nudge)\nI can set up real-time spending nudges when you're approaching your dining limit. If dining category alerts feel like too much, you can toggle them independently in your My Preferences tab without changing your global settings.\n\n**The Math**\nEven cutting $20/week frees up over $1,000 a year — that's more than 2 months of emergency fund contributions just from dining adjustments.\n\nWant me to set up any of these?",
-          timestamp: new Date(now.getTime() - 230000),
-          safetyTier: 'suggestive',
-          safetyMessage: 'Suggestion',
-          provenance: 'Dining spending trends from My Finances (SoFi Money transactions, last 90 days). Cooking habit from About Me (you corrected this recently). Aggregate savings estimates based on SoFi member data.',
-        },
-        { id: uid(), role: 'user', content: 'Can you move $500 from checking to savings?', timestamp: new Date(now.getTime() - 180000) },
-        {
-          id: uid(), role: 'ai', content: "**Transfer Preview**\n\nHere's what this transfer would look like:\n\n**Transfer Details**\n• **From:** SoFi Money ($27,282.12 current balance)\n• **To:** SoFi Money Vault — linked to your Emergency Fund goal in My Goals\n• **Amount:** $500.00\n\n**After Transfer**\n• **Money balance:** $26,782.12 — still covers ~5.5 months of essential expenses\n• **Emergency Fund:** $8,900 (74% of $12,000 goal, up from 70%)\n• **Pending charges:** $127.80 settles tomorrow — you'll still have $26,654.32 available\n\n**Impact on Your Goal**\nThis bumps your Emergency Fund 4% closer and puts you about 1 week ahead of schedule. Progress will update in both My Goals and on your Money product page.\n\nWant me to confirm this transfer?",
-          timestamp: new Date(now.getTime() - 170000),
-          safetyTier: 'actionable',
-          safetyMessage: 'Actionable — needs your approval',
-          provenance: 'Balance from your SoFi Money account. Emergency Fund progress from My Goals. Pending transactions from today\'s settlement queue.',
-          suggestions: ['Confirm transfer', 'Change amount', 'Cancel'],
-        },
-        { id: uid(), role: 'user', content: 'Should I rebalance my investment portfolio?', timestamp: new Date(now.getTime() - 120000) },
-        {
-          id: uid(), role: 'ai', content: "**Portfolio Rebalancing — Expert Recommendation**\n\nPortfolio rebalancing involves several layers of complexity:\n\n**What's Involved**\n• **Tax implications:** Selling assets may trigger capital gains taxes\n• **Market timing:** Rebalancing at the wrong time can lock in losses\n• **Goal alignment:** Your allocation should match your risk tolerance, timeline, and other financial priorities\n\n**Why I'd Recommend a Human Expert**\nGiven your down payment timeline and the tax complexity involved, this is a great candidate for a SoFi Certified Financial Planner session — free for SoFi members.\n\n**What They Can Do**\n• Review your full investment picture (SoFi Invest + Vanguard 401k from your My Finances)\n• Identify tax-loss harvesting opportunities\n• Build a rebalancing strategy that matches your comfort level\n• Factor in your active goals (Emergency Fund at 70%, down payment intent) for a holistic approach\n\n**Profile Context Sharing**\nWith your permission, I'll share relevant context from your Profile with the planner so they don't need to start from scratch:\n• **From About Me:** Income, location, age, employer, risk tolerance\n• **From My Goals:** Active goals, progress, timelines\n• **From My Finances:** Account balances across SoFi and external accounts\n• **From My Preferences:** Your coaching preferences and communication style\n\nThe planner gets a head start, and you skip repeating everything. You control exactly what's shared.\n\nWant me to set that up?",
-          timestamp: new Date(now.getTime() - 60000),
-          safetyTier: 'handoff',
-          safetyMessage: 'Complex — human advisor recommended',
-          provenance: 'Portfolio data from SoFi Invest account. 401k context from About Me (you told Coach). Tax and rebalancing considerations require professional analysis beyond Coach scope.',
-          chips: [{ type: 'handoff', label: 'Specialist recommended' }],
-          suggestions: ['Share my Profile and connect me', 'Connect without sharing Profile', 'I\'ll handle it myself'],
-        },
-      ],
-      memories: [...SHARED_MEMORIES],
-      goals: [{ ...EMERGENCY_FUND_GOAL }],
-    },
   ];
 }
 
@@ -337,5 +281,5 @@ export const SCENARIOS = buildScenarios();
 export const SCENARIO_ORDER = [
   'cold-start', 'returning-member', 'memory-lifecycle',
   'goal-discovery', 'proactive-risk', 'milestone-celebration',
-  'cross-product', 'tiered-safety',
+  'cross-product',
 ];

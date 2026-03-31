@@ -6,7 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import type { AppTheme } from '@/constants/theme';
 import { Fonts } from '@/constants/fonts';
-import { Message, MessageChip, SafetyTier } from '@/constants/types';
+import { Message, MessageChip } from '@/constants/types';
 import { useCoach } from '@/context/CoachContext';
 import { useToast } from '@/components/Toast';
 import { FlipIcon } from '@/components/icons';
@@ -45,15 +45,6 @@ function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string;
 }
 
 const BOTTOM_CHIP_TYPES = new Set(['memory-saved', 'memory-updated', 'conflict-resolved', 'goal-created']);
-
-function getSafetyStyles(c: AppTheme): Record<SafetyTier, { bg: string; color: string; icon: FeatherIconName; text: string }> {
-  return {
-    informational: { bg: c.surfaceMuted, color: c.contentSecondary, icon: 'shield', text: 'Informational' },
-    suggestive: { bg: c.surfaceMuted, color: c.contentSecondary, icon: 'shield', text: 'Suggestion' },
-    actionable: { bg: c.warningBg, color: c.warning, icon: 'shield', text: 'Actionable — needs your approval' },
-    handoff: { bg: c.infoBg, color: c.info, icon: 'arrow-up-right', text: 'Complex — human advisor recommended' },
-  };
-}
 
 type ContentBlock =
   | { type: 'text'; text: string; paragraphGap: boolean }
@@ -357,18 +348,6 @@ function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate?: bool
   );
 }
 
-function SafetyBadge({ tier }: { tier: SafetyTier }) {
-  const { colors } = useTheme();
-  const safetyStyles = getSafetyStyles(colors);
-  const style = safetyStyles[tier];
-  return (
-    <View style={[styles.safetyBadge, { backgroundColor: style.bg }]}>
-      <Feather name={style.icon} size={10} color={style.color} />
-      <Text style={[styles.safetyText, { color: style.color }]}>{style.text}</Text>
-    </View>
-  );
-}
-
 
 function MorphingProposalCard({
   isExiting,
@@ -637,7 +616,7 @@ function GoalProposalCard({ message }: { message: Message }) {
   const isExiting = isConfirmed || isDismissed;
   const exitLabel = isConfirmed ? 'Goal created' : 'Skipped';
   const monthStr = proposal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  const showApproval = message.safetyTier === 'actionable';
+  const showApproval = !!proposal;
 
   return (
     <MorphingProposalCard
@@ -1013,10 +992,6 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
   const topChips = allChips.filter(c => !BOTTOM_CHIP_TYPES.has(c.type));
   const bottomChips = allChips.filter(c => BOTTOM_CHIP_TYPES.has(c.type));
 
-  const showSafety = !streaming && message.safetyTier && !(
-    message.safetyTier === 'actionable' && message.goalProposal
-  );
-
   return (
     <View style={styles.aiRow}>
       {topChips.length > 0 && (
@@ -1032,12 +1007,6 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
           renderContent(message.content)
         ) : null}
       </View>
-
-      {showSafety && (
-        <AnimatedSlot animate={animate} delay={50} duration={250}>
-          <SafetyBadge tier={message.safetyTier!} />
-        </AnimatedSlot>
-      )}
 
       {!streaming && message.memoryProposal && (
         <AnimatedSlot animate={animate}>
@@ -1101,12 +1070,6 @@ const styles = StyleSheet.create({
     height: 0.75,
     marginVertical: 16,
   },
-  safetyBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4,
-    alignSelf: 'flex-start', marginLeft: 4,
-  },
-  safetyText: { fontSize: 10, fontFamily: Fonts.medium, lineHeight: 12 },
   proposalCard: {
     borderWidth: 0.75, borderRadius: 16, padding: 12,
   },

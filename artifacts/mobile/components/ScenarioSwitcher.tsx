@@ -33,7 +33,6 @@ const ICON_MAP: Record<string, FeatherIconName> = {
   'alert-triangle': 'alert-triangle',
   'party-popper': 'award',
   'layers': 'layers',
-  'shield-check': 'shield',
   'message-circle': 'message-circle',
 };
 
