@@ -167,9 +167,9 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: "Actually, that dining thing is outdated — I've been cooking more lately", timestamp: new Date(now.getTime() - 240000) },
         {
-          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory in your Priorities tab to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\" *(Coach inferred)*\n• **After:** \"Shifted to cooking at home — dining spend down 21%\" *(you corrected)*\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and future down payment.",
+          id: uid(), role: 'ai', content: "**Profile Updated**\n\nI've adjusted your Priorities tab to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\" *(Coach inferred)*\n• **After:** \"Shifted to cooking at home — dining spend down 21%\" *(you corrected)*\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and future down payment.",
           timestamp: new Date(now.getTime() - 230000),
-          chips: [{ type: 'memory-updated', label: 'Memory updated', memoryIds: ['mem-2'] }],
+          chips: [{ type: 'memory-updated', label: 'Profile updated', memoryIds: ['mem-2'] }],
           provenance: 'Dining spending trend from your SoFi Money transactions over the last 90 days. Down payment intent referenced 3 times across previous sessions.',
           suggestions: ["What should I focus on first?", "Show me my spending trends", "Open my Profile"],
         },

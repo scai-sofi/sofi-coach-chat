@@ -6,6 +6,12 @@ import { generateAIResponse } from '../constants/aiResponse';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
+const CATEGORY_TAB_LABEL: Record<MemoryCategory, string> = {
+  ABOUT_ME: 'About Me',
+  PREFERENCES: 'Preferences',
+  PRIORITIES: 'Priorities',
+};
+
 export const TYPING_INDICATOR_ID = '__typing_indicator__';
 
 export type ChatMode = 'demo' | 'live';
@@ -381,12 +387,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       setMemories(prev => [...prev, ...newMemories]);
       const memoryIds = newMemories.map(m => m.id);
       const count = newMemories.length;
-      chips.push({ type: 'memory-saved', label: count === 1 ? 'Saved to memory' : `${count} items saved to memory`, memoryIds });
+      const categories = [...new Set(newMemories.map(m => m.category))];
+      const tabLabel = categories.length === 1 ? CATEGORY_TAB_LABEL[categories[0]] : 'Profile';
+      chips.push({ type: 'memory-saved', label: count === 1 ? `Saved to ${tabLabel}` : `${count} items saved to ${tabLabel}`, memoryIds });
     }
 
     if (updatedMemoryIds.length > 0) {
       const count = updatedMemoryIds.length;
-      chips.push({ type: 'memory-updated', label: count === 1 ? 'Memory updated' : `${count} memories updated`, memoryIds: updatedMemoryIds });
+      chips.push({ type: 'memory-updated', label: count === 1 ? 'Profile updated' : `${count} items updated`, memoryIds: updatedMemoryIds });
     }
 
     if (chips.length > 0) result.chips = chips;
@@ -872,7 +880,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
           };
         } else {
           const memId = uid();
-          chips.push({ type: 'memory-saved', label: 'Saved to memory', memoryIds: [memId] });
+          const tabName = CATEGORY_TAB_LABEL[response.autoSaveMemory.category] || 'Profile';
+          chips.push({ type: 'memory-saved', label: `Saved to ${tabName}`, memoryIds: [memId] });
           const mem: Memory = {
             id: memId,
             category: response.autoSaveMemory.category,
