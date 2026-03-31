@@ -32,7 +32,7 @@ function sourceLabel(source: string): string {
 
 export default function PreferencesScreen() {
   const { colors } = useTheme();
-  const { navigate } = usePhase2Nav();
+  const { goBack } = usePhase2Nav();
   const { memoryMode, setMemoryMode, memories } = useCoach();
   const [localMode, setLocalMode] = useState<MemoryMode>(memoryMode);
 
@@ -51,7 +51,7 @@ export default function PreferencesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="Preferences" onBack={() => navigate('home')} />
+      <AppBar variant="back" title="Preferences" onBack={() => goBack()} />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.section}>

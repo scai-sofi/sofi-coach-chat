@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,11 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 import { usePhase2Nav } from '../context/Phase2NavContext';
+import { useCoach } from '../context/CoachContext';
 import { ProfileDrawer } from '../components/ProfileDrawer';
+import { ScenarioSwitcher } from '../components/ScenarioSwitcher';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Fonts } from '../constants/fonts';
@@ -68,9 +71,17 @@ const HEADER_ROW_HEIGHT = 44;
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { navigate } = usePhase2Nav();
+  const { navigate, shouldOpenDrawer, consumeDrawerFlag } = usePhase2Nav();
+  const { activePanel, setActivePanel } = useCoach();
   const [profileOpen, setProfileOpen] = useState(false);
   const headerHeight = insets.top + HEADER_ROW_HEIGHT;
+
+  useEffect(() => {
+    if (shouldOpenDrawer) {
+      setProfileOpen(true);
+      consumeDrawerFlag();
+    }
+  }, [shouldOpenDrawer, consumeDrawerFlag]);
 
   return (
     <View style={styles.container}>
@@ -94,6 +105,9 @@ export default function HomeScreen() {
             </LinearGradient>
           </View>
           <View style={styles.headerRight}>
+            <Pressable style={styles.headerIconBtn} onPress={() => setActivePanel('scenarios')} hitSlop={12}>
+              <Feather name="play-circle" size={22} color="#ffffff" />
+            </Pressable>
             <Pressable style={styles.headerIconBtn} hitSlop={12}>
               <NotificationBellSvg width={24} height={24} />
             </Pressable>
@@ -275,6 +289,8 @@ export default function HomeScreen() {
       </View>
 
       <ProfileDrawer visible={profileOpen} onClose={() => setProfileOpen(false)} />
+
+      {activePanel === 'scenarios' && <ScenarioSwitcher />}
     </View>
   );
 }
@@ -418,6 +434,7 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
   headerIconBtn: {
     width: 24,

@@ -10,7 +10,7 @@ import { ProgressRing, GoalCard, SuggestedGoalCard } from '../components/GoalsDa
 
 export default function GoalsProfileScreen() {
   const { colors } = useTheme();
-  const { navigate } = usePhase2Nav();
+  const { navigate, goBack } = usePhase2Nav();
   const { goals } = useCoach();
 
   const draftGoals = goals.filter(g => g.status === 'DRAFT');
@@ -20,7 +20,7 @@ export default function GoalsProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="Goals" onBack={() => navigate('home')} />
+      <AppBar variant="back" title="Goals" onBack={() => goBack()} />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {!hasAny ? (

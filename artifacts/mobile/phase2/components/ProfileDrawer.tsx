@@ -52,7 +52,7 @@ const MENU_ITEMS: MenuItem[] = [
 ];
 
 const BOTTOM_ITEMS: MenuItem[] = [
-  { icon: 'settings', label: 'Settings' },
+  { icon: 'shield', label: 'Legal & security' },
   { icon: 'log-out', label: 'Log Out' },
 ];
 

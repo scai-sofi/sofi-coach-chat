@@ -60,7 +60,7 @@ const chipStyles = StyleSheet.create({
 
 export default function MyFinancesScreen() {
   const { colors } = useTheme();
-  const { navigate } = usePhase2Nav();
+  const { goBack } = usePhase2Nav();
   const { memories } = useCoach();
 
   const priorityInsights = memories.filter(
@@ -69,7 +69,7 @@ export default function MyFinancesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="My Finances" onBack={() => navigate('home')} />
+      <AppBar variant="back" title="My Finances" onBack={() => goBack()} />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.netWorthHeader}>

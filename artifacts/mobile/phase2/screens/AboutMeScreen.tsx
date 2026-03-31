@@ -76,7 +76,7 @@ function sourceLabel(source: string): string {
 
 export default function AboutMeScreen() {
   const { colors } = useTheme();
-  const { navigate } = usePhase2Nav();
+  const { goBack } = usePhase2Nav();
   const { memories } = useCoach();
 
   const aboutMeMemories = memories.filter(
@@ -94,7 +94,7 @@ export default function AboutMeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="About Me" onBack={() => navigate('home')} />
+      <AppBar variant="back" title="About Me" onBack={() => goBack()} />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileHeader}>
