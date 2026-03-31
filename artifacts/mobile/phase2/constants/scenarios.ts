@@ -150,7 +150,7 @@ function buildScenarios(): Scenario[] {
     {
       id: 'memory-lifecycle',
       title: 'Knowledge Management',
-      subtitle: 'Source labels, Profile tabs, per-category control, promotion opportunity',
+      subtitle: 'Source labels, Profile tabs, and per-category control',
       icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
@@ -171,34 +171,18 @@ function buildScenarios(): Scenario[] {
           provenance: 'Based on your SoFi Credit Card APR (22.99%) and current Emergency Fund goal progress.',
           suggestions: ["Approve", "Skip this one", "Show me my debt overview"],
         },
-        { id: uid(), role: 'user', content: "I make about $130,000 a year", timestamp: new Date(now.getTime() - 300000) },
-        {
-          id: uid(), role: 'ai', content: "**Good to know — that gives me a clearer picture.**\n\nAt $130k/year in Austin, here's a quick financial health snapshot:\n\n**Income Breakdown (estimated)**\n• **Gross monthly:** ~$10,833\n• **After taxes (est.):** ~$8,300/month — no state income tax in Texas\n• **Current savings rate:** ~24% based on your spending patterns\n\n**How This Compares**\nA 24% savings rate at $130k is well above average. If you can maintain that while paying off debt, you'll be in excellent shape to ramp up your down payment savings once you're debt-free.\n\n**One Thing to Watch**\nAt this income level, you're within the Roth IRA income range ($161k for single filers). Worth contributing while you can — I can help you plan around that.\n\n**⚠️ Profile Notice**\nYour About Me shows $115k (from your SoFi profile — source: \"SoFi verified\"). You just shared $130k. You can resolve this in your About Me tab.",
-          timestamp: new Date(now.getTime() - 290000),
-          safetyTier: 'informational',
-          chips: [{ type: 'memory-saved', label: 'Saved to About Me', memoryIds: ['mem-mi-2'] }],
-          member360Conflict: {
-            id: uid(),
-            field: 'Annual income',
-            userValue: 'Income is $130,000/year',
-            profileValue: 'Annual income: $115,000/year',
-          },
-          provenance: 'Income from what you shared. Profile income labeled \"SoFi verified\" in About Me. Savings rate calculated from your SoFi Money transaction history. Roth IRA limits per 2026 IRS guidelines.',
-          suggestions: ["Update my income in Profile", "Tell me about Roth limits", "How can I increase my savings rate?"],
-        },
         { id: uid(), role: 'user', content: "Actually, that dining thing is outdated — I've been cooking more lately", timestamp: new Date(now.getTime() - 240000) },
         {
-          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory in your Priorities tab to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\" *(Coach inferred)*\n• **After:** \"Shifted to cooking at home — dining spend down 21%\" *(you corrected)*\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and future down payment.\n\n**💡 Promotion Opportunity**\nYou've mentioned saving for a down payment a few times now. Want me to promote that into a tracked goal in My Goals? I'd add a target amount, timeline, and link it to a SoFi Money Vault so we can monitor your progress automatically.",
+          id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory in your Priorities tab to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\" *(Coach inferred)*\n• **After:** \"Shifted to cooking at home — dining spend down 21%\" *(you corrected)*\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund and future down payment.",
           timestamp: new Date(now.getTime() - 230000),
           chips: [{ type: 'memory-updated', label: 'Memory updated', memoryIds: ['mem-2'] }],
           provenance: 'Dining spending trend from your SoFi Money transactions over the last 90 days. Down payment intent referenced 3 times across previous sessions.',
-          suggestions: ["Yes, set up a down payment goal", "Not yet — just track the memory", "Show me my Profile"],
+          suggestions: ["What should I focus on first?", "Show me my spending trends", "Open my Profile"],
         },
       ],
       memories: [
         ...SHARED_MEMORIES,
         { id: 'mem-mi-1', category: 'ABOUT_ME', content: 'Has 401k at Vanguard with $45,000 balance', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
-        { id: 'mem-mi-2', category: 'ABOUT_ME', content: 'Annual income is $130,000', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
         { id: 'mem-manual-1', category: 'PRIORITIES', content: 'Wants to build a down payment fund after clearing debt', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(3), updatedAt: daysAgo(3) },
       ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
@@ -281,30 +265,6 @@ function buildScenarios(): Scenario[] {
       }],
     },
     {
-      id: 'weekly-recap',
-      title: 'Weekly Financial Recap',
-      subtitle: 'Cross-surface summary — Chat, Home feed, My Finances insights',
-      icon: 'calendar-check',
-      messages: [
-        {
-          id: uid(), role: 'system', content: 'Your weekly financial summary is ready — also posted to your Home feed', timestamp: new Date(now.getTime() - 120000), isProactive: true,
-        },
-        {
-          id: uid(), role: 'ai', content: "**Your Week in Review**\n\n**Spending Summary (from My Finances)**\nYou spent **$892** this week (excludes fixed bills) — down 8% from last week ($970) and 5% below your 4-week average ($938). Full breakdown available in your My Finances tab.\n\n• **Groceries:** $165 — on budget, consistent with your meal-planning habit\n• **Dining:** $95 — your best week this month (avg was $121). The cooking-at-home shift is paying off\n• **Transportation:** $52 — stable, right at your weekly norm\n• **Shopping:** $580 — one-time monitor purchase (excluded from baseline, your typical was $312)\n\n**Fixed Bills This Month**\n• **Rent:** $2,100 — auto-pay on the 1st, as usual\n\n**Goals Trajectory (from My Goals)**\n• **Emergency Fund:** $8,400 of $12,000 (70%) — on track, 2 weeks ahead. SoFi Money Vault is auto-contributing $460/month.\n• **Credit Card:** $2,940 of $4,200 (70%) — trajectory slipping. Last payment was $40 below target. If this continues for 2 more weeks, I'll escalate to a formal trajectory alert.\n\n**Something Worth Looking At**\nI spotted a $14.99/month streaming subscription you haven't used in 6 weeks (via SoFi Relay linked accounts). Canceling it would free up $180/year — that's nearly half a month's emergency fund contribution.\n\n**This Week's Win**\nYour baseline spending (excluding the monitor) was $312 — well below your typical $380. That's $68 saved in a single week through small, consistent choices.\n\n*A summary of this recap also appears on your Home feed and as a card on your SoFi Money product page.*\n\nWant me to dig into any of these?",
-          timestamp: new Date(now.getTime() - 60000),
-          safetyTier: 'informational',
-          chips: [
-            { type: 'goal-progress', label: 'Emergency Fund on track' },
-            { type: 'goal-risk', label: 'Credit Card trajectory slipping' },
-          ],
-          provenance: 'Spending from SoFi Money and Relay-linked transactions this week. Goal trajectories from My Goals (actual vs. target contributions over 90 days). Subscription usage from SoFi Relay linked accounts.',
-          suggestions: ['Cancel that subscription', 'Open My Finances', 'Show me the Credit Card trajectory'],
-        },
-      ],
-      memories: [...SHARED_MEMORIES],
-      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
-    },
-    {
       id: 'cross-product',
       title: 'Cross-Product Orchestration',
       subtitle: "Goals as connective tissue across Banking, Invest, and Credit",
@@ -376,6 +336,6 @@ export const SCENARIOS = buildScenarios();
 
 export const SCENARIO_ORDER = [
   'cold-start', 'returning-member', 'memory-lifecycle',
-  'goal-discovery', 'proactive-risk', 'milestone-celebration', 'weekly-recap',
+  'goal-discovery', 'proactive-risk', 'milestone-celebration',
   'cross-product', 'tiered-safety',
 ];

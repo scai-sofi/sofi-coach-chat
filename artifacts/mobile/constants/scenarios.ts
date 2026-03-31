@@ -147,7 +147,7 @@ function buildScenarios(): Scenario[] {
     {
       id: 'memory-lifecycle',
       title: 'Memory System',
-      subtitle: 'Auto-save, proposals, corrections, and profile conflict detection',
+      subtitle: 'Auto-save, proposals, and corrections',
       icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
@@ -166,20 +166,6 @@ function buildScenarios(): Scenario[] {
           memoryProposal: { id: uid(), content: 'Prioritizes debt payoff before increasing investments', category: 'PREFERENCES' },
           suggestions: ["Show me my debt overview", "What's a good payoff strategy?", "How much am I spending on interest?"],
         },
-        { id: uid(), role: 'user', content: "I make about $130,000 a year", timestamp: new Date(now.getTime() - 300000) },
-        {
-          id: uid(), role: 'ai', content: "**Good to know — that gives me a clearer picture.**\n\nAt $130k/year, here's a quick financial health snapshot:\n\n**Income Breakdown (estimated)**\n• **Gross monthly:** ~$10,833\n• **After taxes (est.):** ~$7,800/month\n• **Current savings rate:** ~24% based on your spending patterns\n\n**How This Compares**\nA 24% savings rate at $130k is well above average. If you can maintain that while paying off debt, you'll be in excellent shape to ramp up investing once you're debt-free.\n\n**One Thing to Watch**\nAt this income level, you might be close to the Roth IRA income limit ($161k for single filers). Something to keep in mind as your income grows — I can help you plan around that when the time comes.",
-          timestamp: new Date(now.getTime() - 290000),
-          safetyTier: 'informational',
-          chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-mi-2'] }],
-          member360Conflict: {
-            id: uid(),
-            field: 'Annual income',
-            userValue: 'Income is $130,000/year',
-            profileValue: 'Annual income: $115,000/year',
-          },
-          suggestions: ["Tell me about Roth limits", "What's my ideal budget split?", "How can I increase my savings rate?"],
-        },
         { id: uid(), role: 'user', content: "Actually, that dining thing is outdated — I've been cooking more lately", timestamp: new Date(now.getTime() - 240000) },
         {
           id: uid(), role: 'ai', content: "**Memory Updated**\n\nI've adjusted that memory to reflect your shift toward cooking at home.\n\n**What Changed**\n• **Before:** \"Dining out is a focus area for spending reduction\"\n• **After:** Updated to reflect your active cooking-at-home habit\n\n**Why This Matters**\nThis shift is already showing results — your dining spend is down 21% over the last 3 months, which translates to roughly $1,500/year in savings. That's real money flowing toward your emergency fund.",
@@ -192,7 +178,6 @@ function buildScenarios(): Scenario[] {
       memories: [
         ...SHARED_MEMORIES,
         { id: 'mem-mi-1', category: 'ABOUT_ME', content: 'Has 401k at Vanguard with $45,000 balance', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
-        { id: 'mem-mi-2', category: 'ABOUT_ME', content: 'Annual income is $130,000', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
         { id: 'mem-manual-1', category: 'PRIORITIES', content: 'Saving for a home down payment by 2028', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(3), updatedAt: daysAgo(3) },
       ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
@@ -275,30 +260,6 @@ function buildScenarios(): Scenario[] {
       }],
     },
     {
-      id: 'weekly-recap',
-      title: 'Weekly Financial Recap',
-      subtitle: 'Proactive weekly summary with recommendations',
-      icon: 'calendar-check',
-      notReady: true,
-      messages: [
-        {
-          id: uid(), role: 'system', content: 'Your weekly financial summary is ready', timestamp: new Date(now.getTime() - 120000), isProactive: true,
-        },
-        {
-          id: uid(), role: 'ai', content: "**Your Week in Review**\n\n**Spending Summary**\nYou spent **$892** this week — down 8% from last week ($970) and 5% below your 4-week average ($938).\n\n• **Groceries:** $165 — on budget, consistent with your meal-planning habit\n• **Dining:** $95 — your best week this month (avg was $121). The cooking-at-home shift is paying off\n• **Transportation:** $52 — stable, right at your weekly norm\n• **Shopping:** $580 — one-time monitor purchase (excluded, your baseline spend was $312)\n\n**Goals Update**\n• **Emergency Fund:** $8,400 of $12,000 (70%) — on track, 2 weeks ahead of schedule\n• **Credit Card:** $2,940 of $4,200 (70%) — needs attention, last payment was $40 below target\n\n**Something Worth Looking At**\nI spotted a $14.99/month streaming subscription you haven't used in 6 weeks. Canceling it would free up $180/year — that's nearly half a month's emergency fund contribution, just from one unused service.\n\n**This Week's Win**\nYour baseline spending (excluding the monitor) was $312 — well below your typical $380. That's $68 saved in a single week through small, consistent choices.\n\nWant me to dig into any of these?",
-          timestamp: new Date(now.getTime() - 60000),
-          safetyTier: 'informational',
-          chips: [
-            { type: 'goal-progress', label: 'Emergency Fund on track' },
-            { type: 'goal-risk', label: 'Credit Card needs attention' },
-          ],
-          suggestions: ['Cancel that subscription', 'Show me all my subscriptions', 'Tell me more about the credit card'],
-        },
-      ],
-      memories: [...SHARED_MEMORIES],
-      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
-    },
-    {
       id: 'cross-product',
       title: 'Cross-Product Orchestration',
       subtitle: "Multi-product coordination — SoFi's unique advantage",
@@ -366,6 +327,6 @@ export const SCENARIOS = buildScenarios();
 
 export const SCENARIO_ORDER = [
   'cold-start', 'returning-member', 'memory-lifecycle',
-  'goal-discovery', 'proactive-risk', 'milestone-celebration', 'weekly-recap',
+  'goal-discovery', 'proactive-risk', 'milestone-celebration',
   'cross-product', 'tiered-safety',
 ];
