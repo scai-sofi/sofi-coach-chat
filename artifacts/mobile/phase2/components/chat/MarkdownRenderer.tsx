@@ -10,21 +10,51 @@ type ContentBlock =
   | { type: 'divider' };
 
 function normalizeLine(raw: string): string {
-  let s = raw.replace(/\u200B/g, '').replace(/\t/g, '  ');
-  s = s.replace(/^\s*---+\s*$/, '---');
-  return s.trim();
+  let line = raw.trim();
+
+  line = line.replace(/\*{3}(.+?)\*{3}/g, '**$1**');
+  line = line.replace(/_{3}(.+?)_{3}/g, '**$1**');
+  line = line.replace(/_{2}(.+?)_{2}/g, '**$1**');
+
+  line = line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+  line = line.replace(/`([^`]+)`/g, '$1');
+
+  return line;
 }
 
-function classifyLine(effective: string): { isHeader: boolean; isList: boolean; isRule: boolean; displayText: string } {
-  if (/^---+$/.test(effective)) return { isHeader: false, isList: false, isRule: true, displayText: '' };
+function classifyLine(line: string): { isHeader: boolean; isList: boolean; isRule: boolean; displayText: string } {
+  const hashMatch = line.match(/^#{1,6}\s+(.*)/);
+  if (hashMatch) {
+    const content = hashMatch[1].trim();
+    return { isHeader: true, isList: false, isRule: false, displayText: `**${content.replace(/^\*\*|\*\*$/g, '')}**` };
+  }
 
-  const isHeader = /^#{1,6}\s/.test(effective) || /^\*\*[^*]+\*\*[:\s]*$/.test(effective);
+  const blockquoteMatch = line.match(/^>\s?(.*)/);
+  const effective = blockquoteMatch ? blockquoteMatch[1] : line;
+
+  const isRule = /^[-*_]{3,}\s*$/.test(effective);
+  if (isRule) return { isHeader: false, isList: false, isRule: true, displayText: effective };
+
+  const isNumbered = /^\d+\.\s/.test(effective);
+  const isStandaloneBold = /^\*\*[^*]+\*\*[:\s]*$/.test(effective);
+
+  const isBullet = effective.startsWith('•') || effective.startsWith('- ') || effective === '-' || /^\*\s+/.test(effective);
+
+  let promotedHeader = false;
+  if (!isStandaloneBold && isBullet) {
+    const stripped = effective.replace(/^[•\-\*]\s*/, '');
+    if (/^\*\*[^*]+\*\*[:\s]*$/.test(stripped)) {
+      promotedHeader = true;
+    }
+  }
+
+  const isHeader = isStandaloneBold || promotedHeader;
+  const isList = !isHeader && (isBullet || isNumbered);
+
   let displayText = effective;
-  if (isHeader) displayText = effective.replace(/^#{1,6}\s+/, '');
-
-  const isList = /^[•\-\*]\s/.test(displayText) || /^\d+\.\s/.test(displayText);
-  if (isList) {
-    displayText = displayText.replace(/^[•\-\*]\s*/, '');
+  if (promotedHeader) {
+    displayText = effective.replace(/^[•\-\*]\s*/, '');
   }
   if (isList && /^\*\s+/.test(displayText)) {
     displayText = '• ' + displayText.replace(/^\*\s+/, '');
