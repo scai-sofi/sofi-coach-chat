@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ComponentProps } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
@@ -8,25 +7,9 @@ import { useCoach } from '../context/CoachContext';
 import { usePhase2Nav } from '../context/Phase2NavContext';
 import { MemoryMode } from '../constants/types';
 import { AppBar } from '../components/AppBar';
+import { RadioSelected, RadioUnselected } from '../components/SettingsPanel';
 
-function RadioSelected({ size = 24 }: { size?: number }) {
-  const { colors } = useTheme();
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={9.5} stroke={colors.contentPrimary} strokeWidth={1} />
-      <Circle cx={12} cy={12} r={6} fill={colors.contentPrimary} />
-    </Svg>
-  );
-}
-
-function RadioUnselected({ size = 24 }: { size?: number }) {
-  const { colors } = useTheme();
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={9.5} stroke={colors.contentSecondary} strokeWidth={1} />
-    </Svg>
-  );
-}
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
 const MODES: { value: MemoryMode; label: string; description: string }[] = [
   { value: 'full', label: 'Full chat memory', description: 'Coach automatically remembers details from your conversations to use in chat.' },
@@ -34,7 +17,7 @@ const MODES: { value: MemoryMode; label: string; description: string }[] = [
   { value: 'off', label: 'Chat memory off', description: 'Coach won\u2019t save or use any chat memories. Goals are still tracked.' },
 ];
 
-const APP_SETTINGS = [
+const APP_SETTINGS: { icon: FeatherIconName; label: string }[] = [
   { icon: 'bell', label: 'Notifications' },
   { icon: 'lock', label: 'Privacy' },
   { icon: 'sun', label: 'App appearance' },
@@ -121,7 +104,7 @@ export default function PreferencesScreen() {
                 ]}
               >
                 <View style={styles.settingLeft}>
-                  <Feather name={item.icon as any} size={20} color={colors.contentSecondary} />
+                  <Feather name={item.icon} size={20} color={colors.contentSecondary} />
                   <Text style={[styles.settingLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
                 </View>
                 <Feather name="chevron-right" size={18} color={colors.contentSecondary} />

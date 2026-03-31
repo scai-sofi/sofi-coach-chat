@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -8,10 +8,12 @@ import { usePhase2Nav } from '../context/Phase2NavContext';
 import { getMember360Profile } from '../constants/member360';
 import { AppBar } from '../components/AppBar';
 
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
+
 const profile360 = getMember360Profile();
 
 interface DetailRowProps {
-  icon: string;
+  icon: FeatherIconName;
   label: string;
   value: string;
   provenance: string;
@@ -22,7 +24,7 @@ function DetailRow({ icon, label, value, provenance }: DetailRowProps) {
   return (
     <View style={detailStyles.row}>
       <View style={detailStyles.iconWrap}>
-        <Feather name={icon as any} size={18} color={colors.contentSecondary} />
+        <Feather name={icon} size={18} color={colors.contentSecondary} />
       </View>
       <View style={detailStyles.textArea}>
         <Text style={[detailStyles.label, { color: colors.contentSecondary }]}>{label}</Text>

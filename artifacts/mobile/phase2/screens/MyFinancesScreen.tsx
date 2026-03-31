@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { View, Text, ScrollView, StyleSheet, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
 import { useCoach } from '../context/CoachContext';
@@ -22,7 +24,7 @@ function sourceLabel(source: string): string {
   return 'You added';
 }
 
-const MOCK_ACCOUNTS = [
+const MOCK_ACCOUNTS: { title: string; subtitle: string; balance: string; icon: FeatherIconName }[] = [
   { title: 'Banking', subtitle: '0 transactions', balance: '$27,282.12', icon: 'credit-card' },
   { title: 'Invest', subtitle: 'Start trading for $1', balance: '$45,120.50', icon: 'trending-up' },
   { title: 'Credit Card', subtitle: 'Current balance', balance: '$1,282.12', icon: 'credit-card' },
@@ -94,7 +96,7 @@ export default function MyFinancesScreen() {
               <View style={styles.accountTop}>
                 <View style={styles.accountLeft}>
                   <View style={[styles.accountIconWrap, { backgroundColor: colors.surfaceTint }]}>
-                    <Feather name={acct.icon as any} size={16} color={colors.contentSecondary} />
+                    <Feather name={acct.icon} size={16} color={colors.contentSecondary} />
                   </View>
                   <View>
                     <Text style={[styles.accountTitle, { color: colors.contentPrimary }]}>{acct.title}</Text>

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, ComponentProps } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { Feather } from '@expo/vector-icons';
 import { Fonts } from '../constants/fonts';
 import { usePhase2Nav, Phase2Screen } from '../context/Phase2NavContext';
 
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 320);
 
@@ -28,7 +30,7 @@ const TIMING_CONFIG = {
 };
 
 interface MenuItem {
-  icon: string;
+  icon: FeatherIconName;
   label: string;
   screen?: Phase2Screen;
   onPress?: () => void;
@@ -120,7 +122,7 @@ export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
               onPress={() => handleMenuPress(item)}
             >
               <Feather
-                name={item.icon as any}
+                name={item.icon}
                 size={22}
                 color="#1a1919"
                 style={styles.menuIcon}
@@ -143,7 +145,7 @@ export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
               onPress={() => handleMenuPress(item)}
             >
               <Feather
-                name={item.icon as any}
+                name={item.icon}
                 size={22}
                 color="#1a1919"
                 style={styles.menuIcon}

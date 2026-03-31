@@ -10,7 +10,7 @@ import { useCoach } from '../context/CoachContext';
 import { Goal, GOAL_TYPE_LABELS } from '../constants/types';
 import { AppBar } from './AppBar';
 
-function ProgressRing({ percentage, status, size = 72 }: { percentage: number; status: string; size?: number }) {
+export function ProgressRing({ percentage, status, size = 72 }: { percentage: number; status: string; size?: number }) {
   const { colors } = useTheme();
   const strokeWidth = 4;
   const r = (size - strokeWidth) / 2 - 2;
@@ -40,7 +40,7 @@ function ProgressRing({ percentage, status, size = 72 }: { percentage: number; s
   );
 }
 
-function GoalCard({ goal }: { goal: Goal }) {
+export function GoalCard({ goal, onAskPress }: { goal: Goal; onAskPress?: () => void }) {
   const { colors } = useTheme();
   const { setActivePanel } = useCoach();
   const percentage = (goal.currentAmount / goal.targetAmount) * 100;
@@ -122,7 +122,7 @@ function GoalCard({ goal }: { goal: Goal }) {
       </View>
 
       {!isCompleted && (
-        <Pressable style={[styles.askBtn, { borderColor: colors.surfaceEdge }]} onPress={() => setActivePanel('none')}>
+        <Pressable style={[styles.askBtn, { borderColor: colors.surfaceEdge }]} onPress={onAskPress ?? (() => setActivePanel('none'))}>
           <Feather name="message-square" size={13} color={colors.contentPrimary} />
           <Text style={[styles.askBtnText, { color: colors.contentPrimary }]}>Ask about this goal</Text>
         </Pressable>
@@ -131,7 +131,7 @@ function GoalCard({ goal }: { goal: Goal }) {
   );
 }
 
-function SuggestedGoalCard({ goal }: { goal: Goal }) {
+export function SuggestedGoalCard({ goal }: { goal: Goal }) {
   const { colors } = useTheme();
   const { acceptDraftGoal, dismissDraftGoal } = useCoach();
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));

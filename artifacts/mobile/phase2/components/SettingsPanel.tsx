@@ -8,7 +8,7 @@ import { useCoach } from '../context/CoachContext';
 import { MemoryMode } from '../constants/types';
 import { AppBar } from './AppBar';
 
-function RadioSelected({ size = 24 }: { size?: number }) {
+export function RadioSelected({ size = 24 }: { size?: number }) {
   const { colors } = useTheme();
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -18,7 +18,7 @@ function RadioSelected({ size = 24 }: { size?: number }) {
   );
 }
 
-function RadioUnselected({ size = 24 }: { size?: number }) {
+export function RadioUnselected({ size = 24 }: { size?: number }) {
   const { colors } = useTheme();
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
