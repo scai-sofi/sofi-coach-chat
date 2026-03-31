@@ -61,6 +61,15 @@ The system is designed to defensively handle varied AI output while guiding the 
 - **Chat Screen (`app/chat.tsx`):** Coach Chat — presented as a modal (slide-from-bottom). Accessible via the "Ask Coach" pill on Home. ChevronDown icon in header dismisses back to Home. `beforeRemove` listener resets `activePanel` on gesture dismiss.
 - **Route Config (`app/_layout.tsx`):** Stack with `index` (Home) and `chat` (modal presentation, vertical gesture enabled).
 
+### Prototype Phase System (Task #27)
+Three strictly separated layers for Phase 1 / Phase 2 prototyping:
+
+- **Phase 1 (untouched):** `app/`, `components/`, `context/`, `constants/` — the original expo-router-based codebase. Zero changes.
+- **Phase 2 (full clone):** `phase2/` — complete file clone of Phase 1 with all `@/` imports rewritten to relative paths within `phase2/`. Uses its own `Phase2NavContext` instead of expo-router. `Phase2Root.tsx` is the entry point, wrapping its own providers (Theme, Coach, Toast, Phase2Nav). Screens are plain React components, not expo-router routes.
+- **Prototype control layer:** `prototype/PrototypeContext.tsx` (phase state + toggle) and `prototype/PhaseSwitcherFab.tsx` (draggable FAB with Pan+Tap gesture). Mounted at root layout level above both phases. FAB shows "P1" (dark) or "P2" (teal) and is draggable to any position. Tap toggles between phases.
+
+The `_layout.tsx` conditionally renders Phase 1 (expo-router Stack) or Phase 2 (Phase2Root) based on `protoPhase` from PrototypeContext. Phase 2 `PanelType` includes `'profile'` for future use.
+
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
 - **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory, SettingsPanel) managed via a `PanelType` enum.
