@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { Fonts } from '../constants/fonts';
+import { usePhase2Nav, Phase2Screen } from '../context/Phase2NavContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 320);
@@ -29,6 +30,7 @@ const TIMING_CONFIG = {
 interface MenuItem {
   icon: string;
   label: string;
+  screen?: Phase2Screen;
   onPress?: () => void;
 }
 
@@ -39,10 +41,10 @@ interface ProfileDrawerProps {
 
 const MENU_ITEMS: MenuItem[] = [
   { icon: 'award', label: 'Membership & rewards' },
-  { icon: 'user', label: 'About me' },
-  { icon: 'dollar-sign', label: 'My finances' },
-  { icon: 'target', label: 'Goals' },
-  { icon: 'sliders', label: 'Preferences' },
+  { icon: 'user', label: 'About me', screen: 'about-me' },
+  { icon: 'dollar-sign', label: 'My finances', screen: 'my-finances' },
+  { icon: 'target', label: 'Goals', screen: 'goals-profile' },
+  { icon: 'sliders', label: 'Preferences', screen: 'preferences' },
   { icon: 'file-text', label: 'Documents' },
   { icon: 'gift', label: 'Referral' },
 ];
@@ -55,6 +57,16 @@ const BOTTOM_ITEMS: MenuItem[] = [
 export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
   const insets = useSafeAreaInsets();
   const progress = useSharedValue(0);
+  const { navigate } = usePhase2Nav();
+
+  const handleMenuPress = useCallback((item: MenuItem) => {
+    if (item.screen) {
+      onClose();
+      navigate(item.screen);
+    } else if (item.onPress) {
+      item.onPress();
+    }
+  }, [onClose, navigate]);
 
   useEffect(() => {
     progress.value = withTiming(visible ? 1 : 0, TIMING_CONFIG);
@@ -105,7 +117,7 @@ export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
                 styles.menuItem,
                 pressed && styles.menuItemPressed,
               ]}
-              onPress={item.onPress}
+              onPress={() => handleMenuPress(item)}
             >
               <Feather
                 name={item.icon as any}
@@ -128,7 +140,7 @@ export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
                 styles.menuItem,
                 pressed && styles.menuItemPressed,
               ]}
-              onPress={item.onPress}
+              onPress={() => handleMenuPress(item)}
             >
               <Feather
                 name={item.icon as any}

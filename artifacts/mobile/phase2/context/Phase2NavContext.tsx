@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type Phase2Screen = 'home' | 'chat';
+export type Phase2Screen = 'home' | 'chat' | 'about-me' | 'my-finances' | 'goals-profile' | 'preferences';
 
 interface Phase2NavContextType {
   screen: Phase2Screen;
