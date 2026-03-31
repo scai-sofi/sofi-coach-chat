@@ -70,6 +70,8 @@ Three strictly separated layers for Phase 1 / Phase 2 prototyping:
 
 The `_layout.tsx` conditionally renders Phase 1 (expo-router Stack) or Phase 2 (Phase2Root) based on `protoPhase` from PrototypeContext. Phase 2 `PanelType` includes `'profile'` for future use.
 
+**Phase 2 Profile Drawer:** `phase2/components/ProfileDrawer.tsx` — slides in from the left when the user taps the profile icon on the Phase 2 home screen. Matches the Figma design (node 427-35241): avatar placeholder, name/member-since, menu items (Membership & rewards, About me, My finances, Goals, Preferences, Documents, Referral), and bottom section (Settings, Log Out). Animated with reanimated `withTiming` slide + scrim fade. Closes on scrim tap or X button.
+
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
 - **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory, SettingsPanel) managed via a `PanelType` enum.

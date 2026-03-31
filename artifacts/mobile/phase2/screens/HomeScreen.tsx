@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePhase2Nav } from '../context/Phase2NavContext';
+import { ProfileDrawer } from '../components/ProfileDrawer';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Fonts } from '../constants/fonts';
@@ -68,6 +69,7 @@ const HEADER_ROW_HEIGHT = 44;
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { navigate } = usePhase2Nav();
+  const [profileOpen, setProfileOpen] = useState(false);
   const headerHeight = insets.top + HEADER_ROW_HEIGHT;
 
   return (
@@ -77,9 +79,9 @@ export default function HomeScreen() {
       <View style={[styles.fixedHeader, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
-            <View style={styles.headerIconBtn}>
+            <Pressable style={styles.headerIconBtn} onPress={() => setProfileOpen(true)} hitSlop={12}>
               <ProfileIconSvg width={24} height={24} />
-            </View>
+            </Pressable>
             <LinearGradient
               colors={['#151035', '#201749', '#330072']}
               locations={[0, 0.316, 0.632]}
@@ -271,6 +273,8 @@ export default function HomeScreen() {
           <TabItem icon={<TabLoansSvg width={20} height={20} />} label="Loans" />
         </View>
       </View>
+
+      <ProfileDrawer visible={profileOpen} onClose={() => setProfileOpen(false)} />
     </View>
   );
 }
