@@ -15,7 +15,7 @@ const PrototypeContext = createContext<PrototypeContextType>({
 });
 
 export function PrototypeProvider({ children }: { children: React.ReactNode }) {
-  const [protoPhase, setProtoPhase] = useState<ProtoPhase>('phase2');
+  const [protoPhase, setProtoPhase] = useState<ProtoPhase>('phase1');
 
   const togglePhase = useCallback(() => {
     setProtoPhase(prev => prev === 'phase1' ? 'phase2' : 'phase1');
