@@ -7,7 +7,15 @@ import type { AppTheme } from '../../constants/theme';
 import { Fonts } from '../../constants/fonts';
 import { MessageChip } from '../../constants/types';
 import { useCoach } from '../../context/CoachContext';
+import { usePhase2Nav } from '../../context/Phase2NavContext';
 import { useToast } from '../Toast';
+import type { MemoryCategory } from '../../constants/types';
+
+const CATEGORY_TO_SCREEN: Record<MemoryCategory, 'about-me' | 'preferences'> = {
+  ABOUT_ME: 'about-me',
+  PREFERENCES: 'preferences',
+  PRIORITIES: 'about-me',
+};
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 export type IconName = FeatherIconName | 'brain';
@@ -47,7 +55,8 @@ export function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate
   const { colors } = useTheme();
   const chipStyles = getChipStyles(colors);
   const style = chipStyles[chip.type] || chipStyles['memory-saved'];
-  const { memories, navigateToMemory } = useCoach();
+  const { memories } = useCoach();
+  const { navigate } = usePhase2Nav();
   const { showToast } = useToast();
 
   const fadeAnim = useRef(new RNAnimated.Value(animate ? 0 : 1)).current;
@@ -67,11 +76,12 @@ export function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate
   const handlePress = () => {
     if (!hasMemoryIds) return;
     const ids = chip.memoryIds!;
-    const anyAlive = memories.some(m => ids.includes(m.id) && m.status !== 'DELETED');
-    if (anyAlive) {
-      navigateToMemory(ids);
+    const mem = memories.find(m => ids.includes(m.id) && m.status !== 'DELETED');
+    if (mem) {
+      const screen = CATEGORY_TO_SCREEN[mem.category] || 'about-me';
+      navigate(screen);
     } else {
-      showToast({ message: 'This chat memory has been deleted.' });
+      showToast({ message: 'This profile item has been deleted.' });
     }
   };
 

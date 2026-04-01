@@ -5,8 +5,16 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { Fonts } from '../../constants/fonts';
 import { useCoach } from '../../context/CoachContext';
+import { usePhase2Nav } from '../../context/Phase2NavContext';
 import { useToast } from '../Toast';
 import { AppIcon, IconName } from './ChipBadge';
+import type { MemoryCategory } from '../../constants/types';
+
+const CATEGORY_TO_SCREEN: Record<MemoryCategory, 'about-me' | 'preferences'> = {
+  ABOUT_ME: 'about-me',
+  PREFERENCES: 'preferences',
+  PRIORITIES: 'about-me',
+};
 
 export function MorphingProposalCard({
   isExiting,
@@ -22,7 +30,8 @@ export function MorphingProposalCard({
   children: React.ReactNode;
 }) {
   const { colors } = useTheme();
-  const { memories, navigateToMemory } = useCoach();
+  const { memories } = useCoach();
+  const { navigate } = usePhase2Nav();
   const { showToast } = useToast();
 
   const collapse = useRef(new RNAnimated.Value(0)).current;
@@ -77,11 +86,12 @@ export function MorphingProposalCard({
 
   const handleChipPress = () => {
     if (!memoryIds || memoryIds.length === 0) return;
-    const anyAlive = memories.some(m => memoryIds.includes(m.id) && m.status !== 'DELETED');
-    if (anyAlive) {
-      navigateToMemory(memoryIds);
+    const mem = memories.find(m => memoryIds.includes(m.id) && m.status !== 'DELETED');
+    if (mem) {
+      const screen = CATEGORY_TO_SCREEN[mem.category] || 'about-me';
+      navigate(screen);
     } else {
-      showToast({ message: 'This chat memory has been deleted.' });
+      showToast({ message: 'This profile item has been deleted.' });
     }
   };
 

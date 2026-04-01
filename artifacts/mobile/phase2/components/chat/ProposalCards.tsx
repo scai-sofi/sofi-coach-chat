@@ -3,10 +3,16 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { Fonts } from '../../constants/fonts';
-import { Message } from '../../constants/types';
+import { Message, MemoryCategory } from '../../constants/types';
 import { useCoach } from '../../context/CoachContext';
 import { BrainIcon } from './ChipBadge';
 import { MorphingProposalCard } from './MorphingProposalCard';
+
+const CATEGORY_TAB_LABEL: Record<MemoryCategory, string> = {
+  ABOUT_ME: 'About Me',
+  PREFERENCES: 'Preferences',
+  PRIORITIES: 'Priorities',
+};
 
 export function MemoryProposalCard({ message }: { message: Message }) {
   const { confirmMemory, dismissMemoryProposal } = useCoach();
@@ -17,13 +23,14 @@ export function MemoryProposalCard({ message }: { message: Message }) {
   const isConfirmed = proposal.confirmed === true;
   const isDismissed = proposal.dismissed === true;
   const isExiting = isConfirmed || isDismissed;
-  const exitLabel = isConfirmed ? 'Saved to chat memory' : 'Skipped';
+  const tabLabel = CATEGORY_TAB_LABEL[proposal.category] || 'About Me';
+  const exitLabel = isConfirmed ? `Saved to ${tabLabel}` : 'Skipped';
 
   return (
     <MorphingProposalCard
       isExiting={isExiting}
       confirmedLabel={exitLabel}
-      finalIcon="brain"
+      finalIcon="user"
       memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
     >
       <View style={styles.proposalHeader}>

@@ -171,7 +171,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
                 const wasPaused = memory.status === 'PAUSED';
                 pauseMemory(memory.id);
                 showToast({
-                  message: wasPaused ? 'Chat memory resumed.' : 'Chat memory paused.',
+                  message: wasPaused ? 'Profile item resumed.' : 'Profile item paused.',
                   action: { label: 'Undo', onPress: () => pauseMemory(memory.id) },
                 });
               }}>
@@ -184,7 +184,7 @@ function MemoryCard({ memory, onEditStart, highlighted }: { memory: Memory; onEd
               <Pressable style={styles.memActionBtn} onPress={() => {
                 deleteMemory(memory.id);
                 showToast({
-                  message: 'Chat memory deleted.',
+                  message: 'Profile item deleted.',
                   action: { label: 'Undo', onPress: () => restoreMemory(memory.id) },
                 });
               }}>
@@ -250,7 +250,7 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
     if (trimmed.length > 0 && trimmed.length <= ADD_MAX_CHARS) {
       const category = classifyCategory(trimmed);
       addMemory(trimmed, category);
-      showToast({ message: 'Chat memory added.' });
+      showToast({ message: 'Profile item added.' });
       setShowAddForm(false);
       setAddText('');
     }
@@ -317,7 +317,7 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
     <ReAnimated.View style={[styles.panel, { backgroundColor: colors.surfaceBase }, slideStyle]}>
       <AppBar
         variant="back"
-        title="Chat memory"
+        title="Profile"
         onBack={handleClose}
         rightActions={memoryMode !== 'off' ? [
           {
@@ -346,7 +346,7 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
                 onPress: () => {
                   pauseAllMemories();
                   setShowMoreMenu(false);
-                  showToast({ message: allPaused ? 'All chat memories resumed.' : 'All chat memories paused.' });
+                  showToast({ message: allPaused ? 'All profile items resumed.' : 'All profile items paused.' });
                 },
               },
               {
@@ -369,9 +369,9 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
       {showDeleteConfirm && (
         <View style={[styles.confirmOverlay, { backgroundColor: colors.scrimHeavy }]}>
           <View style={[styles.confirmCard, { backgroundColor: colors.surfaceElevated }]}>
-            <Text style={[styles.confirmTitle, { color: colors.contentPrimary }]}>Delete all chat memories?</Text>
+            <Text style={[styles.confirmTitle, { color: colors.contentPrimary }]}>Delete all profile items?</Text>
             <Text style={[styles.confirmDesc, { color: colors.contentSecondary }]}>
-              {`This can't be undone. ${memories.filter(m => m.status !== 'DELETED').length} chat ${memories.filter(m => m.status !== 'DELETED').length === 1 ? 'memory' : 'memories'} will be permanently deleted.`}
+              {`This can't be undone. ${memories.filter(m => m.status !== 'DELETED').length} profile ${memories.filter(m => m.status !== 'DELETED').length === 1 ? 'item' : 'items'} will be permanently deleted.`}
             </Text>
             <View style={styles.confirmActions}>
               <Pressable style={[styles.confirmCancelBtn, { borderColor: colors.borderMedium }]} onPress={() => setShowDeleteConfirm(false)}>
@@ -380,7 +380,7 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
               <Pressable style={[styles.confirmDeleteBtn, { backgroundColor: colors.danger }]} onPress={() => {
                 deleteAllMemories();
                 setShowDeleteConfirm(false);
-                showToast({ message: 'All chat memories deleted.' });
+                showToast({ message: 'All profile items deleted.' });
               }}>
                 <Text style={[styles.confirmDeleteText, { color: colors.whiteOnDark }]}>Delete all</Text>
               </Pressable>
@@ -463,15 +463,15 @@ export function MemoryCenter({ onClose }: { onClose: () => void }) {
 
           {memoryMode === 'off' ? (
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.contentPrimary }]}>Chat memory is off</Text>
+              <Text style={[styles.emptyTitle, { color: colors.contentPrimary }]}>Profile learning is off</Text>
               <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
-                The coach won't save or use chat memories while chat memory is turned off. You can change this in Settings.
+                The coach won't save or use profile information while learning is turned off. You can change this in Settings.
               </Text>
             </View>
           ) : visibleMemories.length === 0 ? (
             <View style={styles.empty}>
               <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
-                {search || filterCat ? 'No chat memories match your search' : 'No chat memories yet. The coach will start learning as you chat.'}
+                {search || filterCat ? 'No profile items match your search' : 'No profile items yet. The coach will start learning as you chat.'}
               </Text>
               {(search || filterCat) && (
                 <Pressable onPress={() => { setSearch(''); setFilterCat(null); }}>
