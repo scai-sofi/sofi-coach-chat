@@ -37,8 +37,8 @@ export function AppIcon({ name, size = 12, color = '#000', style }: { name: Icon
 
 export function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string; icon: IconName }> {
   return {
-    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'brain' },
-    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'brain' },
+    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'user' },
+    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'user' },
     'conflict-resolved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'user' },
     'goal-created': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-progress': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },

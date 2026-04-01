@@ -5,7 +5,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { Fonts } from '../../constants/fonts';
 import { Message, MemoryCategory } from '../../constants/types';
 import { useCoach } from '../../context/CoachContext';
-import { BrainIcon } from './ChipBadge';
 import { MorphingProposalCard } from './MorphingProposalCard';
 
 const CATEGORY_TAB_LABEL: Record<MemoryCategory, string> = {
@@ -34,14 +33,14 @@ export function MemoryProposalCard({ message }: { message: Message }) {
       memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
     >
       <View style={styles.proposalHeader}>
-        <View style={styles.proposalIcon}><BrainIcon size={12} color={colors.contentPrimary} /></View>
+        <Feather name="user" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
-          Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
+          Save to {tabLabel}: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
       </View>
       <View style={styles.proposalButtonsIndented}>
         <Pressable style={[styles.confirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => confirmMemory(message.id)} disabled={isExiting}>
-          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Remember</Text>
+          <Text style={[styles.confirmBtnText, { color: colors.contentPrimaryInverse }]}>Save</Text>
         </Pressable>
         <Pressable style={[styles.dismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissMemoryProposal(message.id)} disabled={isExiting}>
           <Text style={[styles.dismissBtnText, { color: colors.contentSecondary }]}>Not now</Text>
