@@ -143,7 +143,7 @@ function buildScenarios(): Scenario[] {
       id: 'memory-lifecycle',
       title: 'Memory System',
       subtitle: 'Auto-save, proposals, corrections, and deletion',
-      icon: 'bookmark',
+      icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
         {

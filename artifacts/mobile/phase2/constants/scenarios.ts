@@ -147,7 +147,7 @@ function buildScenarios(): Scenario[] {
       id: 'memory-lifecycle',
       title: 'Knowledge Management',
       subtitle: 'Source labels, Profile tabs, and per-category control',
-      icon: 'bookmark',
+      icon: 'brain',
       messages: [
         { id: uid(), role: 'user', content: "I have a 401k at Vanguard with about $45,000 in it", timestamp: new Date(now.getTime() - 420000) },
         {
