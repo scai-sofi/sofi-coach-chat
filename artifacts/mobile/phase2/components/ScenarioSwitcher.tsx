@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,17 +14,7 @@ import { AppBar } from './AppBar';
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
 function BrainIcon({ size = 14, color = '#000' }: { size?: number; color?: string }) {
-  const sw = 1.5;
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M11 4C9.5 3.5 7.5 4.2 6.5 6C5.5 8 5.2 10.2 5.5 12.2C5.8 14.2 6.8 15.8 8.2 17C9.2 17.8 10.2 18 11.2 17.5" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M13 4C14.5 3.5 16.5 4.2 17.5 6C18.5 8 18.8 10.2 18.5 12.2C18.2 14.2 17.2 15.8 15.8 17C14.8 17.8 13.8 18 12.8 17.5" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M6.2 8.5Q8.5 10.2 11 8.5" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M6 12.5Q8.5 14 11 12.5" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M17.8 8.5Q15.5 10.2 13 8.5" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M18 12.5Q15.5 14 13 12.5" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
+  return <MaterialCommunityIcons name="brain" size={size} color={color} />;
 }
 
 const BRAIN_ICON_KEY = 'brain';
