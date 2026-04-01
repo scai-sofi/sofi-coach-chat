@@ -16,12 +16,12 @@ type FeatherIconName = ComponentProps<typeof Feather>['name'];
 function BrainIcon({ size = 14, color = '#000' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M12 2C9.5 2 7.5 3.5 7 5.5C5.5 5.8 4 7.5 4 9.5C4 11.5 5 13 6.5 13.5C6.2 14.5 6.5 16 8 17C9 17.7 10 18 11 18L11 22" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M12 2C14.5 2 16.5 3.5 17 5.5C18.5 5.8 20 7.5 20 9.5C20 11.5 19 13 17.5 13.5C17.8 14.5 17.5 16 16 17C15 17.7 14 18 13 18L13 22" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M7.5 10C8.5 10 10 9 10 7.5" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M16.5 10C15.5 10 14 9 14 7.5" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M8 14.5C9.5 14 10.5 12.5 10.5 11" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M16 14.5C14.5 14 13.5 12.5 13.5 11" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M11.2 5C10 4.2 8 4.5 6.8 6C5.6 7.5 5 9.5 5.2 11.5C5.4 13.5 6.2 15 7.5 16.2C8.8 17.4 10 17.8 11.2 17.5" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M12.8 5C14 4.2 16 4.5 17.2 6C18.4 7.5 19 9.5 18.8 11.5C18.6 13.5 17.8 15 16.5 16.2C15.2 17.4 14 17.8 12.8 17.5" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M6.5 8.5C7.5 9.5 9 10 11 9" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M6 12.5C7 13.5 9 14 11 13" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M17.5 8.5C16.5 9.5 15 10 13 9" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M18 12.5C17 13.5 15 14 13 13" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }
