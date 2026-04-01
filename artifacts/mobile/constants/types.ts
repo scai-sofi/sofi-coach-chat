@@ -1,7 +1,7 @@
 export type MemoryCategory = 'ABOUT_ME' | 'PREFERENCES' | 'PRIORITIES';
 export type MemorySource = 'EXPLICIT' | 'IMPLICIT_CONFIRMED' | 'MEMBER_360';
 export type MemoryStatus = 'ACTIVE' | 'PAUSED' | 'DELETED';
-export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CUSTOM';
+export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'INVESTMENT' | 'CUSTOM';
 export type GoalStatus = 'DRAFT' | 'ACTIVE' | 'ON_TRACK' | 'AT_RISK' | 'PAUSED' | 'COMPLETED';
 export type ChipType = 'memory-saved' | 'goal-progress' | 'goal-risk' | 'memory-updated' | 'memory-deleted' | 'milestone' | 'alert' | 'handoff' | 'conflict-resolved' | 'goal-created';
 export type MemoryMode = 'full' | 'ask-first' | 'off';
@@ -154,5 +154,30 @@ export const GOAL_TYPE_LABELS: Record<GoalType, string> = {
   EMERGENCY_FUND: 'Save Up',
   DEBT_PAYOFF: 'Pay Down',
   SAVINGS_TARGET: 'Save Up',
+  INVESTMENT: 'Investment',
   CUSTOM: 'Custom',
+};
+
+export type GoalTabCategory = 'save-up' | 'pay-down' | 'investment';
+
+export const GOAL_TAB_MAP: Record<GoalType, GoalTabCategory> = {
+  EMERGENCY_FUND: 'save-up',
+  SAVINGS_TARGET: 'save-up',
+  CUSTOM: 'save-up',
+  DEBT_PAYOFF: 'pay-down',
+  INVESTMENT: 'investment',
+};
+
+export const GOAL_TAB_LABELS: Record<GoalTabCategory, string> = {
+  'save-up': 'Save up',
+  'pay-down': 'Pay down',
+  'investment': 'Investment',
+};
+
+export const GOAL_TAB_ORDER: GoalTabCategory[] = ['save-up', 'pay-down', 'investment'];
+
+export const GOAL_TAB_SUBTITLE: Record<GoalTabCategory, string> = {
+  'save-up': 'Saved up for',
+  'pay-down': 'Paid down on',
+  'investment': 'Invested in',
 };

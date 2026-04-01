@@ -1,131 +1,159 @@
-import React, { ComponentProps } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-
-type FeatherIconName = ComponentProps<typeof Feather>['name'];
-import Svg, { Circle, Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
 import { useCoach } from '../context/CoachContext';
-import { Goal, GOAL_TYPE_LABELS } from '../constants/types';
+import { Goal, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '../constants/types';
 import { AppBar } from './AppBar';
 
-export function ProgressRing({ percentage, status, size = 72 }: { percentage: number; status: string; size?: number }) {
+function GoalProgressBar({ percentage }: { percentage: number }) {
   const { colors } = useTheme();
-  const strokeWidth = 4;
-  const r = (size - strokeWidth) / 2 - 2;
-  const cx = size / 2;
-  const cy = size / 2;
-  const circumference = 2 * Math.PI * r;
-  const strokeDashoffset = circumference * (1 - Math.min(percentage / 100, 1));
-
-  let strokeColor = colors.contentPrimary;
-  if (status === 'AT_RISK') strokeColor = colors.dangerLight;
-  else if (status === 'COMPLETED') strokeColor = colors.success;
+  const clampedPct = Math.min(Math.max(percentage, 0), 100);
 
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
-        <Circle cx={cx} cy={cy} r={r} stroke={colors.progressTrack} strokeWidth={strokeWidth} fill="none" />
-        <Circle
-          cx={cx} cy={cy} r={r}
-          stroke={strokeColor} strokeWidth={strokeWidth} fill="none"
-          strokeLinecap="round"
-          strokeDasharray={`${circumference}`}
-          strokeDashoffset={strokeDashoffset}
-        />
-      </Svg>
-      <Text style={[styles.ringText, { color: strokeColor }]}>{Math.round(percentage)}%</Text>
+    <View style={[styles.progressTrack, { backgroundColor: colors.progressTrack }]}>
+      <View
+        style={[
+          styles.progressFill,
+          { backgroundColor: colors.contentPrimary, width: `${clampedPct}%` },
+        ]}
+      />
     </View>
   );
 }
 
-export function GoalCard({ goal, onAskPress }: { goal: Goal; onAskPress?: () => void }) {
+function SegmentedTabs({
+  tabs,
+  activeTab,
+  onTabChange,
+}: {
+  tabs: { key: GoalTabCategory; label: string; count: number }[];
+  activeTab: GoalTabCategory;
+  onTabChange: (tab: GoalTabCategory) => void;
+}) {
   const { colors } = useTheme();
-  const { setActivePanel } = useCoach();
-  const percentage = (goal.currentAmount / goal.targetAmount) * 100;
-  const isCompleted = goal.status === 'COMPLETED';
-
-  const statusIcon: FeatherIconName = isCompleted ? 'check-circle' : goal.status === 'AT_RISK' ? 'alert-triangle' : 'trending-up';
-  const statusColor = isCompleted ? colors.successDark : goal.status === 'AT_RISK' ? colors.dangerLight : colors.contentPrimary;
-  const statusText = isCompleted ? 'Goal reached!' : goal.status === 'AT_RISK' ? 'At risk' : goal.status === 'ON_TRACK' ? 'On track' : 'Active';
-
-  const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
 
   return (
-    <View style={[styles.goalCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }, isCompleted && { backgroundColor: colors.successBgLight }]}>
-      <View style={styles.goalTop}>
-        <ProgressRing percentage={percentage} status={goal.status} />
-        <View style={styles.goalInfo}>
-          <View style={styles.goalTitleRow}>
-            <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{goal.title}</Text>
-            <View style={[styles.typeBadge, { backgroundColor: colors.surfaceTint }, isCompleted && { backgroundColor: colors.successBg }]}>
-              <Text style={[styles.typeBadgeText, { color: colors.contentSecondary }, isCompleted && { color: colors.successDark }]}>
-                {isCompleted ? 'Done' : GOAL_TYPE_LABELS[goal.type]}
-              </Text>
-            </View>
+    <View style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack, borderColor: colors.progressTrack }]}>
+      {tabs.map((tab) => {
+        const isActive = tab.key === activeTab;
+        return (
+          <Pressable
+            key={tab.key}
+            style={[
+              styles.segmentedTab,
+              isActive && [styles.segmentedTabActive, { backgroundColor: colors.surfaceElevated }],
+            ]}
+            onPress={() => onTabChange(tab.key)}
+          >
+            <Text
+              style={[
+                styles.segmentedTabText,
+                { color: colors.contentSecondary },
+                isActive && { color: colors.contentPrimary },
+              ]}
+              numberOfLines={1}
+            >
+              {tab.label} {'\u2022'} {tab.count}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+export function GoalCard({ goal, onAskPress, onEditPress }: { goal: Goal; onAskPress?: () => void; onEditPress?: () => void }) {
+  const { colors } = useTheme();
+  const percentage = Math.round((goal.currentAmount / goal.targetAmount) * 100);
+  const isCompleted = goal.status === 'COMPLETED';
+  const tabCategory = GOAL_TAB_MAP[goal.type];
+  const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
+
+  const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
+  const estDate = goal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  return (
+    <View style={[styles.goalCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}>
+      <View style={styles.goalHeader}>
+        <View style={styles.goalHeaderText}>
+          <View style={styles.percentageRow}>
+            <Text style={[styles.percentageNumber, { color: colors.contentPrimary }]}>{percentage}</Text>
+            <Text style={[styles.percentageSign, { color: colors.contentPrimary }]}>%</Text>
           </View>
-          <Text style={[styles.goalAmount, { color: colors.contentSecondary }]}>
-            ${goal.currentAmount.toLocaleString()} of ${goal.targetAmount.toLocaleString()}
+          <Text style={[styles.goalSubtitle, { color: colors.contentSecondary }]}>{subtitle}</Text>
+        </View>
+      </View>
+
+      <View style={styles.meterSection}>
+        <GoalProgressBar percentage={percentage} />
+        <View style={styles.meterLabels}>
+          <Text style={[styles.meterLabel, { color: colors.contentPrimary }]}>
+            ${goal.currentAmount.toLocaleString()} saved
           </Text>
-          <View style={styles.statusRow}>
-            <Feather name={statusIcon} size={12} color={statusColor} />
-            <Text style={[styles.statusText, { color: statusColor }]}>{statusText}</Text>
-            {!isCompleted && (
-              <Text style={[styles.confidenceText, { color: colors.contentSecondary }]}> · {Math.round(goal.confidenceScore * 100)}% confidence</Text>
-            )}
-          </View>
+          <Text style={[styles.meterLabel, styles.meterLabelRight, { color: colors.contentPrimary }]}>
+            ${goal.targetAmount.toLocaleString()} target
+          </Text>
         </View>
-      </View>
-
-      <View style={styles.detailRows}>
-        {isCompleted ? (
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Final amount</Text>
-            <Text style={[styles.detailValue, { color: colors.successDark }]}>${goal.currentAmount.toLocaleString()}</Text>
-          </View>
-        ) : (
-          <>
-            <View style={styles.detailRow}>
-              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Monthly target</Text>
-              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>${goal.monthlyContributionTarget}/mo</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Est. completion</Text>
-              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{monthsRemaining <= 1 ? 'This month' : `~${monthsRemaining} months`}</Text>
-            </View>
-          </>
-        )}
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Linked account</Text>
-          <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{goal.linkedAccount}</Text>
-        </View>
-      </View>
-
-      <View style={styles.milestones}>
-        {goal.milestones.map(m => (
-          <View key={m.id} style={[
-            styles.milestone,
-            { backgroundColor: colors.surfaceTint },
-            m.reached && !isCompleted && { backgroundColor: colors.contentPrimary },
-            m.reached && isCompleted && { backgroundColor: colors.successBg },
-          ]}>
-            {m.reached && <Feather name="check-circle" size={10} color={isCompleted ? colors.successDark : colors.contentPrimaryInverse} />}
-            <Text style={[
-              styles.milestoneText,
-              { color: colors.contentSecondary },
-              m.reached && !isCompleted && { color: colors.contentPrimaryInverse },
-              m.reached && isCompleted && { color: colors.successDark },
-            ]}>{m.label}</Text>
-          </View>
-        ))}
       </View>
 
       {!isCompleted && (
-        <Pressable style={[styles.askBtn, { borderColor: colors.surfaceEdge }]} onPress={onAskPress ?? (() => setActivePanel('none'))}>
-          <Feather name="message-square" size={13} color={colors.contentPrimary} />
-          <Text style={[styles.askBtnText, { color: colors.contentPrimary }]}>Ask about this goal</Text>
-        </Pressable>
+        <>
+          <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
+
+          <View style={styles.detailRows}>
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Est. completion</Text>
+              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>
+                ~ {monthsRemaining} months {'\u2022'} {estDate}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Recurring contribution</Text>
+              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>
+                ${goal.monthlyContributionTarget}/mo
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Linked account</Text>
+              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{goal.linkedAccount}</Text>
+            </View>
+          </View>
+
+          <View style={styles.actionButtons}>
+            <Pressable
+              style={[styles.editButton, { borderColor: colors.borderMedium }]}
+              onPress={onEditPress}
+            >
+              <Text style={[styles.editButtonText, { color: colors.contentPrimary }]}>Edit</Text>
+            </Pressable>
+            <Pressable
+              style={styles.askCoachButton}
+              onPress={onAskPress}
+            >
+              <Text style={styles.askCoachButtonText}>Ask Coach</Text>
+            </Pressable>
+          </View>
+        </>
+      )}
+
+      {isCompleted && (
+        <>
+          <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
+          <View style={styles.detailRows}>
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Final amount</Text>
+              <Text style={[styles.detailValue, { color: colors.successDark }]}>
+                ${goal.currentAmount.toLocaleString()}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Linked account</Text>
+              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{goal.linkedAccount}</Text>
+            </View>
+          </View>
+        </>
       )}
     </View>
   );
@@ -134,6 +162,8 @@ export function GoalCard({ goal, onAskPress }: { goal: Goal; onAskPress?: () => 
 export function SuggestedGoalCard({ goal }: { goal: Goal }) {
   const { colors } = useTheme();
   const { acceptDraftGoal, dismissDraftGoal } = useCoach();
+  const tabCategory = GOAL_TAB_MAP[goal.type];
+  const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
 
   return (
@@ -143,29 +173,23 @@ export function SuggestedGoalCard({ goal }: { goal: Goal }) {
           <Text style={[styles.suggestedBadgeText, { color: colors.contentBrand }]}>Suggested</Text>
         </View>
       </View>
-      <View style={styles.goalTop}>
-        <View style={styles.goalInfo}>
-          <View style={styles.goalTitleRow}>
-            <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{goal.title}</Text>
-            <View style={[styles.typeBadge, { backgroundColor: colors.surfaceTint }]}>
-              <Text style={[styles.typeBadgeText, { color: colors.contentSecondary }]}>{GOAL_TYPE_LABELS[goal.type]}</Text>
-            </View>
-          </View>
-          <Text style={[styles.goalAmount, { color: colors.contentSecondary }]}>
-            ${goal.targetAmount.toLocaleString()} · ${goal.monthlyContributionTarget}/mo · ~{monthsRemaining} months
-          </Text>
-          <Text style={[styles.goalAmount, { color: colors.contentSecondary, marginTop: 2 }]}>
-            Linked: {goal.linkedAccount}
-          </Text>
-        </View>
+
+      <View style={styles.goalHeaderText}>
+        <Text style={[styles.goalSubtitle, { color: colors.contentPrimary }]}>{subtitle}</Text>
+        <Text style={[styles.suggestedMeta, { color: colors.contentSecondary }]}>
+          ${goal.targetAmount.toLocaleString()} {'\u2022'} ${goal.monthlyContributionTarget}/mo {'\u2022'} ~{monthsRemaining} months
+        </Text>
+        <Text style={[styles.suggestedMeta, { color: colors.contentSecondary }]}>
+          Linked: {goal.linkedAccount}
+        </Text>
       </View>
 
-      <View style={styles.suggestedButtons}>
-        <Pressable style={[styles.suggestedConfirmBtn, { backgroundColor: colors.contentPrimary }]} onPress={() => acceptDraftGoal(goal.id)}>
-          <Text style={[styles.suggestedConfirmText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
+      <View style={styles.actionButtons}>
+        <Pressable style={[styles.editButton, { borderColor: colors.surfaceEdge }]} onPress={() => dismissDraftGoal(goal.id)}>
+          <Text style={[styles.editButtonText, { color: colors.contentSecondary }]}>Dismiss</Text>
         </Pressable>
-        <Pressable style={[styles.suggestedDismissBtn, { borderColor: colors.surfaceEdge }]} onPress={() => dismissDraftGoal(goal.id)}>
-          <Text style={[styles.suggestedDismissText, { color: colors.contentSecondary }]}>Dismiss</Text>
+        <Pressable style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]} onPress={() => acceptDraftGoal(goal.id)}>
+          <Text style={[styles.setupButtonText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
         </Pressable>
       </View>
     </View>
@@ -175,16 +199,29 @@ export function SuggestedGoalCard({ goal }: { goal: Goal }) {
 export function GoalsDashboard() {
   const { colors } = useTheme();
   const { goals, setActivePanel } = useCoach();
+  const [activeTab, setActiveTab] = useState<GoalTabCategory>('save-up');
 
+  const allGoals = goals.filter(g => g.status !== 'DRAFT');
   const draftGoals = goals.filter(g => g.status === 'DRAFT');
-  const activeGoals = goals.filter(g => !['COMPLETED', 'PAUSED', 'DRAFT'].includes(g.status));
-  const completedGoals = goals.filter(g => g.status === 'COMPLETED');
 
-  const hasAny = draftGoals.length > 0 || activeGoals.length > 0 || completedGoals.length > 0;
+  const tabCounts: Record<GoalTabCategory, number> = { 'save-up': 0, 'pay-down': 0, 'investment': 0 };
+  goals.forEach(g => { tabCounts[GOAL_TAB_MAP[g.type]]++; });
+
+  const tabs = GOAL_TAB_ORDER.map(key => ({
+    key,
+    label: GOAL_TAB_LABELS[key],
+    count: tabCounts[key],
+  }));
+
+  const filteredGoals = allGoals.filter(g => GOAL_TAB_MAP[g.type] === activeTab);
+  const activeGoals = filteredGoals.filter(g => g.status !== 'COMPLETED');
+  const completedGoals = filteredGoals.filter(g => g.status === 'COMPLETED');
+
+  const hasAny = allGoals.length > 0 || draftGoals.length > 0;
 
   return (
     <View style={[styles.panel, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="My goals" onBack={() => setActivePanel('none')} />
+      <AppBar variant="back" title="Goals" onBack={() => setActivePanel('none')} />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {!hasAny ? (
@@ -196,40 +233,43 @@ export function GoalsDashboard() {
           </View>
         ) : (
           <>
-            {draftGoals.length > 0 && (
+            <SegmentedTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {draftGoals.length > 0 && draftGoals.some(g => GOAL_TAB_MAP[g.type] === activeTab) && (
               <>
                 <View style={styles.sectionHeader}>
                   <Feather name="star" size={13} color={colors.contentBrand} />
                   <Text style={[styles.sectionHeaderText, { color: colors.contentBrand }]}>Suggested</Text>
                 </View>
-                {draftGoals.map(g => <SuggestedGoalCard key={g.id} goal={g} />)}
-                {activeGoals.length > 0 && (
-                  <View style={styles.divider}>
-                    <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
-                    <Text style={[styles.dividerText, { color: colors.contentSecondary }]}>ACTIVE</Text>
-                    <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
-                  </View>
-                )}
+                {draftGoals
+                  .filter(g => GOAL_TAB_MAP[g.type] === activeTab)
+                  .map(g => <SuggestedGoalCard key={g.id} goal={g} />)}
               </>
             )}
-            {activeGoals.map(g => <GoalCard key={g.id} goal={g} />)}
-            {(activeGoals.length > 0 || draftGoals.length > 0) && completedGoals.length > 0 && (
-              <View style={styles.divider}>
-                <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
-                <Text style={[styles.dividerText, { color: colors.contentSecondary }]}>COMPLETED</Text>
-                <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
+
+            {activeGoals.map(g => (
+              <GoalCard key={g.id} goal={g} onAskPress={() => setActivePanel('none')} />
+            ))}
+
+            {activeGoals.length > 0 && completedGoals.length > 0 && (
+              <View style={styles.sectionDivider}>
+                <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
+                <Text style={[styles.sectionDividerText, { color: colors.contentSecondary }]}>COMPLETED</Text>
+                <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
               </View>
             )}
             {completedGoals.map(g => <GoalCard key={g.id} goal={g} />)}
+
+            {filteredGoals.length === 0 && draftGoals.filter(g => GOAL_TAB_MAP[g.type] === activeTab).length === 0 && (
+              <View style={styles.emptyTab}>
+                <Text style={[styles.emptyTabText, { color: colors.contentSecondary }]}>
+                  No {GOAL_TAB_LABELS[activeTab].toLowerCase()} goals yet
+                </Text>
+              </View>
+            )}
           </>
         )}
       </ScrollView>
-
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.contentSecondary }]}>
-          {activeGoals.length} active{draftGoals.length > 0 ? ` · ${draftGoals.length} suggested` : ''}{completedGoals.length > 0 ? ` · ${completedGoals.length} completed` : ''} · Auto-updated from your accounts
-        </Text>
-      </View>
     </View>
   );
 }
@@ -243,110 +283,246 @@ const styles = StyleSheet.create({
   contentInner: {
     paddingHorizontal: 16,
     paddingBottom: 20,
-    gap: 12,
+    gap: 16,
+  },
+  segmentedContainer: {
+    flexDirection: 'row',
+    borderRadius: 24,
+    borderWidth: 2,
+    height: 40,
+    alignItems: 'center',
+    padding: 0,
+  },
+  segmentedTab: {
+    flex: 1,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 24,
+  },
+  segmentedTabActive: {
+    shadowColor: 'rgba(0,0,0,0.06)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  segmentedTabText: {
+    fontSize: 12,
+    fontFamily: Fonts.medium,
+    letterSpacing: 0.1,
+    textAlign: 'center',
   },
   goalCard: {
     borderRadius: 20,
-    padding: 16,
-    gap: 12,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+    gap: 16,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
-  goalTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  ringText: {
-    position: 'absolute', fontSize: 14, fontFamily: Fonts.medium,
+  goalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  goalInfo: { flex: 1, minWidth: 0 },
-  goalTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  goalTitle: { fontSize: 15, fontFamily: Fonts.medium, lineHeight: 20 },
-  typeBadge: {
-    paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4,
+  goalHeaderText: {
+    flex: 1,
+    gap: 0,
   },
-  typeBadgeText: {
-    fontSize: 10, fontFamily: Fonts.medium,
-    textTransform: 'uppercase',
+  percentageRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
-  goalAmount: { fontSize: 14, fontFamily: Fonts.regular, marginTop: 2 },
-  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  statusText: { fontSize: 12, fontFamily: Fonts.medium },
-  confidenceText: { fontSize: 12, fontFamily: Fonts.regular, marginLeft: 4 },
-  detailRows: { gap: 6 },
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  detailLabel: { fontSize: 12, fontFamily: Fonts.regular },
-  detailValue: { fontSize: 12, fontFamily: Fonts.medium },
-  milestones: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  milestone: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999,
+  percentageNumber: {
+    fontSize: 28,
+    fontFamily: Fonts.medium,
+    lineHeight: 32,
+    letterSpacing: -0.8,
   },
-  milestoneText: { fontSize: 11, fontFamily: Fonts.medium },
-  askBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    paddingVertical: 8, borderRadius: 9999,
-    borderWidth: 0.75,
+  percentageSign: {
+    fontSize: 18,
+    fontFamily: Fonts.medium,
+    lineHeight: 26,
+    letterSpacing: -0.2,
+    marginBottom: 0,
   },
-  askBtnText: { fontSize: 14, fontFamily: Fonts.medium },
-  sectionHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 4,
+  goalSubtitle: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
   },
-  sectionHeaderText: {
-    fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20,
+  meterSection: {
+    gap: 8,
+    paddingBottom: 8,
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: 32,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 20,
+  },
+  meterLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  meterLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
+  },
+  meterLabelRight: {
+    textAlign: 'right',
+  },
+  dividerLine: {
+    height: 1,
+    width: '100%',
+  },
+  detailRows: {
+    gap: 8,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
+  },
+  detailValue: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  editButton: {
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  editButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+  },
+  askCoachButton: {
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: '#edf8fc',
+    borderWidth: 1.5,
+    borderColor: '#5aeaff',
+  },
+  askCoachButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+    color: '#00a2c7',
+  },
+  setupButton: {
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+  },
+  setupButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
   },
   suggestedCard: {
     borderRadius: 20,
-    padding: 16,
+    paddingTop: 16,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
     gap: 12,
-    borderWidth: 0.75,
+    borderWidth: 1,
     borderStyle: 'dashed',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
   },
   suggestedLabelRow: {
-    flexDirection: 'row', alignItems: 'center',
-  },
-  suggestedBadge: {
-    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4,
-  },
-  suggestedBadgeText: {
-    fontSize: 10, fontFamily: Fonts.medium,
-    textTransform: 'uppercase', letterSpacing: 0.6,
-  },
-  suggestedButtons: {
-    flexDirection: 'row', gap: 8,
-  },
-  suggestedConfirmBtn: {
-    borderRadius: 9999,
-    paddingHorizontal: 12, paddingVertical: 6,
-  },
-  suggestedConfirmText: {
-    fontSize: 12, fontFamily: Fonts.medium,
-  },
-  suggestedDismissBtn: {
-    borderWidth: 0.75, borderRadius: 9999,
-    paddingHorizontal: 12, paddingVertical: 6,
-  },
-  suggestedDismissText: {
-    fontSize: 12, fontFamily: Fonts.medium,
-  },
-  divider: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8,
-  },
-  dividerLine: { flex: 1, height: 1 },
-  dividerText: {
-    fontSize: 11, fontFamily: Fonts.medium,
-    textTransform: 'uppercase', letterSpacing: 1,
-  },
-  empty: {
-    alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12,
-  },
-  emptyText: { fontSize: 14, fontFamily: Fonts.regular, textAlign: 'center', maxWidth: 260 },
-  footer: {
-    paddingHorizontal: 16, paddingVertical: 16,
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  footerText: { fontSize: 12, fontFamily: Fonts.regular },
+  suggestedBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  suggestedBadgeText: {
+    fontSize: 10,
+    fontFamily: Fonts.medium,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  suggestedMeta: {
+    fontSize: 13,
+    fontFamily: Fonts.regular,
+    lineHeight: 18,
+    marginTop: 2,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  sectionHeaderText: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
+  },
+  sectionDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  sectionDividerLine: { flex: 1, height: 1 },
+  sectionDividerText: {
+    fontSize: 11,
+    fontFamily: Fonts.medium,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  empty: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+    gap: 12,
+  },
+  emptyText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    textAlign: 'center',
+    maxWidth: 260,
+  },
+  emptyTab: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 32,
+  },
+  emptyTabText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    textAlign: 'center',
+  },
 });
