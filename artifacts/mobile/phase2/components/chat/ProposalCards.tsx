@@ -5,7 +5,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { Fonts } from '../../constants/fonts';
 import { Message } from '../../constants/types';
 import { useCoach } from '../../context/CoachContext';
-import { BrainIcon } from './ChipBadge';
 import { MorphingProposalCard } from './MorphingProposalCard';
 
 export function MemoryProposalCard({ message }: { message: Message }) {
@@ -23,11 +22,11 @@ export function MemoryProposalCard({ message }: { message: Message }) {
     <MorphingProposalCard
       isExiting={isExiting}
       confirmedLabel={exitLabel}
-      finalIcon="brain"
+      finalIcon="bookmark"
       memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
     >
       <View style={styles.proposalHeader}>
-        <View style={styles.proposalIcon}><BrainIcon size={12} color={colors.contentPrimary} /></View>
+        <View style={styles.proposalIcon}><Feather name="bookmark" size={12} color={colors.contentPrimary} /></View>
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>

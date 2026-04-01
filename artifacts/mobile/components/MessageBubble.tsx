@@ -12,28 +12,16 @@ import { useToast } from '@/components/Toast';
 import { FlipIcon } from '@/components/icons';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
-type IconName = FeatherIconName | 'brain';
-
-function BrainIcon({ size = 12, color = '#000', strokeWidth = 2 }: { size?: number; color?: string; strokeWidth?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M12 18v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
+type IconName = FeatherIconName;
 
 function AppIcon({ name, size = 12, color = '#000', style }: { name: IconName; size?: number; color?: string; style?: any }) {
-  if (name === 'brain') return <BrainIcon size={size} color={color} strokeWidth={2} />;
   return <Feather name={name} size={size} color={color} style={style} />;
 }
 
 function getChipStyles(c: AppTheme): Record<string, { bg: string; color: string; icon: IconName }> {
   return {
-    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'brain' },
-    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'brain' },
+    'memory-saved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'bookmark' },
+    'memory-updated': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'bookmark' },
     'conflict-resolved': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'user' },
     'goal-created': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
     'goal-progress': { bg: c.surfaceTint, color: c.contentPrimary, icon: 'target' },
@@ -542,11 +530,11 @@ function MemoryProposalCard({ message }: { message: Message }) {
     <MorphingProposalCard
       isExiting={isExiting}
       confirmedLabel={exitLabel}
-      finalIcon="brain"
+      finalIcon="bookmark"
       memoryIds={proposal.confirmedMemoryId ? [proposal.confirmedMemoryId] : undefined}
     >
       <View style={styles.proposalHeader}>
-        <View style={styles.proposalIcon}><BrainIcon size={12} color={colors.contentPrimary} /></View>
+        <View style={styles.proposalIcon}><Feather name="bookmark" size={12} color={colors.contentPrimary} /></View>
         <Text style={[styles.proposalText, { color: colors.contentPrimary }]}>
           Want me to remember: <Text style={styles.proposalQuote}>"{proposal.content}"</Text>?
         </Text>
@@ -666,7 +654,7 @@ function MemoryDeletionCard({ message }: { message: Message }) {
     <MorphingProposalCard
       isExiting={isExiting}
       confirmedLabel={exitLabel}
-      finalIcon="brain"
+      finalIcon="bookmark"
     >
       <View style={styles.proposalHeader}>
         <Feather name="trash-2" size={12} color={colors.contentPrimary} style={styles.proposalIcon} />
