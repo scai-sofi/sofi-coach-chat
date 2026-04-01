@@ -1076,15 +1076,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories(prev => prev.map(m => m.id === id ? { ...m, status: 'ACTIVE' } : m));
   }, []);
 
-  const navigateToMemory = useCallback((memoryIds: string[]) => {
-    const activeMemory = memoriesRef.current.find(
-      m => memoryIds.includes(m.id) && m.status !== 'DELETED'
-    );
-    if (activeMemory) {
-      setHighlightedMemoryId(activeMemory.id);
-      setActivePanelState('memory');
-      setTimeout(() => setHighlightedMemoryId(null), 3000);
-    }
+  const navigateToMemory = useCallback((_memoryIds: string[]) => {
   }, []);
 
   const sessionTitleRef = useRef(sessionTitle);

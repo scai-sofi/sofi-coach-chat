@@ -21,7 +21,7 @@ import {
 
 export function ChatHeader() {
   const { colors } = useTheme();
-  const { goBack } = usePhase2Nav();
+  const { goBack, navigate } = usePhase2Nav();
   const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle, goals } = useCoach();
   const draftGoalCount = goals.filter(g => g.status === 'DRAFT').length;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -62,7 +62,7 @@ export function ChatHeader() {
     },
     {
       icon: <MemoryMenuIcon size={20} color={colors.contentPrimary} />,
-      onPress: () => { Keyboard.dismiss(); setActivePanel('memory'); },
+      onPress: () => { Keyboard.dismiss(); navigate('about-me'); },
     },
     {
       icon: <MoreIcon size={20} color={menuOpen ? colors.contentDimmed : colors.contentPrimary} />,

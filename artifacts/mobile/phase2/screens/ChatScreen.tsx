@@ -10,7 +10,7 @@ import { MessageBubble } from '../components/MessageBubble';
 import { TypingIndicator } from '../components/TypingIndicator';
 import { InputBar } from '../components/InputBar';
 import { EmptyChat, SuggestionCards } from '../components/EmptyChat';
-import { MemoryCenter } from '../components/MemoryCenter';
+
 import { GoalsDashboard } from '../components/GoalsDashboard';
 import { ScenarioSwitcher } from '../components/ScenarioSwitcher';
 import { ScenarioFab } from '../components/ScenarioFab';
@@ -188,7 +188,6 @@ export default function ChatScreen() {
 
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showMemory, setShowMemory] = useState(false);
 
   useEffect(() => {
     if (activePanel === 'history') {
@@ -196,9 +195,6 @@ export default function ChatScreen() {
     }
     if (activePanel === 'settings') {
       setShowSettings(true);
-    }
-    if (activePanel === 'memory') {
-      setShowMemory(true);
     }
   }, [activePanel]);
 
@@ -270,12 +266,6 @@ export default function ChatScreen() {
 
       {messages.length === 0 && activePanel === 'none' && <SuggestionCards bottomOffset={inputBarHeight} />}
 
-      {showMemory && (
-        <MemoryCenter onClose={() => {
-          setShowMemory(false);
-          setActivePanel('none');
-        }} />
-      )}
       {activePanel === 'goals' && <GoalsDashboard />}
 
       {showHistory && (

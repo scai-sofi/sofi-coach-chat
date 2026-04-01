@@ -5,7 +5,7 @@ export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'CU
 export type GoalStatus = 'DRAFT' | 'ACTIVE' | 'ON_TRACK' | 'AT_RISK' | 'PAUSED' | 'COMPLETED';
 export type ChipType = 'memory-saved' | 'goal-progress' | 'goal-risk' | 'memory-updated' | 'milestone' | 'alert' | 'handoff' | 'conflict-resolved' | 'goal-created';
 export type MemoryMode = 'full' | 'ask-first' | 'off';
-export type PanelType = 'none' | 'memory' | 'goals' | 'scenarios' | 'history' | 'settings' | 'profile';
+export type PanelType = 'none' | 'goals' | 'scenarios' | 'history' | 'settings' | 'profile';
 
 export interface MessageChip {
   type: ChipType;
