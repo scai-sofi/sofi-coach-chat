@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, ComponentProps } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated as RNAnimated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import type { AppTheme } from '../../constants/theme';
 import { Fonts } from '../../constants/fonts';
@@ -13,7 +13,13 @@ type FeatherIconName = ComponentProps<typeof Feather>['name'];
 export type IconName = FeatherIconName | 'brain';
 
 export function BrainIcon({ size = 12, color = '#000' }: { size?: number; color?: string }) {
-  return <MaterialCommunityIcons name="brain" size={size} color={color} />;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </Svg>
+  );
 }
 
 export function AppIcon({ name, size = 12, color = '#000', style }: { name: IconName; size?: number; color?: string; style?: any }) {
