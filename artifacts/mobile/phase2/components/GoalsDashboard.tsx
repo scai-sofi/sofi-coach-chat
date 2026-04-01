@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Image, ImageSourcePropType } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
 import { useCoach } from '../context/CoachContext';
-import { Goal, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '../constants/types';
+import { Goal, GoalType, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '../constants/types';
 import { AppBar } from './AppBar';
+
+const goalHouseImg = require('../../assets/images/goal-house.png');
+const goalPagodaImg = require('../../assets/images/goal-pagoda.png');
+
+const GOAL_ILLUSTRATIONS: Partial<Record<GoalType, ImageSourcePropType>> = {
+  EMERGENCY_FUND: goalHouseImg,
+  SAVINGS_TARGET: goalHouseImg,
+  DEBT_PAYOFF: goalPagodaImg,
+  INVESTMENT: goalPagodaImg,
+  CUSTOM: goalHouseImg,
+};
 
 function GoalProgressBar({ percentage }: { percentage: number }) {
   const { colors } = useTheme();
@@ -70,12 +81,16 @@ export function GoalCard({ goal, onAskPress, onEditPress }: { goal: Goal; onAskP
   const isCompleted = goal.status === 'COMPLETED';
   const tabCategory = GOAL_TAB_MAP[goal.type];
   const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
+  const illustration = GOAL_ILLUSTRATIONS[goal.type];
 
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
   const estDate = goal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   return (
     <View style={[styles.goalCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}>
+      {illustration && (
+        <Image source={illustration} style={styles.goalIllustration} />
+      )}
       <View style={styles.goalHeader}>
         <View style={styles.goalHeaderText}>
           <View style={styles.percentageRow}>
@@ -323,6 +338,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
+    overflow: 'hidden',
+  },
+  goalIllustration: {
+    position: 'absolute',
+    top: -4,
+    right: 0,
+    width: 94,
+    height: 94,
+    zIndex: 1,
   },
   goalHeader: {
     flexDirection: 'row',
