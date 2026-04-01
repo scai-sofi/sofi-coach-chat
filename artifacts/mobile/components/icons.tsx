@@ -110,11 +110,9 @@ export function ChatNewIcon({ size = 24, color = '#1a1919' }: { size?: number; c
 export function MemoryMenuIcon({ size = 24, color = '#1a1919' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M9.5 2A5.5 5.5 0 0 0 4 7.5C4 9.11 4.65 10.56 5.71 11.62A5.48 5.48 0 0 0 4 15.5C4 18.54 6.46 21 9.5 21H12V2H9.5Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
-      <Path d="M14.5 2A5.5 5.5 0 0 1 20 7.5C20 9.11 19.35 10.56 18.29 11.62A5.48 5.48 0 0 1 20 15.5C20 18.54 17.54 21 14.5 21H12V2H14.5Z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
-      <Path d="M8 10C9 10.5 10.5 11.5 12 13" stroke={color} strokeWidth={2} strokeLinecap="round" />
-      <Path d="M16 10C15 10.5 13.5 11.5 12 13" stroke={color} strokeWidth={2} strokeLinecap="round" />
-      <Path d="M12 13V22" stroke={color} strokeWidth={2} strokeLinecap="round" />
+      <Path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </Svg>
   );
 }
