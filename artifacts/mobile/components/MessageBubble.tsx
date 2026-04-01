@@ -515,7 +515,9 @@ function MorphingProposalCard({
     </RNAnimated.View>
   );
 
-  if (phase === 'done' && memoryIds && memoryIds.length > 0) {
+  const isTappable = (phase === 'done' || phase === 'check') && memoryIds && memoryIds.length > 0;
+
+  if (isTappable) {
     return (
       <Pressable onPress={handleChipPress}>
         {morphCard}
