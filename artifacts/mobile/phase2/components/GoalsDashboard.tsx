@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Image, ImageSourcePropType } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable, ScrollView, StyleSheet, Image, ImageSourcePropType, AccessibilityInfo, Platform, UIManager } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedReaction,
+  withSpring,
+  withTiming,
+  withDelay,
+  interpolate,
+  Easing,
+  runOnJS,
+  FadeInDown,
+  ReduceMotion,
+} from 'react-native-reanimated';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
 import { useCoach } from '../context/CoachContext';
 import { Goal, GoalType, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '../constants/types';
 import { AppBar } from './AppBar';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const goalHouseImg = require('../../assets/images/goal-house.png');
 const goalPagodaImg = require('../../assets/images/goal-pagoda.png');
@@ -18,20 +35,106 @@ const GOAL_ILLUSTRATIONS: Partial<Record<GoalType, ImageSourcePropType>> = {
   CUSTOM: goalHouseImg,
 };
 
-function GoalProgressBar({ percentage }: { percentage: number }) {
+const PROGRESS_SPRING = { damping: 28, stiffness: 60, mass: 1.2, reduceMotion: ReduceMotion.System };
+const ILLUSTRATION_SPRING = { damping: 14, stiffness: 100, mass: 0.8, reduceMotion: ReduceMotion.System };
+const TAB_SPRING = { damping: 22, stiffness: 200, mass: 0.8, reduceMotion: ReduceMotion.System };
+const BUTTON_SPRING_IN = { damping: 15, stiffness: 400, reduceMotion: ReduceMotion.System };
+const BUTTON_SPRING_OUT = { damping: 12, stiffness: 300, reduceMotion: ReduceMotion.System };
+
+function AnimatedProgressBar({ percentage, delay = 0 }: { percentage: number; delay?: number }) {
   const { colors } = useTheme();
-  const clampedPct = Math.min(Math.max(percentage, 0), 100);
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    const clampedPct = Math.min(Math.max(percentage, 0), 100);
+    progress.value = withDelay(delay, withSpring(clampedPct, PROGRESS_SPRING));
+  }, [percentage, delay]);
+
+  const fillStyle = useAnimatedStyle(() => ({
+    width: `${progress.value}%`,
+    backgroundColor: colors.contentPrimary,
+    height: '100%',
+    borderRadius: 20,
+  }));
 
   return (
     <View style={[styles.progressTrack, { backgroundColor: colors.progressTrack }]}>
-      <View
-        style={[
-          styles.progressFill,
-          { backgroundColor: colors.contentPrimary, width: `${clampedPct}%` },
-        ]}
-      />
+      <Animated.View style={fillStyle} />
     </View>
   );
+}
+
+function AnimatedPercentage({ value, delay = 0 }: { value: number; delay?: number }) {
+  const { colors } = useTheme();
+  const animatedValue = useSharedValue(0);
+  const [displayValue, setDisplayValue] = useState(0);
+
+  const updateDisplay = (v: number) => {
+    setDisplayValue(Math.round(v));
+  };
+
+  useEffect(() => {
+    animatedValue.value = withDelay(
+      delay,
+      withTiming(value, {
+        duration: 1200,
+        easing: Easing.out(Easing.cubic),
+        reduceMotion: ReduceMotion.System,
+      })
+    );
+  }, [value, delay]);
+
+  useAnimatedReaction(
+    () => animatedValue.value,
+    (current) => {
+      runOnJS(updateDisplay)(current);
+    }
+  );
+
+  return (
+    <View style={styles.percentageRow}>
+      <Text style={[styles.percentageNumber, { color: colors.contentPrimary }]}>{displayValue}</Text>
+      <Text style={[styles.percentageSign, { color: colors.contentPrimary }]}>%</Text>
+    </View>
+  );
+}
+
+function AnimatedTabIndicator({
+  tabIndex,
+  tabCount,
+  containerWidth,
+}: {
+  tabIndex: number;
+  tabCount: number;
+  containerWidth: number;
+}) {
+  const { colors } = useTheme();
+  const translateX = useSharedValue(0);
+  const tabWidth = containerWidth > 0 ? (containerWidth - 4) / tabCount : 0;
+
+  useEffect(() => {
+    translateX.value = withSpring(tabIndex * tabWidth, TAB_SPRING);
+  }, [tabIndex, tabWidth]);
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    width: tabWidth,
+    height: '100%',
+    position: 'absolute' as const,
+    left: 2,
+    top: 0,
+    borderRadius: 24,
+    backgroundColor: colors.surfaceElevated,
+    shadowColor: 'rgba(0,0,0,0.08)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
+    elevation: 2,
+  }));
+
+  if (containerWidth === 0) return null;
+
+  return <Animated.View style={indicatorStyle} />;
 }
 
 function SegmentedTabs({
@@ -44,30 +147,36 @@ function SegmentedTabs({
   onTabChange: (tab: GoalTabCategory) => void;
 }) {
   const { colors } = useTheme();
+  const [containerWidth, setContainerWidth] = useState(0);
+  const activeIndex = tabs.findIndex(t => t.key === activeTab);
 
   return (
-    <View style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack, borderColor: colors.progressTrack }]}>
+    <View
+      style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack }]}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+    >
+      <AnimatedTabIndicator
+        tabIndex={activeIndex}
+        tabCount={tabs.length}
+        containerWidth={containerWidth}
+      />
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
         return (
           <Pressable
             key={tab.key}
-            style={[
-              styles.segmentedTab,
-              isActive && [styles.segmentedTabActive, { backgroundColor: colors.surfaceElevated }],
-            ]}
+            style={styles.segmentedTab}
             onPress={() => onTabChange(tab.key)}
           >
-            <Text
+            <Animated.Text
               style={[
                 styles.segmentedTabText,
-                { color: colors.contentSecondary },
-                isActive && { color: colors.contentPrimary },
+                { color: isActive ? colors.contentPrimary : colors.contentSecondary },
               ]}
               numberOfLines={1}
             >
               {tab.label} {'\u2022'} {tab.count}
-            </Text>
+            </Animated.Text>
           </Pressable>
         );
       })}
@@ -75,7 +184,31 @@ function SegmentedTabs({
   );
 }
 
-export function GoalCard({ goal, onAskPress, onEditPress }: { goal: Goal; onAskPress?: () => void; onEditPress?: () => void }) {
+function AnimatedButton({ onPress, style, children }: { onPress?: () => void; style: any; children: React.ReactNode }) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.96, BUTTON_SPRING_IN);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, BUTTON_SPRING_OUT);
+  };
+
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} style={{ flex: 1 }}>
+      <Animated.View style={[style, animatedStyle]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+export function GoalCard({ goal, onAskPress, onEditPress, index = 0 }: { goal: Goal; onAskPress?: () => void; onEditPress?: () => void; index?: number }) {
   const { colors } = useTheme();
   const percentage = Math.round((goal.currentAmount / goal.targetAmount) * 100);
   const isCompleted = goal.status === 'COMPLETED';
@@ -86,23 +219,40 @@ export function GoalCard({ goal, onAskPress, onEditPress }: { goal: Goal; onAskP
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
   const estDate = goal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
+  const staggerDelay = index * 120;
+  const illustrationScale = useSharedValue(0);
+
+  useEffect(() => {
+    illustrationScale.value = withDelay(
+      staggerDelay + 300,
+      withSpring(1, ILLUSTRATION_SPRING)
+    );
+  }, []);
+
+  const illustrationStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: illustrationScale.value }],
+    opacity: interpolate(illustrationScale.value, [0, 0.5, 1], [0, 0.8, 1]),
+  }));
+
   return (
-    <View style={[styles.goalCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}>
+    <Animated.View
+      entering={FadeInDown.delay(staggerDelay).duration(500).springify().damping(18).stiffness(100).reduceMotion(ReduceMotion.System)}
+      style={[styles.goalCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
+    >
       {illustration && (
-        <Image source={illustration} style={styles.goalIllustration} />
+        <Animated.View style={[styles.goalIllustration, illustrationStyle]}>
+          <Image source={illustration} style={styles.goalIllustrationImage} />
+        </Animated.View>
       )}
       <View style={styles.goalHeader}>
         <View style={styles.goalHeaderText}>
-          <View style={styles.percentageRow}>
-            <Text style={[styles.percentageNumber, { color: colors.contentPrimary }]}>{percentage}</Text>
-            <Text style={[styles.percentageSign, { color: colors.contentPrimary }]}>%</Text>
-          </View>
+          <AnimatedPercentage value={percentage} delay={staggerDelay + 200} />
           <Text style={[styles.goalSubtitle, { color: colors.contentSecondary }]}>{subtitle}</Text>
         </View>
       </View>
 
       <View style={styles.meterSection}>
-        <GoalProgressBar percentage={percentage} />
+        <AnimatedProgressBar percentage={percentage} delay={staggerDelay + 400} />
         <View style={styles.meterLabels}>
           <Text style={[styles.meterLabel, { color: colors.contentPrimary }]}>
             ${goal.currentAmount.toLocaleString()} saved
@@ -137,18 +287,18 @@ export function GoalCard({ goal, onAskPress, onEditPress }: { goal: Goal; onAskP
           </View>
 
           <View style={styles.actionButtons}>
-            <Pressable
-              style={[styles.editButton, { borderColor: colors.borderMedium }]}
+            <AnimatedButton
               onPress={onEditPress}
+              style={[styles.editButton, { borderColor: colors.borderMedium }]}
             >
               <Text style={[styles.editButtonText, { color: colors.contentPrimary }]}>Edit</Text>
-            </Pressable>
-            <Pressable
-              style={styles.askCoachButton}
+            </AnimatedButton>
+            <AnimatedButton
               onPress={onAskPress}
+              style={styles.askCoachButton}
             >
               <Text style={styles.askCoachButtonText}>Ask Coach</Text>
-            </Pressable>
+            </AnimatedButton>
           </View>
         </>
       )}
@@ -170,19 +320,24 @@ export function GoalCard({ goal, onAskPress, onEditPress }: { goal: Goal; onAskP
           </View>
         </>
       )}
-    </View>
+    </Animated.View>
   );
 }
 
-export function SuggestedGoalCard({ goal }: { goal: Goal }) {
+export function SuggestedGoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
   const { colors } = useTheme();
   const { acceptDraftGoal, dismissDraftGoal } = useCoach();
   const tabCategory = GOAL_TAB_MAP[goal.type];
   const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
 
+  const staggerDelay = index * 120;
+
   return (
-    <View style={[styles.suggestedCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.contentBrand, shadowColor: colors.shadowColor }]}>
+    <Animated.View
+      entering={FadeInDown.delay(staggerDelay).duration(500).springify().damping(18).stiffness(100).reduceMotion(ReduceMotion.System)}
+      style={[styles.suggestedCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.contentBrand, shadowColor: colors.shadowColor }]}
+    >
       <View style={styles.suggestedLabelRow}>
         <View style={[styles.suggestedBadge, { backgroundColor: colors.surfaceTint }]}>
           <Text style={[styles.suggestedBadgeText, { color: colors.contentBrand }]}>Suggested</Text>
@@ -200,14 +355,14 @@ export function SuggestedGoalCard({ goal }: { goal: Goal }) {
       </View>
 
       <View style={styles.actionButtons}>
-        <Pressable style={[styles.editButton, { borderColor: colors.surfaceEdge }]} onPress={() => dismissDraftGoal(goal.id)}>
+        <AnimatedButton style={[styles.editButton, { borderColor: colors.surfaceEdge }]} onPress={() => dismissDraftGoal(goal.id)}>
           <Text style={[styles.editButtonText, { color: colors.contentSecondary }]}>Dismiss</Text>
-        </Pressable>
-        <Pressable style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]} onPress={() => acceptDraftGoal(goal.id)}>
+        </AnimatedButton>
+        <AnimatedButton style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]} onPress={() => acceptDraftGoal(goal.id)}>
           <Text style={[styles.setupButtonText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
-        </Pressable>
+        </AnimatedButton>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -258,12 +413,12 @@ export function GoalsDashboard() {
                 </View>
                 {draftGoals
                   .filter(g => GOAL_TAB_MAP[g.type] === activeTab)
-                  .map(g => <SuggestedGoalCard key={g.id} goal={g} />)}
+                  .map((g, i) => <SuggestedGoalCard key={g.id} goal={g} index={i} />)}
               </>
             )}
 
-            {activeGoals.map(g => (
-              <GoalCard key={g.id} goal={g} onAskPress={() => setActivePanel('none')} />
+            {activeGoals.map((g, i) => (
+              <GoalCard key={g.id} goal={g} index={i} onAskPress={() => setActivePanel('none')} />
             ))}
 
             {activeGoals.length > 0 && completedGoals.length > 0 && (
@@ -273,7 +428,7 @@ export function GoalsDashboard() {
                 <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
               </View>
             )}
-            {completedGoals.map(g => <GoalCard key={g.id} goal={g} />)}
+            {completedGoals.map((g, i) => <GoalCard key={g.id} goal={g} index={activeGoals.length + i} />)}
 
             {filteredGoals.length === 0 && draftGoals.filter(g => GOAL_TAB_MAP[g.type] === activeTab).length === 0 && (
               <View style={styles.emptyTab}>
@@ -303,10 +458,8 @@ const styles = StyleSheet.create({
   segmentedContainer: {
     flexDirection: 'row',
     borderRadius: 24,
-    borderWidth: 2,
     height: 40,
     alignItems: 'center',
-    padding: 0,
   },
   segmentedTab: {
     flex: 1,
@@ -314,13 +467,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 24,
-  },
-  segmentedTabActive: {
-    shadowColor: 'rgba(0,0,0,0.06)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    elevation: 1,
+    zIndex: 1,
   },
   segmentedTabText: {
     fontSize: 12,
@@ -347,6 +494,10 @@ const styles = StyleSheet.create({
     width: 94,
     height: 94,
     zIndex: 1,
+  },
+  goalIllustrationImage: {
+    width: 94,
+    height: 94,
   },
   goalHeader: {
     flexDirection: 'row',
@@ -387,10 +538,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     overflow: 'hidden',
     width: '100%',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 20,
   },
   meterLabels: {
     flexDirection: 'row',

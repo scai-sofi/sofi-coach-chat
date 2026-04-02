@@ -82,12 +82,12 @@ export default function GoalsProfileScreen() {
                 </View>
                 {draftGoals
                   .filter(g => GOAL_TAB_MAP[g.type] === activeTab)
-                  .map(g => <SuggestedGoalCard key={g.id} goal={g} />)}
+                  .map((g, i) => <SuggestedGoalCard key={g.id} goal={g} index={i} />)}
               </>
             )}
 
-            {activeGoals.map(g => (
-              <GoalCard key={g.id} goal={g} onAskPress={() => navigate('chat')} />
+            {activeGoals.map((g, i) => (
+              <GoalCard key={g.id} goal={g} index={i} onAskPress={() => navigate('chat')} />
             ))}
 
             {activeGoals.length > 0 && completedGoals.length > 0 && (
@@ -97,7 +97,7 @@ export default function GoalsProfileScreen() {
                 <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
               </View>
             )}
-            {completedGoals.map(g => <GoalCard key={g.id} goal={g} />)}
+            {completedGoals.map((g, i) => <GoalCard key={g.id} goal={g} index={activeGoals.length + i} />)}
 
             {filteredGoals.length === 0 && draftGoals.filter(g => GOAL_TAB_MAP[g.type] === activeTab).length === 0 && (
               <View style={styles.emptyTab}>
