@@ -4,7 +4,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
   runOnJS,
   interpolate,
   Extrapolation,
@@ -13,7 +12,8 @@ import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-g
 import { useTheme } from '@/context/ThemeContext';
 
 const DISMISS_THRESHOLD = 120;
-const SPRING_CONFIG = { damping: 28, stiffness: 220, mass: 0.6 };
+const EASE_IN_CONFIG = { duration: 300 };
+const EASE_SNAP_CONFIG = { duration: 220 };
 
 interface PacificBottomSheetProps {
   visible: boolean;
@@ -30,7 +30,7 @@ export function PacificBottomSheet({ visible, onClose, children }: PacificBottom
 
   useEffect(() => {
     if (visible) {
-      translateY.value = withSpring(0, SPRING_CONFIG);
+      translateY.value = withTiming(0, EASE_IN_CONFIG);
       scrimOpacity.value = withTiming(1, { duration: 300 });
     }
   }, [visible]);
@@ -61,7 +61,7 @@ export function PacificBottomSheet({ visible, onClose, children }: PacificBottom
       if (dragY.value > DISMISS_THRESHOLD || e.velocityY > 500) {
         runOnJS(dismiss)();
       } else {
-        translateY.value = withSpring(0, SPRING_CONFIG);
+        translateY.value = withTiming(0, EASE_SNAP_CONFIG);
         scrimOpacity.value = withTiming(1, { duration: 200 });
       }
     });
