@@ -8,6 +8,7 @@ import { Fonts } from '@/constants/fonts';
 import { useCoach } from '@/context/CoachContext';
 
 const FLOW_ICONS: Record<string, keyof typeof Feather.glyphMap> = {
+  'message-circle': 'message-circle',
   'sparkles': 'zap',
   'target': 'target',
   'layers': 'layers',
@@ -27,7 +28,7 @@ function hexToRgba(hex: string, alpha: number): string {
 
 export function FlowPickerSheet() {
   const { colors } = useTheme();
-  const { activePanel, activePersona, activeScenario, switchScenario, setActivePanel } = useCoach();
+  const { activePanel, activePersona, activeScenario, switchScenario, preparePersona, setActivePanel } = useCoach();
   const insets = useSafeAreaInsets();
   const [pressedId, setPressedId] = useState<string | null>(null);
 
@@ -37,7 +38,11 @@ export function FlowPickerSheet() {
   const accent = activePersona.accentColor;
 
   const handleFlowSelect = (scenarioId: string) => {
-    switchScenario(scenarioId, activePersona.id);
+    if (!scenarioId) {
+      preparePersona(activePersona.id);
+    } else {
+      switchScenario(scenarioId, activePersona.id);
+    }
     setActivePanel('none');
   };
 
@@ -72,7 +77,7 @@ export function FlowPickerSheet() {
               {activePersona.name}
             </Text>
             <Text style={[styles.headerSub, { color: colors.contentMuted ?? colors.contentSecondary }]}>
-              Choose a scenario
+              {activePersona.subtitle}
             </Text>
           </View>
         </View>
@@ -80,11 +85,11 @@ export function FlowPickerSheet() {
         <View style={[styles.divider, { backgroundColor: colors.strokeDivide ?? 'rgba(10,10,10,0.06)' }]} />
 
         {flows.map((flow, idx) => {
-          const isActive = activeScenario === flow.scenarioId;
+          const isActive = flow.scenarioId === '' ? !activeScenario : activeScenario === flow.scenarioId;
           const isPressed = pressedId === flow.scenarioId;
           return (
             <Pressable
-              key={flow.scenarioId}
+              key={flow.scenarioId || 'free-chat'}
               style={[
                 styles.flowRow,
                 isActive && { backgroundColor: hexToRgba(accent, 0.08) },

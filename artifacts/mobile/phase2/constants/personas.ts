@@ -9,9 +9,10 @@ export const PERSONAS: Persona[] = [
     age: 25,
     subtitle: 'New member, no history with Coach',
     flows: [
-      { scenarioId: 'cold-start', label: 'First visit', icon: 'sparkles', description: 'Brand new to Coach — cold-start onboarding' },
-      { scenarioId: 'goal-discovery', label: 'Setting a goal', icon: 'target', description: 'Guided goal creation with Coach suggestions' },
-      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Coach helps allocate a bonus across products' },
+      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
+      { scenarioId: 'cold-start', label: 'First-time onboarding', icon: 'sparkles', description: 'New member meets Coach for the first time' },
+      { scenarioId: 'goal-discovery', label: 'Goal creation', icon: 'target', description: 'Coach guides setting up a savings goal' },
+      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Splitting a $3K bonus across goals and products' },
     ],
     financialProfile: {
       greeting: 'Good morning, Maya',
@@ -35,9 +36,10 @@ export const PERSONAS: Persona[] = [
     age: 32,
     subtitle: 'Active goals, regular check-ins',
     flows: [
-      { scenarioId: 'returning-member', label: 'Weekly check-in', icon: 'user-check', description: 'Returning member with active goals and history' },
-      { scenarioId: 'proactive-risk', label: 'Goal at risk', icon: 'alert-triangle', description: 'Coach flags a savings goal falling behind' },
-      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Coach helps allocate a bonus across products' },
+      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
+      { scenarioId: 'returning-member', label: 'Personalized check-in', icon: 'user-check', description: 'Coach remembers past context and goals' },
+      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags a goal at risk from overspending' },
+      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Splitting a $3K bonus across goals and products' },
     ],
     financialProfile: {
       greeting: 'Good morning, Marcus',
@@ -62,9 +64,10 @@ export const PERSONAS: Persona[] = [
     age: 29,
     subtitle: 'Values privacy, manages her data',
     flows: [
-      { scenarioId: 'memory-lifecycle', label: 'Managing preferences', icon: 'brain', description: 'Reviewing and managing Coach memory settings' },
-      { scenarioId: 'milestone-celebration', label: 'Milestone reached', icon: 'award', description: 'Coach celebrates a completed savings milestone' },
-      { scenarioId: 'returning-member', label: 'Weekly check-in', icon: 'user-check', description: 'Returning member with active goals and history' },
+      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
+      { scenarioId: 'memory-lifecycle', label: 'Memory & privacy controls', icon: 'brain', description: 'Edit, pause, or delete what Coach remembers' },
+      { scenarioId: 'milestone-celebration', label: 'Milestone celebration', icon: 'award', description: 'Coach recognizes hitting 75% of a savings goal' },
+      { scenarioId: 'returning-member', label: 'Personalized check-in', icon: 'user-check', description: 'Coach remembers past context and goals' },
     ],
     financialProfile: {
       greeting: 'Good morning, Sarah',
@@ -88,9 +91,10 @@ export const PERSONAS: Persona[] = [
     age: 28,
     subtitle: 'Carries debt, needs a payoff plan',
     flows: [
-      { scenarioId: 'goal-discovery', label: 'Tackling debt', icon: 'target', description: 'Building a structured plan to pay down debt' },
-      { scenarioId: 'proactive-risk', label: 'Goal at risk', icon: 'alert-triangle', description: 'Coach flags a savings goal falling behind' },
-      { scenarioId: 'cold-start', label: 'First visit', icon: 'sparkles', description: 'Brand new to Coach — cold-start onboarding' },
+      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
+      { scenarioId: 'goal-discovery', label: 'Debt payoff plan', icon: 'target', description: 'Coach builds a structured plan to pay down debt' },
+      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags a goal at risk from overspending' },
+      { scenarioId: 'cold-start', label: 'First-time onboarding', icon: 'sparkles', description: 'New member meets Coach for the first time' },
     ],
     financialProfile: {
       greeting: 'Good morning, Jordan',
@@ -114,9 +118,10 @@ export const PERSONAS: Persona[] = [
     age: 31,
     subtitle: 'Consistent saver, hitting milestones',
     flows: [
-      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags unusual spending patterns' },
-      { scenarioId: 'returning-member', label: 'Weekly check-in', icon: 'user-check', description: 'Returning member with active goals and history' },
-      { scenarioId: 'milestone-celebration', label: 'Milestone reached', icon: 'award', description: 'Coach celebrates a completed savings milestone' },
+      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
+      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags a goal at risk from overspending' },
+      { scenarioId: 'returning-member', label: 'Personalized check-in', icon: 'user-check', description: 'Coach remembers past context and goals' },
+      { scenarioId: 'milestone-celebration', label: 'Milestone celebration', icon: 'award', description: 'Coach recognizes hitting 75% of a savings goal' },
     ],
     financialProfile: {
       greeting: 'Good morning, Aisha',
@@ -141,9 +146,10 @@ export const PERSONAS: Persona[] = [
     age: 37,
     subtitle: 'Multi-product user, complex portfolio',
     flows: [
-      { scenarioId: 'milestone-celebration', label: 'Milestone reached', icon: 'award', description: 'Coach celebrates a completed savings milestone' },
-      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Coach helps allocate a bonus across products' },
-      { scenarioId: 'memory-lifecycle', label: 'Managing preferences', icon: 'brain', description: 'Reviewing and managing Coach memory settings' },
+      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
+      { scenarioId: 'milestone-celebration', label: 'Milestone celebration', icon: 'award', description: 'Coach recognizes hitting 75% of a savings goal' },
+      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Splitting a $3K bonus across goals and products' },
+      { scenarioId: 'memory-lifecycle', label: 'Memory & privacy controls', icon: 'brain', description: 'Edit, pause, or delete what Coach remembers' },
     ],
     financialProfile: {
       greeting: 'Good morning, David',
