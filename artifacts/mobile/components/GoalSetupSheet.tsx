@@ -271,6 +271,11 @@ export function GoalSetupSheet() {
     });
   };
 
+  const isPayDown = category === 'pay-down';
+  const target = parse(targetAmount);
+  const monthly = parse(monthlyContribution);
+  const months = monthsBetween(new Date(), targetDate);
+
   const panelStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: panelX.value }],
   }));
@@ -278,12 +283,18 @@ export function GoalSetupSheet() {
     transform: [{ translateX: stripX.value }],
   }));
 
-  if (!visible) return null;
+  const debtEstimate = useMemo(() => {
+    if (!isPayDown || !selectedDebt || target <= 0) return null;
+    const minOnly = calcDebtPayoff(target, selectedDebt.apr, selectedDebt.minPayment);
+    const withExtra = monthly > selectedDebt.minPayment
+      ? calcDebtPayoff(target, selectedDebt.apr, monthly)
+      : null;
+    const sugPay = Math.ceil(target / months + (target * selectedDebt.apr / 100 / 12));
+    const withSuggested = calcDebtPayoff(target, selectedDebt.apr, sugPay);
+    return { minOnly, withExtra, suggestedPayment: sugPay, withSuggested };
+  }, [isPayDown, selectedDebt, target, monthly, months]);
 
-  const isPayDown = category === 'pay-down';
-  const target = parse(targetAmount);
-  const monthly = parse(monthlyContribution);
-  const months = monthsBetween(new Date(), targetDate);
+  if (!visible) return null;
 
   const planPageValid = isPayDown
     ? target > 0 && monthly > 0 && !!selectedDebt
@@ -303,17 +314,6 @@ export function GoalSetupSheet() {
   const projected = monthly * months;
   const onTrack = monthly > 0 && projected >= target;
   const shortfall = target - projected;
-
-  const debtEstimate = useMemo(() => {
-    if (!isPayDown || !selectedDebt || target <= 0) return null;
-    const minOnly = calcDebtPayoff(target, selectedDebt.apr, selectedDebt.minPayment);
-    const withExtra = monthly > selectedDebt.minPayment
-      ? calcDebtPayoff(target, selectedDebt.apr, monthly)
-      : null;
-    const sugPay = Math.ceil(target / months + (target * selectedDebt.apr / 100 / 12));
-    const withSuggested = calcDebtPayoff(target, selectedDebt.apr, sugPay);
-    return { minOnly, withExtra, suggestedPayment: sugPay, withSuggested };
-  }, [isPayDown, selectedDebt, target, monthly, months]);
 
   return (
     <Animated.View style={[st.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
