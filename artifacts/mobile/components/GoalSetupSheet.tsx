@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing, runOnJS } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
@@ -128,6 +128,7 @@ const GOAL_TYPE_DISPLAY: Record<GoalType, string> = {
 };
 
 export function GoalSetupSheet() {
+  'use no memo';
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -201,16 +202,16 @@ export function GoalSetupSheet() {
     });
   };
 
-  const goNext = useCallback(() => {
+  const goNext = () => {
     goToPage(Math.min(page + 1, TOTAL_PAGES - 1));
-  }, [page, screenWidth]);
+  };
 
-  const goBack = useCallback(() => {
+  const goBack = () => {
     if (page === 0) { dismiss(); return; }
     if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
     if (page === 4 && category === 'pay-down') { goToPage(2); return; }
     goToPage(page - 1);
-  }, [page, category, screenWidth]);
+  };
 
   const handleCreate = () => {
     if (!setup) return;
@@ -386,7 +387,7 @@ export function GoalSetupSheet() {
                   </Text>
 
                   {/* ── Compact debt selector tabs ── */}
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.debtTabScroll} contentContainerStyle={st.debtTabRow}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled style={st.debtTabScroll} contentContainerStyle={st.debtTabRow}>
                     {DEBT_ACCOUNTS.map((debt) => {
                       const sel = selectedDebt?.id === debt.id;
                       return (
