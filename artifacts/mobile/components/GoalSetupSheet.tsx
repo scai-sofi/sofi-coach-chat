@@ -18,12 +18,13 @@ interface DebtAccount {
   balance: number;
   apr: number;
   minPayment: number;
+  source: 'sofi' | 'external';
 }
 
-const DEBT_ACCOUNTS: DebtAccount[] = [
-  { id: 'cc1', name: 'SoFi Credit Card', icon: 'credit-card', balance: 4820, apr: 15.99, minPayment: 96 },
-  { id: 'pl1', name: 'SoFi Personal Loan', icon: 'file-text', balance: 12400, apr: 8.49, minPayment: 248 },
-  { id: 'sl1', name: 'Student Loans', icon: 'book-open', balance: 28750, apr: 5.25, minPayment: 320 },
+const SOFI_DEBT_ACCOUNTS: DebtAccount[] = [
+  { id: 'cc1', name: 'SoFi Credit Card', icon: 'credit-card', balance: 4820, apr: 15.99, minPayment: 96, source: 'sofi' },
+  { id: 'pl1', name: 'SoFi Personal Loan', icon: 'file-text', balance: 12400, apr: 8.49, minPayment: 248, source: 'sofi' },
+  { id: 'sl1', name: 'Student Loans', icon: 'book-open', balance: 28750, apr: 5.25, minPayment: 320, source: 'sofi' },
 ];
 
 const CATEGORIES: { key: GoalCategory; label: string; subtitle: string; icon: keyof typeof Feather.glyphMap }[] = [
@@ -147,6 +148,14 @@ export function GoalSetupSheet() {
   const [linkedAccount, setLinkedAccount] = useState('');
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [userDebtAccounts, setUserDebtAccounts] = useState<DebtAccount[]>([]);
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [linkName, setLinkName] = useState('');
+  const [linkBalance, setLinkBalance] = useState('');
+  const [linkApr, setLinkApr] = useState('');
+  const [linkMin, setLinkMin] = useState('');
+
+  const allDebtAccounts = useMemo(() => [...SOFI_DEBT_ACCOUNTS, ...userDebtAccounts], [userDebtAccounts]);
 
   const panelX = useSharedValue(screenWidth);
   const stripX = useSharedValue(0);
@@ -185,6 +194,11 @@ export function GoalSetupSheet() {
         setSelectedDebt(null);
         setPage(0);
         stripX.value = 0;
+        setShowLinkForm(false);
+        setLinkName('');
+        setLinkBalance('');
+        setLinkApr('');
+        setLinkMin('');
       }
       setVisible(true);
       panelX.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
@@ -245,8 +259,9 @@ export function GoalSetupSheet() {
       goToPage(1);
     } else if (cat === 'pay-down') {
       setGoalType('DEBT_PAYOFF');
+      setShowLinkForm(false);
       if (!selectedDebt) {
-        const first = DEBT_ACCOUNTS[0];
+        const first = allDebtAccounts[0];
         setSelectedDebt(first);
         setTitle(`Pay off ${first.name}`);
         setTargetAmount(fmt(first.balance));
@@ -277,6 +292,29 @@ export function GoalSetupSheet() {
 
   const fmtDateShort = (d: Date) =>
     d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  const handleLinkAccount = () => {
+    const bal = parse(linkBalance);
+    const apr = parseFloat(linkApr.replace(/[^0-9.]/g, '')) || 0;
+    const min = parse(linkMin);
+    if (!linkName.trim() || bal <= 0) return;
+    const newAcct: DebtAccount = {
+      id: `ext-${Date.now()}`,
+      name: linkName.trim(),
+      icon: 'external-link',
+      balance: bal,
+      apr,
+      minPayment: min || Math.ceil(bal * 0.02),
+      source: 'external',
+    };
+    setUserDebtAccounts(prev => [...prev, newAcct]);
+    pickDebt(newAcct);
+    setShowLinkForm(false);
+    setLinkName('');
+    setLinkBalance('');
+    setLinkApr('');
+    setLinkMin('');
+  };
 
   const isPayDown = category === 'pay-down';
   const target = parse(targetAmount);
@@ -395,7 +433,7 @@ export function GoalSetupSheet() {
 
                   {/* ── Compact debt selector tabs ── */}
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled style={st.debtTabScroll} contentContainerStyle={st.debtTabRow}>
-                    {DEBT_ACCOUNTS.map((debt) => {
+                    {allDebtAccounts.map((debt) => {
                       const sel = selectedDebt?.id === debt.id;
                       return (
                         <Pressable
@@ -404,17 +442,99 @@ export function GoalSetupSheet() {
                             st.debtTab,
                             { backgroundColor: sel ? colors.contentPrimary : colors.surfaceElevated, borderColor: sel ? colors.contentPrimary : colors.surfaceEdge },
                           ]}
-                          onPress={() => pickDebt(debt)}
+                          onPress={() => { setShowLinkForm(false); pickDebt(debt); }}
                         >
                           <Feather name={debt.icon} size={14} color={sel ? '#fff' : colors.contentPrimary} />
-                          <Text style={[st.debtTabLabel, { color: sel ? '#fff' : colors.contentPrimary }]}>{debt.name.replace('SoFi ', '')}</Text>
+                          <Text style={[st.debtTabLabel, { color: sel ? '#fff' : colors.contentPrimary }]}>
+                            {debt.source === 'sofi' ? debt.name.replace('SoFi ', '') : debt.name}
+                          </Text>
+                          {debt.source === 'external' && (
+                            <View style={[st.externalBadge, { backgroundColor: colors.surfaceTint }]}>
+                              <Text style={[st.externalBadgeText, { color: colors.contentBrand }]}>Linked</Text>
+                            </View>
+                          )}
                         </Pressable>
                       );
                     })}
+                    <Pressable
+                      style={[st.debtTab, st.linkAccountTab, { borderColor: colors.contentBrand, borderStyle: 'dashed' }]}
+                      onPress={() => setShowLinkForm(true)}
+                    >
+                      <Feather name="plus" size={14} color={colors.contentBrand} />
+                      <Text style={[st.debtTabLabel, { color: colors.contentBrand }]}>Link account</Text>
+                    </Pressable>
                   </ScrollView>
 
+                  {/* ── Link new account form ── */}
+                  {showLinkForm && (
+                    <View style={[st.linkForm, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+                      <View style={st.linkFormHeader}>
+                        <Feather name="link" size={16} color={colors.contentBrand} />
+                        <Text style={[st.linkFormTitle, { color: colors.contentPrimary }]}>Link an external account</Text>
+                      </View>
+                      <View style={st.linkFormFields}>
+                        <TextInput
+                          style={[st.linkInput, { color: colors.contentPrimary, borderColor: colors.surfaceEdge }]}
+                          value={linkName} onChangeText={setLinkName}
+                          placeholder="Account name (e.g. Chase Visa)"
+                          placeholderTextColor={colors.contentDimmed}
+                        />
+                        <View style={st.linkFormRow}>
+                          <View style={st.linkFormCol}>
+                            <Text style={[st.linkInputLabel, { color: colors.contentSecondary }]}>Balance</Text>
+                            <View style={[st.linkInputWrap, { borderColor: colors.surfaceEdge }]}>
+                              <Text style={[st.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                              <TextInput
+                                style={[st.linkInputField, { color: colors.contentPrimary }]}
+                                value={linkBalance} onChangeText={setLinkBalance}
+                                keyboardType="numeric" placeholder="0"
+                                placeholderTextColor={colors.contentDimmed}
+                              />
+                            </View>
+                          </View>
+                          <View style={st.linkFormCol}>
+                            <Text style={[st.linkInputLabel, { color: colors.contentSecondary }]}>APR</Text>
+                            <View style={[st.linkInputWrap, { borderColor: colors.surfaceEdge }]}>
+                              <TextInput
+                                style={[st.linkInputField, { color: colors.contentPrimary }]}
+                                value={linkApr} onChangeText={setLinkApr}
+                                keyboardType="numeric" placeholder="0"
+                                placeholderTextColor={colors.contentDimmed}
+                              />
+                              <Text style={[st.currencySign, { color: colors.contentSecondary }]}>%</Text>
+                            </View>
+                          </View>
+                          <View style={st.linkFormCol}>
+                            <Text style={[st.linkInputLabel, { color: colors.contentSecondary }]}>Min/mo</Text>
+                            <View style={[st.linkInputWrap, { borderColor: colors.surfaceEdge }]}>
+                              <Text style={[st.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                              <TextInput
+                                style={[st.linkInputField, { color: colors.contentPrimary }]}
+                                value={linkMin} onChangeText={setLinkMin}
+                                keyboardType="numeric" placeholder="0"
+                                placeholderTextColor={colors.contentDimmed}
+                              />
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                      <View style={st.linkFormActions}>
+                        <Pressable style={[st.linkFormCancel, { borderColor: colors.surfaceEdge }]} onPress={() => setShowLinkForm(false)}>
+                          <Text style={[st.linkFormCancelText, { color: colors.contentSecondary }]}>Cancel</Text>
+                        </Pressable>
+                        <Pressable
+                          style={[st.linkFormAdd, { backgroundColor: linkName.trim() && parse(linkBalance) > 0 ? colors.contentPrimary : colors.contentDisabled }]}
+                          onPress={handleLinkAccount}
+                          disabled={!linkName.trim() || parse(linkBalance) <= 0}
+                        >
+                          <Text style={[st.linkFormAddText, { color: '#fff' }]}>Link account</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
+
                   {/* ── Selected debt detail strip ── */}
-                  {selectedDebt && (
+                  {selectedDebt && !showLinkForm && (
                     <View style={[st.debtDetail, { backgroundColor: colors.surfaceElevated }]}>
                       <View style={st.debtDetailItem}>
                         <Text style={[st.debtDetailLabel, { color: colors.contentSecondary }]}>Balance</Text>
@@ -430,6 +550,15 @@ export function GoalSetupSheet() {
                         <Text style={[st.debtDetailLabel, { color: colors.contentSecondary }]}>Minimum</Text>
                         <Text style={[st.debtDetailValue, { color: colors.contentPrimary }]}>${selectedDebt.minPayment}/mo</Text>
                       </View>
+                      {selectedDebt.source === 'external' && (
+                        <>
+                          <View style={[st.debtDetailDiv, { backgroundColor: colors.surfaceEdge }]} />
+                          <View style={st.debtDetailItem}>
+                            <Feather name="external-link" size={12} color={colors.contentBrand} />
+                            <Text style={[st.debtDetailLabel, { color: colors.contentBrand }]}>External</Text>
+                          </View>
+                        </>
+                      )}
                     </View>
                   )}
 
@@ -679,6 +808,25 @@ const st = StyleSheet.create({
   debtTabRow: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
   debtTab: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, borderWidth: 1.5 },
   debtTabLabel: { fontSize: 13, fontFamily: Fonts.medium },
+  linkAccountTab: { backgroundColor: 'transparent' },
+  externalBadge: { borderRadius: 6, paddingHorizontal: 5, paddingVertical: 1 },
+  externalBadgeText: { fontSize: 9, fontFamily: Fonts.bold, textTransform: 'uppercase', letterSpacing: 0.4 },
+
+  linkForm: { borderRadius: 16, borderWidth: 1, padding: 16, marginBottom: 20, gap: 14 },
+  linkFormHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  linkFormTitle: { fontSize: 15, fontFamily: Fonts.bold },
+  linkFormFields: { gap: 10 },
+  linkInput: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, fontFamily: Fonts.regular },
+  linkFormRow: { flexDirection: 'row', gap: 8 },
+  linkFormCol: { flex: 1, gap: 4 },
+  linkInputLabel: { fontSize: 11, fontFamily: Fonts.medium, textTransform: 'uppercase', letterSpacing: 0.4 },
+  linkInputWrap: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 10 },
+  linkInputField: { flex: 1, fontSize: 15, fontFamily: Fonts.regular, padding: 0 },
+  linkFormActions: { flexDirection: 'row', gap: 10 },
+  linkFormCancel: { flex: 1, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  linkFormCancelText: { fontSize: 14, fontFamily: Fonts.medium },
+  linkFormAdd: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  linkFormAddText: { fontSize: 14, fontFamily: Fonts.bold },
 
   debtDetail: { flexDirection: 'row', alignItems: 'center', borderRadius: 14, padding: 14, marginBottom: 20 },
   debtDetailItem: { flex: 1, alignItems: 'center', gap: 2 },
