@@ -4,12 +4,10 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   runOnJS,
 } from 'react-native-reanimated';
 import { usePrototype } from './PrototypeContext';
-
-const SPRING_CONFIG = { damping: 15 };
 
 export function PhaseSwitcherFab() {
   const { protoPhase, togglePhase } = usePrototype();
@@ -25,7 +23,7 @@ export function PhaseSwitcherFab() {
   const panGesture = Gesture.Pan()
     .onStart(() => {
       isDragging.value = true;
-      scale.value = withSpring(1.1, SPRING_CONFIG);
+      scale.value = withTiming(1.1, { duration: 150 });
     })
     .onUpdate((e) => {
       translateX.value = offsetX.value + e.translationX;
@@ -34,7 +32,7 @@ export function PhaseSwitcherFab() {
     .onEnd(() => {
       offsetX.value = translateX.value;
       offsetY.value = translateY.value;
-      scale.value = withSpring(1, SPRING_CONFIG);
+      scale.value = withTiming(1, { duration: 150 });
       isDragging.value = false;
     });
 

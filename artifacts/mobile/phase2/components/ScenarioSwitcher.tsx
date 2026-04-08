@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } fr
 import Svg, { Path } from 'react-native-svg';
 import { Feather } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
@@ -63,8 +63,8 @@ export function ScenarioSwitcher() {
         backdropOpacity.value = withTiming(0, { duration: 200 });
         runOnJS(dismiss)();
       } else {
-        translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
-        backdropOpacity.value = withSpring(1, { damping: 20, stiffness: 300 });
+        translateY.value = withTiming(0, { duration: 220 });
+        backdropOpacity.value = withTiming(1, { duration: 200 });
       }
     });
 
