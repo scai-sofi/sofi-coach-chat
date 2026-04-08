@@ -1,14 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, Pressable, Modal, StyleSheet } from 'react-native';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { View, Text, Pressable, Modal, StyleSheet, ScrollView } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, FadeIn, SlideInDown } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
+import Svg, { Path } from 'react-native-svg';
 
 const DAYS_OF_WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const YEAR_RANGE_START = 2021;
+const YEAR_RANGE_END = 2035;
+const YEAR_ROW_HEIGHT = 48;
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -16,6 +21,22 @@ function getDaysInMonth(year: number, month: number) {
 
 function getFirstDayOfMonth(year: number, month: number) {
   return new Date(year, month, 1).getDay();
+}
+
+function ChevronDown({ color, size = 12 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 12 12" fill="none">
+      <Path d="M3 4.5L6 7.5L9 4.5" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function CheckMark({ color }: { color: string }) {
+  return (
+    <Svg width={16} height={12} viewBox="0 0 16 12" fill="none">
+      <Path d="M1 6L6 11L15 1" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
 }
 
 interface PacificDatePickerProps {
@@ -42,6 +63,17 @@ export function PacificDatePicker({
   const [viewYear, setViewYear] = useState(date.getFullYear());
   const [viewMonth, setViewMonth] = useState(date.getMonth());
   const [selectedDate, setSelectedDate] = useState(date);
+  const [pickerMode, setPickerMode] = useState<'calendar' | 'year'>('calendar');
+  const yearScrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (visible) {
+      setPickerMode('calendar');
+      setViewYear(date.getFullYear());
+      setViewMonth(date.getMonth());
+      setSelectedDate(date);
+    }
+  }, [visible]);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -82,6 +114,24 @@ export function PacificDatePicker({
     return rows;
   }, [viewYear, viewMonth]);
 
+  const years = useMemo(() => {
+    const list: number[] = [];
+    for (let y = YEAR_RANGE_START; y <= YEAR_RANGE_END; y++) {
+      list.push(y);
+    }
+    return list;
+  }, []);
+
+  useEffect(() => {
+    if (pickerMode === 'year' && yearScrollRef.current) {
+      const idx = viewYear - YEAR_RANGE_START;
+      const offset = Math.max(0, (idx * YEAR_ROW_HEIGHT) - (YEAR_ROW_HEIGHT * 3));
+      setTimeout(() => {
+        yearScrollRef.current?.scrollTo({ y: offset, animated: false });
+      }, 50);
+    }
+  }, [pickerMode, viewYear]);
+
   const isDisabled = (day: number) => {
     const d = new Date(viewYear, viewMonth, day);
     d.setHours(0, 0, 0, 0);
@@ -110,6 +160,27 @@ export function PacificDatePicker({
     setSelectedDate(newDate);
   };
 
+  const handleYearSelect = (year: number) => {
+    setViewYear(year);
+    const maxDay = getDaysInMonth(year, viewMonth);
+    const clampedDay = Math.min(selectedDate.getDate(), maxDay);
+    setSelectedDate(new Date(year, viewMonth, clampedDay));
+    setPickerMode('calendar');
+  };
+
+  const handleConfirm = () => {
+    onSelect(selectedDate);
+    onClose();
+  };
+
+  const canGoPrev = useMemo(() => {
+    const prevMonth = viewMonth === 0 ? 11 : viewMonth - 1;
+    const prevYear = viewMonth === 0 ? viewYear - 1 : viewYear;
+    const lastDayOfPrev = getDaysInMonth(prevYear, prevMonth);
+    const d = new Date(prevYear, prevMonth, lastDayOfPrev);
+    return d >= effectiveMin;
+  }, [viewMonth, viewYear, effectiveMin]);
+
   const goToPrevMonth = () => {
     if (viewMonth === 0) {
       setViewMonth(11);
@@ -128,20 +199,9 @@ export function PacificDatePicker({
     }
   };
 
-  const handleConfirm = () => {
-    onSelect(selectedDate);
-    onClose();
-  };
-
-  const canGoPrev = useMemo(() => {
-    const prevMonth = viewMonth === 0 ? 11 : viewMonth - 1;
-    const prevYear = viewMonth === 0 ? viewYear - 1 : viewYear;
-    const lastDayOfPrev = getDaysInMonth(prevYear, prevMonth);
-    const d = new Date(prevYear, prevMonth, lastDayOfPrev);
-    return d >= effectiveMin;
-  }, [viewMonth, viewYear, effectiveMin]);
-
   if (!visible) return null;
+
+  const isYearMode = pickerMode === 'year';
 
   return (
     <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
@@ -157,7 +217,7 @@ export function PacificDatePicker({
 
           <View style={s.titleArea}>
             <View style={s.titleRow}>
-              <Pressable onPress={onClose} hitSlop={12}>
+              <Pressable onPress={isYearMode ? () => setPickerMode('calendar') : onClose} hitSlop={12}>
                 <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
               </Pressable>
               <Text style={[s.titleText, { color: colors.contentPrimary }]}>{title}</Text>
@@ -170,71 +230,119 @@ export function PacificDatePicker({
 
           <View style={s.controls}>
             <Pressable
-              onPress={goToPrevMonth}
-              style={[s.pillControl, { borderColor: colors.surfaceEdge, opacity: canGoPrev ? 1 : 0.4 }]}
-              disabled={!canGoPrev}
+              onPress={isYearMode ? undefined : goToPrevMonth}
+              style={[
+                s.pillControl,
+                { borderColor: colors.surfaceEdge },
+                !isYearMode && !canGoPrev && { opacity: 0.4 },
+              ]}
+              disabled={isYearMode || !canGoPrev}
               hitSlop={8}
             >
               <Text style={[s.pillText, { color: colors.contentPrimary }]}>{MONTH_SHORT[viewMonth]}</Text>
-              <Feather name="chevron-left" size={12} color={colors.contentPrimary} />
+              <View style={s.chevronWrap}>
+                <ChevronDown color={colors.contentPrimary} />
+              </View>
             </Pressable>
 
             <Pressable
-              onPress={goToNextMonth}
-              style={[s.pillControl, { borderColor: colors.surfaceEdge }]}
+              onPress={() => setPickerMode(isYearMode ? 'calendar' : 'year')}
+              style={[
+                s.pillControl,
+                {
+                  borderColor: isYearMode ? colors.contentPrimary : colors.surfaceEdge,
+                  borderWidth: isYearMode ? 1.5 : 1,
+                },
+              ]}
               hitSlop={8}
             >
               <Text style={[s.pillText, { color: colors.contentPrimary }]}>{viewYear}</Text>
-              <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+              <View style={s.chevronWrap}>
+                <ChevronDown color={colors.contentPrimary} />
+              </View>
             </Pressable>
           </View>
 
-          <View style={s.calendar}>
-            <View style={s.weekRow}>
-              {DAYS_OF_WEEK.map((d, i) => (
-                <View key={i} style={s.dayHeaderCell}>
-                  <Text style={[s.dayHeaderText, { color: colors.contentSecondary }]}>{d}</Text>
+          {!isYearMode && (
+            <View style={s.calendar}>
+              <View style={s.weekRow}>
+                {DAYS_OF_WEEK.map((d, i) => (
+                  <View key={i} style={s.dayHeaderCell}>
+                    <Text style={[s.dayHeaderText, { color: colors.contentSecondary }]}>{d}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {calendarDays.map((row, ri) => (
+                <View key={ri} style={s.weekRow}>
+                  {row.map((day, di) => {
+                    if (day === null) {
+                      return <View key={di} style={s.dayCell} />;
+                    }
+                    const disabled = isDisabled(day);
+                    const selected = isSelected(day);
+                    const todayDay = isToday(day);
+
+                    return (
+                      <View key={di} style={s.dayCell}>
+                        <Pressable
+                          onPress={() => handleDayPress(day)}
+                          disabled={disabled}
+                          style={[
+                            s.dayButton,
+                            selected && { backgroundColor: colors.contentPrimary },
+                            todayDay && !selected && { borderWidth: 1.5, borderColor: colors.contentPrimary },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              s.dayText,
+                              { color: disabled ? '#dbdad7' : selected ? colors.surfaceBase : '#5c5b5a' },
+                              selected && { fontFamily: Fonts.bold },
+                            ]}
+                          >
+                            {day}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    );
+                  })}
                 </View>
               ))}
             </View>
+          )}
 
-            {calendarDays.map((row, ri) => (
-              <View key={ri} style={s.weekRow}>
-                {row.map((day, di) => {
-                  if (day === null) {
-                    return <View key={di} style={s.dayCell} />;
-                  }
-                  const disabled = isDisabled(day);
-                  const selected = isSelected(day);
-                  const todayDay = isToday(day);
-
-                  return (
-                    <View key={di} style={s.dayCell}>
-                      <Pressable
-                        onPress={() => handleDayPress(day)}
-                        disabled={disabled}
-                        style={[
-                          s.dayButton,
-                          selected && { backgroundColor: colors.contentPrimary },
-                          todayDay && !selected && { borderWidth: 1.5, borderColor: colors.contentPrimary },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            s.dayText,
-                            { color: disabled ? '#dbdad7' : selected ? colors.surfaceBase : '#5c5b5a' },
-                            selected && { fontFamily: Fonts.bold },
-                          ]}
-                        >
-                          {day}
-                        </Text>
-                      </Pressable>
-                    </View>
-                  );
-                })}
-              </View>
-            ))}
-          </View>
+          {isYearMode && (
+            <ScrollView
+              ref={yearScrollRef}
+              style={s.yearList}
+              contentContainerStyle={s.yearListContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {years.map((year) => {
+                const isCurrentYear = year === viewYear;
+                return (
+                  <Pressable
+                    key={year}
+                    onPress={() => handleYearSelect(year)}
+                    style={s.yearRow}
+                  >
+                    <Text
+                      style={[
+                        s.yearText,
+                        { color: colors.contentPrimary },
+                      ]}
+                    >
+                      {year}
+                    </Text>
+                    {isCurrentYear && (
+                      <CheckMark color={colors.contentPrimary} />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          )}
 
           <View style={[s.footer, { paddingBottom: insets.bottom || 16 }]}>
             <Pressable
@@ -315,6 +423,9 @@ const s = StyleSheet.create({
     fontFamily: Fonts.medium,
     lineHeight: 20,
   },
+  chevronWrap: {
+    paddingTop: 2,
+  },
   calendar: {
     paddingHorizontal: 16,
     gap: 4,
@@ -355,6 +466,26 @@ const s = StyleSheet.create({
     fontFamily: Fonts.medium,
     lineHeight: 20,
     textAlign: 'center',
+  },
+  yearList: {
+    maxHeight: 476,
+    paddingHorizontal: 16,
+  },
+  yearListContent: {
+    paddingBottom: 8,
+  },
+  yearRow: {
+    height: YEAR_ROW_HEIGHT,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  yearText: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
   },
   footer: {
     paddingHorizontal: 16,
