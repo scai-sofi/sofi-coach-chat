@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Modal, StyleSheet, ScrollView } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, FadeIn, SlideInDown } from 'react-native-reanimated';
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import Svg, { Path } from 'react-native-svg';
+import { PacificBottomSheet } from './PacificBottomSheet';
 
 const DAYS_OF_WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -194,17 +194,7 @@ export function PacificDatePicker({
   const isMonthMode = pickerMode === 'month';
 
   return (
-    <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
-      <View style={s.overlay}>
-        <Pressable style={s.scrim} onPress={onClose} />
-        <Animated.View
-          entering={SlideInDown.duration(350).springify().damping(20).stiffness(150)}
-          style={[s.sheet, { backgroundColor: colors.surfaceBase }]}
-        >
-          <View style={s.dragHandleWrap}>
-            <View style={[s.dragHandle, { backgroundColor: colors.contentDimmed }]} />
-          </View>
-
+    <PacificBottomSheet visible={visible} onClose={onClose}>
           <View style={s.titleArea}>
             <View style={s.titleRow}>
               <Text style={[s.titleText, { color: colors.contentPrimary }]}>{title}</Text>
@@ -377,33 +367,11 @@ export function PacificDatePicker({
               <Text style={s.dismissText}>Dismiss</Text>
             </Pressable>
           </View>
-        </Animated.View>
-      </View>
-    </Modal>
+    </PacificBottomSheet>
   );
 }
 
 const s = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'flex-end' },
-  scrim: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(10,10,10,0.5)',
-  },
-  sheet: {
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    overflow: 'hidden',
-  },
-  dragHandleWrap: {
-    alignItems: 'center',
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  dragHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: 4,
-  },
   titleArea: {
     paddingHorizontal: 16,
     paddingBottom: 12,
