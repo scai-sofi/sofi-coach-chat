@@ -60,12 +60,23 @@ export function GoalSetupSheet() {
     if (pendingGoalSetup) {
       const p = pendingGoalSetup.proposal;
       setSetup(pendingGoalSetup);
-      setTitle(p.title);
-      setTargetAmount(formatCurrency(p.targetAmount));
-      setMonthlyContribution(formatCurrency(p.monthlyContribution));
-      setTargetDate(p.targetDate);
-      setLinkedAccount(p.linkedAccount);
-      setGoalType(p.type);
+      if (p) {
+        setTitle(p.title);
+        setTargetAmount(formatCurrency(p.targetAmount));
+        setMonthlyContribution(formatCurrency(p.monthlyContribution));
+        setTargetDate(p.targetDate);
+        setLinkedAccount(p.linkedAccount);
+        setGoalType(p.type);
+      } else {
+        const defaultDate = new Date();
+        defaultDate.setMonth(defaultDate.getMonth() + 6);
+        setTitle('');
+        setTargetAmount('');
+        setMonthlyContribution('');
+        setTargetDate(defaultDate);
+        setLinkedAccount('');
+        setGoalType('SAVINGS_TARGET');
+      }
       setShowAccountPicker(false);
       setVisible(true);
       slideY.value = withTiming(0, { duration: 350, easing: Easing.out(Easing.cubic) });
@@ -100,7 +111,7 @@ export function GoalSetupSheet() {
       targetDate,
       monthlyContribution: parseCurrency(monthlyContribution),
       linkedAccount,
-    }, setup.messageId);
+    }, setup.messageId ?? undefined);
   };
 
   const adjustMonth = (delta: number) => {
@@ -122,10 +133,11 @@ export function GoalSetupSheet() {
 
   if (!visible) return null;
 
+  const isNewGoal = !setup?.proposal;
   const isValid = title.trim().length > 0 && parseCurrency(targetAmount) > 0 && parseCurrency(monthlyContribution) > 0 && linkedAccount.length > 0;
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+    <View style={styles.container} pointerEvents="box-none">
       <Animated.View style={[styles.backdrop, { backgroundColor: 'rgba(0,0,0,0.5)' }, animatedBackdrop]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={handleCancel} />
       </Animated.View>
@@ -139,7 +151,7 @@ export function GoalSetupSheet() {
           <Pressable onPress={handleCancel} hitSlop={12}>
             <Feather name="x" size={22} color={colors.contentPrimary} />
           </Pressable>
-          <Text style={[styles.headerTitle, { color: colors.contentPrimary }]}>Set up goal</Text>
+          <Text style={[styles.headerTitle, { color: colors.contentPrimary }]}>{isNewGoal ? 'New goal' : 'Set up goal'}</Text>
           <View style={{ width: 22 }} />
         </View>
 
@@ -274,6 +286,10 @@ export function GoalSetupSheet() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 200,
+  },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
   },

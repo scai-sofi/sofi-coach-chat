@@ -45,8 +45,8 @@ interface CoachState {
 }
 
 export interface PendingGoalSetup {
-  messageId: string;
-  proposal: GoalProposal;
+  messageId?: string;
+  proposal?: GoalProposal;
 }
 
 interface CoachContextType extends CoachState {
@@ -79,7 +79,8 @@ interface CoachContextType extends CoachState {
   confirmMemoryDeletion: (messageId: string) => void;
   dismissMemoryDeletion: (messageId: string) => void;
   pendingGoalSetup: PendingGoalSetup | null;
-  createGoalFromSetup: (setup: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }, messageId: string) => void;
+  openNewGoalSetup: () => void;
+  createGoalFromSetup: (setup: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }, messageId?: string) => void;
   cancelGoalSetup: () => void;
 }
 
@@ -1064,12 +1065,18 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setPendingGoalSetup({ messageId, proposal: msg.goalProposal });
   }, []);
 
-  const createGoalFromSetup = useCallback((setup: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }, messageId: string) => {
+  const openNewGoalSetup = useCallback(() => {
+    setPendingGoalSetup({});
+  }, []);
+
+  const createGoalFromSetup = useCallback((setup: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }, messageId?: string) => {
     addGoalFromProposal(setup);
-    setMessages(prev => prev.map(m => {
-      if (m.id !== messageId || !m.goalProposal) return m;
-      return { ...m, goalProposal: { ...m.goalProposal, confirmed: true } };
-    }));
+    if (messageId) {
+      setMessages(prev => prev.map(m => {
+        if (m.id !== messageId || !m.goalProposal) return m;
+        return { ...m, goalProposal: { ...m.goalProposal, confirmed: true } };
+      }));
+    }
     setPendingGoalSetup(null);
   }, [addGoalFromProposal]);
 
@@ -1221,7 +1228,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
       saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory, resolveMember360Conflict,
       confirmMemoryDeletion, dismissMemoryDeletion,
-      pendingGoalSetup, createGoalFromSetup, cancelGoalSetup,
+      pendingGoalSetup, openNewGoalSetup, createGoalFromSetup, cancelGoalSetup,
     }}>
       {children}
     </CoachContext.Provider>

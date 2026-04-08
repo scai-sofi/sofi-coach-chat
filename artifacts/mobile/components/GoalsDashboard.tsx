@@ -366,7 +366,7 @@ function SuggestedGoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) 
 
 export function GoalsDashboard() {
   const { colors } = useTheme();
-  const { goals, setActivePanel } = useCoach();
+  const { goals, setActivePanel, openNewGoalSetup } = useCoach();
   const [activeTab, setActiveTab] = useState<GoalTabCategory>('save-up');
 
   const allGoals = goals.filter(g => g.status !== 'DRAFT');
@@ -389,15 +389,30 @@ export function GoalsDashboard() {
 
   return (
     <View style={[styles.panel, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="Goals" onBack={() => setActivePanel('none')} />
+      <AppBar
+        variant="back"
+        title="Goals"
+        onBack={() => setActivePanel('none')}
+        rightActions={[{
+          icon: <Feather name="plus" size={22} color={colors.contentPrimary} />,
+          onPress: openNewGoalSetup,
+        }]}
+      />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {!hasAny ? (
           <View style={styles.empty}>
             <Feather name="target" size={32} color={colors.contentMuted} />
             <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
-              No goals yet. Tell the coach what you're working toward and it will help you set one up.
+              No goals yet. Create one to start tracking your progress.
             </Text>
+            <Pressable
+              style={[styles.newGoalBtn, { backgroundColor: colors.contentPrimary }]}
+              onPress={openNewGoalSetup}
+            >
+              <Feather name="plus" size={16} color={colors.contentPrimaryInverse} />
+              <Text style={[styles.newGoalBtnText, { color: colors.contentPrimaryInverse }]}>New goal</Text>
+            </Pressable>
           </View>
         ) : (
           <>
@@ -693,5 +708,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.regular,
     textAlign: 'center',
+  },
+  newGoalBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 4,
+  },
+  newGoalBtnText: {
+    fontSize: 15,
+    fontFamily: Fonts.bold,
   },
 });
