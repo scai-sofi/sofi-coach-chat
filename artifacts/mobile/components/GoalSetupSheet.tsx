@@ -8,6 +8,7 @@ import { useCoach, PendingGoalSetup } from '@/context/CoachContext';
 import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
 import { PacificDatePicker } from '@/components/PacificDatePicker';
+import { getMember360Profile } from '@/constants/member360';
 
 type GoalCategory = 'save-up' | 'pay-down' | 'investment';
 
@@ -41,9 +42,12 @@ const MOCK_FINANCES = {
   bankBalance: 27282,
 };
 const DISPOSABLE = MOCK_FINANCES.monthlyTakeHome - MOCK_FINANCES.rent - MOCK_FINANCES.debtMinimums - MOCK_FINANCES.monthlySpending;
+const MONTHLY_EXPENSES = MOCK_FINANCES.rent + MOCK_FINANCES.debtMinimums + MOCK_FINANCES.monthlySpending;
+
+const EF_REC = getEfRecommendation();
 
 const SMART_DEFAULTS: Record<string, { target: number; monthly: number }> = {
-  'Emergency Fund': { target: 21000, monthly: Math.round(DISPOSABLE * 0.30) },
+  'Emergency Fund': { target: MONTHLY_EXPENSES * EF_REC.months, monthly: Math.round(DISPOSABLE * 0.30) },
   'Travel':         { target: 3000,  monthly: Math.round(DISPOSABLE * 0.12) },
   'Kids':           { target: 5000,  monthly: Math.round(DISPOSABLE * 0.10) },
   'House':          { target: 60000, monthly: Math.round(DISPOSABLE * 0.25) },
@@ -84,14 +88,27 @@ const SAVE_UP_ITEMS: { label: string; icon: keyof typeof Feather.glyphMap; goalT
   { label: 'Other', icon: 'plus-circle', goalType: 'CUSTOM' },
 ];
 
-const MONTHLY_EXPENSES = MOCK_FINANCES.rent + MOCK_FINANCES.debtMinimums + MOCK_FINANCES.monthlySpending;
+function getEfRecommendation(): { months: number; reason: string } {
+  const profile = getMember360Profile();
+  const isRenter = profile.housingStatus === 'renter';
+  const isHomeowner = profile.housingStatus === 'homeowner' || !!profile.mortgage;
+  const hasDependents = profile.dependents && profile.dependents !== '0';
+  const isMarried = profile.maritalStatus === 'married';
 
-const EF_MONTH_OPTIONS: { months: number; title: string; subtitle: string }[] = [
-  { months: 3, title: '3 months', subtitle: 'You rent, have transferrable skills, or live in a dual-income household.' },
-  { months: 6, title: '6 months', subtitle: 'You own a home or support others financially' },
-  { months: 9, title: '9 months', subtitle: "You're self-employed, have specialized work, or want more peace of mind" },
-  { months: 0, title: 'Custom', subtitle: 'Choose your own number of months' },
-];
+  if (isHomeowner || hasDependents) {
+    return {
+      months: 6,
+      reason: `Based on your profile${isHomeowner ? ' as a homeowner' : ''}${hasDependents ? ' supporting dependents' : ''}, 6 months of expenses gives you a solid safety net.`,
+    };
+  }
+  if (isRenter || isMarried) {
+    return {
+      months: 3,
+      reason: `Since you ${isRenter ? 'rent' : ''}${isRenter && isMarried ? ' and ' : ''}${isMarried ? 'have dual-income potential' : ''}, 3 months of expenses is a strong starting point.`,
+    };
+  }
+  return { months: 3, reason: '3 months of expenses is a great starting point for most people.' };
+}
 
 type ContributionMethod = 'direct-deposit' | 'recurring' | 'one-time';
 
@@ -194,8 +211,7 @@ export function GoalSetupSheet() {
   const [targetDate, setTargetDate] = useState(new Date());
   const [linkedAccount, setLinkedAccount] = useState('');
   const [contributionMethod, setContributionMethod] = useState<ContributionMethod>('recurring');
-  const [showEfMonths, setShowEfMonths] = useState(false);
-  const [efExpenses, setEfExpenses] = useState(fmt(MONTHLY_EXPENSES));
+  const [isEfGoal, setIsEfGoal] = useState(false);
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [userDebtAccounts, setUserDebtAccounts] = useState<DebtAccount[]>([]);
@@ -234,8 +250,7 @@ export function GoalSetupSheet() {
         const cat = p.type === 'DEBT_PAYOFF' ? 'pay-down' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
         setCategory(cat);
         setSelectedDebt(null);
-        setShowEfMonths(false);
-        setEfExpenses(fmt(MONTHLY_EXPENSES));
+        setIsEfGoal(p.type === 'EMERGENCY_FUND');
         setPage(4);
         stripX.value = -4 * screenWidth;
       } else {
@@ -252,8 +267,7 @@ export function GoalSetupSheet() {
         setPage(0);
         stripX.value = 0;
         setContributionMethod('recurring');
-        setShowEfMonths(false);
-        setEfExpenses(fmt(MONTHLY_EXPENSES));
+        setIsEfGoal(false);
         setShowLinkForm(false);
         setLinkName('');
         setLinkBalance('');
@@ -295,7 +309,6 @@ export function GoalSetupSheet() {
 
   const goBack = () => {
     if (page === 0) { dismiss(); return; }
-    if (page === 1 && showEfMonths) { setShowEfMonths(false); return; }
     if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
     if (page === 4 && category === 'pay-down') { goToPage(2); return; }
     goToPage(page - 1);
@@ -348,26 +361,11 @@ export function GoalSetupSheet() {
     setTitle(item.label);
     setMonthlyContribution('');
     setLinkedAccount('SoFi Savings');
-    if (item.label === 'Emergency Fund') {
-      setShowEfMonths(true);
-      return;
-    }
+    setIsEfGoal(item.label === 'Emergency Fund');
     const smartTarget = getSmartTarget(item.label);
     if (smartTarget > 0) {
       setTargetAmount(fmt(smartTarget));
     }
-    goToPage(2);
-  };
-
-  const efExpensesParsed = parse(efExpenses);
-
-  const selectEfMonths = (months: number) => {
-    if (months === 0) {
-      setTargetAmount('');
-    } else {
-      setTargetAmount(fmt(efExpensesParsed * months));
-    }
-    setShowEfMonths(false);
     goToPage(2);
   };
 
@@ -487,71 +485,24 @@ export function GoalSetupSheet() {
             </ScrollView>
           </View>
 
-          {/* ─── Page 1: Save-up vault list / EF months picker ─── */}
+          {/* ─── Page 1: Save-up vault list ─── */}
           <View style={[st.stepPage, { width: screenWidth }]}>
-            {showEfMonths ? (
-              <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                <Text style={[st.title, { color: colors.contentPrimary }]}>
-                  How many months should your{'\n'}emergency fund cover?
-                </Text>
-                <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
-                  Most people aim for 3–6 months of expenses. We'll calculate a target based on your spending.
-                </Text>
-
-                <View style={[st.efExpenseRow, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
-                  <Text style={[st.efExpenseLabel, { color: colors.contentSecondary }]}>Your monthly expenses</Text>
-                  <View style={st.efExpenseInputWrap}>
-                    <Text style={[st.efExpenseCurrency, { color: colors.contentSecondary }]}>$</Text>
-                    <TextInput
-                      style={[st.efExpenseInput, { color: colors.contentPrimary }]}
-                      value={efExpenses}
-                      onChangeText={setEfExpenses}
-                      keyboardType="numeric"
-                      placeholder="0"
-                      placeholderTextColor={colors.contentDimmed}
-                    />
-                    <Text style={[st.efExpensePerMonth, { color: colors.contentSecondary }]}>/mo</Text>
-                  </View>
-                </View>
-
-                <View style={st.methodOptions}>
-                  {EF_MONTH_OPTIONS.map(opt => (
-                    <Pressable
-                      key={opt.months}
-                      onPress={() => selectEfMonths(opt.months)}
-                      style={[st.efCard, { backgroundColor: colors.surfaceElevated }]}
-                    >
-                      <View style={st.efCardContent}>
-                        <Text style={[st.efCardTitle, { color: colors.contentPrimary }]}>{opt.title}</Text>
-                        <Text style={[st.efCardSubtitle, { color: colors.contentSecondary }]}>{opt.subtitle}</Text>
-                        {opt.months > 0 && efExpensesParsed > 0 && (
-                          <Text style={[st.efCardAmount, { color: colors.contentSecondary }]}>
-                            Target: <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(efExpensesParsed * opt.months)}</Text>
-                          </Text>
-                        )}
-                      </View>
-                    </Pressable>
-                  ))}
-                </View>
-              </ScrollView>
-            ) : (
-              <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
-                <Text style={[st.title, { color: colors.contentPrimary }]}>What are you saving for?</Text>
-                <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
-                  Pick a category or choose "Other" to create your own.
-                </Text>
-                <View style={st.vaultList}>
-                  {SAVE_UP_ITEMS.map((item) => (
-                    <Pressable key={item.label} style={[st.vaultRow, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectSaveUpItem(item)}>
-                      <View style={st.vaultIconWrap}>
-                        <Feather name={item.icon} size={20} color={colors.contentPrimary} />
-                      </View>
-                      <Text style={[st.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-              </ScrollView>
-            )}
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+              <Text style={[st.title, { color: colors.contentPrimary }]}>What are you saving for?</Text>
+              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                Pick a category or choose "Other" to create your own.
+              </Text>
+              <View style={st.vaultList}>
+                {SAVE_UP_ITEMS.map((item) => (
+                  <Pressable key={item.label} style={[st.vaultRow, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectSaveUpItem(item)}>
+                    <View style={st.vaultIconWrap}>
+                      <Feather name={item.icon} size={20} color={colors.contentPrimary} />
+                    </View>
+                    <Text style={[st.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
           </View>
 
           {/* ─── Page 2: Plan (save-up planner / pay-down unified / investment) ─── */}
@@ -738,6 +689,19 @@ export function GoalSetupSheet() {
                       placeholderTextColor={colors.contentDimmed}
                     />
                   </View>
+
+                  {isEfGoal && (
+                    <View style={[st.coachNote, { backgroundColor: colors.surfaceTint }]}>
+                      <View style={st.coachNoteHeader}>
+                        <Feather name="zap" size={14} color={colors.contentBrand} />
+                        <Text style={[st.coachNoteTitle, { color: colors.contentBrand }]}>Coach suggestion</Text>
+                      </View>
+                      <Text style={[st.coachNoteBody, { color: colors.contentPrimary }]}>
+                        {EF_REC.reason} That's{' '}
+                        <Text style={{ fontFamily: Fonts.bold }}>{EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}</Text>.
+                      </Text>
+                    </View>
+                  )}
 
                   <View style={[st.plannerCard, { backgroundColor: colors.surfaceElevated }]}>
                     <View style={st.plannerRow}>
@@ -1014,18 +978,10 @@ const st = StyleSheet.create({
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
 
-  efExpenseRow: { borderRadius: 16, padding: 16, marginBottom: 8, borderWidth: 1 },
-  efExpenseLabel: { fontSize: 12, fontFamily: Fonts.medium, textTransform: 'uppercase' as const, letterSpacing: 0.6, marginBottom: 8 },
-  efExpenseInputWrap: { flexDirection: 'row' as const, alignItems: 'center' as const },
-  efExpenseCurrency: { fontSize: 24, fontFamily: Fonts.bold, marginRight: 2 },
-  efExpenseInput: { fontSize: 24, fontFamily: Fonts.bold, flex: 1, padding: 0 },
-  efExpensePerMonth: { fontSize: 14, fontFamily: Fonts.medium },
-
-  efCard: { borderRadius: 20, padding: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
-  efCardContent: { gap: 4 },
-  efCardTitle: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
-  efCardSubtitle: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, opacity: 0.7 },
-  efCardAmount: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, marginTop: 4 },
+  coachNote: { borderRadius: 16, padding: 14, gap: 8 },
+  coachNoteHeader: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6 },
+  coachNoteTitle: { fontSize: 13, fontFamily: Fonts.bold, letterSpacing: 0.2 },
+  coachNoteBody: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20 },
 
   methodOptions: { gap: 16 },
   methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
