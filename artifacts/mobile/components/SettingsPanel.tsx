@@ -28,9 +28,9 @@ function RadioUnselected({ size = 24 }: { size?: number }) {
 }
 
 const MODES: { value: MemoryMode; label: string; description: string }[] = [
-  { value: 'full', label: 'Learn as we go', description: 'Coach saves relevant context from conversations automatically. You can review and manage anytime.' },
-  { value: 'ask-first', label: 'I\u2019ll decide', description: 'Coach proposes memories inline during conversation. Nothing saved without your approval.' },
-  { value: 'off', label: 'Just answers', description: 'Coach doesn\u2019t save conversational memories. Responses still use your goals and financial data.' },
+  { value: 'full', label: 'Full memory', description: 'Coach automatically remembers details from your conversations.' },
+  { value: 'ask-first', label: 'Always ask me first', description: 'Coach will ask before saving any memory from your conversations.' },
+  { value: 'off', label: 'Memory off', description: 'Coach won\u2019t save or use any memories. Goals are still tracked.' },
 ];
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -69,7 +69,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.contentSecondary }]}>Trust spectrum</Text>
+          <Text style={[styles.sectionLabel, { color: colors.contentSecondary }]}>Memory</Text>
           <View style={[styles.card, { backgroundColor: colors.surfaceElevated, shadowColor: colors.contentStatusbar }]}>
             {MODES.map((mode, idx) => (
               <Pressable
