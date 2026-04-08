@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type Phase2Screen = 'home' | 'chat' | 'about-me' | 'my-finances' | 'goals-profile' | 'preferences' | 'ai-usage';
+export type Phase2Screen = 'home' | 'chat' | 'my-accounts' | 'goals-profile' | 'about-me' | 'coach-memory' | 'preferences' | 'ai-usage';
 
-const PROFILE_SCREENS: Phase2Screen[] = ['about-me', 'my-finances', 'goals-profile', 'preferences'];
+const PROFILE_SCREENS: Phase2Screen[] = ['my-accounts', 'goals-profile', 'about-me', 'coach-memory', 'preferences'];
 
 interface Phase2NavContextType {
   screen: Phase2Screen;

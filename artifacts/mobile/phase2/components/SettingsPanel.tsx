@@ -29,18 +29,11 @@ export function RadioUnselected({ size = 24 }: { size?: number }) {
 }
 
 const MODES: { value: MemoryMode; label: string; description: string }[] = [
-  { value: 'full', label: 'Full memory', description: 'Coach automatically remembers details from your conversations.' },
-  { value: 'ask-first', label: 'Always ask first', description: 'Coach will ask before saving anything from conversations.' },
-  { value: 'off', label: 'Memory off', description: 'Coach won\u2019t save or use any memories. Goals are still tracked.' },
+  { value: 'full', label: 'Learn as we go', description: 'Coach saves relevant context from conversations automatically. You can review and manage anytime.' },
+  { value: 'ask-first', label: 'I\u2019ll decide', description: 'Coach proposes memories inline during conversation. Nothing saved without your approval.' },
+  { value: 'off', label: 'Just answers', description: 'Coach doesn\u2019t save conversational memories. Responses still use your goals and financial data.' },
 ];
 
-type TrustLevel = 'conservative' | 'balanced' | 'proactive';
-
-const TRUST_LEVELS: { value: TrustLevel; label: string; description: string }[] = [
-  { value: 'conservative', label: 'Conservative', description: 'Only act on what I\u2019ve explicitly confirmed' },
-  { value: 'balanced', label: 'Balanced', description: 'Infer from patterns, but check on big moves' },
-  { value: 'proactive', label: 'Proactive', description: 'Anticipate my needs and act when confident' },
-];
 
 const SUPPRESSION_PRESETS: string[] = [
   'Credit score discussions',
@@ -80,7 +73,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const { colors } = useTheme();
   const { memoryMode, setMemoryMode } = useCoach();
   const [localMode, setLocalMode] = useState<MemoryMode>(memoryMode);
-  const [trustLevel, setTrustLevel] = useState<TrustLevel>('balanced');
   const [categoryToggles, setCategoryToggles] = useState<Record<MemoryCategory, boolean>>({
     ABOUT_ME: true,
     PREFERENCES: true,
@@ -123,7 +115,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.contentSecondary }]}>Memory mode</Text>
+          <Text style={[styles.sectionLabel, { color: colors.contentSecondary }]}>Trust spectrum</Text>
           <View style={[styles.card, { backgroundColor: colors.surfaceElevated, shadowColor: colors.contentStatusbar }]}>
             {MODES.map((mode, idx) => (
               <Pressable
@@ -140,42 +132,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 </View>
               </Pressable>
             ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.contentSecondary }]}>Trust spectrum</Text>
-          <View style={[styles.card, { backgroundColor: colors.surfaceElevated, shadowColor: colors.contentStatusbar }]}>
-            <View style={styles.trustContent}>
-              <Text style={[styles.trustHint, { color: colors.contentMuted }]}>
-                How much should Coach act on your behalf?
-              </Text>
-              <View style={styles.trustRow}>
-                {TRUST_LEVELS.map((level) => {
-                  const active = trustLevel === level.value;
-                  return (
-                    <Pressable
-                      key={level.value}
-                      style={[
-                        styles.trustChip,
-                        { borderColor: colors.surfaceEdge },
-                        active && { backgroundColor: colors.contentPrimary, borderColor: colors.contentPrimary },
-                      ]}
-                      onPress={() => setTrustLevel(level.value)}
-                    >
-                      <Text style={[
-                        styles.trustChipLabel,
-                        { color: colors.contentPrimary },
-                        active && { color: colors.contentPrimaryInverse },
-                      ]}>{level.label}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-              <Text style={[styles.trustDesc, { color: colors.contentSecondary }]}>
-                {TRUST_LEVELS.find(t => t.value === trustLevel)?.description}
-              </Text>
-            </View>
           </View>
         </View>
 
@@ -280,37 +236,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
-  },
-  trustContent: {
-    paddingVertical: 16,
-    gap: 10,
-  },
-  trustHint: {
-    fontSize: 13,
-    fontFamily: Fonts.regular,
-    lineHeight: 18,
-  },
-  trustRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  trustChip: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  trustChipLabel: {
-    fontSize: 13,
-    fontFamily: Fonts.medium,
-    lineHeight: 18,
-  },
-  trustDesc: {
-    fontSize: 13,
-    fontFamily: Fonts.regular,
-    lineHeight: 18,
-    fontStyle: 'italic',
   },
   toggleContent: {
     paddingVertical: 12,

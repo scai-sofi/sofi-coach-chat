@@ -69,7 +69,7 @@ export default function MyFinancesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="My Finances" onBack={() => goBack()} />
+      <AppBar variant="back" title="My Accounts" onBack={() => goBack()} />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.netWorthHeader}>

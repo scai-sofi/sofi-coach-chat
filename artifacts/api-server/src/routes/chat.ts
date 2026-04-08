@@ -297,20 +297,20 @@ You don't have any stored memories about this user yet. Pay attention to persona
   if (!memoryMode || memoryMode === 'full') {
     prompt += `
 
-## IMPORTANT: Memory Mode is "Full" (Auto-save enabled)
+## IMPORTANT: Trust Spectrum is "Learn as we go" (Auto-save enabled)
 Memory is fully enabled. You MUST emit memory markers for every piece of personal information the user shares. Use [MEMORY_SAVE] for explicit facts (income, location, accounts, family, age, job) and [MEMORY_PROPOSAL] for preferences and attitudes (risk tolerance, communication style, financial philosophy). NEVER skip emitting a marker when the user shares personal information — emit it AFTER [SUGGESTIONS] on its own line. This is the most critical instruction: if the user tells you about themselves, ALWAYS emit a marker.`;
   }
 
   if (memoryMode === 'ask-first') {
     prompt += `
 
-## IMPORTANT: Memory Mode is "Always Ask First"
-The user has enabled "Always ask me first" for memory. You MUST emit [MEMORY_SAVE] markers for ALL personal information the user shares. The client will convert these to proposals that the user can approve or dismiss. Do NOT skip memory markers — the user wants to be asked, not ignored. ALWAYS extract and emit memory markers for every personal fact, preference, or life detail mentioned.`;
+## IMPORTANT: Trust Spectrum is "I'll decide" (Approval required)
+The user has selected "I'll decide" for memory. You MUST emit [MEMORY_SAVE] markers for ALL personal information the user shares. The client will convert these to proposals that the user can approve or dismiss. Do NOT skip memory markers — the user wants to be asked, not ignored. ALWAYS extract and emit memory markers for every personal fact, preference, or life detail mentioned.`;
   } else if (memoryMode === 'off') {
     prompt += `
 
-## Memory Mode: Off
-The user has turned off memory. Do NOT emit any [MEMORY_SAVE], [MEMORY_PROPOSAL], or [MEMORY_UPDATE] markers.`;
+## Trust Spectrum: "Just answers" (Memory off)
+The user has selected "Just answers." Do NOT emit any [MEMORY_SAVE], [MEMORY_PROPOSAL], or [MEMORY_UPDATE] markers.`;
   }
 
   return prompt;

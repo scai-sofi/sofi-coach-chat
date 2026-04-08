@@ -128,7 +128,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [memoryMode, setMemoryMode] = useState<MemoryMode>('full');
+  const [memoryMode, setMemoryMode] = useState<MemoryMode>('ask-first');
   const [activePanel, setActivePanelState] = useState<PanelType>('none');
   const [activeScenario, setActiveScenario] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);

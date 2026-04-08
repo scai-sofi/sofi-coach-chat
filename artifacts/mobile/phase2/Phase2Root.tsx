@@ -6,7 +6,8 @@ import { Phase2NavProvider, usePhase2Nav } from './context/Phase2NavContext';
 import HomeScreen from './screens/HomeScreen';
 import ChatScreen from './screens/ChatScreen';
 import AboutMeScreen from './screens/AboutMeScreen';
-import MyFinancesScreen from './screens/MyFinancesScreen';
+import MyAccountsScreen from './screens/MyFinancesScreen';
+import CoachMemoryScreen from './screens/CoachMemoryScreen';
 import GoalsProfileScreen from './screens/GoalsProfileScreen';
 import PreferencesScreen from './screens/PreferencesScreen';
 import AiUsageScreen from './screens/AiUsageScreen';
@@ -19,8 +20,10 @@ function Phase2Navigator() {
       return <ChatScreen />;
     case 'about-me':
       return <AboutMeScreen />;
-    case 'my-finances':
-      return <MyFinancesScreen />;
+    case 'my-accounts':
+      return <MyAccountsScreen />;
+    case 'coach-memory':
+      return <CoachMemoryScreen />;
     case 'goals-profile':
       return <GoalsProfileScreen />;
     case 'preferences':

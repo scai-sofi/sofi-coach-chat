@@ -71,13 +71,12 @@ Three strictly separated layers for GA / Post-GA prototyping:
 
 The `_layout.tsx` conditionally renders GA (expo-router Stack) or Post-GA (Phase2Root) based on `protoPhase` from PrototypeContext. Post-GA `PanelType` includes `'profile'` for future use.
 
-**Post-GA Profile Drawer:** `phase2/components/ProfileDrawer.tsx` — slides in from the left when the user taps the profile icon on the Post-GA home screen. Matches the Figma design (node 427-35241): avatar placeholder, name/member-since, menu items (Membership & rewards, About me, My finances, Goals, Preferences, Documents, Referral), and bottom section (Settings, Log Out). Animated with reanimated `withTiming` slide + scrim fade. Closes on scrim tap or X button.
+**Post-GA Profile Drawer:** `phase2/components/ProfileDrawer.tsx` — slides in from the left when the user taps the profile icon on the Post-GA home screen. Five Coach Intelligence tabs matching the updated doc: My Accounts (renamed from My Finances), My Goals, About Me, Coach Memory (new — trust-spectrum-governed conversational memories with pause/delete), Preferences. Plus non-Coach items (Membership & rewards, Documents, Referral). Animated with reanimated `withTiming` slide + scrim fade. Closes on scrim tap or X button.
 
 ### Key Architectural Decisions
 - **State Management:** Utilizes a single `CoachContext` with plain React context, prioritizing Flutter portability over external state libraries.
 - **Panel System:** Full-screen overlay panels (MemoryCenter, GoalsDashboard, ChatHistory, SettingsPanel) managed via a `PanelType` enum.
-- **Chat Memory Naming Convention:** All user-facing text uses "chat memory" / "chat memories" (never just "memory") to clearly communicate that this feature only affects the chat experience and does not automatically consume or modify memory outside of chat conversations.
-- **Memory Privacy Mode:** 3-mode picker (`full` | `ask-first` | `off`) accessible from Settings panel. Controls whether AI receives chat memories, how saves are handled (auto vs proposal vs suppressed), and Memory Center display state. Goals are unaffected by chat memory mode.
+- **Trust Spectrum:** The core member-control setting with three modes — "Learn as we go" (`full`: auto-save), "I'll decide" (`ask-first`: approval required, **default**), "Just answers" (`off`: no conversational memory). Controls whether Coach saves conversational context. Goals are independent of the trust spectrum and persist in all modes. The internal values (`full`/`ask-first`/`off`) remain unchanged; only user-facing labels changed.
 - **Chat Sessions:** In-memory management of sessions, each with `id`, `title`, `messages`, `memories`, `goals`. Includes auto-generation of titles and a `sessionVersionRef` for concurrency.
 - **Demo vs Live Mode:** Supports switching between pre-built demo scenarios and live AI interactions.
 

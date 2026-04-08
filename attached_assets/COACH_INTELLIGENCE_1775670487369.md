@@ -211,7 +211,7 @@ Goals are available in all three modes — they are independent of conversationa
 
 | Mode | Reactive output (chat) | Proactive output (70/20/10) |
 |------|----------------------|----------------------------|
-| **Just answers** | Responses grounded in goals and financial reality — no conversational memory | No proactive engagement. Coach never initiates. |
+| **Just answers** | Generic responses — no memory or goal context | No proactive engagement. Coach never initiates. |
 | **I'll decide** | Responses use approved memories and goals | Proactive engagement scales with what the member has approved. More approvals → richer FYIs, sharper nudges. |
 | **Learn as we go** | Full context — all memories and goals shape every response | Full engagement framework active. All three tiers fire based on the member's complete profile. |
 

@@ -43,9 +43,10 @@ interface ProfileDrawerProps {
 
 const MENU_ITEMS: MenuItem[] = [
   { icon: 'award', label: 'Membership & rewards' },
-  { icon: 'user', label: 'About me', screen: 'about-me' },
-  { icon: 'dollar-sign', label: 'My finances', screen: 'my-finances' },
-  { icon: 'target', label: 'Goals', screen: 'goals-profile' },
+  { icon: 'credit-card', label: 'My Accounts', screen: 'my-accounts' },
+  { icon: 'target', label: 'My Goals', screen: 'goals-profile' },
+  { icon: 'user', label: 'About Me', screen: 'about-me' },
+  { icon: 'book-open', label: 'Coach Memory', screen: 'coach-memory' },
   { icon: 'sliders', label: 'Preferences', screen: 'preferences' },
   { icon: 'file-text', label: 'Documents' },
   { icon: 'gift', label: 'Referral' },
