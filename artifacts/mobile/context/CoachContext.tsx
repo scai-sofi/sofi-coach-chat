@@ -205,8 +205,6 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     sessionVersionRef.current += 1;
     setChatMode('live');
     setMessages([]);
-    setMemories([]);
-    setGoals([]);
     setIsTyping(false);
     setActiveScenario('');
     setActivePersona(persona);
@@ -215,7 +213,22 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     titleGeneratedRef.current = false;
     setPendingGoalSetup(null);
     setCurrentSessionId(null);
-    setChatHistory(buildSeededHistory(personaId));
+    const seeded = buildSeededHistory(personaId);
+    setChatHistory(seeded);
+    const seenMemIds = new Set<string>();
+    const seenGoalIds = new Set<string>();
+    const aggregatedMemories: Memory[] = [];
+    const aggregatedGoals: Goal[] = [];
+    for (const session of seeded) {
+      for (const m of session.memories ?? []) {
+        if (!seenMemIds.has(m.id)) { seenMemIds.add(m.id); aggregatedMemories.push(m); }
+      }
+      for (const g of session.goals ?? []) {
+        if (!seenGoalIds.has(g.id)) { seenGoalIds.add(g.id); aggregatedGoals.push(g); }
+      }
+    }
+    setMemories(aggregatedMemories);
+    setGoals(aggregatedGoals);
     setSharedPersonaId(personaId);
   }, [setSharedPersonaId]);
 
