@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Dimensions, Platform } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Pressable, TextInput, ScrollView, StyleSheet } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS, SlideInRight, SlideOutLeft, SlideInLeft, SlideOutRight } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
 import { useCoach, PendingGoalSetup } from '@/context/CoachContext';
 import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const SHEET_HEIGHT = SCREEN_HEIGHT * 0.85;
+const SLIDE_DISTANCE = 800;
 
-const GOAL_TYPE_LABELS: Record<GoalType, string> = {
-  EMERGENCY_FUND: 'Emergency Fund',
-  DEBT_PAYOFF: 'Debt Payoff',
-  SAVINGS_TARGET: 'Savings Target',
-  INVESTMENT: 'Investment',
-  CUSTOM: 'Custom',
-};
+const GOAL_TYPES: { type: GoalType; label: string; icon: keyof typeof Feather.glyphMap }[] = [
+  { type: 'EMERGENCY_FUND', label: 'Emergency Fund', icon: 'shield' },
+  { type: 'DEBT_PAYOFF', label: 'Debt Payoff', icon: 'trending-down' },
+  { type: 'SAVINGS_TARGET', label: 'Savings Target', icon: 'target' },
+  { type: 'INVESTMENT', label: 'Investment', icon: 'bar-chart-2' },
+  { type: 'CUSTOM', label: 'Custom Goal', icon: 'star' },
+];
 
 const LINKED_ACCOUNTS = [
   'SoFi Checking',
@@ -39,22 +39,50 @@ function formatMonthYear(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
+type Step = 1 | 2 | 3 | 4;
+
+function StepIndicator({ current, total }: { current: number; total: number }) {
+  const { colors } = useTheme();
+  return (
+    <View style={stepStyles.row}>
+      {Array.from({ length: total }, (_, i) => (
+        <View
+          key={i}
+          style={[
+            stepStyles.dot,
+            {
+              backgroundColor: i < current ? colors.contentPrimary : colors.progressTrack,
+              width: i + 1 === current ? 24 : 8,
+            },
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
+
+const stepStyles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center', paddingVertical: 12 },
+  dot: { height: 6, borderRadius: 3 },
+});
+
 export function GoalSetupSheet() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { pendingGoalSetup, createGoalFromSetup, cancelGoalSetup } = useCoach();
   const [visible, setVisible] = useState(false);
   const [setup, setSetup] = useState<PendingGoalSetup | null>(null);
 
+  const [step, setStep] = useState<Step>(1);
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [title, setTitle] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [monthlyContribution, setMonthlyContribution] = useState('');
   const [targetDate, setTargetDate] = useState(new Date());
   const [linkedAccount, setLinkedAccount] = useState('');
-  const [goalType, setGoalType] = useState<GoalType>('CUSTOM');
-  const [showAccountPicker, setShowAccountPicker] = useState(false);
+  const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
 
-  const slideY = useSharedValue(SHEET_HEIGHT);
-  const backdropOpacity = useSharedValue(0);
+  const slideY = useSharedValue(SLIDE_DISTANCE);
 
   useEffect(() => {
     if (pendingGoalSetup) {
@@ -67,6 +95,7 @@ export function GoalSetupSheet() {
         setTargetDate(p.targetDate);
         setLinkedAccount(p.linkedAccount);
         setGoalType(p.type);
+        setStep(4);
       } else {
         const defaultDate = new Date();
         defaultDate.setMonth(defaultDate.getMonth() + 6);
@@ -76,11 +105,11 @@ export function GoalSetupSheet() {
         setTargetDate(defaultDate);
         setLinkedAccount('');
         setGoalType('SAVINGS_TARGET');
+        setStep(1);
       }
-      setShowAccountPicker(false);
+      setDirection('forward');
       setVisible(true);
-      slideY.value = withTiming(0, { duration: 350, easing: Easing.out(Easing.cubic) });
-      backdropOpacity.value = withTiming(1, { duration: 300 });
+      slideY.value = withTiming(0, { duration: 320, easing: Easing.out(Easing.cubic) });
     } else if (visible) {
       dismiss();
     }
@@ -92,15 +121,24 @@ export function GoalSetupSheet() {
   };
 
   const dismiss = () => {
-    slideY.value = withTiming(SHEET_HEIGHT, { duration: 280, easing: Easing.in(Easing.cubic) }, () => {
+    slideY.value = withTiming(SLIDE_DISTANCE, { duration: 260, easing: Easing.in(Easing.cubic) }, () => {
       runOnJS(onDismissComplete)();
     });
-    backdropOpacity.value = withTiming(0, { duration: 250 });
   };
 
-  const handleCancel = () => {
-    dismiss();
-  };
+  const goNext = useCallback(() => {
+    setDirection('forward');
+    setStep(s => Math.min(s + 1, 4) as Step);
+  }, []);
+
+  const goBack = useCallback(() => {
+    if (step === 1) {
+      dismiss();
+      return;
+    }
+    setDirection('back');
+    setStep(s => Math.max(s - 1, 1) as Step);
+  }, [step]);
 
   const handleCreate = () => {
     if (!setup) return;
@@ -114,6 +152,14 @@ export function GoalSetupSheet() {
     }, setup.messageId ?? undefined);
   };
 
+  const selectType = (type: GoalType) => {
+    setGoalType(type);
+    const label = GOAL_TYPES.find(g => g.type === type)?.label || '';
+    if (!title) setTitle(label);
+    setDirection('forward');
+    setStep(2);
+  };
+
   const adjustMonth = (delta: number) => {
     setTargetDate(prev => {
       const d = new Date(prev);
@@ -123,288 +169,408 @@ export function GoalSetupSheet() {
     });
   };
 
-  const animatedSheet = useAnimatedStyle(() => ({
+  const animatedPanel = useAnimatedStyle(() => ({
     transform: [{ translateY: slideY.value }],
-  }));
-
-  const animatedBackdrop = useAnimatedStyle(() => ({
-    opacity: backdropOpacity.value,
   }));
 
   if (!visible) return null;
 
   const isNewGoal = !setup?.proposal;
-  const isValid = title.trim().length > 0 && parseCurrency(targetAmount) > 0 && parseCurrency(monthlyContribution) > 0 && linkedAccount.length > 0;
+  const step2Valid = title.trim().length > 0 && parseCurrency(targetAmount) > 0;
+  const step3Valid = parseCurrency(monthlyContribution) > 0 && linkedAccount.length > 0;
+  const reviewValid = step2Valid && step3Valid;
 
   return (
-    <View style={styles.container} pointerEvents="box-none">
-      <Animated.View style={[styles.backdrop, { backgroundColor: 'rgba(0,0,0,0.5)' }, animatedBackdrop]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={handleCancel} />
-      </Animated.View>
-
-      <Animated.View style={[styles.sheet, { backgroundColor: colors.surfacePrimary }, animatedSheet]}>
-        <View style={styles.handleBar}>
-          <View style={[styles.handle, { backgroundColor: colors.contentMuted }]} />
+    <Animated.View style={[styles.fullScreen, animatedPanel, { backgroundColor: colors.surfaceBase }]}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <Pressable style={styles.backBtn} onPress={goBack} hitSlop={12}>
+          <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
+        </Pressable>
+        <View style={styles.headerCenter}>
+          <StepIndicator current={step} total={4} />
         </View>
+        <Pressable style={styles.closeBtn} onPress={dismiss} hitSlop={12}>
+          <Feather name="x" size={22} color={colors.contentPrimary} />
+        </Pressable>
+      </View>
 
-        <View style={[styles.header, { borderBottomColor: colors.surfaceEdge }]}>
-          <Pressable onPress={handleCancel} hitSlop={12}>
-            <Feather name="x" size={22} color={colors.contentPrimary} />
-          </Pressable>
-          <Text style={[styles.headerTitle, { color: colors.contentPrimary }]}>{isNewGoal ? 'New goal' : 'Set up goal'}</Text>
-          <View style={{ width: 22 }} />
-        </View>
-
-        <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.contentSecondary }]}>Goal name</Text>
-            <TextInput
-              style={[styles.input, { color: colors.contentPrimary, borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="e.g. Credit Card Payoff"
-              placeholderTextColor={colors.contentDimmed}
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.contentSecondary }]}>Type</Text>
-            <View style={[styles.typeChips]}>
-              {(Object.keys(GOAL_TYPE_LABELS) as GoalType[]).map(t => (
-                <Pressable
-                  key={t}
-                  style={[
-                    styles.typeChip,
-                    { borderColor: t === goalType ? colors.contentPrimary : colors.surfaceEdge, backgroundColor: t === goalType ? colors.contentPrimary : 'transparent' },
-                  ]}
-                  onPress={() => setGoalType(t)}
-                >
-                  <Text style={[styles.typeChipText, { color: t === goalType ? colors.contentPrimaryInverse : colors.contentSecondary }]}>
-                    {GOAL_TYPE_LABELS[t]}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <View style={[styles.section, styles.halfSection]}>
-              <Text style={[styles.label, { color: colors.contentSecondary }]}>Target amount</Text>
-              <View style={[styles.inputRow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
-                <Text style={[styles.currencyPrefix, { color: colors.contentSecondary }]}>$</Text>
-                <TextInput
-                  style={[styles.inputInner, { color: colors.contentPrimary }]}
-                  value={targetAmount}
-                  onChangeText={setTargetAmount}
-                  keyboardType="numeric"
-                  placeholder="0"
-                  placeholderTextColor={colors.contentDimmed}
-                />
-              </View>
-            </View>
-
-            <View style={[styles.section, styles.halfSection]}>
-              <Text style={[styles.label, { color: colors.contentSecondary }]}>Monthly amount</Text>
-              <View style={[styles.inputRow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
-                <Text style={[styles.currencyPrefix, { color: colors.contentSecondary }]}>$</Text>
-                <TextInput
-                  style={[styles.inputInner, { color: colors.contentPrimary }]}
-                  value={monthlyContribution}
-                  onChangeText={setMonthlyContribution}
-                  keyboardType="numeric"
-                  placeholder="0"
-                  placeholderTextColor={colors.contentDimmed}
-                />
-                <Text style={[styles.perMonth, { color: colors.contentSecondary }]}>/mo</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.contentSecondary }]}>Target date</Text>
-            <View style={styles.dateRow}>
-              <Pressable onPress={() => adjustMonth(-1)} style={[styles.dateBtn, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
-                <Feather name="chevron-left" size={18} color={colors.contentPrimary} />
-              </Pressable>
-              <Text style={[styles.dateText, { color: colors.contentPrimary }]}>{formatMonthYear(targetDate)}</Text>
-              <Pressable onPress={() => adjustMonth(1)} style={[styles.dateBtn, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
-                <Feather name="chevron-right" size={18} color={colors.contentPrimary} />
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.contentSecondary }]}>Linked account</Text>
-            <Pressable
-              style={[styles.selectBtn, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
-              onPress={() => setShowAccountPicker(!showAccountPicker)}
-            >
-              <Text style={[styles.selectBtnText, { color: linkedAccount ? colors.contentPrimary : colors.contentDimmed }]}>
-                {linkedAccount || 'Select account'}
-              </Text>
-              <Feather name={showAccountPicker ? 'chevron-up' : 'chevron-down'} size={16} color={colors.contentSecondary} />
-            </Pressable>
-            {showAccountPicker && (
-              <View style={[styles.accountList, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
-                {LINKED_ACCOUNTS.map(a => (
-                  <Pressable
-                    key={a}
-                    style={[styles.accountItem, a === linkedAccount && { backgroundColor: colors.surfaceTint }]}
-                    onPress={() => { setLinkedAccount(a); setShowAccountPicker(false); }}
-                  >
-                    <Text style={[styles.accountItemText, { color: a === linkedAccount ? colors.contentPrimary : colors.contentSecondary }]}>{a}</Text>
-                    {a === linkedAccount && <Feather name="check" size={14} color={colors.contentPrimary} />}
-                  </Pressable>
-                ))}
-              </View>
-            )}
-          </View>
-
-          <View style={[styles.summaryCard, { backgroundColor: colors.surfaceTint, borderColor: colors.surfaceEdge }]}>
-            <View style={styles.summaryRow}>
-              <Feather name="target" size={14} color={colors.contentSecondary} />
-              <Text style={[styles.summaryText, { color: colors.contentSecondary }]}>
-                ${formatCurrency(parseCurrency(targetAmount))} goal · ${formatCurrency(parseCurrency(monthlyContribution))}/mo · {formatMonthYear(targetDate)}
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-
-        <View style={[styles.footer, { borderTopColor: colors.surfaceEdge }]}>
-          <Pressable
-            style={[styles.createBtn, { backgroundColor: isValid ? colors.contentPrimary : colors.contentDisabled }]}
-            onPress={handleCreate}
-            disabled={!isValid}
+      <View style={styles.body}>
+        {step === 1 && (
+          <Animated.View
+            key="step1"
+            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
+            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
+            style={styles.stepContainer}
           >
-            <Feather name="target" size={16} color={colors.contentPrimaryInverse} style={{ marginRight: 6 }} />
-            <Text style={[styles.createBtnText, { color: colors.contentPrimaryInverse }]}>Create goal</Text>
-          </Pressable>
-        </View>
-      </Animated.View>
-    </View>
+            <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>What are you saving for?</Text>
+              <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
+                Choose a goal type to get started.
+              </Text>
+
+              <View style={styles.typeList}>
+                {GOAL_TYPES.map(({ type, label, icon }) => {
+                  const selected = type === goalType;
+                  return (
+                    <Pressable
+                      key={type}
+                      style={[
+                        styles.typeRow,
+                        { backgroundColor: colors.surfaceElevated, borderColor: selected ? colors.contentPrimary : colors.surfaceEdge },
+                        selected && { borderWidth: 2 },
+                      ]}
+                      onPress={() => selectType(type)}
+                    >
+                      <View style={[styles.typeIconWrap, { backgroundColor: colors.surfaceTint }]}>
+                        <Feather name={icon} size={18} color={colors.contentPrimary} />
+                      </View>
+                      <Text style={[styles.typeLabel, { color: colors.contentPrimary }]}>{label}</Text>
+                      <Feather name="chevron-right" size={18} color={colors.contentMuted} />
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </Animated.View>
+        )}
+
+        {step === 2 && (
+          <Animated.View
+            key="step2"
+            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
+            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
+            style={styles.stepContainer}
+          >
+            <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Customize your goal</Text>
+              <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
+                Give it a name and set your target.
+              </Text>
+
+              <View style={styles.fieldGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Name</Text>
+                <TextInput
+                  style={[styles.fieldInput, { color: colors.contentPrimary, borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder="e.g. Credit Card Payoff"
+                  placeholderTextColor={colors.contentDimmed}
+                  autoFocus
+                />
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Goal</Text>
+                <View style={[styles.currencyInput, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
+                  <Text style={[styles.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                  <TextInput
+                    style={[styles.currencyField, { color: colors.contentPrimary }]}
+                    value={targetAmount}
+                    onChangeText={setTargetAmount}
+                    keyboardType="numeric"
+                    placeholder="10,000"
+                    placeholderTextColor={colors.contentDimmed}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+
+            <View style={[styles.footer, { paddingBottom: insets.bottom || 16 }]}>
+              <Pressable
+                style={[styles.nextBtn, { backgroundColor: step2Valid ? colors.contentBrand : colors.contentDisabled }]}
+                onPress={goNext}
+                disabled={!step2Valid}
+              >
+                <Text style={[styles.nextBtnText, { color: '#ffffff' }]}>Next</Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        )}
+
+        {step === 3 && (
+          <Animated.View
+            key="step3"
+            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
+            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
+            style={styles.stepContainer}
+          >
+            <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>How do you want to save?</Text>
+              <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
+                Set up your contribution and timeline.
+              </Text>
+
+              <View style={styles.fieldGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Monthly contribution</Text>
+                <View style={[styles.currencyInput, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
+                  <Text style={[styles.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                  <TextInput
+                    style={[styles.currencyField, { color: colors.contentPrimary }]}
+                    value={monthlyContribution}
+                    onChangeText={setMonthlyContribution}
+                    keyboardType="numeric"
+                    placeholder="500"
+                    placeholderTextColor={colors.contentDimmed}
+                    autoFocus
+                  />
+                  <Text style={[styles.perMonthLabel, { color: colors.contentSecondary }]}>/mo</Text>
+                </View>
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Target date</Text>
+                <View style={styles.dateSelector}>
+                  <Pressable onPress={() => adjustMonth(-1)} style={[styles.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
+                    <Feather name="chevron-left" size={18} color={colors.contentPrimary} />
+                  </Pressable>
+                  <View style={[styles.dateDisplay, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+                    <Text style={[styles.dateText, { color: colors.contentPrimary }]}>{formatMonthYear(targetDate)}</Text>
+                  </View>
+                  <Pressable onPress={() => adjustMonth(1)} style={[styles.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
+                    <Feather name="chevron-right" size={18} color={colors.contentPrimary} />
+                  </Pressable>
+                </View>
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Linked account</Text>
+                <View style={styles.accountOptions}>
+                  {LINKED_ACCOUNTS.map(acct => {
+                    const selected = acct === linkedAccount;
+                    return (
+                      <Pressable
+                        key={acct}
+                        style={[
+                          styles.accountRow,
+                          { backgroundColor: colors.surfaceElevated, borderColor: selected ? colors.contentPrimary : colors.surfaceEdge },
+                          selected && { borderWidth: 2 },
+                        ]}
+                        onPress={() => setLinkedAccount(acct)}
+                      >
+                        <View style={[styles.radio, { borderColor: selected ? colors.contentPrimary : colors.contentMuted }]}>
+                          {selected && <View style={[styles.radioFill, { backgroundColor: colors.contentPrimary }]} />}
+                        </View>
+                        <Text style={[styles.accountLabel, { color: colors.contentPrimary }]}>{acct}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+            </ScrollView>
+
+            <View style={[styles.footer, { paddingBottom: insets.bottom || 16 }]}>
+              <Pressable
+                style={[styles.nextBtn, { backgroundColor: step3Valid ? colors.contentBrand : colors.contentDisabled }]}
+                onPress={goNext}
+                disabled={!step3Valid}
+              >
+                <Text style={[styles.nextBtnText, { color: '#ffffff' }]}>Next</Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        )}
+
+        {step === 4 && (
+          <Animated.View
+            key="step4"
+            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
+            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
+            style={styles.stepContainer}
+          >
+            <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Review your goal</Text>
+              <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
+                Everything look right? You can edit anytime.
+              </Text>
+
+              <View style={[styles.reviewCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+                <View style={styles.reviewHeader}>
+                  <View style={[styles.reviewIconWrap, { backgroundColor: colors.surfaceTint }]}>
+                    <Feather name="target" size={20} color={colors.contentPrimary} />
+                  </View>
+                  <View style={styles.reviewHeaderText}>
+                    <Text style={[styles.reviewName, { color: colors.contentPrimary }]}>{title || 'Untitled Goal'}</Text>
+                    <Text style={[styles.reviewType, { color: colors.contentSecondary }]}>
+                      {GOAL_TYPES.find(g => g.type === goalType)?.label || 'Custom'}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={[styles.reviewDivider, { backgroundColor: colors.surfaceEdge }]} />
+
+                <View style={styles.reviewRows}>
+                  <View style={styles.reviewRow}>
+                    <Text style={[styles.reviewLabel, { color: colors.contentSecondary }]}>Target</Text>
+                    <Text style={[styles.reviewValue, { color: colors.contentPrimary }]}>
+                      ${formatCurrency(parseCurrency(targetAmount))}
+                    </Text>
+                  </View>
+                  <View style={styles.reviewRow}>
+                    <Text style={[styles.reviewLabel, { color: colors.contentSecondary }]}>Monthly</Text>
+                    <Text style={[styles.reviewValue, { color: colors.contentPrimary }]}>
+                      ${formatCurrency(parseCurrency(monthlyContribution))}/mo
+                    </Text>
+                  </View>
+                  <View style={styles.reviewRow}>
+                    <Text style={[styles.reviewLabel, { color: colors.contentSecondary }]}>Timeline</Text>
+                    <Text style={[styles.reviewValue, { color: colors.contentPrimary }]}>{formatMonthYear(targetDate)}</Text>
+                  </View>
+                  <View style={styles.reviewRow}>
+                    <Text style={[styles.reviewLabel, { color: colors.contentSecondary }]}>Account</Text>
+                    <Text style={[styles.reviewValue, { color: colors.contentPrimary }]}>{linkedAccount || '—'}</Text>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+
+            <View style={[styles.footer, { paddingBottom: insets.bottom || 16 }]}>
+              <Pressable
+                style={[styles.nextBtn, { backgroundColor: reviewValid ? colors.contentBrand : colors.contentDisabled }]}
+                onPress={handleCreate}
+                disabled={!reviewValid}
+              >
+                <Text style={[styles.nextBtnText, { color: '#ffffff' }]}>Create goal</Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        )}
+      </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  fullScreen: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 200,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  sheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: SHEET_HEIGHT,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    overflow: 'hidden',
-  },
-  handleBar: {
-    alignItems: 'center',
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 8,
+    paddingBottom: 4,
   },
-  headerTitle: {
-    fontSize: 17,
-    fontFamily: Fonts.bold,
+  backBtn: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerCenter: {
+    flex: 1,
+  },
+  closeBtn: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   body: {
     flex: 1,
   },
-  bodyContent: {
-    padding: 20,
+  stepContainer: {
+    flex: 1,
+  },
+  stepContent: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
     paddingBottom: 40,
   },
-  section: {
-    marginBottom: 20,
+  stepTitle: {
+    fontSize: 24,
+    fontFamily: Fonts.bold,
+    lineHeight: 30,
+    marginBottom: 8,
   },
-  label: {
-    fontSize: 13,
+  stepSubtitle: {
+    fontSize: 15,
+    fontFamily: Fonts.regular,
+    lineHeight: 21,
+    marginBottom: 28,
+  },
+  typeList: {
+    gap: 10,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    gap: 14,
+  },
+  typeIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  typeLabel: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    flex: 1,
+  },
+  fieldGroup: {
+    marginBottom: 24,
+  },
+  fieldLabel: {
+    fontSize: 12,
     fontFamily: Fonts.medium,
     marginBottom: 8,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
   },
-  input: {
+  fieldInput: {
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 17,
     fontFamily: Fonts.regular,
   },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  halfSection: {
-    flex: 1,
-  },
-  inputRow: {
+  currencyInput: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  currencyPrefix: {
-    fontSize: 16,
+  currencySign: {
+    fontSize: 17,
     fontFamily: Fonts.regular,
-    marginRight: 2,
+    marginRight: 4,
   },
-  inputInner: {
+  currencyField: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: Fonts.regular,
     padding: 0,
   },
-  perMonth: {
-    fontSize: 13,
+  perMonthLabel: {
+    fontSize: 14,
     fontFamily: Fonts.regular,
     marginLeft: 4,
   },
-  typeChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  typeChip: {
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  typeChipText: {
-    fontSize: 13,
-    fontFamily: Fonts.medium,
-  },
-  dateRow: {
+  dateSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
-  dateBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  dateArrow: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dateDisplay: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -412,68 +578,99 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    flex: 1,
-    textAlign: 'center',
   },
-  selectBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  selectBtnText: {
-    fontSize: 16,
-    fontFamily: Fonts.regular,
-  },
-  accountList: {
-    marginTop: 4,
-    borderWidth: 1,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  accountItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-  },
-  accountItemText: {
-    fontSize: 15,
-    fontFamily: Fonts.regular,
-  },
-  summaryCard: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 14,
-    marginTop: 4,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  accountOptions: {
     gap: 8,
   },
-  summaryText: {
-    fontSize: 14,
-    fontFamily: Fonts.regular,
-    flex: 1,
-  },
-  footer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    padding: 16,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-  },
-  createBtn: {
+  accountRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
     paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
   },
-  createBtnText: {
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioFill: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  accountLabel: {
+    fontSize: 15,
+    fontFamily: Fonts.medium,
+  },
+  reviewCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    gap: 14,
+  },
+  reviewIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewHeaderText: {
+    flex: 1,
+    gap: 2,
+  },
+  reviewName: {
+    fontSize: 18,
+    fontFamily: Fonts.bold,
+    lineHeight: 22,
+  },
+  reviewType: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+  },
+  reviewDivider: {
+    height: 1,
+    marginHorizontal: 20,
+  },
+  reviewRows: {
+    padding: 20,
+    gap: 14,
+  },
+  reviewRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  reviewLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+  },
+  reviewValue: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+  },
+  nextBtn: {
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextBtnText: {
     fontSize: 16,
     fontFamily: Fonts.bold,
   },
