@@ -954,7 +954,7 @@ const st = StyleSheet.create({
   debtDetailValue: { fontSize: 15, fontFamily: Fonts.bold },
   debtDetailDiv: { width: 1, height: 28 },
 
-  plannerCard: { borderRadius: 16, overflow: 'hidden', marginBottom: 16, shadowColor: '#121211', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
+  plannerCard: { borderRadius: 20, overflow: 'hidden', marginBottom: 16, shadowColor: '#121211', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   plannerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },
   plannerLabel: { fontSize: 15, fontFamily: Fonts.regular },
   plannerInput: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, minWidth: 140 },
