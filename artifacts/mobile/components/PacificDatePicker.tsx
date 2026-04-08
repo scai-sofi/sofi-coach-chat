@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Modal, StyleSheet, ScrollView } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, FadeIn, SlideInDown } from 'react-native-reanimated';
-import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
@@ -208,15 +207,7 @@ export function PacificDatePicker({
 
           <View style={s.titleArea}>
             <View style={s.titleRow}>
-              {!isCalendar ? (
-                <Pressable onPress={() => setPickerMode('calendar')} hitSlop={12}>
-                  <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
-                </Pressable>
-              ) : (
-                <View style={{ width: 24 }} />
-              )}
               <Text style={[s.titleText, { color: colors.contentPrimary }]}>{title}</Text>
-              <View style={{ width: 24 }} />
             </View>
             {subtitle && (
               <Text style={[s.subtitleText, { color: colors.contentPrimary }]}>{subtitle}</Text>
