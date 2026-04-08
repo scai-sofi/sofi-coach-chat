@@ -216,13 +216,7 @@ export function PacificDatePicker({
                 <View style={{ width: 24 }} />
               )}
               <Text style={[s.titleText, { color: colors.contentPrimary }]}>{title}</Text>
-              {isCalendar ? (
-                <Pressable onPress={onClose} hitSlop={12}>
-                  <Feather name="x" size={24} color={colors.contentPrimary} />
-                </Pressable>
-              ) : (
-                <View style={{ width: 24 }} />
-              )}
+              <View style={{ width: 24 }} />
             </View>
             {subtitle && (
               <Text style={[s.subtitleText, { color: colors.contentPrimary }]}>{subtitle}</Text>
@@ -385,6 +379,12 @@ export function PacificDatePicker({
             >
               <Text style={[s.confirmText, { color: '#ffffff' }]}>Confirm</Text>
             </Pressable>
+            <Pressable
+              style={s.dismissBtn}
+              onPress={onClose}
+            >
+              <Text style={s.dismissText}>Dismiss</Text>
+            </Pressable>
           </View>
         </Animated.View>
       </View>
@@ -537,5 +537,19 @@ const s = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.bold,
     lineHeight: 20,
+  },
+  dismissBtn: {
+    height: 60,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  dismissText: {
+    fontSize: 16,
+    fontFamily: Fonts.bold,
+    lineHeight: 20,
+    color: '#00a2c7',
   },
 });
