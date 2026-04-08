@@ -160,9 +160,14 @@ export function GoalSetupSheet() {
   const panelX = useSharedValue(screenWidth);
   const stripX = useSharedValue(0);
 
-  const goToPage = (p: number) => {
+  const goToPage = (p: number, instant?: boolean) => {
+    const jump = Math.abs(p - page);
     setPage(p);
-    stripX.value = withSpring(-p * screenWidth, STEP_SPRING);
+    if (instant || jump > 1) {
+      stripX.value = -p * screenWidth;
+    } else {
+      stripX.value = withSpring(-p * screenWidth, STEP_SPRING);
+    }
   };
 
   useEffect(() => {
