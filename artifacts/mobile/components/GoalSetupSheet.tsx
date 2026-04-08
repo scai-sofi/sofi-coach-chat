@@ -202,6 +202,17 @@ export function GoalSetupSheet() {
     });
   };
 
+  useEffect(() => {
+    if (page === 2 && monthlyContribution === '') {
+      if (isPayDown && debtEstimate) {
+        setMonthlyContribution(fmt(debtEstimate.suggestedPayment));
+      } else if (!isPayDown && target > 0 && months > 0) {
+        const sug = Math.ceil(target / months);
+        if (sug > 0) setMonthlyContribution(fmt(sug));
+      }
+    }
+  }, [page]);
+
   const goNext = () => {
     goToPage(Math.min(page + 1, TOTAL_PAGES - 1));
   };
@@ -426,59 +437,6 @@ export function GoalSetupSheet() {
                     </View>
                   )}
 
-                  {/* ── Coach estimate ── */}
-                  {debtEstimate && selectedDebt && (
-                    <View style={[st.coachTip, { backgroundColor: colors.surfaceTint }]}>
-                      <View style={st.coachTipHeader}>
-                        <Feather name="zap" size={14} color={colors.contentBrand} />
-                        <Text style={[st.coachTipTitle, { color: colors.contentPrimary }]}>Coach estimate</Text>
-                      </View>
-
-                      <View style={[st.debtCompare, { borderColor: colors.surfaceEdge }]}>
-                        <View style={st.dcRow}>
-                          <Text style={[st.dcLabel, { color: colors.contentSecondary }]}>Minimum only</Text>
-                          <View style={st.dcRight}>
-                            <Text style={[st.dcTime, { color: colors.contentSecondary }]}>{fmtPayoffTime(debtEstimate.minOnly.months)}</Text>
-                            <Text style={[st.dcInterest, { color: '#c62828' }]}>${fmt(debtEstimate.minOnly.totalInterest)} int.</Text>
-                          </View>
-                        </View>
-                        <View style={[st.dcDivider, { backgroundColor: colors.surfaceEdge }]} />
-                        <View style={st.dcRow}>
-                          <Text style={[st.dcLabel, { color: colors.contentPrimary, fontFamily: Fonts.bold }]}>Coach suggests</Text>
-                          <View style={st.dcRight}>
-                            <Text style={[st.dcTime, { color: colors.contentPrimary, fontFamily: Fonts.bold }]}>{fmtPayoffTime(debtEstimate.withSuggested.months)}</Text>
-                            <Text style={[st.dcInterest, { color: '#2e7d32' }]}>${fmt(debtEstimate.withSuggested.totalInterest)} int.</Text>
-                          </View>
-                        </View>
-                      </View>
-
-                      {monthly === 0 ? (
-                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
-                          Pay <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(debtEstimate.suggestedPayment)}/mo</Text> to be debt-free by {fmtDate(targetDate)} and save{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withSuggested.totalInterest)}</Text> in interest.
-                        </Text>
-                      ) : monthly <= selectedDebt.minPayment ? (
-                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
-                          <Text style={{ fontFamily: Fonts.bold, color: '#c62828' }}>${fmt(monthly)}/mo</Text> is at or below your minimum. Paying more saves you money and time.
-                        </Text>
-                      ) : debtEstimate.withExtra ? (
-                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
-                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, debt-free in{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>{fmtPayoffTime(debtEstimate.withExtra.months)}</Text> — saving{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withExtra.totalInterest)}</Text> in interest.
-                        </Text>
-                      ) : null}
-
-                      {(monthly === 0 || monthly <= selectedDebt.minPayment) && (
-                        <Pressable
-                          style={[st.coachTipBtn, { borderColor: colors.contentBrand }]}
-                          onPress={() => setMonthlyContribution(fmt(debtEstimate.suggestedPayment))}
-                        >
-                          <Text style={[st.coachTipBtnText, { color: colors.contentBrand }]}>Use ${fmt(debtEstimate.suggestedPayment)}/mo</Text>
-                        </Pressable>
-                      )}
-                    </View>
-                  )}
 
                   {/* ── Payment + date inputs ── */}
                   <View style={st.fieldGroup}>
@@ -568,44 +526,6 @@ export function GoalSetupSheet() {
                     </View>
                   </View>
 
-                  {target > 0 && (
-                    <View style={[st.coachTip, { backgroundColor: colors.surfaceTint }]}>
-                      <View style={st.coachTipHeader}>
-                        <Feather name="zap" size={14} color={colors.contentBrand} />
-                        <Text style={[st.coachTipTitle, { color: colors.contentPrimary }]}>Coach suggests</Text>
-                      </View>
-                      {monthly === 0 ? (
-                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
-                          To reach <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(target)}</Text> by {fmtDate(targetDate)}, save about{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(suggested)}/mo</Text>.
-                        </Text>
-                      ) : onTrack ? (
-                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
-                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, you'll hit your goal
-                          {projected > target
-                            ? <> with <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>~${fmt(projected - target)} extra</Text></>
-                            : <> right on time</>
-                          }. Nice.
-                        </Text>
-                      ) : (
-                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
-                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, you'd be about{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: '#c62828' }}>${fmt(shortfall)} short</Text>.{' '}
-                          Try <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(suggested)}/mo</Text> or push the date out.
-                        </Text>
-                      )}
-                      {monthly === 0 && suggested > 0 && (
-                        <Pressable style={[st.coachTipBtn, { borderColor: colors.contentBrand }]} onPress={() => setMonthlyContribution(fmt(suggested))}>
-                          <Text style={[st.coachTipBtnText, { color: colors.contentBrand }]}>Use ${fmt(suggested)}/mo</Text>
-                        </Pressable>
-                      )}
-                      {!onTrack && monthly > 0 && suggested > 0 && (
-                        <Pressable style={[st.coachTipBtn, { borderColor: colors.contentBrand }]} onPress={() => setMonthlyContribution(fmt(suggested))}>
-                          <Text style={[st.coachTipBtnText, { color: colors.contentBrand }]}>Adjust to ${fmt(suggested)}/mo</Text>
-                        </Pressable>
-                      )}
-                    </View>
-                  )}
                 </>
               )}
             </ScrollView>
@@ -777,20 +697,6 @@ const st = StyleSheet.create({
   plannerDateArrow: { width: 32, height: 32, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   plannerDateText: { fontSize: 15, fontFamily: Fonts.medium, minWidth: 120, textAlign: 'center' },
 
-  coachTip: { borderRadius: 14, padding: 14, marginBottom: 20 },
-  coachTipHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
-  coachTipTitle: { fontSize: 13, fontFamily: Fonts.bold, letterSpacing: -0.1 },
-  coachTipBody: { fontSize: 14, fontFamily: Fonts.regular, lineHeight: 20 },
-  coachTipBtn: { alignSelf: 'flex-start', borderWidth: 1.5, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 7, marginTop: 10 },
-  coachTipBtnText: { fontSize: 13, fontFamily: Fonts.bold },
-
-  debtCompare: { borderWidth: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
-  dcRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10 },
-  dcLabel: { fontSize: 13, fontFamily: Fonts.medium, flex: 1 },
-  dcRight: { alignItems: 'flex-end', gap: 2 },
-  dcTime: { fontSize: 13, fontFamily: Fonts.medium },
-  dcInterest: { fontSize: 12, fontFamily: Fonts.medium },
-  dcDivider: { height: 1 },
 
   fieldGroup: { marginBottom: 24 },
   fieldLabel: { fontSize: 12, fontFamily: Fonts.medium, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.6 },
