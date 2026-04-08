@@ -316,9 +316,10 @@ export function GoalSetupSheet() {
       setGoalType('INVESTMENT');
       setTitle('Investment');
       const smartTarget = getSmartTarget('Investment');
-      if (smartTarget > 0 && targetAmount === '') {
+      if (smartTarget > 0) {
         setTargetAmount(fmt(smartTarget));
       }
+      setMonthlyContribution('');
       goToPage(2);
     }
   };
@@ -327,9 +328,10 @@ export function GoalSetupSheet() {
     setGoalType(item.goalType);
     setTitle(item.label);
     const smartTarget = getSmartTarget(item.label);
-    if (smartTarget > 0 && targetAmount === '') {
+    if (smartTarget > 0) {
       setTargetAmount(fmt(smartTarget));
     }
+    setMonthlyContribution('');
     goToPage(2);
   };
 
