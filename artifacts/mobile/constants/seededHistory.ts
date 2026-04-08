@@ -17,16 +17,12 @@ const PERSONA_SEEDED_SESSIONS: Record<string, SeededSessionDef[]> = {
   ],
   'persona-marcus': [
     { scenarioId: 'returning-member', title: 'Weekly spending review', daysAgoCreated: 3, daysAgoUpdated: 3 },
-    { scenarioId: 'proactive-risk', title: 'Credit card payoff alert', daysAgoCreated: 10, daysAgoUpdated: 10 },
-    { scenarioId: 'cross-product', title: 'Splitting my work bonus', daysAgoCreated: 21, daysAgoUpdated: 21 },
   ],
   'persona-jordan': [
-    { scenarioId: 'goal-discovery', title: 'Building my debt payoff plan', daysAgoCreated: 5, daysAgoUpdated: 5 },
     { scenarioId: 'cold-start', title: 'First chat with Coach', daysAgoCreated: 14, daysAgoUpdated: 14 },
   ],
   'persona-david': [
     { scenarioId: 'returning-member', title: 'Monthly portfolio review', daysAgoCreated: 4, daysAgoUpdated: 4 },
-    { scenarioId: 'milestone-celebration', title: 'Emergency fund hit 75%!', daysAgoCreated: 12, daysAgoUpdated: 12 },
     { scenarioId: 'memory-lifecycle', title: 'Updating my financial preferences', daysAgoCreated: 25, daysAgoUpdated: 25 },
   ],
 };

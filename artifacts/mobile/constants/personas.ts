@@ -11,8 +11,6 @@ export const PERSONAS: Persona[] = [
     flows: [
       { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
       { scenarioId: 'cold-start', label: 'First-time onboarding', icon: 'sparkles', description: 'New member meets Coach for the first time' },
-      { scenarioId: 'goal-discovery', label: 'Goal creation', icon: 'target', description: 'Coach guides setting up a savings goal' },
-      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Splitting a $3K bonus across goals and products' },
     ],
     financialProfile: {
       greeting: 'Good morning, Maya',
@@ -38,8 +36,6 @@ export const PERSONAS: Persona[] = [
     flows: [
       { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
       { scenarioId: 'returning-member', label: 'Personalized check-in', icon: 'user-check', description: 'Coach remembers past context and goals' },
-      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags a goal at risk from overspending' },
-      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Splitting a $3K bonus across goals and products' },
     ],
     financialProfile: {
       greeting: 'Good morning, Marcus',
@@ -65,8 +61,6 @@ export const PERSONAS: Persona[] = [
     subtitle: 'Carries debt, needs a payoff plan',
     flows: [
       { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
-      { scenarioId: 'goal-discovery', label: 'Debt payoff plan', icon: 'target', description: 'Coach builds a structured plan to pay down debt' },
-      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags a goal at risk from overspending' },
       { scenarioId: 'cold-start', label: 'First-time onboarding', icon: 'sparkles', description: 'New member meets Coach for the first time' },
     ],
     financialProfile: {
@@ -92,8 +86,6 @@ export const PERSONAS: Persona[] = [
     subtitle: 'Multi-product user, complex portfolio',
     flows: [
       { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
-      { scenarioId: 'milestone-celebration', label: 'Milestone celebration', icon: 'award', description: 'Coach recognizes hitting 75% of a savings goal' },
-      { scenarioId: 'cross-product', label: 'Bonus allocation', icon: 'layers', description: 'Splitting a $3K bonus across goals and products' },
       { scenarioId: 'memory-lifecycle', label: 'Memory & privacy controls', icon: 'brain', description: 'Edit, pause, or delete what Coach remembers' },
     ],
     financialProfile: {

@@ -179,97 +179,6 @@ function buildScenarios(): Scenario[] {
       ],
       goals: [{ ...EMERGENCY_FUND_GOAL }],
     },
-    {
-      id: 'goal-discovery',
-      title: 'Goal Discovery & Creation',
-      subtitle: 'Suggested goal surfaces in Goals Center from natural conversation',
-      icon: 'target',
-
-      messages: [
-        { id: uid(), role: 'user', content: 'I really need to pay off my credit card. The balance is about $4,200', timestamp: new Date(now.getTime() - 120000) },
-        {
-          id: uid(), role: 'ai', content: "**Credit Card Payoff Plan**\n\nLet's get a plan together. Here's your current situation:\n\n**Your Card Details**\n• **Balance:** $4,200\n• **Interest rate:** 22.99% APR\n• **Minimum payment:** $84/month\n• **Daily interest accruing:** ~$2.64\n\n**The Cost of Minimum Payments**\nAt $84/month, you'd be paying for 7+ years and spend over $3,100 in interest — nearly doubling what you owe. Every month you accelerate saves you real money.\n\n**Option A — Aggressive (6 months)**\n• **Monthly payment:** $720\n• **Paid off by:** July\n• **Total interest paid:** ~$400\n• **Interest saved vs. minimum:** ~$2,800\n• **Impact on budget:** Leaves $800/month from your surplus\n\n**Option B — Balanced (12 months)**\n• **Monthly payment:** $380\n• **Paid off by:** January\n• **Total interest paid:** ~$700\n• **Interest saved vs. minimum:** ~$2,400\n• **Impact on budget:** Leaves $1,140/month from your surplus\n\n**My Take**\nOption A saves you $400 more in interest, but Option B gives you significantly more breathing room each month. Given your wedding savings coming up, the balanced approach might be the smarter play.\n\nWhich feels more doable for your monthly budget?",
-          timestamp: new Date(now.getTime() - 60000),
-          chips: [{ type: 'memory-saved', label: 'Saved to memory', memoryIds: ['mem-gd-1'] }],
-          autoSaveMemory: { content: 'Has $4,200 credit card balance at 22.99% APR', category: 'ABOUT_ME' },
-          memoryProposal: { id: uid(), content: 'Paying off credit card debt is a financial priority', category: 'PRIORITIES' },
-          suggestions: ['Set up Option A', 'Set up Option B', 'Help me prioritize my debts'],
-        },
-        { id: uid(), role: 'system', content: "I've added a goal suggestion to your Goals panel — check it when you're ready.", timestamp: new Date(now.getTime() - 59000) },
-      ],
-      memories: [
-        ...SHARED_MEMORIES.slice(0, 3),
-        { id: 'mem-gd-1', category: 'ABOUT_ME', content: 'Has $4,200 credit card balance at 22.99% APR', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
-      ],
-      goals: [
-        { ...EMERGENCY_FUND_GOAL },
-        { id: 'draft-cc-payoff', type: 'DEBT_PAYOFF', title: 'Credit Card Payoff', targetAmount: 4200, currentAmount: 0, targetDate: daysFromNow(180), monthlyContributionTarget: 380, actualMonthlyContribution: 380, status: 'DRAFT', confidenceScore: 0.88, milestones: [{ id: 'dm1', label: '25%', targetPct: 25, reached: false }, { id: 'dm2', label: '50%', targetPct: 50, reached: false }, { id: 'dm3', label: '75%', targetPct: 75, reached: false }, { id: 'dm4', label: '100%', targetPct: 100, reached: false }], linkedAccount: 'SoFi Credit Card', createdAt: daysAgo(0) },
-      ],
-    },
-    {
-      id: 'proactive-risk',
-      title: 'Proactive Risk Alert',
-      subtitle: 'Goal setback triggers memory proposal — connects priorities to recovery',
-      icon: 'alert-triangle',
-
-      messages: [
-        {
-          id: uid(), role: 'system', content: 'Coach detected a change in your goals', timestamp: new Date(now.getTime() - 120000), isProactive: true,
-        },
-        {
-          id: uid(), role: 'ai', content: "**Credit Card Payoff — Risk Alert**\n\nI wanted to give you a heads-up — your confidence score dropped from 82% to 58% this week. Here's the full picture:\n\n**What Happened**\n• **Last 2 payments:** $380 each (target was $420, shortfall of $80 total)\n• **New charge:** $340 added to the balance\n• **Net impact:** $420 further from your goal than planned\n\n**Where This Puts You**\n• **Current balance:** $1,260 remaining\n• **Original payoff date:** 4 months from now\n• **Projected payoff at current pace:** ~5.5 months (6 weeks late)\n• **Extra interest cost if delayed:** ~$48\n\n**Why This Matters for Your Priorities**\nI know paying off this card is a priority for you, especially with the wedding in October 2027. Staying on track here frees up $380/month that can flow straight into wedding savings once you're done.\n\n**Your Options**\n\n• **Option A — Catch up this month:** Bump payment to $520 (+$140 over your usual). Gets you back to 78% confidence and on track for the original date.\n\n• **Option B — Extend timeline:** Add 2 months to your deadline. Monthly payment drops to $350, giving you $70/month more breathing room. Confidence resets to 72%.\n\nNo need to panic — both paths get you to debt-free. It comes down to whether you'd prefer a short push or a steadier pace.\n\nWhat feels right for your budget this month?",
-          timestamp: new Date(now.getTime() - 60000),
-          chips: [{ type: 'goal-risk', label: 'Credit Card at risk' }],
-          memoryProposal: { id: uid(), content: 'Credit card spending increased in recent months', category: 'ABOUT_ME' },
-          suggestions: ['Increase this month\'s payment', 'Extend my deadline', 'Show me the full picture'],
-        },
-      ],
-      memories: [...SHARED_MEMORIES],
-      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
-    },
-    {
-      id: 'milestone-celebration',
-      title: 'Milestone Celebration',
-      subtitle: 'Goal completion flow with celebration',
-      icon: 'party-popper',
-
-      messages: [
-        {
-          id: uid(), role: 'system', content: 'Your Emergency Fund hit a milestone!', timestamp: new Date(now.getTime() - 120000), isProactive: true,
-        },
-        {
-          id: uid(), role: 'ai', content: "**Emergency Fund — 75% Milestone!**\n\nYou just hit **75% of your Emergency Fund goal!** That's $9,000 out of $12,000.\n\n**Your Journey**\n• **25% ($3,000)** — reached 60 days ago\n• **50% ($6,000)** — reached 20 days ago\n• **75% ($9,000)** — reached today\n• **100% ($12,000)** — on track for ~6 months from now\n\n**What's Working**\nYou've been contributing $460/month — that's $10 above your $450 target, every single month. That consistency is exactly why you're 2 weeks ahead of schedule.\n\n**The Home Stretch**\n• **Remaining:** $3,000\n• **At your current pace:** ~6.5 months to go\n• **Interest earned so far:** ~$150 at 4.00% APY\n• **What $12,000 covers:** 3 full months of essential expenses\n\n**By the Numbers**\nYou've saved $9,000 in about 5 months — that's a 24% savings rate dedicated just to this goal. For context, the average American saves about 4.7% of income total. You're crushing it.\n\nJust $3,000 to go. You've got this!",
-          timestamp: new Date(now.getTime() - 60000),
-          chips: [{ type: 'milestone', label: '75% milestone reached!' }],
-          suggestions: ['Show my goals dashboard', 'What should I do when I reach 100%?', 'Can I increase my contribution?'],
-        },
-      ],
-      memories: [...SHARED_MEMORIES],
-      goals: [{
-        ...EMERGENCY_FUND_GOAL,
-        currentAmount: 9000,
-        confidenceScore: 0.92,
-        milestones: makeMilestones([25, 50, 75], [60, 20, 0, 0]),
-      }],
-    },
-    {
-      id: 'cross-product',
-      title: 'Cross-Product Orchestration',
-      subtitle: "Multi-product coordination — SoFi's unique advantage",
-      icon: 'layers',
-
-      messages: [
-        { id: uid(), role: 'user', content: 'I just got a $3,000 bonus at work. What should I do with it?', timestamp: new Date(now.getTime() - 120000) },
-        {
-          id: uid(), role: 'ai', content: "**Your $3,000 Bonus — Optimized Allocation**\n\nCongrats! Here's how I'd split this based on your goals, interest rates, and financial picture:\n\n**1. Credit Card Payoff — $1,260**\n• **Impact:** Clears your entire remaining balance\n• **Why:** Eliminates 22.99% APR — every dollar here is a guaranteed 23% return. This is mathematically your best move.\n• **After:** $0 debt, freeing up $380/month from your payoff plan\n\n**2. Emergency Fund — $1,200**\n• **Impact:** Brings you from $8,400 → $9,600 (80% of goal)\n• **Why:** Jumps you 6 weeks ahead of schedule. At this pace, you'd hit $12,000 about 2 months early.\n• **Earning:** This $1,200 earns ~$48/year at 4.00% APY\n\n**3. SoFi Invest — $540**\n• **Impact:** Starts building your investment portfolio\n• **Why:** With debt eliminated and a strong emergency fund, this is the right time to start growing wealth long-term\n• **Suggested allocation:** Conservative portfolio (70% bonds, 30% index funds) — matches your risk preference\n\n**The Big Picture**\nThis single allocation eliminates your most expensive debt, fast-tracks your safety net, and starts your investment journey — all in one move. Plus, the $380/month freed from debt payments gives you ongoing firepower.\n\nWant me to set up all three transfers?",
-          timestamp: new Date(now.getTime() - 60000),
-          memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'ABOUT_ME' },
-          suggestions: ['Set up all three transfers', 'Adjust the split', 'Tell me more about the invest option'],
-        },
-      ],
-      memories: [...SHARED_MEMORIES],
-      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
-    },
   ];
 }
 
@@ -277,6 +186,4 @@ export const SCENARIOS = buildScenarios();
 
 export const SCENARIO_ORDER = [
   'cold-start', 'returning-member', 'memory-lifecycle',
-  'goal-discovery', 'proactive-risk', 'milestone-celebration',
-  'cross-product',
 ];
