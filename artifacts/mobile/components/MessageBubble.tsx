@@ -1049,11 +1049,6 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
           <MemoryProposalCard message={message} />
         </AnimatedSlot>
       )}
-      {!streaming && message.member360Conflict && (
-        <AnimatedSlot animate={animate}>
-          <Member360ConflictCard message={message} />
-        </AnimatedSlot>
-      )}
       {!streaming && message.goalProposal && (
         <AnimatedSlot animate={animate}>
           <GoalProposalCard message={message} />
@@ -1068,6 +1063,11 @@ export function MessageBubble({ message, isLatest }: { message: Message; isLates
         <View style={styles.chipsRow}>
           {bottomChips.map((chip, i) => <ChipBadge key={`bottom-${i}`} chip={chip} animate={chipAnimate} />)}
         </View>
+      )}
+      {!streaming && message.member360Conflict && (
+        <AnimatedSlot animate={animate}>
+          <Member360ConflictCard message={message} />
+        </AnimatedSlot>
       )}
 
       {!streaming && (

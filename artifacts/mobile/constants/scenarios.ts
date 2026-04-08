@@ -129,7 +129,6 @@ function buildScenarios(): Scenario[] {
             userValue: 'Income is $145,000/year',
             profileValue: 'Annual income: $115,000/year',
           },
-          memoryProposal: { id: uid(), content: 'Wants to avoid lifestyle creep after raise', category: 'PRIORITIES' },
           suggestions: ['Model the allocation', 'Accelerate debt payoff', 'Start an investment plan'],
         },
       ],

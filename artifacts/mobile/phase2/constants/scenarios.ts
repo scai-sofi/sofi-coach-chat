@@ -132,7 +132,6 @@ function buildScenarios(): Scenario[] {
             userValue: 'Income is $135,000/year',
             profileValue: 'Annual income: $115,000/year',
           },
-          memoryProposal: { id: uid(), content: 'Wants to avoid lifestyle creep after raise', category: 'PRIORITIES' },
           provenance: 'Income from what you shared. Tax estimate based on 2026 federal brackets (no TX state tax). Spending baseline from your SoFi Money transaction history. Profile income from About Me (SoFi verified).',
           suggestions: ['Model the allocation', 'Accelerate debt payoff', 'Open my About Me tab'],
         },
