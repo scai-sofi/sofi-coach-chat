@@ -33,6 +33,44 @@ const CATEGORIES: { key: GoalCategory; label: string; subtitle: string; icon: ke
   { key: 'investment', label: 'Investment', subtitle: 'Grow your money over time', icon: 'bar-chart-2' },
 ];
 
+const MOCK_FINANCES = {
+  monthlyTakeHome: 7200,
+  rent: 2100,
+  debtMinimums: 664,
+  monthlySpending: 1280,
+  bankBalance: 27282,
+};
+const DISPOSABLE = MOCK_FINANCES.monthlyTakeHome - MOCK_FINANCES.rent - MOCK_FINANCES.debtMinimums - MOCK_FINANCES.monthlySpending;
+
+const SMART_DEFAULTS: Record<string, { target: number; monthly: number }> = {
+  'Emergency Fund': { target: 21000, monthly: Math.round(DISPOSABLE * 0.30) },
+  'Travel':         { target: 3000,  monthly: Math.round(DISPOSABLE * 0.12) },
+  'Kids':           { target: 5000,  monthly: Math.round(DISPOSABLE * 0.10) },
+  'House':          { target: 60000, monthly: Math.round(DISPOSABLE * 0.25) },
+  'Car':            { target: 8000,  monthly: Math.round(DISPOSABLE * 0.15) },
+  'Dining Out':     { target: 1200,  monthly: Math.round(DISPOSABLE * 0.06) },
+  'Splurge':        { target: 1500,  monthly: Math.round(DISPOSABLE * 0.05) },
+  'Taxes':          { target: 4000,  monthly: Math.round(DISPOSABLE * 0.10) },
+  'Wedding':        { target: 25000, monthly: Math.round(DISPOSABLE * 0.20) },
+  'Investment':     { target: 10000, monthly: Math.round(DISPOSABLE * 0.15) },
+};
+
+function getSmartEstimate(label: string, target: number, months: number): number {
+  const defaults = SMART_DEFAULTS[label];
+  if (defaults) {
+    const timeBasedAmount = target > 0 && months > 0 ? Math.ceil(target / months) : 0;
+    const affordable = defaults.monthly;
+    if (timeBasedAmount > 0 && timeBasedAmount <= affordable * 1.5) return timeBasedAmount;
+    return affordable;
+  }
+  if (target > 0 && months > 0) return Math.ceil(target / months);
+  return Math.round(DISPOSABLE * 0.10);
+}
+
+function getSmartTarget(label: string): number {
+  return SMART_DEFAULTS[label]?.target ?? 0;
+}
+
 const SAVE_UP_ITEMS: { label: string; icon: keyof typeof Feather.glyphMap; goalType: GoalType }[] = [
   { label: 'Emergency Fund', icon: 'shield', goalType: 'EMERGENCY_FUND' },
   { label: 'Travel', icon: 'map-pin', goalType: 'SAVINGS_TARGET' },
@@ -227,9 +265,9 @@ export function GoalSetupSheet() {
     if (page === 2 && monthlyContribution === '') {
       if (isPayDown && debtEstimate) {
         setMonthlyContribution(fmt(debtEstimate.suggestedPayment));
-      } else if (!isPayDown && target > 0 && months > 0) {
-        const sug = Math.ceil(target / months);
-        if (sug > 0) setMonthlyContribution(fmt(sug));
+      } else if (!isPayDown) {
+        const smart = getSmartEstimate(title, target, months);
+        if (smart > 0) setMonthlyContribution(fmt(smart));
       }
     }
   }, [page]);
@@ -277,6 +315,10 @@ export function GoalSetupSheet() {
     } else {
       setGoalType('INVESTMENT');
       setTitle('Investment');
+      const smartTarget = getSmartTarget('Investment');
+      if (smartTarget > 0 && targetAmount === '') {
+        setTargetAmount(fmt(smartTarget));
+      }
       goToPage(2);
     }
   };
@@ -284,6 +326,10 @@ export function GoalSetupSheet() {
   const selectSaveUpItem = (item: typeof SAVE_UP_ITEMS[0]) => {
     setGoalType(item.goalType);
     setTitle(item.label);
+    const smartTarget = getSmartTarget(item.label);
+    if (smartTarget > 0 && targetAmount === '') {
+      setTargetAmount(fmt(smartTarget));
+    }
     goToPage(2);
   };
 
@@ -360,7 +406,7 @@ export function GoalSetupSheet() {
     ? (page <= 0 ? 1 : page === 2 ? 2 : page >= 4 ? 3 : 2)
     : (page <= 1 ? 1 : page === 2 ? 2 : page === 3 ? 3 : 4);
 
-  const suggested = target > 0 ? Math.ceil(target / months) : 0;
+  const suggested = getSmartEstimate(title, target, months);
   const projected = monthly * months;
   const onTrack = monthly > 0 && projected >= target;
   const shortfall = target - projected;
