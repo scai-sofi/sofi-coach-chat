@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS, SlideInRight, SlideOutLeft, SlideInLeft, SlideOutRight } from 'react-native-reanimated';
+import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing, runOnJS } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
 import { useCoach, PendingGoalSetup } from '@/context/CoachContext';
 import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
-
-const SLIDE_DISTANCE = 800;
 
 const GOAL_TYPES: { type: GoalType; label: string; icon: keyof typeof Feather.glyphMap }[] = [
   { type: 'EMERGENCY_FUND', label: 'Emergency Fund', icon: 'shield' },
@@ -25,6 +23,8 @@ const LINKED_ACCOUNTS = [
   'SoFi Invest',
   'SoFi Money',
 ];
+
+const STEP_SPRING = { damping: 24, stiffness: 220, mass: 0.8 };
 
 function formatCurrency(val: number): string {
   return val.toLocaleString('en-US');
@@ -45,18 +45,22 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
   const { colors } = useTheme();
   return (
     <View style={stepStyles.row}>
-      {Array.from({ length: total }, (_, i) => (
-        <View
-          key={i}
-          style={[
-            stepStyles.dot,
-            {
-              backgroundColor: i < current ? colors.contentPrimary : colors.progressTrack,
-              width: i + 1 === current ? 24 : 8,
-            },
-          ]}
-        />
-      ))}
+      {Array.from({ length: total }, (_, i) => {
+        const isActive = i + 1 === current;
+        const isPast = i < current;
+        return (
+          <View
+            key={i}
+            style={[
+              stepStyles.dot,
+              {
+                backgroundColor: isPast ? colors.contentPrimary : colors.progressTrack,
+                width: isActive ? 24 : 8,
+              },
+            ]}
+          />
+        );
+      })}
     </View>
   );
 }
@@ -69,12 +73,12 @@ const stepStyles = StyleSheet.create({
 export function GoalSetupSheet() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
   const { pendingGoalSetup, createGoalFromSetup, cancelGoalSetup } = useCoach();
   const [visible, setVisible] = useState(false);
   const [setup, setSetup] = useState<PendingGoalSetup | null>(null);
 
   const [step, setStep] = useState<Step>(1);
-  const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [title, setTitle] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [monthlyContribution, setMonthlyContribution] = useState('');
@@ -82,7 +86,8 @@ export function GoalSetupSheet() {
   const [linkedAccount, setLinkedAccount] = useState('');
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
 
-  const slideX = useSharedValue(SLIDE_DISTANCE);
+  const panelX = useSharedValue(screenWidth);
+  const stripX = useSharedValue(0);
 
   useEffect(() => {
     if (pendingGoalSetup) {
@@ -96,6 +101,7 @@ export function GoalSetupSheet() {
         setLinkedAccount(p.linkedAccount);
         setGoalType(p.type);
         setStep(4);
+        stripX.value = -3 * screenWidth;
       } else {
         const defaultDate = new Date();
         defaultDate.setMonth(defaultDate.getMonth() + 6);
@@ -106,14 +112,18 @@ export function GoalSetupSheet() {
         setLinkedAccount('');
         setGoalType('SAVINGS_TARGET');
         setStep(1);
+        stripX.value = 0;
       }
-      setDirection('forward');
       setVisible(true);
-      slideX.value = withTiming(0, { duration: 320, easing: Easing.out(Easing.cubic) });
+      panelX.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
     } else if (visible) {
       dismiss();
     }
   }, [pendingGoalSetup]);
+
+  const animateToStep = (s: Step) => {
+    stripX.value = withSpring(-(s - 1) * screenWidth, STEP_SPRING);
+  };
 
   const onDismissComplete = () => {
     setVisible(false);
@@ -121,24 +131,26 @@ export function GoalSetupSheet() {
   };
 
   const dismiss = () => {
-    slideX.value = withTiming(SLIDE_DISTANCE, { duration: 260, easing: Easing.in(Easing.cubic) }, () => {
+    panelX.value = withTiming(screenWidth, { duration: 250, easing: Easing.in(Easing.cubic) }, () => {
       runOnJS(onDismissComplete)();
     });
   };
 
   const goNext = useCallback(() => {
-    setDirection('forward');
-    setStep(s => Math.min(s + 1, 4) as Step);
-  }, []);
+    const next = Math.min(step + 1, 4) as Step;
+    setStep(next);
+    animateToStep(next);
+  }, [step, screenWidth]);
 
   const goBack = useCallback(() => {
     if (step === 1) {
       dismiss();
       return;
     }
-    setDirection('back');
-    setStep(s => Math.max(s - 1, 1) as Step);
-  }, [step]);
+    const prev = Math.max(step - 1, 1) as Step;
+    setStep(prev);
+    animateToStep(prev);
+  }, [step, screenWidth]);
 
   const handleCreate = () => {
     if (!setup) return;
@@ -156,8 +168,9 @@ export function GoalSetupSheet() {
     setGoalType(type);
     const label = GOAL_TYPES.find(g => g.type === type)?.label || '';
     if (!title) setTitle(label);
-    setDirection('forward');
-    setStep(2);
+    const next = 2 as Step;
+    setStep(next);
+    animateToStep(next);
   };
 
   const adjustMonth = (delta: number) => {
@@ -169,19 +182,22 @@ export function GoalSetupSheet() {
     });
   };
 
-  const animatedPanel = useAnimatedStyle(() => ({
-    transform: [{ translateX: slideX.value }],
+  const panelStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: panelX.value }],
+  }));
+
+  const stripStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: stripX.value }],
   }));
 
   if (!visible) return null;
 
-  const isNewGoal = !setup?.proposal;
   const step2Valid = title.trim().length > 0 && parseCurrency(targetAmount) > 0;
   const step3Valid = parseCurrency(monthlyContribution) > 0 && linkedAccount.length > 0;
   const reviewValid = step2Valid && step3Valid;
 
   return (
-    <Animated.View style={[styles.fullScreen, animatedPanel, { backgroundColor: colors.surfaceBase }]}>
+    <Animated.View style={[styles.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <Pressable style={styles.backBtn} onPress={goBack} hitSlop={12}>
           <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
@@ -195,19 +211,15 @@ export function GoalSetupSheet() {
       </View>
 
       <View style={styles.body}>
-        {step === 1 && (
-          <Animated.View
-            key="step1"
-            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
-            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
-            style={styles.stepContainer}
-          >
+        <Animated.View style={[styles.strip, { width: screenWidth * 4 }, stripStyle]}>
+
+          {/* Step 1: Goal type */}
+          <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>What are you saving for?</Text>
               <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
                 Choose a goal type to get started.
               </Text>
-
               <View style={styles.typeList}>
                 {GOAL_TYPES.map(({ type, label, icon }) => {
                   const selected = type === goalType;
@@ -231,22 +243,15 @@ export function GoalSetupSheet() {
                 })}
               </View>
             </ScrollView>
-          </Animated.View>
-        )}
+          </View>
 
-        {step === 2 && (
-          <Animated.View
-            key="step2"
-            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
-            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
-            style={styles.stepContainer}
-          >
+          {/* Step 2: Name & target */}
+          <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Customize your goal</Text>
               <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
                 Give it a name and set your target.
               </Text>
-
               <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Name</Text>
                 <TextInput
@@ -255,10 +260,8 @@ export function GoalSetupSheet() {
                   onChangeText={setTitle}
                   placeholder="e.g. Credit Card Payoff"
                   placeholderTextColor={colors.contentDimmed}
-                  autoFocus
                 />
               </View>
-
               <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Goal</Text>
                 <View style={[styles.currencyInput, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
@@ -274,7 +277,6 @@ export function GoalSetupSheet() {
                 </View>
               </View>
             </ScrollView>
-
             <View style={[styles.footer, { paddingBottom: insets.bottom || 16 }]}>
               <Pressable
                 style={[styles.nextBtn, { backgroundColor: step2Valid ? colors.contentBrand : colors.contentDisabled }]}
@@ -284,22 +286,15 @@ export function GoalSetupSheet() {
                 <Text style={[styles.nextBtnText, { color: '#ffffff' }]}>Next</Text>
               </Pressable>
             </View>
-          </Animated.View>
-        )}
+          </View>
 
-        {step === 3 && (
-          <Animated.View
-            key="step3"
-            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
-            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
-            style={styles.stepContainer}
-          >
+          {/* Step 3: Contribution, date, account */}
+          <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>How do you want to save?</Text>
               <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
                 Set up your contribution and timeline.
               </Text>
-
               <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Monthly contribution</Text>
                 <View style={[styles.currencyInput, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
@@ -311,12 +306,10 @@ export function GoalSetupSheet() {
                     keyboardType="numeric"
                     placeholder="500"
                     placeholderTextColor={colors.contentDimmed}
-                    autoFocus
                   />
                   <Text style={[styles.perMonthLabel, { color: colors.contentSecondary }]}>/mo</Text>
                 </View>
               </View>
-
               <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Target date</Text>
                 <View style={styles.dateSelector}>
@@ -331,7 +324,6 @@ export function GoalSetupSheet() {
                   </Pressable>
                 </View>
               </View>
-
               <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Linked account</Text>
                 <View style={styles.accountOptions}>
@@ -357,7 +349,6 @@ export function GoalSetupSheet() {
                 </View>
               </View>
             </ScrollView>
-
             <View style={[styles.footer, { paddingBottom: insets.bottom || 16 }]}>
               <Pressable
                 style={[styles.nextBtn, { backgroundColor: step3Valid ? colors.contentBrand : colors.contentDisabled }]}
@@ -367,22 +358,15 @@ export function GoalSetupSheet() {
                 <Text style={[styles.nextBtnText, { color: '#ffffff' }]}>Next</Text>
               </Pressable>
             </View>
-          </Animated.View>
-        )}
+          </View>
 
-        {step === 4 && (
-          <Animated.View
-            key="step4"
-            entering={direction === 'forward' ? SlideInRight.duration(280) : SlideInLeft.duration(280)}
-            exiting={direction === 'forward' ? SlideOutLeft.duration(200) : SlideOutRight.duration(200)}
-            style={styles.stepContainer}
-          >
+          {/* Step 4: Review */}
+          <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Review your goal</Text>
               <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
                 Everything look right? You can edit anytime.
               </Text>
-
               <View style={[styles.reviewCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
                 <View style={styles.reviewHeader}>
                   <View style={[styles.reviewIconWrap, { backgroundColor: colors.surfaceTint }]}>
@@ -395,9 +379,7 @@ export function GoalSetupSheet() {
                     </Text>
                   </View>
                 </View>
-
                 <View style={[styles.reviewDivider, { backgroundColor: colors.surfaceEdge }]} />
-
                 <View style={styles.reviewRows}>
                   <View style={styles.reviewRow}>
                     <Text style={[styles.reviewLabel, { color: colors.contentSecondary }]}>Target</Text>
@@ -422,7 +404,6 @@ export function GoalSetupSheet() {
                 </View>
               </View>
             </ScrollView>
-
             <View style={[styles.footer, { paddingBottom: insets.bottom || 16 }]}>
               <Pressable
                 style={[styles.nextBtn, { backgroundColor: reviewValid ? colors.contentBrand : colors.contentDisabled }]}
@@ -432,8 +413,9 @@ export function GoalSetupSheet() {
                 <Text style={[styles.nextBtnText, { color: '#ffffff' }]}>Create goal</Text>
               </Pressable>
             </View>
-          </Animated.View>
-        )}
+          </View>
+
+        </Animated.View>
       </View>
     </Animated.View>
   );
@@ -443,6 +425,7 @@ const styles = StyleSheet.create({
   fullScreen: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 200,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
@@ -467,8 +450,13 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    overflow: 'hidden',
   },
-  stepContainer: {
+  strip: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  stepPage: {
     flex: 1,
   },
   stepContent: {
