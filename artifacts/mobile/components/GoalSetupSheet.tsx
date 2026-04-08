@@ -10,7 +10,7 @@ import { GoalType } from '@/constants/types';
 import { PacificDatePicker } from '@/components/PacificDatePicker';
 import { getMember360Profile } from '@/constants/member360';
 
-const orbTipImg = require('@/assets/images/orb-tip.png');
+const orbGif = require('@/assets/images/orb-analyzing.gif');
 
 type GoalCategory = 'save-up' | 'pay-down' | 'investment';
 
@@ -696,7 +696,7 @@ export function GoalSetupSheet() {
                     {isEfGoal && (
                       <View style={[st.coachTip, { backgroundColor: colors.surfaceTip, borderColor: colors.surfaceEdge }]}>
                         <View style={st.coachTipOrb}>
-                          <Image source={orbTipImg} style={st.coachTipOrbImg} />
+                          <Image source={orbGif} style={st.coachTipOrbImg} />
                         </View>
                         <Text style={[st.coachTipText, { color: colors.contentTip }]} numberOfLines={2}>
                           {EF_REC.reason} That's {EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}.
@@ -979,8 +979,8 @@ const st = StyleSheet.create({
 
 
   coachTip: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, borderRadius: 12, borderWidth: 0.5, padding: 12, marginHorizontal: 12, marginTop: 12 },
-  coachTipOrb: { width: 14.5, height: 14.5, borderRadius: 60, overflow: 'hidden' as const },
-  coachTipOrbImg: { width: 14.5, height: 14.5 },
+  coachTipOrb: { width: 14.5, height: 14.5, borderRadius: 60, overflow: 'hidden' as const, alignItems: 'center' as const, justifyContent: 'center' as const },
+  coachTipOrbImg: { width: 27, height: 27 },
   coachTipText: { flex: 1, fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1, paddingHorizontal: 2 },
 
   methodOptions: { gap: 16 },
