@@ -13,7 +13,6 @@ import { InputBar } from '@/components/InputBar';
 import { EmptyChat, SuggestionCards } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
-import { FlowPickerSheet } from '@/components/FlowPickerSheet';
 import { ChatHistory } from '@/components/ChatHistory';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { GoalSetupSheet } from '@/components/GoalSetupSheet';
@@ -275,7 +274,6 @@ export default function ChatScreen() {
           </View>
         </View>
 
-        <FlowPickerSheet />
       </KeyboardAvoidingView>
 
       {messages.length === 0 && activePanel === 'none' && <SuggestionCards bottomOffset={inputBarHeight} />}

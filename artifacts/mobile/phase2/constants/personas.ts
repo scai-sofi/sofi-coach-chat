@@ -57,33 +57,6 @@ export const PERSONAS: Persona[] = [
     },
   },
   {
-    id: 'persona-sarah',
-    name: 'Sarah',
-    avatar: require('@/assets/images/personas/sarah-patel.png'),
-    accentColor: '#c4a0a8',
-    age: 29,
-    subtitle: 'Values privacy, manages her data',
-    flows: [
-      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
-      { scenarioId: 'memory-lifecycle', label: 'Memory & privacy controls', icon: 'brain', description: 'Edit, pause, or delete what Coach remembers' },
-      { scenarioId: 'milestone-celebration', label: 'Milestone celebration', icon: 'award', description: 'Coach recognizes hitting 75% of a savings goal' },
-      { scenarioId: 'returning-member', label: 'Personalized check-in', icon: 'user-check', description: 'Coach remembers past context and goals' },
-    ],
-    financialProfile: {
-      greeting: 'Good morning, Sarah',
-      bankingBalance: '$8,920.30',
-      bankingCount: 2,
-      investBalance: '$45,000',
-      monthlyIncome: '$8,750',
-      creditScore: 756,
-      creditScoreLabel: 'Good',
-      netWorth: '$62,320',
-      spending: '$3,200',
-      spendingNote: 'Under budget',
-      rewardPoints: '380 pts',
-    },
-  },
-  {
     id: 'persona-jordan',
     name: 'Jordan',
     avatar: require('@/assets/images/personas/jordan-rivera.png'),
@@ -108,34 +81,6 @@ export const PERSONAS: Persona[] = [
       spending: '$3,850',
       spendingNote: 'Slightly over budget',
       rewardPoints: '95 pts',
-    },
-  },
-  {
-    id: 'persona-aisha',
-    name: 'Aisha',
-    avatar: require('@/assets/images/personas/aisha-williams.png'),
-    accentColor: '#d4a636',
-    age: 31,
-    subtitle: 'Consistent saver, hitting milestones',
-    flows: [
-      { scenarioId: '', label: 'Free chat', icon: 'message-circle', description: 'Open conversation with Coach' },
-      { scenarioId: 'proactive-risk', label: 'Spending alert', icon: 'alert-triangle', description: 'Coach flags a goal at risk from overspending' },
-      { scenarioId: 'returning-member', label: 'Personalized check-in', icon: 'user-check', description: 'Coach remembers past context and goals' },
-      { scenarioId: 'milestone-celebration', label: 'Milestone celebration', icon: 'award', description: 'Coach recognizes hitting 75% of a savings goal' },
-    ],
-    financialProfile: {
-      greeting: 'Good morning, Aisha',
-      bankingBalance: '$9,100.75',
-      bankingCount: 2,
-      investBalance: '$22,500',
-      creditCardBalance: '$1,260',
-      monthlyIncome: '$9,200',
-      creditScore: 728,
-      creditScoreLabel: 'Good',
-      netWorth: '$54,800',
-      spending: '$3,420',
-      spendingNote: 'Under budget this month',
-      rewardPoints: '210 pts',
     },
   },
   {
@@ -167,7 +112,4 @@ export const PERSONAS: Persona[] = [
   },
 ];
 
-export const PERSONA_ORDER = [
-  'persona-maya', 'persona-marcus', 'persona-sarah',
-  'persona-jordan', 'persona-aisha', 'persona-david',
-];
+export const PERSONA_ORDER = ['persona-maya', 'persona-marcus', 'persona-jordan', 'persona-david'];

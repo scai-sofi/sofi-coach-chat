@@ -16,7 +16,6 @@ import {
   PencilMenuIcon,
   DeleteMenuIcon,
   CloseIcon,
-  DemoIcon,
 } from '@/components/icons';
 
 export function ChatHeader() {
@@ -130,11 +129,6 @@ export function ChatHeader() {
           icon: <CloseIcon size={24} color={colors.contentPrimary} />,
           onPress: dismissChat,
         }}
-        leftExtra={
-          <Pressable onPress={() => { Keyboard.dismiss(); setActivePanel('flows'); }} hitSlop={8} style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-            <DemoIcon size={24} color={colors.contentPrimary} />
-          </Pressable>
-        }
         rightActions={rightActions}
       />
 

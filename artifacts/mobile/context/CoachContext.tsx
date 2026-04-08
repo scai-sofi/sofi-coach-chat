@@ -3,6 +3,7 @@ import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryPr
 import { detectMember360Conflict } from '@/constants/member360';
 import { SCENARIOS } from '@/constants/scenarios';
 import { PERSONAS } from '@/constants/personas';
+import { buildSeededHistory } from '@/constants/seededHistory';
 import { generateAIResponse } from '@/constants/aiResponse';
 import { usePrototype } from '@/prototype/PrototypeContext';
 
@@ -20,6 +21,7 @@ export interface ChatSession {
   goals: Goal[];
   createdAt: Date;
   updatedAt: Date;
+  scenarioId?: string;
 }
 
 function getApiBaseUrl(): string {
@@ -154,7 +156,9 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [chatMode, setChatMode] = useState<ChatMode>('live');
   const [pendingGoalSetup, setPendingGoalSetup] = useState<PendingGoalSetup | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
-  const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatSession[]>(() =>
+    initialPersona ? buildSeededHistory(initialPersona.id) : []
+  );
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [sessionTitle, setSessionTitle] = useState(initialPersona?.name ?? 'Coach');
   const [highlightedMemoryId, setHighlightedMemoryId] = useState<string | null>(null);
@@ -210,6 +214,8 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setSessionTitle(persona.name);
     titleGeneratedRef.current = false;
     setPendingGoalSetup(null);
+    setCurrentSessionId(null);
+    setChatHistory(buildSeededHistory(personaId));
     setSharedPersonaId(personaId);
   }, [setSharedPersonaId]);
 
@@ -1225,16 +1231,17 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
     if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
     sessionVersionRef.current += 1;
-    setChatMode('live');
+    const isDemo = !!session.scenarioId;
+    setChatMode(isDemo ? 'demo' : 'live');
     setMessages([...session.messages]);
     setMemories([...session.memories]);
     setGoals([...session.goals]);
     setIsTyping(false);
 
     setActivePanelState('none');
-    setActiveScenario('');
-    setShowOnboarding(false);
-    setCurrentSessionId(id);
+    setActiveScenario(session.scenarioId || '');
+    setShowOnboarding(session.scenarioId === 'cold-start');
+    setCurrentSessionId(isDemo ? null : id);
     setSessionTitle(session.title);
     titleGeneratedRef.current = true;
     setPendingGoalSetup(null);
