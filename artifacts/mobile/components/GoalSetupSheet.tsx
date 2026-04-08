@@ -980,7 +980,7 @@ const st = StyleSheet.create({
   coachTip: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, borderRadius: 12, borderWidth: 0.5, padding: 12, marginHorizontal: 12, marginTop: 12 },
   coachTipOrb: { width: 14.5, height: 14.5, borderRadius: 60, overflow: 'hidden' as const, alignItems: 'center' as const, justifyContent: 'center' as const },
   coachTipOrbImg: { width: 27, height: 27 },
-  coachTipText: { flex: 1, fontSize: 12, fontFamily: Fonts.bold, lineHeight: 16, letterSpacing: 0.1, paddingHorizontal: 2 },
+  coachTipText: { flex: 1, fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1, paddingHorizontal: 2 },
 
   methodOptions: { gap: 16 },
   methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
