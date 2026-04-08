@@ -84,6 +84,15 @@ const SAVE_UP_ITEMS: { label: string; icon: keyof typeof Feather.glyphMap; goalT
   { label: 'Other', icon: 'plus-circle', goalType: 'CUSTOM' },
 ];
 
+const MONTHLY_EXPENSES = MOCK_FINANCES.rent + MOCK_FINANCES.debtMinimums + MOCK_FINANCES.monthlySpending;
+
+const EF_MONTH_OPTIONS: { months: number; title: string; subtitle: string }[] = [
+  { months: 3, title: '3 months', subtitle: 'You rent, have transferrable skills, or live in a dual-income household.' },
+  { months: 6, title: '6 months', subtitle: 'You own a home or support others financially' },
+  { months: 9, title: '9 months', subtitle: "You're self-employed, have specialized work, or want more peace of mind" },
+  { months: 0, title: 'Custom', subtitle: 'Choose your own number of months' },
+];
+
 type ContributionMethod = 'direct-deposit' | 'recurring' | 'one-time';
 
 const CONTRIBUTION_METHODS: { value: ContributionMethod; title: string; subtitle: string }[] = [
@@ -185,6 +194,7 @@ export function GoalSetupSheet() {
   const [targetDate, setTargetDate] = useState(new Date());
   const [linkedAccount, setLinkedAccount] = useState('');
   const [contributionMethod, setContributionMethod] = useState<ContributionMethod>('recurring');
+  const [showEfMonths, setShowEfMonths] = useState(false);
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [userDebtAccounts, setUserDebtAccounts] = useState<DebtAccount[]>([]);
@@ -223,6 +233,7 @@ export function GoalSetupSheet() {
         const cat = p.type === 'DEBT_PAYOFF' ? 'pay-down' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
         setCategory(cat);
         setSelectedDebt(null);
+        setShowEfMonths(false);
         setPage(4);
         stripX.value = -4 * screenWidth;
       } else {
@@ -239,6 +250,7 @@ export function GoalSetupSheet() {
         setPage(0);
         stripX.value = 0;
         setContributionMethod('recurring');
+        setShowEfMonths(false);
         setShowLinkForm(false);
         setLinkName('');
         setLinkBalance('');
@@ -280,6 +292,7 @@ export function GoalSetupSheet() {
 
   const goBack = () => {
     if (page === 0) { dismiss(); return; }
+    if (page === 1 && showEfMonths) { setShowEfMonths(false); return; }
     if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
     if (page === 4 && category === 'pay-down') { goToPage(2); return; }
     goToPage(page - 1);
@@ -330,12 +343,26 @@ export function GoalSetupSheet() {
   const selectSaveUpItem = (item: typeof SAVE_UP_ITEMS[0]) => {
     setGoalType(item.goalType);
     setTitle(item.label);
+    setMonthlyContribution('');
+    setLinkedAccount('SoFi Savings');
+    if (item.label === 'Emergency Fund') {
+      setShowEfMonths(true);
+      return;
+    }
     const smartTarget = getSmartTarget(item.label);
     if (smartTarget > 0) {
       setTargetAmount(fmt(smartTarget));
     }
-    setMonthlyContribution('');
-    setLinkedAccount('SoFi Savings');
+    goToPage(2);
+  };
+
+  const selectEfMonths = (months: number) => {
+    if (months === 0) {
+      setTargetAmount('');
+    } else {
+      setTargetAmount(fmt(MONTHLY_EXPENSES * months));
+    }
+    setShowEfMonths(false);
     goToPage(2);
   };
 
@@ -455,24 +482,54 @@ export function GoalSetupSheet() {
             </ScrollView>
           </View>
 
-          {/* ─── Page 1: Save-up vault list (pay-down skips this) ─── */}
+          {/* ─── Page 1: Save-up vault list / EF months picker ─── */}
           <View style={[st.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
-              <Text style={[st.title, { color: colors.contentPrimary }]}>What are you saving for?</Text>
-              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
-                Pick a category or choose "Other" to create your own.
-              </Text>
-              <View style={st.vaultList}>
-                {SAVE_UP_ITEMS.map((item) => (
-                  <Pressable key={item.label} style={[st.vaultRow, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectSaveUpItem(item)}>
-                    <View style={st.vaultIconWrap}>
-                      <Feather name={item.icon} size={20} color={colors.contentPrimary} />
-                    </View>
-                    <Text style={[st.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            </ScrollView>
+            {showEfMonths ? (
+              <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+                <Text style={[st.title, { color: colors.contentPrimary }]}>
+                  How many months should your{'\n'}emergency fund cover?
+                </Text>
+                <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                  Most people aim for 3–6 months of expenses. We'll help you figure out the right amount for you.
+                </Text>
+                <View style={st.methodOptions}>
+                  {EF_MONTH_OPTIONS.map(opt => (
+                    <Pressable
+                      key={opt.months}
+                      onPress={() => selectEfMonths(opt.months)}
+                      style={[st.efCard, { backgroundColor: colors.surfaceElevated }]}
+                    >
+                      <View style={st.efCardContent}>
+                        <Text style={[st.efCardTitle, { color: colors.contentPrimary }]}>{opt.title}</Text>
+                        <Text style={[st.efCardSubtitle, { color: colors.contentSecondary }]}>{opt.subtitle}</Text>
+                        {opt.months > 0 && (
+                          <Text style={[st.efCardAmount, { color: colors.contentBrand }]}>
+                            ${fmt(MONTHLY_EXPENSES * opt.months)}
+                          </Text>
+                        )}
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            ) : (
+              <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+                <Text style={[st.title, { color: colors.contentPrimary }]}>What are you saving for?</Text>
+                <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                  Pick a category or choose "Other" to create your own.
+                </Text>
+                <View style={st.vaultList}>
+                  {SAVE_UP_ITEMS.map((item) => (
+                    <Pressable key={item.label} style={[st.vaultRow, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectSaveUpItem(item)}>
+                      <View style={st.vaultIconWrap}>
+                        <Feather name={item.icon} size={20} color={colors.contentPrimary} />
+                      </View>
+                      <Text style={[st.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
           </View>
 
           {/* ─── Page 2: Plan (save-up planner / pay-down unified / investment) ─── */}
@@ -934,6 +991,12 @@ const st = StyleSheet.create({
   datePickerTrigger: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 },
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
+
+  efCard: { borderRadius: 20, padding: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  efCardContent: { gap: 4 },
+  efCardTitle: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
+  efCardSubtitle: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, opacity: 0.7 },
+  efCardAmount: { fontSize: 14, fontFamily: Fonts.bold, lineHeight: 20, marginTop: 4 },
 
   methodOptions: { gap: 16 },
   methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
