@@ -48,6 +48,8 @@ export interface AppTheme {
   chipUnselectedBg: string;
   chipUnselectedBorder: string;
   chipSelectedBg: string;
+  surfaceTip: string;
+  contentTip: string;
 }
 
 export const lightTheme: AppTheme = {
@@ -100,6 +102,8 @@ export const lightTheme: AppTheme = {
   chipUnselectedBg: '#ffffff',
   chipUnselectedBorder: '#dbdad7',
   chipSelectedBg: '#1a1919',
+  surfaceTip: '#edf8fc',
+  contentTip: '#006280',
 };
 
 export const darkTheme: AppTheme = {
@@ -152,4 +156,6 @@ export const darkTheme: AppTheme = {
   chipUnselectedBg: '#1a1919',
   chipUnselectedBorder: '#4d4c4b',
   chipSelectedBg: '#ffffff',
+  surfaceTip: '#0d2a33',
+  contentTip: '#5cc8e4',
 };

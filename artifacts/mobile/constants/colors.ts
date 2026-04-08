@@ -27,4 +27,6 @@ export default {
   progressTrack: '#e5e1da',
   frameBg: '#e8e4de',
   contentBrand: '#00a2c7',
+  surfaceTip: '#edf8fc',
+  contentTip: '#006280',
 };

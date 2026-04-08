@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, TextInput, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing, runOnJS } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +9,8 @@ import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
 import { PacificDatePicker } from '@/components/PacificDatePicker';
 import { getMember360Profile } from '@/constants/member360';
+
+const orbGif = require('@/assets/images/orb-analyzing.gif');
 
 type GoalCategory = 'save-up' | 'pay-down' | 'investment';
 
@@ -691,15 +693,18 @@ export function GoalSetupSheet() {
                   </View>
 
                   {isEfGoal && (
-                    <View style={[st.coachNote, { backgroundColor: colors.surfaceTint }]}>
-                      <View style={st.coachNoteHeader}>
-                        <Feather name="zap" size={14} color={colors.contentBrand} />
-                        <Text style={[st.coachNoteTitle, { color: colors.contentBrand }]}>Coach suggestion</Text>
+                    <View style={[st.coachTip, { backgroundColor: colors.surfaceTip, borderColor: colors.surfaceEdge }]}>
+                      <View style={st.coachTipOrb}>
+                        <Image source={orbGif} style={st.coachTipOrbImg} />
                       </View>
-                      <Text style={[st.coachNoteBody, { color: colors.contentPrimary }]}>
-                        {EF_REC.reason} That's{' '}
-                        <Text style={{ fontFamily: Fonts.bold }}>{EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}</Text>.
-                      </Text>
+                      <View style={st.coachTipContent}>
+                        <Text style={[st.coachTipHeader, { color: colors.contentTip }]}>
+                          We suggest {EF_REC.months} months
+                        </Text>
+                        <Text style={[st.coachTipBody, { color: colors.contentTip }]}>
+                          {EF_REC.reason} That's {EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}.
+                        </Text>
+                      </View>
                     </View>
                   )}
 
@@ -978,10 +983,12 @@ const st = StyleSheet.create({
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
 
-  coachNote: { borderRadius: 16, padding: 14, gap: 8 },
-  coachNoteHeader: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 6 },
-  coachNoteTitle: { fontSize: 13, fontFamily: Fonts.bold, letterSpacing: 0.2 },
-  coachNoteBody: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20 },
+  coachTip: { flexDirection: 'row' as const, alignItems: 'flex-start' as const, gap: 8, borderRadius: 16, borderWidth: 0.5, paddingTop: 16, paddingBottom: 20, paddingLeft: 16, paddingRight: 16 },
+  coachTipOrb: { width: 20, height: 20, borderRadius: 60, overflow: 'hidden' as const, alignItems: 'center' as const, justifyContent: 'center' as const, marginTop: 2 },
+  coachTipOrbImg: { width: 33, height: 33 },
+  coachTipContent: { flex: 1, gap: 4, paddingHorizontal: 4 },
+  coachTipHeader: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
+  coachTipBody: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
 
   methodOptions: { gap: 16 },
   methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
