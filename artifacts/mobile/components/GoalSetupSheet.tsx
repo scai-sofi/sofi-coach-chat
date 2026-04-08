@@ -697,14 +697,10 @@ export function GoalSetupSheet() {
                       <View style={st.coachTipOrb}>
                         <Image source={orbGif} style={st.coachTipOrbImg} />
                       </View>
-                      <View style={st.coachTipContent}>
-                        <Text style={[st.coachTipHeader, { color: colors.contentTip }]}>
-                          We suggest {EF_REC.months} months
-                        </Text>
-                        <Text style={[st.coachTipBody, { color: colors.contentTip }]}>
-                          {EF_REC.reason} That's {EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}.
-                        </Text>
-                      </View>
+                      <Text style={[st.coachTipText, { color: colors.contentTip }]}>
+                        {EF_REC.reason} That's {EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}.
+                      </Text>
+                      <Feather name="chevron-right" size={13} color={colors.contentTip} />
                     </View>
                   )}
 
@@ -983,12 +979,10 @@ const st = StyleSheet.create({
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
 
-  coachTip: { flexDirection: 'row' as const, alignItems: 'flex-start' as const, gap: 8, borderRadius: 16, borderWidth: 0.5, paddingTop: 16, paddingBottom: 20, paddingLeft: 16, paddingRight: 16 },
-  coachTipOrb: { width: 20, height: 20, borderRadius: 60, overflow: 'hidden' as const, alignItems: 'center' as const, justifyContent: 'center' as const, marginTop: 2 },
-  coachTipOrbImg: { width: 33, height: 33 },
-  coachTipContent: { flex: 1, gap: 4, paddingHorizontal: 4 },
-  coachTipHeader: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
-  coachTipBody: { fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1 },
+  coachTip: { flexDirection: 'row' as const, alignItems: 'center' as const, flexWrap: 'wrap' as const, gap: 8, borderRadius: 12, borderWidth: 0.5, padding: 12 },
+  coachTipOrb: { width: 16, height: 16, alignItems: 'center' as const, justifyContent: 'center' as const },
+  coachTipOrbImg: { width: 27, height: 27, borderRadius: 60 },
+  coachTipText: { flex: 1, fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1, paddingHorizontal: 2 },
 
   methodOptions: { gap: 16 },
   methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
