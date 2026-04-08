@@ -1,8 +1,19 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { usePrototype, SharedScreen } from '../../prototype/PrototypeContext';
 
 export type Phase2Screen = 'home' | 'chat' | 'my-accounts' | 'goals-profile' | 'about-me' | 'coach-memory' | 'preferences' | 'ai-usage';
 
 const PROFILE_SCREENS: Phase2Screen[] = ['my-accounts', 'goals-profile', 'about-me', 'coach-memory', 'preferences'];
+
+const SHARED_SCREEN_MAP: Record<SharedScreen, Phase2Screen> = {
+  'home': 'home',
+  'chat': 'chat',
+};
+
+function toSharedScreen(s: Phase2Screen): SharedScreen {
+  if (s === 'chat') return 'chat';
+  return 'home';
+}
 
 interface Phase2NavContextType {
   screen: Phase2Screen;
@@ -21,13 +32,15 @@ const Phase2NavContext = createContext<Phase2NavContextType>({
 });
 
 export function Phase2NavProvider({ children }: { children: React.ReactNode }) {
-  const [screen, setScreen] = useState<Phase2Screen>('home');
+  const { sharedScreen, setSharedScreen } = usePrototype();
+  const [screen, setScreen] = useState<Phase2Screen>(SHARED_SCREEN_MAP[sharedScreen] || 'home');
   const [shouldOpenDrawer, setShouldOpenDrawer] = useState(false);
 
   const navigate = useCallback((s: Phase2Screen) => {
     setShouldOpenDrawer(false);
     setScreen(s);
-  }, []);
+    setSharedScreen(toSharedScreen(s));
+  }, [setSharedScreen]);
 
   const goBack = useCallback(() => {
     setScreen(prev => {
@@ -37,7 +50,8 @@ export function Phase2NavProvider({ children }: { children: React.ReactNode }) {
       }
       return 'home';
     });
-  }, []);
+    setSharedScreen('home');
+  }, [setSharedScreen]);
 
   const consumeDrawerFlag = useCallback(() => {
     setShouldOpenDrawer(false);

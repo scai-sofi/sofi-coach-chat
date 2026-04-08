@@ -1,5 +1,40 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "r134T-tfpMrwWZsGVsYWA"
+uri = "file://artifacts/mobile/assets/images/personas/maya-chen.png"
+type = "image"
+title = "Maya clay avatar"
+
+[[generated]]
+id = "yGkQfMTESMAjD3pqT3iCt"
+uri = "file://artifacts/mobile/assets/images/personas/marcus-johnson.png"
+type = "image"
+title = "Marcus clay avatar"
+
+[[generated]]
+id = "kK5uijoh1cDSAOs1psUGB"
+uri = "file://artifacts/mobile/assets/images/personas/sarah-patel.png"
+type = "image"
+title = "Sarah clay avatar"
+
+[[generated]]
+id = "5Bj2UNN9zWrajCKWJj06I"
+uri = "file://artifacts/mobile/assets/images/personas/jordan-rivera.png"
+type = "image"
+title = "Jordan clay avatar"
+
+[[generated]]
+id = "sVzeA6jXw8ceKIgCQyVJn"
+uri = "file://artifacts/mobile/assets/images/personas/aisha-williams.png"
+type = "image"
+title = "Aisha clay avatar"
+
+[[generated]]
+id = "LKANV1ifh00yNwVLV7aaI"
+uri = "file://artifacts/mobile/assets/images/personas/david-kim.png"
+type = "image"
+title = "David clay avatar"
 
 [[outputs]]
 id = "LXn-akHXIAsZ4pelKbXvk"

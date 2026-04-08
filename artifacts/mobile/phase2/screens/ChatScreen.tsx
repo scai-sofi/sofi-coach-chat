@@ -12,8 +12,7 @@ import { InputBar } from '../components/InputBar';
 import { EmptyChat, SuggestionCards } from '../components/EmptyChat';
 
 import { GoalsDashboard } from '../components/GoalsDashboard';
-import { ScenarioSwitcher } from '../components/ScenarioSwitcher';
-import { ScenarioFab } from '../components/ScenarioFab';
+import { FlowPickerSheet } from '../components/FlowPickerSheet';
 import { ChatHistory } from '../components/ChatHistory';
 import { SettingsPanel } from '../components/SettingsPanel';
 import { ScrollAnchor } from '../components/ScrollAnchor';
@@ -255,13 +254,12 @@ export default function ChatScreen() {
             </Animated.View>
           )}
 
-          <ScenarioFab />
           <View onLayout={handleInputBarLayout}>
             <InputBar />
           </View>
         </View>
 
-        {activePanel === 'scenarios' && <ScenarioSwitcher />}
+        <FlowPickerSheet />
       </KeyboardAvoidingView>
 
       {messages.length === 0 && activePanel === 'none' && <SuggestionCards bottomOffset={inputBarHeight} />}

@@ -5,6 +5,7 @@ import {
   Pressable,
   StyleSheet,
   Dimensions,
+  Image,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -18,6 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { Fonts } from '../constants/fonts';
 import { usePhase2Nav, Phase2Screen } from '../context/Phase2NavContext';
+import { useCoach } from '../context/CoachContext';
 
 type FeatherIconName = ComponentProps<typeof Feather>['name'];
 
@@ -39,6 +41,7 @@ interface MenuItem {
 interface ProfileDrawerProps {
   visible: boolean;
   onClose: () => void;
+  onSwitchProfile?: () => void;
 }
 
 const MENU_ITEMS: MenuItem[] = [
@@ -57,10 +60,11 @@ const BOTTOM_ITEMS: MenuItem[] = [
   { icon: 'log-out', label: 'Log Out' },
 ];
 
-export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
+export function ProfileDrawer({ visible, onClose, onSwitchProfile }: ProfileDrawerProps) {
   const insets = useSafeAreaInsets();
   const progress = useSharedValue(0);
   const { navigate } = usePhase2Nav();
+  const { activePersona } = useCoach();
 
   const handleMenuPress = useCallback((item: MenuItem) => {
     if (item.screen) {
@@ -101,15 +105,33 @@ export function ProfileDrawer({ visible, onClose }: ProfileDrawerProps) {
       >
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View style={styles.avatarContainer}>
-              <Feather name="user" size={32} color="#706f6e" />
-            </View>
+            {activePersona ? (
+              <View style={styles.avatarContainer}>
+                <Image source={activePersona.avatar} style={styles.avatarImage} />
+              </View>
+            ) : (
+              <View style={styles.avatarContainer}>
+                <Feather name="user" size={32} color="#706f6e" />
+              </View>
+            )}
             <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
               <Feather name="x" size={24} color="#1a1919" />
             </Pressable>
           </View>
-          <Text style={styles.name}>Olivia</Text>
+          <Text style={styles.name}>{activePersona?.name ?? 'Olivia'}</Text>
           <Text style={styles.memberSince}>SoFi Member since 2023</Text>
+          {onSwitchProfile && (
+            <Pressable
+              style={({ pressed }) => [styles.switchBtn, pressed && styles.switchBtnPressed]}
+              onPress={() => {
+                onClose();
+                setTimeout(() => onSwitchProfile(), 320);
+              }}
+            >
+              <Feather name="repeat" size={14} color="#706f6e" />
+              <Text style={styles.switchLabel}>Switch profile</Text>
+            </Pressable>
+          )}
         </View>
 
         <View style={styles.menuSection}>
@@ -186,11 +208,15 @@ const styles = StyleSheet.create({
   avatarContainer: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#e8e4de',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  avatarImage: {
+    width: 64,
+    height: 64,
   },
   closeBtn: {
     width: 40,
@@ -211,6 +237,26 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#706f6e',
     marginTop: 2,
+  },
+  switchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(10,10,10,0.04)',
+    alignSelf: 'flex-start',
+  },
+  switchBtnPressed: {
+    backgroundColor: 'rgba(10,10,10,0.1)',
+  },
+  switchLabel: {
+    fontFamily: Fonts.medium,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#706f6e',
   },
   menuSection: {
     marginTop: 16,

@@ -1,93 +1,164 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  runOnJS,
+  FadeIn,
+  FadeOut,
 } from 'react-native-reanimated';
-import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
 import { useCoach } from '../context/CoachContext';
 
+const FLOW_ICONS: Record<string, keyof typeof Feather.glyphMap> = {
+  'sparkles': 'zap',
+  'target': 'target',
+  'layers': 'layers',
+  'user-check': 'user-check',
+  'alert-triangle': 'alert-triangle',
+  'brain': 'cpu',
+  'award': 'award',
+};
+
 export function ScenarioFab() {
-  return null;
   const { colors } = useTheme();
-  const { setActivePanel, activePanel, messages } = useCoach();
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const offsetX = useSharedValue(0);
-  const offsetY = useSharedValue(0);
+  const { activePanel, activePersona, activeScenario, switchScenario } = useCoach();
+  const [open, setOpen] = useState(false);
+
   const scale = useSharedValue(1);
-  const isDragging = useSharedValue(false);
-
-  const openPanel = () => setActivePanel('scenarios');
-
-  const gesture = Gesture.Pan()
-    .onStart(() => {
-      isDragging.value = true;
-      scale.value = withSpring(1.1, { damping: 15 });
-    })
-    .onUpdate((e) => {
-      translateX.value = offsetX.value + e.translationX;
-      translateY.value = offsetY.value + e.translationY;
-    })
-    .onEnd(() => {
-      offsetX.value = translateX.value;
-      offsetY.value = translateY.value;
-      scale.value = withSpring(1, { damping: 15 });
-      isDragging.value = false;
-    });
-
-  const tap = Gesture.Tap()
-    .onEnd(() => {
-      runOnJS(openPanel)();
-    });
-
-  const composed = Gesture.Race(gesture, tap);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+  const fabStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
   }));
 
-  if (activePanel !== 'none' || messages.length === 0) return null;
+  if (activePanel !== 'none' || !activePersona) return null;
+
+  const flows = activePersona.flows;
+
+  const handleFlowSelect = (scenarioId: string) => {
+    switchScenario(scenarioId, activePersona.id);
+    setOpen(false);
+  };
 
   return (
-    <GestureDetector gesture={composed}>
-      <Animated.View style={[styles.fab, { backgroundColor: colors.contentPrimary }, animatedStyle]}>
-        <Feather name="play-circle" size={20} color={colors.contentPrimaryInverse} />
-        <Animated.Text style={[styles.fabText, { color: colors.contentPrimaryInverse }]}>Demos</Animated.Text>
+    <View style={styles.container}>
+      {open && (
+        <>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} />
+          <Animated.View
+            entering={FadeIn.duration(180)}
+            exiting={FadeOut.duration(120)}
+            style={[styles.popover, { backgroundColor: colors.surfaceElevated }]}
+          >
+            <Text style={[styles.popoverTitle, { color: colors.contentSecondary }]}>
+              {activePersona.name}'s scenarios
+            </Text>
+            {flows.map((flow, idx) => {
+              const isActive = activeScenario === flow.scenarioId;
+              return (
+                <Pressable
+                  key={flow.scenarioId}
+                  style={[
+                    styles.flowRow,
+                    idx < flows.length - 1 && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.contentMuted },
+                    isActive && { backgroundColor: colors.surfaceTint },
+                  ]}
+                  onPress={() => handleFlowSelect(flow.scenarioId)}
+                >
+                  <Feather
+                    name={FLOW_ICONS[flow.icon] || 'play'}
+                    size={16}
+                    color={isActive ? colors.contentBrand : colors.contentSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.flowLabel,
+                      { color: colors.contentPrimary },
+                      isActive && { color: colors.contentBrand, fontFamily: Fonts.medium },
+                    ]}
+                  >
+                    {flow.label}
+                  </Text>
+                  {isActive && (
+                    <Feather name="check" size={14} color={colors.contentBrand} />
+                  )}
+                </Pressable>
+              );
+            })}
+          </Animated.View>
+        </>
+      )}
+
+      <Animated.View style={fabStyle}>
+        <Pressable
+          style={[styles.fab, { backgroundColor: colors.contentPrimary }]}
+          onPress={() => setOpen(!open)}
+          onPressIn={() => { scale.value = withSpring(0.92, { damping: 15, stiffness: 300 }); }}
+          onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
+        >
+          <Feather name="sliders" size={18} color={colors.contentPrimaryInverse} />
+        </Pressable>
       </Animated.View>
-    </GestureDetector>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  fab: {
+  container: {
     position: 'absolute',
     bottom: 120,
     right: 16,
-    flexDirection: 'row',
+    alignItems: 'flex-end',
+    zIndex: 30,
+  },
+  fab: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 9999,
+    justifyContent: 'center',
     shadowColor: 'rgba(0,0,0,0.25)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 12,
     elevation: 8,
-    zIndex: 30,
   },
-  fabText: {
-    fontSize: 14,
+  popover: {
+    position: 'absolute',
+    bottom: 56,
+    right: 0,
+    minWidth: 220,
+    borderRadius: 16,
+    paddingVertical: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 12,
+    overflow: 'hidden',
+  },
+  popoverTitle: {
+    fontSize: 11,
     fontFamily: Fonts.medium,
+    lineHeight: 16,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 6,
+  },
+  flowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  flowLabel: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    lineHeight: 20,
   },
 });

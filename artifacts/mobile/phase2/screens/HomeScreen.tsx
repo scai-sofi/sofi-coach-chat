@@ -13,7 +13,6 @@ import { usePhase2Nav } from '../context/Phase2NavContext';
 import { useCoach } from '../context/CoachContext';
 import { ProfileDrawer } from '../components/ProfileDrawer';
 import { ScenarioSwitcher } from '../components/ScenarioSwitcher';
-import { DemoIcon } from '../components/icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Fonts } from '../constants/fonts';
@@ -72,9 +71,28 @@ const HEADER_ROW_HEIGHT = 44;
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { navigate, shouldOpenDrawer, consumeDrawerFlag } = usePhase2Nav();
-  const { activePanel, setActivePanel } = useCoach();
+  const { activePanel, setActivePanel, activePersona } = useCoach();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [hasLaunched, setHasLaunched] = useState(false);
   const headerHeight = insets.top + HEADER_ROW_HEIGHT;
+
+  const fp = activePersona?.financialProfile;
+  const greetingName = fp?.greeting ?? 'Good morning, Olivia';
+  const bankingBalance = fp?.bankingBalance ?? '$27,282.12';
+  const bankingCount = fp?.bankingCount ?? 2;
+  const spendingAmount = fp?.spending ?? '$1,282.12';
+  const spendingNote = fp?.spendingNote ?? 'Pacing high this month';
+  const netWorthAmount = fp?.netWorth ?? '$1,278,220.50';
+  const creditScoreNum = fp?.creditScore ?? 732;
+  const creditScoreLabel = fp?.creditScoreLabel ?? 'Good';
+  const rewardPoints = fp?.rewardPoints ?? '250 pts';
+
+  useEffect(() => {
+    if (!hasLaunched && !activePersona) {
+      setActivePanel('scenarios');
+      setHasLaunched(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (shouldOpenDrawer) {
@@ -105,9 +123,6 @@ export default function HomeScreen() {
             </LinearGradient>
           </View>
           <View style={styles.headerRight}>
-            <Pressable style={styles.headerIconBtn} onPress={() => setActivePanel('scenarios')} hitSlop={12}>
-              <DemoIcon size={24} color="#ffffff" />
-            </Pressable>
             <Pressable style={styles.headerIconBtn} hitSlop={12}>
               <NotificationBellSvg width={24} height={24} />
             </Pressable>
@@ -136,11 +151,11 @@ export default function HomeScreen() {
       >
         <View style={[styles.tealScrollSection, { paddingTop: headerHeight }]}>
           <View style={styles.greetingSection}>
-            <Text style={styles.greetingText}>Good morning, Olivia</Text>
+            <Text style={styles.greetingText}>{greetingName}</Text>
             <View style={styles.pillRow}>
               <View style={styles.rewardPill}>
                 <GlyphRewardsSvg width={14.5} height={13} />
-                <Text style={styles.rewardPillText}>250 pts</Text>
+                <Text style={styles.rewardPillText}>{rewardPoints}</Text>
                 <GlyphArrowRightSvg width={10} height={8} />
               </View>
               <View style={styles.rewardPill}>
@@ -160,16 +175,26 @@ export default function HomeScreen() {
           <View style={styles.accountsSection}>
           <AccountCard
             title="Banking"
-            count={2}
+            count={bankingCount}
             subtitle="0 transactions"
-            balance="$27,282.12"
+            balance={bankingBalance}
             showCaret
           />
+          {fp?.creditCardBalance && (
+            <AccountCard
+              title="Credit card"
+              subtitle="Current balance"
+              balance={fp.creditCardBalance}
+              showCaret
+            />
+          )}
           <AccountCard
             title="Invest"
-            subtitle="Start trading for $1"
-            actionText="Get up to $1,000"
-            actionColor={COLORS.accent}
+            subtitle={fp?.investBalance ? 'Portfolio value' : 'Start trading for $1'}
+            balance={fp?.investBalance}
+            actionText={fp?.investBalance ? undefined : 'Get up to $1,000'}
+            actionColor={fp?.investBalance ? undefined : COLORS.accent}
+            showCaret={!!fp?.investBalance}
           />
           <AccountCard
             title="Crypto"
@@ -200,20 +225,8 @@ export default function HomeScreen() {
               <View style={styles.insightTextBlock}>
                 <Text style={styles.insightLabel}>Spending</Text>
                 <View style={styles.insightDataBlock}>
-                  <View style={styles.marqueeRow}>
-                    <View style={styles.dollarWrap}>
-                      <Text style={styles.dollarSign}>$</Text>
-                    </View>
-                    <View style={styles.digitsRow}>
-                      <Text style={styles.insightDigits}>1</Text>
-                      <Text style={styles.insightComma}>,</Text>
-                      <Text style={styles.insightDigits}>282</Text>
-                      <View style={styles.centsWrap}>
-                        <Text style={styles.insightCents}>.12</Text>
-                      </View>
-                    </View>
-                  </View>
-                  <Text style={styles.insightCaution}>Pacing high this month</Text>
+                  <MoneyDisplay amount={spendingAmount} />
+                  <Text style={styles.insightCaution}>{spendingNote}</Text>
                 </View>
               </View>
               <View style={styles.chartAbsolute}>
@@ -224,21 +237,7 @@ export default function HomeScreen() {
               <View style={styles.insightTextBlock}>
                 <Text style={styles.insightLabel}>Net Worth</Text>
                 <View style={styles.insightDataBlock}>
-                  <View style={styles.marqueeRow}>
-                    <View style={styles.dollarWrap}>
-                      <Text style={styles.dollarSign}>$</Text>
-                    </View>
-                    <View style={styles.digitsRow}>
-                      <Text style={styles.insightDigits}>1</Text>
-                      <Text style={styles.insightComma}>,</Text>
-                      <Text style={styles.insightDigits}>278</Text>
-                      <Text style={styles.insightComma}>,</Text>
-                      <Text style={styles.insightDigits}>220</Text>
-                      <View style={styles.centsWrap}>
-                        <Text style={styles.insightCents}>.50</Text>
-                      </View>
-                    </View>
-                  </View>
+                  <MoneyDisplay amount={netWorthAmount} />
                   <View style={styles.subtextRow}>
                     <Text style={styles.insightSubtextMedium}>2 SoFi</Text>
                     <View style={styles.subtextDivider} />
@@ -257,9 +256,9 @@ export default function HomeScreen() {
               <View style={styles.creditScoreLeft}>
                 <Text style={styles.insightLabel}>Credit Score</Text>
                 <View style={styles.insightDataBlock}>
-                  <Text style={styles.creditScoreNumber}>732</Text>
+                  <Text style={styles.creditScoreNumber}>{creditScoreNum}</Text>
                   <View style={styles.subtextRow}>
-                    <Text style={styles.insightSubtextMedium}>Good</Text>
+                    <Text style={styles.insightSubtextMedium}>{creditScoreLabel}</Text>
                     <View style={styles.subtextDivider} />
                     <Text style={styles.insightSubtextMedium}>Updated Jul 25</Text>
                   </View>
@@ -288,9 +287,33 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <ProfileDrawer visible={profileOpen} onClose={() => setProfileOpen(false)} />
+      <ProfileDrawer
+        visible={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        onSwitchProfile={() => setActivePanel('scenarios')}
+      />
 
-      {activePanel === 'scenarios' && <ScenarioSwitcher />}
+      {activePanel === 'scenarios' && <ScenarioSwitcher isLaunch={!activePersona} />}
+    </View>
+  );
+}
+
+function MoneyDisplay({ amount }: { amount: string }) {
+  const cleaned = amount.replace('$', '');
+  const [whole, cents] = cleaned.split('.');
+  return (
+    <View style={styles.marqueeRow}>
+      <View style={styles.dollarWrap}>
+        <Text style={styles.dollarSign}>$</Text>
+      </View>
+      <View style={styles.digitsRow}>
+        <Text style={styles.insightDigits}>{whole}</Text>
+        {cents && (
+          <View style={styles.centsWrap}>
+            <Text style={styles.insightCents}>.{cents}</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }

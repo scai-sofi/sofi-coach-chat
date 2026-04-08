@@ -5,6 +5,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from '
 import { useNavigation } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { useCoach } from '@/context/CoachContext';
+import { usePrototype } from '@/prototype/PrototypeContext';
 import { ChatHeader } from '@/components/ChatHeader';
 import { MessageBubble } from '@/components/MessageBubble';
 import { TypingIndicator } from '@/components/TypingIndicator';
@@ -12,8 +13,7 @@ import { InputBar } from '@/components/InputBar';
 import { EmptyChat, SuggestionCards } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
-import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
-import { ScenarioFab } from '@/components/ScenarioFab';
+import { FlowPickerSheet } from '@/components/FlowPickerSheet';
 import { ChatHistory } from '@/components/ChatHistory';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { GoalSetupSheet } from '@/components/GoalSetupSheet';
@@ -30,6 +30,7 @@ export default function ChatScreen() {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { messages, isTyping, activePanel, activeScenario, setActivePanel } = useCoach();
+  const { setSharedScreen } = usePrototype();
   const listRef = useRef<FlatList>(null);
   const prevMsgCount = useRef(messages.length);
   const prevScenario = useRef(activeScenario);
@@ -47,6 +48,7 @@ export default function ChatScreen() {
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    setSharedScreen('chat');
     return () => {
       if (hideTimer.current) clearTimeout(hideTimer.current);
     };
@@ -55,9 +57,10 @@ export default function ChatScreen() {
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', () => {
       setActivePanel('none');
+      setSharedScreen('home');
     });
     return unsubscribe;
-  }, [navigation, setActivePanel]);
+  }, [navigation, setActivePanel, setSharedScreen]);
 
   const keyboardVisibleRef = useRef(false);
 
@@ -267,13 +270,12 @@ export default function ChatScreen() {
             </Animated.View>
           )}
 
-          <ScenarioFab />
           <View onLayout={handleInputBarLayout}>
             <InputBar />
           </View>
         </View>
 
-        {activePanel === 'scenarios' && <ScenarioSwitcher />}
+        <FlowPickerSheet />
       </KeyboardAvoidingView>
 
       {messages.length === 0 && activePanel === 'none' && <SuggestionCards bottomOffset={inputBarHeight} />}

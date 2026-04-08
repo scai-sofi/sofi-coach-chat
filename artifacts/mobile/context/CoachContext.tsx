@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone, GoalProposal, Member360Conflict } from '@/constants/types';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { Message, MessageChip, Memory, Goal, PanelType, MemoryCategory, MemoryProposal, MemoryMode, GoalType, GoalStatus, Milestone, GoalProposal, Member360Conflict, Persona } from '@/constants/types';
 import { detectMember360Conflict } from '@/constants/member360';
 import { SCENARIOS } from '@/constants/scenarios';
+import { PERSONAS } from '@/constants/personas';
 import { generateAIResponse } from '@/constants/aiResponse';
+import { usePrototype } from '@/prototype/PrototypeContext';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
@@ -36,6 +38,7 @@ interface CoachState {
   memoryMode: MemoryMode;
   activePanel: PanelType;
   activeScenario: string;
+  activePersona: Persona | null;
   showOnboarding: boolean;
   chatMode: ChatMode;
   inputFocused: boolean;
@@ -55,7 +58,9 @@ interface CoachContextType extends CoachState {
   setMemoryMode: (mode: MemoryMode) => void;
   pauseAllMemories: () => void;
   deleteAllMemories: () => void;
-  switchScenario: (id: string) => void;
+  selectPersona: (personaId: string) => void;
+  preparePersona: (personaId: string) => void;
+  switchScenario: (scenarioId: string, personaId?: string) => void;
   startLiveChat: () => void;
   confirmMemory: (messageId: string) => void;
   dismissMemoryProposal: (messageId: string) => void;
@@ -133,6 +138,10 @@ function getActiveMemoryStrings(memories: Memory[]): string[] {
 }
 
 export function CoachProvider({ children }: { children: React.ReactNode }) {
+  const { sharedPersonaId, setSharedPersonaId } = usePrototype();
+  const initialPersona = sharedPersonaId
+    ? (PERSONAS.find(p => p.id === sharedPersonaId) || PERSONAS[0] || null)
+    : null;
   const [messages, setMessages] = useState<Message[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -140,13 +149,14 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [memoryMode, setMemoryMode] = useState<MemoryMode>('ask-first');
   const [activePanel, setActivePanelState] = useState<PanelType>('none');
   const [activeScenario, setActiveScenario] = useState('');
+  const [activePersona, setActivePersona] = useState<Persona | null>(initialPersona);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>('live');
   const [pendingGoalSetup, setPendingGoalSetup] = useState<PendingGoalSetup | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [sessionTitle, setSessionTitle] = useState('Coach');
+  const [sessionTitle, setSessionTitle] = useState(initialPersona?.name ?? 'Coach');
   const [highlightedMemoryId, setHighlightedMemoryId] = useState<string | null>(null);
   const titleGeneratedRef = useRef(false);
 
@@ -183,21 +193,47 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMemories([]);
   }, []);
 
-  const switchScenario = useCallback((id: string) => {
-    const scenario = SCENARIOS.find(s => s.id === id);
+  const preparePersona = useCallback((personaId: string) => {
+    const persona = PERSONAS.find(p => p.id === personaId) || null;
+    if (!persona) return;
+    if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
+    sessionVersionRef.current += 1;
+    setChatMode('live');
+    setMessages([]);
+    setMemories([]);
+    setGoals([]);
+    setIsTyping(false);
+    setActiveScenario('');
+    setActivePersona(persona);
+    setShowOnboarding(false);
+    setSessionTitle(persona.name);
+    titleGeneratedRef.current = false;
+    setPendingGoalSetup(null);
+    setSharedPersonaId(personaId);
+  }, [setSharedPersonaId]);
+
+  const selectPersona = useCallback((personaId: string) => {
+    preparePersona(personaId);
+    setActivePanelState('none');
+  }, [preparePersona]);
+
+  const switchScenario = useCallback((scenarioId: string, personaId?: string) => {
+    const scenario = SCENARIOS.find(s => s.id === scenarioId);
     if (!scenario) return;
     if (pendingTimerRef.current) { clearTimeout(pendingTimerRef.current); pendingTimerRef.current = null; }
     if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
     sessionVersionRef.current += 1;
+    const persona = personaId ? (PERSONAS.find(p => p.id === personaId) || null) : null;
     setChatMode('demo');
     setMessages([...scenario.messages]);
     setMemories([...scenario.memories]);
     setGoals([...scenario.goals]);
     setIsTyping(false);
-    setActivePanelState('none');
-    setActiveScenario(id);
-    setShowOnboarding(id === 'cold-start');
-    setSessionTitle(scenario.title);
+    setActiveScenario(scenarioId);
+    setActivePersona(persona);
+    setShowOnboarding(scenarioId === 'cold-start');
+    setSessionTitle(persona ? persona.name : scenario.title);
     titleGeneratedRef.current = true;
     setPendingGoalSetup(null);
   }, []);
@@ -214,6 +250,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
     setActivePanelState('none');
     setActiveScenario('');
+    setActivePersona(null);
     setShowOnboarding(false);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
@@ -951,7 +988,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
         content: response.content || '',
         timestamp: new Date(),
         chips: filteredChips.length > 0 ? filteredChips : undefined,
-        memoryProposal: memOff ? undefined : response.memoryProposal,
+        memoryProposal: memoryModeRef.current === 'off' ? undefined : response.memoryProposal,
         memoryDeletion: response.memoryDeletion,
         suggestions: response.suggestions,
         provenance: response.provenance,
@@ -1219,10 +1256,10 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CoachContext.Provider value={{
-      messages, memories, goals, isTyping, memoryMode, activePanel, activeScenario, showOnboarding, chatMode, inputFocused,
+      messages, memories, goals, isTyping, memoryMode, activePanel, activeScenario, activePersona, showOnboarding, chatMode, inputFocused,
       chatHistory, currentSessionId, sessionTitle,
       sendMessage, setActivePanel, setMemoryMode, pauseAllMemories, deleteAllMemories,
-      switchScenario, startLiveChat,
+      selectPersona, preparePersona, switchScenario, startLiveChat,
       confirmMemory, dismissMemoryProposal, confirmGoal, dismissGoalProposal,
       acceptDraftGoal, dismissDraftGoal,
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,

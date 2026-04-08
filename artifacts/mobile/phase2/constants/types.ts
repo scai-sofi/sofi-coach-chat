@@ -5,7 +5,7 @@ export type GoalType = 'EMERGENCY_FUND' | 'DEBT_PAYOFF' | 'SAVINGS_TARGET' | 'IN
 export type GoalStatus = 'DRAFT' | 'ACTIVE' | 'ON_TRACK' | 'AT_RISK' | 'PAUSED' | 'COMPLETED';
 export type ChipType = 'memory-saved' | 'goal-progress' | 'goal-risk' | 'memory-updated' | 'milestone' | 'alert' | 'handoff' | 'conflict-resolved' | 'goal-created';
 export type MemoryMode = 'full' | 'ask-first' | 'off';
-export type PanelType = 'none' | 'goals' | 'scenarios' | 'history' | 'settings' | 'profile';
+export type PanelType = 'none' | 'goals' | 'scenarios' | 'flows' | 'history' | 'settings' | 'profile';
 
 export interface MessageChip {
   type: ChipType;
@@ -128,6 +128,39 @@ export interface Scenario {
   memories: Memory[];
   goals: Goal[];
   notReady?: boolean;
+}
+
+export interface PersonaFinancialProfile {
+  greeting: string;
+  bankingBalance: string;
+  bankingCount: number;
+  investBalance?: string;
+  creditCardBalance?: string;
+  monthlyIncome: string;
+  creditScore: number;
+  creditScoreLabel: string;
+  netWorth: string;
+  spending: string;
+  spendingNote: string;
+  rewardPoints: string;
+}
+
+export interface PersonaFlow {
+  scenarioId: string;
+  label: string;
+  icon: string;
+  description?: string;
+}
+
+export interface Persona {
+  id: string;
+  name: string;
+  avatar: number;
+  accentColor: string;
+  age: number;
+  subtitle: string;
+  flows: PersonaFlow[];
+  financialProfile: PersonaFinancialProfile;
 }
 
 export const MEMORY_CATEGORY_LABELS: Record<MemoryCategory, string> = {
