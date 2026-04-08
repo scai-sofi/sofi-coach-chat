@@ -528,7 +528,7 @@ export function GoalSetupSheet() {
                           <Text style={[st.linkFormCancelText, { color: colors.contentSecondary }]}>Cancel</Text>
                         </Pressable>
                         <Pressable
-                          style={[st.linkFormAdd, { backgroundColor: linkName.trim() && parse(linkBalance) > 0 ? colors.contentPrimary : colors.contentDisabled }]}
+                          style={[st.linkFormAdd, { backgroundColor: linkName.trim() && parse(linkBalance) > 0 ? colors.contentBrand : colors.contentDisabled }]}
                           onPress={handleLinkAccount}
                           disabled={!linkName.trim() || parse(linkBalance) <= 0}
                         >
@@ -828,10 +828,10 @@ const st = StyleSheet.create({
   linkInputWrap: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 10 },
   linkInputField: { flex: 1, fontSize: 15, fontFamily: Fonts.regular, padding: 0 },
   linkFormActions: { flexDirection: 'row', gap: 10 },
-  linkFormCancel: { flex: 1, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  linkFormCancelText: { fontSize: 14, fontFamily: Fonts.medium },
-  linkFormAdd: { flex: 1, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  linkFormAddText: { fontSize: 14, fontFamily: Fonts.bold },
+  linkFormCancel: { flex: 1, height: 48, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  linkFormCancelText: { fontSize: 14, fontFamily: Fonts.bold, lineHeight: 20 },
+  linkFormAdd: { flex: 1, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  linkFormAddText: { fontSize: 14, fontFamily: Fonts.bold, lineHeight: 20 },
 
   debtDetail: { flexDirection: 'row', alignItems: 'center', borderRadius: 14, padding: 14, marginBottom: 20 },
   debtDetailItem: { flex: 1, alignItems: 'center', gap: 2 },
@@ -882,6 +882,6 @@ const st = StyleSheet.create({
   reviewSavingsText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18, flex: 1 },
 
   footer: { paddingHorizontal: 24, paddingTop: 12 },
-  nextBtn: { height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
-  nextBtnText: { fontSize: 16, fontFamily: Fonts.bold },
+  nextBtn: { height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 16 },
+  nextBtnText: { fontSize: 16, fontFamily: Fonts.bold, lineHeight: 20 },
 });
