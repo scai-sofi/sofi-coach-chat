@@ -53,7 +53,7 @@ export function PhaseSwitcherFab() {
     ],
   }));
 
-  const otherLabel = protoPhase === 'phase1' ? 'P2' : 'P1';
+  const otherLabel = protoPhase === 'phase1' ? 'beyond GA' : 'GA';
   const bgColor = protoPhase === 'phase1' ? '#1a1919' : '#00a2c7';
 
   return (
