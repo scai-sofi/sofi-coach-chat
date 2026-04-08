@@ -16,6 +16,7 @@ import { ScenarioSwitcher } from '@/components/ScenarioSwitcher';
 import { ScenarioFab } from '@/components/ScenarioFab';
 import { ChatHistory } from '@/components/ChatHistory';
 import { SettingsPanel } from '@/components/SettingsPanel';
+import { GoalSetupSheet } from '@/components/GoalSetupSheet';
 import { ScrollAnchor } from '@/components/ScrollAnchor';
 import { Message } from '@/constants/types';
 
@@ -298,6 +299,8 @@ export default function ChatScreen() {
           setActivePanel('none');
         }} />
       )}
+
+      <GoalSetupSheet />
 
     </View>
   );

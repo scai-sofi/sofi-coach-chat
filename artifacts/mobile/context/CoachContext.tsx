@@ -44,6 +44,11 @@ interface CoachState {
   sessionTitle: string;
 }
 
+export interface PendingGoalSetup {
+  messageId: string;
+  proposal: GoalProposal;
+}
+
 interface CoachContextType extends CoachState {
   sendMessage: (text: string) => void;
   setActivePanel: (panel: PanelType) => void;
@@ -73,6 +78,9 @@ interface CoachContextType extends CoachState {
   resolveMember360Conflict: (messageId: string, resolution: 'user' | 'profile' | 'dismissed') => void;
   confirmMemoryDeletion: (messageId: string) => void;
   dismissMemoryDeletion: (messageId: string) => void;
+  pendingGoalSetup: PendingGoalSetup | null;
+  createGoalFromSetup: (setup: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }, messageId: string) => void;
+  cancelGoalSetup: () => void;
 }
 
 const CoachContext = createContext<CoachContextType | null>(null);
@@ -133,6 +141,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   const [activeScenario, setActiveScenario] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>('live');
+  const [pendingGoalSetup, setPendingGoalSetup] = useState<PendingGoalSetup | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -189,6 +198,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setShowOnboarding(id === 'cold-start');
     setSessionTitle(scenario.title);
     titleGeneratedRef.current = true;
+    setPendingGoalSetup(null);
   }, []);
 
   const startLiveChat = useCallback(() => {
@@ -206,6 +216,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setShowOnboarding(false);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
+    setPendingGoalSetup(null);
   }, []);
 
   const addGoalFromProposal = useCallback((proposal: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }) => {
@@ -1048,12 +1059,23 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const confirmGoal = useCallback((messageId: string) => {
+    const msg = messagesRef.current.find(m => m.id === messageId);
+    if (!msg?.goalProposal) return;
+    setPendingGoalSetup({ messageId, proposal: msg.goalProposal });
+  }, []);
+
+  const createGoalFromSetup = useCallback((setup: { type: GoalType; title: string; targetAmount: number; targetDate: Date; monthlyContribution: number; linkedAccount: string }, messageId: string) => {
+    addGoalFromProposal(setup);
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId || !m.goalProposal) return m;
-      addGoalFromProposal(m.goalProposal);
       return { ...m, goalProposal: { ...m.goalProposal, confirmed: true } };
     }));
+    setPendingGoalSetup(null);
   }, [addGoalFromProposal]);
+
+  const cancelGoalSetup = useCallback(() => {
+    setPendingGoalSetup(null);
+  }, []);
 
   const dismissGoalProposal = useCallback((messageId: string) => {
     setMessages(prev => prev.map(m => {
@@ -1150,6 +1172,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setCurrentSessionId(null);
     setSessionTitle('Coach');
     titleGeneratedRef.current = false;
+    setPendingGoalSetup(null);
   }, [currentSessionId]);
 
   const loadSession = useCallback((id: string) => {
@@ -1170,6 +1193,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setCurrentSessionId(id);
     setSessionTitle(session.title);
     titleGeneratedRef.current = true;
+    setPendingGoalSetup(null);
   }, [chatHistory]);
 
   const deleteSession = useCallback((id: string) => {
@@ -1183,6 +1207,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     setMessages([]);
     setIsTyping(false);
     setShowOnboarding(chatModeRef.current === 'demo');
+    setPendingGoalSetup(null);
   }, []);
 
   return (
@@ -1196,6 +1221,7 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
       addMemory, editMemory, pauseMemory, deleteMemory, restoreMemory, clearConversation, setInputFocused,
       saveAndClose, loadSession, deleteSession, highlightedMemoryId, navigateToMemory, resolveMember360Conflict,
       confirmMemoryDeletion, dismissMemoryDeletion,
+      pendingGoalSetup, createGoalFromSetup, cancelGoalSetup,
     }}>
       {children}
     </CoachContext.Provider>
