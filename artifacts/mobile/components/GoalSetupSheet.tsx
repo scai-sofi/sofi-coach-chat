@@ -8,12 +8,25 @@ import { useCoach, PendingGoalSetup } from '@/context/CoachContext';
 import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
 
-const GOAL_TYPES: { type: GoalType; label: string; icon: keyof typeof Feather.glyphMap }[] = [
-  { type: 'EMERGENCY_FUND', label: 'Emergency Fund', icon: 'shield' },
-  { type: 'DEBT_PAYOFF', label: 'Debt Payoff', icon: 'trending-down' },
-  { type: 'SAVINGS_TARGET', label: 'Savings Target', icon: 'target' },
-  { type: 'INVESTMENT', label: 'Investment', icon: 'bar-chart-2' },
-  { type: 'CUSTOM', label: 'Custom Goal', icon: 'star' },
+type GoalCategory = 'save-up' | 'pay-down' | 'investment';
+
+const CATEGORIES: { key: GoalCategory; label: string; subtitle: string; icon: keyof typeof Feather.glyphMap }[] = [
+  { key: 'save-up', label: 'Save up', subtitle: 'Set aside money for something you want', icon: 'target' },
+  { key: 'pay-down', label: 'Pay down', subtitle: 'Track progress paying off debt', icon: 'trending-down' },
+  { key: 'investment', label: 'Investment', subtitle: 'Grow your money over time', icon: 'bar-chart-2' },
+];
+
+const SAVE_UP_ITEMS: { label: string; icon: keyof typeof Feather.glyphMap; goalType: GoalType }[] = [
+  { label: 'Emergency Fund', icon: 'shield', goalType: 'EMERGENCY_FUND' },
+  { label: 'Travel', icon: 'map-pin', goalType: 'SAVINGS_TARGET' },
+  { label: 'Kids', icon: 'smile', goalType: 'SAVINGS_TARGET' },
+  { label: 'House', icon: 'home', goalType: 'SAVINGS_TARGET' },
+  { label: 'Car', icon: 'truck', goalType: 'SAVINGS_TARGET' },
+  { label: 'Dining Out', icon: 'coffee', goalType: 'SAVINGS_TARGET' },
+  { label: 'Splurge', icon: 'gift', goalType: 'SAVINGS_TARGET' },
+  { label: 'Taxes', icon: 'file-text', goalType: 'SAVINGS_TARGET' },
+  { label: 'Wedding', icon: 'heart', goalType: 'SAVINGS_TARGET' },
+  { label: 'Other', icon: 'plus-circle', goalType: 'CUSTOM' },
 ];
 
 const LINKED_ACCOUNTS = [
@@ -24,6 +37,7 @@ const LINKED_ACCOUNTS = [
   'SoFi Money',
 ];
 
+const TOTAL_PAGES = 5;
 const STEP_SPRING = { damping: 24, stiffness: 220, mass: 0.8 };
 
 function formatCurrency(val: number): string {
@@ -39,7 +53,12 @@ function formatMonthYear(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
-type Step = 1 | 2 | 3 | 4;
+function pageToStep(page: number): number {
+  if (page <= 1) return 1;
+  if (page === 2) return 2;
+  if (page === 3) return 3;
+  return 4;
+}
 
 function StepIndicator({ current, total }: { current: number; total: number }) {
   const { colors } = useTheme();
@@ -70,6 +89,20 @@ const stepStyles = StyleSheet.create({
   dot: { height: 6, borderRadius: 3 },
 });
 
+const CATEGORY_TO_TYPE: Record<GoalCategory, GoalType> = {
+  'save-up': 'SAVINGS_TARGET',
+  'pay-down': 'DEBT_PAYOFF',
+  'investment': 'INVESTMENT',
+};
+
+const GOAL_TYPE_DISPLAY: Record<GoalType, string> = {
+  EMERGENCY_FUND: 'Save up',
+  DEBT_PAYOFF: 'Pay down',
+  SAVINGS_TARGET: 'Save up',
+  INVESTMENT: 'Investment',
+  CUSTOM: 'Save up',
+};
+
 export function GoalSetupSheet() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -78,7 +111,8 @@ export function GoalSetupSheet() {
   const [visible, setVisible] = useState(false);
   const [setup, setSetup] = useState<PendingGoalSetup | null>(null);
 
-  const [step, setStep] = useState<Step>(1);
+  const [page, setPage] = useState(0);
+  const [category, setCategory] = useState<GoalCategory | null>(null);
   const [title, setTitle] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [monthlyContribution, setMonthlyContribution] = useState('');
@@ -88,6 +122,11 @@ export function GoalSetupSheet() {
 
   const panelX = useSharedValue(screenWidth);
   const stripX = useSharedValue(0);
+
+  const goToPage = (p: number) => {
+    setPage(p);
+    stripX.value = withSpring(-p * screenWidth, STEP_SPRING);
+  };
 
   useEffect(() => {
     if (pendingGoalSetup) {
@@ -100,8 +139,10 @@ export function GoalSetupSheet() {
         setTargetDate(p.targetDate);
         setLinkedAccount(p.linkedAccount);
         setGoalType(p.type);
-        setStep(4);
-        stripX.value = -3 * screenWidth;
+        const cat = p.type === 'DEBT_PAYOFF' ? 'pay-down' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
+        setCategory(cat);
+        setPage(4);
+        stripX.value = -4 * screenWidth;
       } else {
         const defaultDate = new Date();
         defaultDate.setMonth(defaultDate.getMonth() + 6);
@@ -111,7 +152,8 @@ export function GoalSetupSheet() {
         setTargetDate(defaultDate);
         setLinkedAccount('');
         setGoalType('SAVINGS_TARGET');
-        setStep(1);
+        setCategory(null);
+        setPage(0);
         stripX.value = 0;
       }
       setVisible(true);
@@ -120,10 +162,6 @@ export function GoalSetupSheet() {
       dismiss();
     }
   }, [pendingGoalSetup]);
-
-  const animateToStep = (s: Step) => {
-    stripX.value = withSpring(-(s - 1) * screenWidth, STEP_SPRING);
-  };
 
   const onDismissComplete = () => {
     setVisible(false);
@@ -137,20 +175,21 @@ export function GoalSetupSheet() {
   };
 
   const goNext = useCallback(() => {
-    const next = Math.min(step + 1, 4) as Step;
-    setStep(next);
-    animateToStep(next);
-  }, [step, screenWidth]);
+    const next = Math.min(page + 1, TOTAL_PAGES - 1);
+    goToPage(next);
+  }, [page, screenWidth]);
 
   const goBack = useCallback(() => {
-    if (step === 1) {
+    if (page === 0) {
       dismiss();
       return;
     }
-    const prev = Math.max(step - 1, 1) as Step;
-    setStep(prev);
-    animateToStep(prev);
-  }, [step, screenWidth]);
+    if (page === 2 && category !== 'save-up') {
+      goToPage(0);
+      return;
+    }
+    goToPage(page - 1);
+  }, [page, category, screenWidth]);
 
   const handleCreate = () => {
     if (!setup) return;
@@ -164,13 +203,21 @@ export function GoalSetupSheet() {
     }, setup.messageId ?? undefined);
   };
 
-  const selectType = (type: GoalType) => {
-    setGoalType(type);
-    const label = GOAL_TYPES.find(g => g.type === type)?.label || '';
-    if (!title) setTitle(label);
-    const next = 2 as Step;
-    setStep(next);
-    animateToStep(next);
+  const selectCategory = (cat: GoalCategory) => {
+    setCategory(cat);
+    if (cat === 'save-up') {
+      goToPage(1);
+    } else {
+      setGoalType(CATEGORY_TO_TYPE[cat]);
+      setTitle(cat === 'pay-down' ? 'Debt Payoff' : 'Investment');
+      goToPage(2);
+    }
+  };
+
+  const selectSaveUpItem = (item: typeof SAVE_UP_ITEMS[0]) => {
+    setGoalType(item.goalType);
+    setTitle(item.label);
+    goToPage(2);
   };
 
   const adjustMonth = (delta: number) => {
@@ -195,6 +242,7 @@ export function GoalSetupSheet() {
   const step2Valid = title.trim().length > 0 && parseCurrency(targetAmount) > 0;
   const step3Valid = parseCurrency(monthlyContribution) > 0 && linkedAccount.length > 0;
   const reviewValid = step2Valid && step3Valid;
+  const displayStep = pageToStep(page);
 
   return (
     <Animated.View style={[styles.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
@@ -203,7 +251,7 @@ export function GoalSetupSheet() {
           <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
         </Pressable>
         <View style={styles.headerCenter}>
-          <StepIndicator current={step} total={4} />
+          <StepIndicator current={displayStep} total={4} />
         </View>
         <Pressable style={styles.closeBtn} onPress={dismiss} hitSlop={12}>
           <Feather name="x" size={22} color={colors.contentPrimary} />
@@ -211,41 +259,61 @@ export function GoalSetupSheet() {
       </View>
 
       <View style={styles.body}>
-        <Animated.View style={[styles.strip, { width: screenWidth * 4 }, stripStyle]}>
+        <Animated.View style={[styles.strip, { width: screenWidth * TOTAL_PAGES }, stripStyle]}>
 
-          {/* Step 1: Goal type */}
+          {/* Page 0: Category selection */}
           <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
-              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>What are you saving for?</Text>
+              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Create a goal</Text>
               <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
-                Choose a goal type to get started.
+                What type of goal do you want to set up?
               </Text>
-              <View style={styles.typeList}>
-                {GOAL_TYPES.map(({ type, label, icon }) => {
-                  const selected = type === goalType;
-                  return (
-                    <Pressable
-                      key={type}
-                      style={[
-                        styles.typeRow,
-                        { backgroundColor: colors.surfaceElevated, borderColor: selected ? colors.contentPrimary : colors.surfaceEdge },
-                        selected && { borderWidth: 2 },
-                      ]}
-                      onPress={() => selectType(type)}
-                    >
-                      <View style={[styles.typeIconWrap, { backgroundColor: colors.surfaceTint }]}>
-                        <Feather name={icon} size={18} color={colors.contentPrimary} />
-                      </View>
-                      <Text style={[styles.typeLabel, { color: colors.contentPrimary }]}>{label}</Text>
-                      <Feather name="chevron-right" size={18} color={colors.contentMuted} />
-                    </Pressable>
-                  );
-                })}
+              <View style={styles.categoryList}>
+                {CATEGORIES.map(({ key, label, subtitle, icon }) => (
+                  <Pressable
+                    key={key}
+                    style={[styles.categoryCard, { backgroundColor: colors.surfaceElevated }]}
+                    onPress={() => selectCategory(key)}
+                  >
+                    <View style={[styles.categoryIconWrap, { backgroundColor: colors.surfaceTint }]}>
+                      <Feather name={icon} size={22} color={colors.contentPrimary} />
+                    </View>
+                    <View style={styles.categoryText}>
+                      <Text style={[styles.categoryLabel, { color: colors.contentPrimary }]}>{label}</Text>
+                      <Text style={[styles.categorySubtitle, { color: colors.contentSecondary }]}>{subtitle}</Text>
+                    </View>
+                    <Feather name="chevron-right" size={20} color={colors.contentMuted} />
+                  </Pressable>
+                ))}
               </View>
             </ScrollView>
           </View>
 
-          {/* Step 2: Name & target */}
+          {/* Page 1: Save-up sub-selection (vault-style) */}
+          <View style={[styles.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>What are you saving for?</Text>
+              <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
+                Pick a category or choose "Other" to create your own.
+              </Text>
+              <View style={styles.vaultList}>
+                {SAVE_UP_ITEMS.map((item) => (
+                  <Pressable
+                    key={item.label}
+                    style={[styles.vaultRow, { backgroundColor: colors.surfaceElevated }]}
+                    onPress={() => selectSaveUpItem(item)}
+                  >
+                    <View style={styles.vaultIconWrap}>
+                      <Feather name={item.icon} size={20} color={colors.contentPrimary} />
+                    </View>
+                    <Text style={[styles.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Page 2: Name & target */}
           <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Customize your goal</Text>
@@ -258,7 +326,7 @@ export function GoalSetupSheet() {
                   style={[styles.fieldInput, { color: colors.contentPrimary, borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
                   value={title}
                   onChangeText={setTitle}
-                  placeholder="e.g. Credit Card Payoff"
+                  placeholder="e.g. Emergency Fund"
                   placeholderTextColor={colors.contentDimmed}
                 />
               </View>
@@ -288,7 +356,7 @@ export function GoalSetupSheet() {
             </View>
           </View>
 
-          {/* Step 3: Contribution, date, account */}
+          {/* Page 3: Contribution, date, account */}
           <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>How do you want to save?</Text>
@@ -360,7 +428,7 @@ export function GoalSetupSheet() {
             </View>
           </View>
 
-          {/* Step 4: Review */}
+          {/* Page 4: Review */}
           <View style={[styles.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={styles.stepContent} showsVerticalScrollIndicator={false}>
               <Text style={[styles.stepTitle, { color: colors.contentPrimary }]}>Review your goal</Text>
@@ -375,7 +443,7 @@ export function GoalSetupSheet() {
                   <View style={styles.reviewHeaderText}>
                     <Text style={[styles.reviewName, { color: colors.contentPrimary }]}>{title || 'Untitled Goal'}</Text>
                     <Text style={[styles.reviewType, { color: colors.contentSecondary }]}>
-                      {GOAL_TYPES.find(g => g.type === goalType)?.label || 'Custom'}
+                      {GOAL_TYPE_DISPLAY[goalType] || 'Save up'}
                     </Text>
                   </View>
                 </View>
@@ -460,44 +528,89 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 40,
   },
   stepTitle: {
-    fontSize: 24,
-    fontFamily: Fonts.bold,
-    lineHeight: 30,
+    fontSize: 20,
+    fontFamily: Fonts.medium,
+    lineHeight: 28,
     marginBottom: 8,
+    letterSpacing: -0.48,
   },
   stepSubtitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: Fonts.regular,
-    lineHeight: 21,
-    marginBottom: 28,
+    lineHeight: 20,
+    marginBottom: 24,
+    letterSpacing: -0.16,
   },
-  typeList: {
-    gap: 10,
+  categoryList: {
+    gap: 12,
   },
-  typeRow: {
+  categoryCard: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 16,
-    borderRadius: 14,
-    borderWidth: 1,
+    borderRadius: 16,
     gap: 14,
+    shadowColor: '#121211',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 2,
   },
-  typeIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+  categoryIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  typeLabel: {
+  categoryText: {
+    flex: 1,
+    gap: 2,
+  },
+  categoryLabel: {
     fontSize: 16,
     fontFamily: Fonts.medium,
+    lineHeight: 24,
+    letterSpacing: -0.16,
+  },
+  categorySubtitle: {
+    fontSize: 13,
+    fontFamily: Fonts.regular,
+    lineHeight: 18,
+  },
+  vaultList: {
+    gap: 16,
+  },
+  vaultRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    gap: 8,
+    shadowColor: '#121211',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  vaultIconWrap: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  vaultLabel: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    lineHeight: 24,
+    letterSpacing: -0.16,
     flex: 1,
   },
   fieldGroup: {
