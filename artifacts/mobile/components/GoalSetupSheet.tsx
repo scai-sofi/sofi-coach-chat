@@ -84,15 +84,7 @@ const SAVE_UP_ITEMS: { label: string; icon: keyof typeof Feather.glyphMap; goalT
   { label: 'Other', icon: 'plus-circle', goalType: 'CUSTOM' },
 ];
 
-const LINKED_ACCOUNTS = [
-  'SoFi Checking',
-  'SoFi Savings',
-  'SoFi Credit Card',
-  'SoFi Invest',
-  'SoFi Money',
-];
-
-const TOTAL_PAGES = 5;
+const TOTAL_PAGES = 4;
 const STEP_SPRING = { damping: 24, stiffness: 220, mass: 0.8 };
 
 function fmt(val: number): string {
@@ -222,8 +214,8 @@ export function GoalSetupSheet() {
         const cat = p.type === 'DEBT_PAYOFF' ? 'pay-down' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
         setCategory(cat);
         setSelectedDebt(null);
-        setPage(4);
-        stripX.value = -4 * screenWidth;
+        setPage(3);
+        stripX.value = -3 * screenWidth;
       } else {
         const defaultDate = new Date();
         defaultDate.setMonth(defaultDate.getMonth() + 6);
@@ -279,7 +271,7 @@ export function GoalSetupSheet() {
   const goBack = () => {
     if (page === 0) { dismiss(); return; }
     if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
-    if (page === 4 && category === 'pay-down') { goToPage(2); return; }
+    if (page === 3 && category === 'pay-down') { goToPage(2); return; }
     goToPage(page - 1);
   };
 
@@ -320,6 +312,7 @@ export function GoalSetupSheet() {
         setTargetAmount(fmt(smartTarget));
       }
       setMonthlyContribution('');
+      setLinkedAccount('SoFi Invest');
       goToPage(2);
     }
   };
@@ -332,6 +325,7 @@ export function GoalSetupSheet() {
       setTargetAmount(fmt(smartTarget));
     }
     setMonthlyContribution('');
+    setLinkedAccount('SoFi Savings');
     goToPage(2);
   };
 
@@ -398,15 +392,12 @@ export function GoalSetupSheet() {
     ? target > 0 && monthly > 0 && !!selectedDebt
     : target > 0 && title.trim().length > 0 && monthly > 0;
 
-  const accountPageValid = linkedAccount.length > 0;
-  const reviewValid = isPayDown
-    ? planPageValid
-    : planPageValid && accountPageValid;
+  const reviewValid = planPageValid;
 
-  const stepCount = isPayDown ? 3 : 4;
+  const stepCount = isPayDown ? 3 : 3;
   const displayStep = isPayDown
-    ? (page <= 0 ? 1 : page === 2 ? 2 : page >= 4 ? 3 : 2)
-    : (page <= 1 ? 1 : page === 2 ? 2 : page === 3 ? 3 : 4);
+    ? (page <= 0 ? 1 : page === 2 ? 2 : page >= 3 ? 3 : 2)
+    : (page <= 1 ? 1 : page === 2 ? 2 : 3);
 
   const suggested = getSmartEstimate(title, target, months);
   const projected = monthly * months;
@@ -706,7 +697,7 @@ export function GoalSetupSheet() {
               {isPayDown ? (
                 <Pressable
                   style={[st.nextBtn, { backgroundColor: planPageValid ? colors.contentBrand : colors.contentDisabled }]}
-                  onPress={() => goToPage(4)}
+                  onPress={() => goToPage(3)}
                   disabled={!planPageValid}
                 >
                   <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
@@ -722,38 +713,7 @@ export function GoalSetupSheet() {
             </View>
           </View>
 
-          {/* ─── Page 3: Account picker (save-up only, pay-down skips) ─── */}
-          <View style={[st.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              <Text style={[st.title, { color: colors.contentPrimary }]}>Where should we save?</Text>
-              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
-                Pick the account to pull your monthly contribution from.
-              </Text>
-              <View style={st.accountOptions}>
-                {LINKED_ACCOUNTS.map(acct => {
-                  const sel = acct === linkedAccount;
-                  return (
-                    <Pressable key={acct} style={[st.accountRow, { backgroundColor: colors.surfaceElevated, borderColor: sel ? colors.contentPrimary : colors.surfaceEdge }, sel && { borderWidth: 2 }]} onPress={() => setLinkedAccount(acct)}>
-                      <View style={[st.radio, { borderColor: sel ? colors.contentPrimary : colors.contentMuted }]}>
-                        {sel && <View style={[st.radioFill, { backgroundColor: colors.contentPrimary }]} />}
-                      </View>
-                      <Text style={[st.accountLabel, { color: colors.contentPrimary }]}>{acct}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </ScrollView>
-            <View style={[st.footer, { paddingBottom: insets.bottom || 16 }]}>
-              <Pressable
-                style={[st.nextBtn, { backgroundColor: accountPageValid ? colors.contentBrand : colors.contentDisabled }]}
-                onPress={goNext} disabled={!accountPageValid}
-              >
-                <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ─── Page 4: Review ─── */}
+          {/* ─── Page 3: Review ─── */}
           <View style={[st.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
               <Text style={[st.title, { color: colors.contentPrimary }]}>Review your goal</Text>
@@ -909,11 +869,6 @@ const st = StyleSheet.create({
   datePickerTrigger: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 },
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
-  accountOptions: { gap: 8 },
-  accountRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16, borderRadius: 12, borderWidth: 1, gap: 12 },
-  radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  radioFill: { width: 10, height: 10, borderRadius: 5 },
-  accountLabel: { fontSize: 15, fontFamily: Fonts.medium },
 
   reviewCard: { borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
   reviewHeader: { flexDirection: 'row', alignItems: 'center', padding: 20, gap: 14 },
