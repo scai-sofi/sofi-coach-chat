@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
@@ -121,7 +121,7 @@ const CONTRIBUTION_METHODS: { value: ContributionMethod; title: string; subtitle
 ];
 
 const TOTAL_PAGES = 5;
-const STEP_SPRING = { damping: 24, stiffness: 220, mass: 0.8 };
+const STEP_TIMING = { duration: 280, easing: Easing.out(Easing.cubic) };
 
 function fmt(val: number): string {
   return val.toLocaleString('en-US', { maximumFractionDigits: 0 });
@@ -234,7 +234,7 @@ export function GoalSetupSheet() {
     if (instant || jump > 1) {
       stripX.value = -p * screenWidth;
     } else {
-      stripX.value = withSpring(-p * screenWidth, STEP_SPRING);
+      stripX.value = withTiming(-p * screenWidth, STEP_TIMING);
     }
   };
 
