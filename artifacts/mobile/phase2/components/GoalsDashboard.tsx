@@ -41,16 +41,9 @@ const TAB_SPRING = { damping: 22, stiffness: 200, mass: 0.8, reduceMotion: Reduc
 const BUTTON_SPRING_IN = { damping: 15, stiffness: 400, reduceMotion: ReduceMotion.System };
 const BUTTON_SPRING_OUT = { damping: 12, stiffness: 300, reduceMotion: ReduceMotion.System };
 
-function getProgressColor(percentage: number, colors: any): string {
-  if (percentage >= 100) return colors.success;
-  if (percentage >= 75) return colors.success;
-  return colors.contentBrand;
-}
-
 function AnimatedProgressBar({ percentage, delay = 0 }: { percentage: number; delay?: number }) {
   const { colors } = useTheme();
   const progress = useSharedValue(0);
-  const progressColor = getProgressColor(percentage, colors);
 
   useEffect(() => {
     const clampedPct = Math.min(Math.max(percentage, 0), 100);
@@ -59,7 +52,7 @@ function AnimatedProgressBar({ percentage, delay = 0 }: { percentage: number; de
 
   const fillStyle = useAnimatedStyle(() => ({
     width: `${progress.value}%`,
-    backgroundColor: progressColor,
+    backgroundColor: colors.contentPrimary,
     height: '100%',
     borderRadius: 20,
   }));
@@ -100,8 +93,8 @@ function AnimatedPercentage({ value, delay = 0 }: { value: number; delay?: numbe
 
   return (
     <View style={styles.percentageRow}>
-      <Text style={[styles.percentageNumber, { color: colors.contentSecondary }]}>{displayValue}</Text>
-      <Text style={[styles.percentageSign, { color: colors.contentSecondary }]}>%</Text>
+      <Text style={[styles.percentageNumber, { color: colors.contentPrimary }]}>{displayValue}</Text>
+      <Text style={[styles.percentageSign, { color: colors.contentPrimary }]}>%</Text>
     </View>
   );
 }
@@ -253,18 +246,18 @@ export function GoalCard({ goal, onAskPress, onEditPress, index = 0 }: { goal: G
       )}
       <View style={styles.goalHeader}>
         <View style={styles.goalHeaderText}>
-          <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{subtitle}</Text>
           <AnimatedPercentage value={percentage} delay={staggerDelay + 200} />
+          <Text style={[styles.goalSubtitle, { color: colors.contentSecondary }]}>{subtitle}</Text>
         </View>
       </View>
 
       <View style={styles.meterSection}>
         <AnimatedProgressBar percentage={percentage} delay={staggerDelay + 400} />
         <View style={styles.meterLabels}>
-          <Text style={[styles.meterLabel, { color: colors.contentSecondary }]}>
+          <Text style={[styles.meterLabel, { color: colors.contentPrimary }]}>
             ${goal.currentAmount.toLocaleString()} saved
           </Text>
-          <Text style={[styles.meterLabel, styles.meterLabelRight, { color: colors.contentSecondary }]}>
+          <Text style={[styles.meterLabel, styles.meterLabelRight, { color: colors.contentPrimary }]}>
             ${goal.targetAmount.toLocaleString()} target
           </Text>
         </View>
@@ -277,12 +270,12 @@ export function GoalCard({ goal, onAskPress, onEditPress, index = 0 }: { goal: G
           <View style={styles.detailRows}>
             <View style={styles.detailRow}>
               <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Est. completion</Text>
-              <Text style={[styles.detailValueHighlight, { color: colors.contentPrimary }]}>
+              <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>
                 ~ {monthsRemaining} months {'\u2022'} {estDate}
               </Text>
             </View>
             <View style={styles.detailRow}>
-              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Recurring</Text>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Recurring contribution</Text>
               <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>
                 ${goal.monthlyContributionTarget}/mo
               </Text>
@@ -302,9 +295,9 @@ export function GoalCard({ goal, onAskPress, onEditPress, index = 0 }: { goal: G
             </AnimatedButton>
             <AnimatedButton
               onPress={onAskPress}
-              style={[styles.askCoachButton, { backgroundColor: colors.surfaceTint, borderColor: colors.contentBrand }]}
+              style={styles.askCoachButton}
             >
-              <Text style={[styles.askCoachButtonText, { color: colors.contentBrand }]}>Ask Coach</Text>
+              <Text style={styles.askCoachButtonText}>Ask Coach</Text>
             </AnimatedButton>
           </View>
         </>
@@ -313,12 +306,6 @@ export function GoalCard({ goal, onAskPress, onEditPress, index = 0 }: { goal: G
       {isCompleted && (
         <>
           <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
-          <View style={styles.completedBadge}>
-            <View style={[styles.completedBadgeInner, { backgroundColor: colors.successBg }]}>
-              <Feather name="check-circle" size={14} color={colors.success} />
-              <Text style={[styles.completedBadgeText, { color: colors.successDark }]}>Goal completed</Text>
-            </View>
-          </View>
           <View style={styles.detailRows}>
             <View style={styles.detailRow}>
               <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Final amount</Text>
@@ -357,25 +344,14 @@ export function SuggestedGoalCard({ goal, index = 0 }: { goal: Goal; index?: num
         </View>
       </View>
 
-      <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{subtitle}</Text>
-
-      <View style={styles.suggestedDetails}>
-        <View style={styles.suggestedDetailRow}>
-          <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Target</Text>
-          <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>${goal.targetAmount.toLocaleString()}</Text>
-        </View>
-        <View style={styles.suggestedDetailRow}>
-          <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Monthly</Text>
-          <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>${goal.monthlyContributionTarget}/mo</Text>
-        </View>
-        <View style={styles.suggestedDetailRow}>
-          <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Timeline</Text>
-          <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>~{monthsRemaining} months</Text>
-        </View>
-        <View style={styles.suggestedDetailRow}>
-          <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Account</Text>
-          <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{goal.linkedAccount}</Text>
-        </View>
+      <View style={styles.goalHeaderText}>
+        <Text style={[styles.goalSubtitle, { color: colors.contentPrimary }]}>{subtitle}</Text>
+        <Text style={[styles.suggestedMeta, { color: colors.contentSecondary }]}>
+          ${goal.targetAmount.toLocaleString()} {'\u2022'} ${goal.monthlyContributionTarget}/mo {'\u2022'} ~{monthsRemaining} months
+        </Text>
+        <Text style={[styles.suggestedMeta, { color: colors.contentSecondary }]}>
+          Linked: {goal.linkedAccount}
+        </Text>
       </View>
 
       <View style={styles.actionButtons}>
@@ -420,22 +396,10 @@ export function GoalsDashboard() {
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {!hasAny ? (
           <View style={styles.empty}>
-            <View style={[styles.emptyIconCircle, { backgroundColor: colors.surfaceTint }]}>
-              <Feather name="target" size={28} color={colors.contentBrand} />
-            </View>
-            <Text style={[styles.emptyTitle, { color: colors.contentPrimary }]}>
-              No goals yet
-            </Text>
+            <Feather name="target" size={32} color={colors.contentMuted} />
             <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
-              Tell the coach what you're working toward and it will help you set one up.
+              No goals yet. Tell the coach what you're working toward and it will help you set one up.
             </Text>
-            <Pressable
-              style={[styles.emptyCta, { backgroundColor: colors.contentPrimary }]}
-              onPress={() => setActivePanel('none')}
-            >
-              <Feather name="message-circle" size={15} color={colors.contentPrimaryInverse} />
-              <Text style={[styles.emptyCtaText, { color: colors.contentPrimaryInverse }]}>Chat with Coach</Text>
-            </Pressable>
           </View>
         ) : (
           <>
@@ -459,8 +423,9 @@ export function GoalsDashboard() {
 
             {activeGoals.length > 0 && completedGoals.length > 0 && (
               <View style={styles.sectionDivider}>
-                <Feather name="check" size={12} color={colors.contentSecondary} />
-                <Text style={[styles.sectionDividerText, { color: colors.contentSecondary }]}>Completed</Text>
+                <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
+                <Text style={[styles.sectionDividerText, { color: colors.contentSecondary }]}>COMPLETED</Text>
+                <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
               </View>
             )}
             {completedGoals.map((g, i) => <GoalCard key={g.id} goal={g} index={activeGoals.length + i} />)}
@@ -505,7 +470,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   segmentedTabText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.medium,
     letterSpacing: 0.1,
     textAlign: 'center',
@@ -515,7 +480,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 16,
-    gap: 14,
+    gap: 16,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
@@ -540,31 +505,33 @@ const styles = StyleSheet.create({
   },
   goalHeaderText: {
     flex: 1,
-    gap: 2,
-  },
-  goalTitle: {
-    fontSize: 14,
-    fontFamily: Fonts.bold,
-    lineHeight: 20,
+    gap: 0,
   },
   percentageRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
   },
   percentageNumber: {
-    fontSize: 20,
+    fontSize: 28,
     fontFamily: Fonts.medium,
-    lineHeight: 24,
-    letterSpacing: -0.5,
+    lineHeight: 32,
+    letterSpacing: -0.8,
   },
   percentageSign: {
-    fontSize: 12,
+    fontSize: 18,
+    fontFamily: Fonts.medium,
+    lineHeight: 26,
+    letterSpacing: -0.2,
+    marginBottom: 0,
+  },
+  goalSubtitle: {
+    fontSize: 14,
     fontFamily: Fonts.medium,
     lineHeight: 20,
-    letterSpacing: -0.2,
   },
   meterSection: {
-    gap: 6,
+    gap: 8,
+    paddingBottom: 8,
   },
   progressTrack: {
     height: 8,
@@ -577,9 +544,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   meterLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.regular,
-    lineHeight: 16,
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
   },
   meterLabelRight: {
     textAlign: 'right',
@@ -589,7 +556,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   detailRows: {
-    gap: 6,
+    gap: 8,
   },
   detailRow: {
     flexDirection: 'row',
@@ -597,35 +564,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   detailLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.regular,
-    lineHeight: 16,
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    lineHeight: 20,
   },
   detailValue: {
     fontSize: 14,
     fontFamily: Fonts.medium,
-    lineHeight: 18,
-  },
-  detailValueHighlight: {
-    fontSize: 14,
-    fontFamily: Fonts.bold,
-    lineHeight: 18,
-  },
-  completedBadge: {
-    flexDirection: 'row',
-  },
-  completedBadgeInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  completedBadgeText: {
-    fontSize: 12,
-    fontFamily: Fonts.medium,
-    lineHeight: 16,
+    lineHeight: 20,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -650,12 +596,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
+    backgroundColor: '#edf8fc',
     borderWidth: 1.5,
+    borderColor: '#5aeaff',
   },
   askCoachButtonText: {
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
+    color: '#00a2c7',
   },
   setupButton: {
     flex: 1,
@@ -692,18 +641,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   suggestedBadgeText: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: Fonts.medium,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
-  suggestedDetails: {
-    gap: 4,
-  },
-  suggestedDetailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  suggestedMeta: {
+    fontSize: 13,
+    fontFamily: Fonts.regular,
+    lineHeight: 18,
+    marginTop: 2,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -718,53 +665,26 @@ const styles = StyleSheet.create({
   sectionDivider: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
+    gap: 8,
   },
+  sectionDividerLine: { flex: 1, height: 1 },
   sectionDividerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: Fonts.medium,
-    letterSpacing: 0.2,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   empty: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 56,
+    paddingVertical: 48,
     gap: 12,
   },
-  emptyIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  emptyTitle: {
-    fontSize: 14,
-    fontFamily: Fonts.bold,
-    lineHeight: 20,
-  },
   emptyText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.regular,
     textAlign: 'center',
     maxWidth: 260,
-    lineHeight: 18,
-  },
-  emptyCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  emptyCtaText: {
-    fontSize: 14,
-    fontFamily: Fonts.bold,
-    lineHeight: 20,
   },
   emptyTab: {
     alignItems: 'center',

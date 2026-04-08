@@ -40,26 +40,14 @@ export default function GoalsProfileScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {!hasAny ? (
           <View style={styles.empty}>
-            <View style={[styles.emptyIconCircle, { backgroundColor: colors.surfaceTint }]}>
-              <Feather name="target" size={28} color={colors.contentBrand} />
-            </View>
-            <Text style={[styles.emptyTitle, { color: colors.contentPrimary }]}>
-              No goals yet
-            </Text>
+            <Feather name="target" size={32} color={colors.contentMuted} />
             <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
-              Tell Coach what you're working toward and it will help you set one up.
+              No goals yet. Tell Coach what you're working toward and it will help you set one up.
             </Text>
-            <Pressable
-              style={[styles.emptyCta, { backgroundColor: colors.contentPrimary }]}
-              onPress={() => navigate('chat')}
-            >
-              <Feather name="message-circle" size={15} color={colors.contentPrimaryInverse} />
-              <Text style={[styles.emptyCtaText, { color: colors.contentPrimaryInverse }]}>Chat with Coach</Text>
-            </Pressable>
           </View>
         ) : (
           <>
-            <View style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack }]}>
+            <View style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack, borderColor: colors.progressTrack }]}>
               {tabs.map((tab) => {
                 const isActive = tab.key === activeTab;
                 return (
@@ -104,8 +92,9 @@ export default function GoalsProfileScreen() {
 
             {activeGoals.length > 0 && completedGoals.length > 0 && (
               <View style={styles.divider}>
-                <Feather name="check" size={12} color={colors.contentSecondary} />
-                <Text style={[styles.dividerText, { color: colors.contentSecondary }]}>Completed</Text>
+                <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
+                <Text style={[styles.dividerText, { color: colors.contentSecondary }]}>COMPLETED</Text>
+                <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
               </View>
             )}
             {completedGoals.map((g, i) => <GoalCard key={g.id} goal={g} index={activeGoals.length + i} />)}
@@ -135,8 +124,10 @@ const styles = StyleSheet.create({
   segmentedContainer: {
     flexDirection: 'row',
     borderRadius: 24,
+    borderWidth: 2,
     height: 40,
     alignItems: 'center',
+    padding: 0,
   },
   segmentedTab: {
     flex: 1,
@@ -153,7 +144,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   segmentedTabText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.medium,
     letterSpacing: 0.1,
     textAlign: 'center',
@@ -171,53 +162,26 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
+    gap: 8,
   },
+  dividerLine: { flex: 1, height: 1 },
   dividerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: Fonts.medium,
-    letterSpacing: 0.2,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   empty: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 56,
+    paddingVertical: 48,
     gap: 12,
   },
-  emptyIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  emptyTitle: {
-    fontSize: 14,
-    fontFamily: Fonts.bold,
-    lineHeight: 20,
-  },
   emptyText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.regular,
     textAlign: 'center',
     maxWidth: 260,
-    lineHeight: 18,
-  },
-  emptyCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  emptyCtaText: {
-    fontSize: 14,
-    fontFamily: Fonts.bold,
-    lineHeight: 20,
   },
   emptyTab: {
     alignItems: 'center',
