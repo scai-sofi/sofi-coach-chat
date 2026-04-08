@@ -195,6 +195,7 @@ export function GoalSetupSheet() {
   const [linkedAccount, setLinkedAccount] = useState('');
   const [contributionMethod, setContributionMethod] = useState<ContributionMethod>('recurring');
   const [showEfMonths, setShowEfMonths] = useState(false);
+  const [efExpenses, setEfExpenses] = useState(fmt(MONTHLY_EXPENSES));
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [userDebtAccounts, setUserDebtAccounts] = useState<DebtAccount[]>([]);
@@ -234,6 +235,7 @@ export function GoalSetupSheet() {
         setCategory(cat);
         setSelectedDebt(null);
         setShowEfMonths(false);
+        setEfExpenses(fmt(MONTHLY_EXPENSES));
         setPage(4);
         stripX.value = -4 * screenWidth;
       } else {
@@ -251,6 +253,7 @@ export function GoalSetupSheet() {
         stripX.value = 0;
         setContributionMethod('recurring');
         setShowEfMonths(false);
+        setEfExpenses(fmt(MONTHLY_EXPENSES));
         setShowLinkForm(false);
         setLinkName('');
         setLinkBalance('');
@@ -356,11 +359,13 @@ export function GoalSetupSheet() {
     goToPage(2);
   };
 
+  const efExpensesParsed = parse(efExpenses);
+
   const selectEfMonths = (months: number) => {
     if (months === 0) {
       setTargetAmount('');
     } else {
-      setTargetAmount(fmt(MONTHLY_EXPENSES * months));
+      setTargetAmount(fmt(efExpensesParsed * months));
     }
     setShowEfMonths(false);
     goToPage(2);
@@ -485,13 +490,30 @@ export function GoalSetupSheet() {
           {/* ─── Page 1: Save-up vault list / EF months picker ─── */}
           <View style={[st.stepPage, { width: screenWidth }]}>
             {showEfMonths ? (
-              <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+              <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 <Text style={[st.title, { color: colors.contentPrimary }]}>
                   How many months should your{'\n'}emergency fund cover?
                 </Text>
                 <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
-                  Most people aim for 3–6 months of expenses. We'll help you figure out the right amount for you.
+                  Most people aim for 3–6 months of expenses. We'll calculate a target based on your spending.
                 </Text>
+
+                <View style={[st.efExpenseRow, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+                  <Text style={[st.efExpenseLabel, { color: colors.contentSecondary }]}>Your monthly expenses</Text>
+                  <View style={st.efExpenseInputWrap}>
+                    <Text style={[st.efExpenseCurrency, { color: colors.contentSecondary }]}>$</Text>
+                    <TextInput
+                      style={[st.efExpenseInput, { color: colors.contentPrimary }]}
+                      value={efExpenses}
+                      onChangeText={setEfExpenses}
+                      keyboardType="numeric"
+                      placeholder="0"
+                      placeholderTextColor={colors.contentDimmed}
+                    />
+                    <Text style={[st.efExpensePerMonth, { color: colors.contentSecondary }]}>/mo</Text>
+                  </View>
+                </View>
+
                 <View style={st.methodOptions}>
                   {EF_MONTH_OPTIONS.map(opt => (
                     <Pressable
@@ -502,9 +524,9 @@ export function GoalSetupSheet() {
                       <View style={st.efCardContent}>
                         <Text style={[st.efCardTitle, { color: colors.contentPrimary }]}>{opt.title}</Text>
                         <Text style={[st.efCardSubtitle, { color: colors.contentSecondary }]}>{opt.subtitle}</Text>
-                        {opt.months > 0 && (
-                          <Text style={[st.efCardAmount, { color: colors.contentBrand }]}>
-                            ${fmt(MONTHLY_EXPENSES * opt.months)}
+                        {opt.months > 0 && efExpensesParsed > 0 && (
+                          <Text style={[st.efCardAmount, { color: colors.contentSecondary }]}>
+                            Target: <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(efExpensesParsed * opt.months)}</Text>
                           </Text>
                         )}
                       </View>
@@ -992,11 +1014,18 @@ const st = StyleSheet.create({
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
 
+  efExpenseRow: { borderRadius: 16, padding: 16, marginBottom: 8, borderWidth: 1 },
+  efExpenseLabel: { fontSize: 12, fontFamily: Fonts.medium, textTransform: 'uppercase' as const, letterSpacing: 0.6, marginBottom: 8 },
+  efExpenseInputWrap: { flexDirection: 'row' as const, alignItems: 'center' as const },
+  efExpenseCurrency: { fontSize: 24, fontFamily: Fonts.bold, marginRight: 2 },
+  efExpenseInput: { fontSize: 24, fontFamily: Fonts.bold, flex: 1, padding: 0 },
+  efExpensePerMonth: { fontSize: 14, fontFamily: Fonts.medium },
+
   efCard: { borderRadius: 20, padding: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
   efCardContent: { gap: 4 },
   efCardTitle: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
   efCardSubtitle: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, opacity: 0.7 },
-  efCardAmount: { fontSize: 14, fontFamily: Fonts.bold, lineHeight: 20, marginTop: 4 },
+  efCardAmount: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, marginTop: 4 },
 
   methodOptions: { gap: 16 },
   methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
