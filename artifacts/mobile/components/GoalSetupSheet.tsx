@@ -82,7 +82,7 @@ export function GoalSetupSheet() {
   const [linkedAccount, setLinkedAccount] = useState('');
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
 
-  const slideY = useSharedValue(SLIDE_DISTANCE);
+  const slideX = useSharedValue(SLIDE_DISTANCE);
 
   useEffect(() => {
     if (pendingGoalSetup) {
@@ -109,7 +109,7 @@ export function GoalSetupSheet() {
       }
       setDirection('forward');
       setVisible(true);
-      slideY.value = withTiming(0, { duration: 320, easing: Easing.out(Easing.cubic) });
+      slideX.value = withTiming(0, { duration: 320, easing: Easing.out(Easing.cubic) });
     } else if (visible) {
       dismiss();
     }
@@ -121,7 +121,7 @@ export function GoalSetupSheet() {
   };
 
   const dismiss = () => {
-    slideY.value = withTiming(SLIDE_DISTANCE, { duration: 260, easing: Easing.in(Easing.cubic) }, () => {
+    slideX.value = withTiming(SLIDE_DISTANCE, { duration: 260, easing: Easing.in(Easing.cubic) }, () => {
       runOnJS(onDismissComplete)();
     });
   };
@@ -170,7 +170,7 @@ export function GoalSetupSheet() {
   };
 
   const animatedPanel = useAnimatedStyle(() => ({
-    transform: [{ translateY: slideY.value }],
+    transform: [{ translateX: slideX.value }],
   }));
 
   if (!visible) return null;
