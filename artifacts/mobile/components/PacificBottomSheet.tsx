@@ -13,7 +13,7 @@ import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-g
 import { useTheme } from '@/context/ThemeContext';
 
 const DISMISS_THRESHOLD = 120;
-const SPRING_CONFIG = { damping: 22, stiffness: 200, mass: 0.8 };
+const SPRING_CONFIG = { damping: 28, stiffness: 220, mass: 0.6 };
 
 interface PacificBottomSheetProps {
   visible: boolean;
