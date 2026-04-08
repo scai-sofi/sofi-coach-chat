@@ -135,7 +135,6 @@ export interface Scenario {
   messages: Message[];
   memories: Memory[];
   goals: Goal[];
-  notReady?: boolean;
 }
 
 export interface PersonaFinancialProfile {
