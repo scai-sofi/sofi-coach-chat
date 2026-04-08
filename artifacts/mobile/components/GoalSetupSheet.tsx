@@ -701,7 +701,6 @@ export function GoalSetupSheet() {
                         <Text style={[st.coachTipText, { color: colors.contentTip }]} numberOfLines={2}>
                           {EF_REC.reason} That's {EF_REC.months} × ${fmt(MONTHLY_EXPENSES)} = ${fmt(MONTHLY_EXPENSES * EF_REC.months)}.
                         </Text>
-                        <Feather name="chevron-right" size={13} color={colors.contentTip} />
                       </View>
                     )}
                     <View style={st.plannerRow}>
