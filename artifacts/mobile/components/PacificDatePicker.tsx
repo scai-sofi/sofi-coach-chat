@@ -380,10 +380,10 @@ export function PacificDatePicker({
 
           <View style={[s.footer, { paddingBottom: insets.bottom || 16 }]}>
             <Pressable
-              style={[s.confirmBtn, { backgroundColor: colors.contentPrimary }]}
+              style={[s.confirmBtn, { backgroundColor: '#00a2c7' }]}
               onPress={handleConfirm}
             >
-              <Text style={[s.confirmText, { color: colors.surfaceBase }]}>Confirm</Text>
+              <Text style={[s.confirmText, { color: '#ffffff' }]}>Confirm</Text>
             </Pressable>
           </View>
         </Animated.View>
@@ -526,14 +526,16 @@ const s = StyleSheet.create({
     paddingTop: 20,
   },
   confirmBtn: {
-    height: 52,
-    borderRadius: 26,
+    height: 60,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   confirmText: {
     fontSize: 16,
     fontFamily: Fonts.bold,
-    letterSpacing: -0.2,
+    lineHeight: 20,
   },
 });
