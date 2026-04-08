@@ -63,8 +63,9 @@ export function PacificDatePicker({
   const [viewYear, setViewYear] = useState(date.getFullYear());
   const [viewMonth, setViewMonth] = useState(date.getMonth());
   const [selectedDate, setSelectedDate] = useState(date);
-  const [pickerMode, setPickerMode] = useState<'calendar' | 'year'>('calendar');
+  const [pickerMode, setPickerMode] = useState<'calendar' | 'year' | 'month'>('calendar');
   const yearScrollRef = useRef<ScrollView>(null);
+  const monthScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (visible) {
@@ -130,7 +131,13 @@ export function PacificDatePicker({
         yearScrollRef.current?.scrollTo({ y: offset, animated: false });
       }, 50);
     }
-  }, [pickerMode, viewYear]);
+    if (pickerMode === 'month' && monthScrollRef.current) {
+      const offset = Math.max(0, (viewMonth * YEAR_ROW_HEIGHT) - (YEAR_ROW_HEIGHT * 3));
+      setTimeout(() => {
+        monthScrollRef.current?.scrollTo({ y: offset, animated: false });
+      }, 50);
+    }
+  }, [pickerMode, viewYear, viewMonth]);
 
   const isDisabled = (day: number) => {
     const d = new Date(viewYear, viewMonth, day);
@@ -168,40 +175,24 @@ export function PacificDatePicker({
     setPickerMode('calendar');
   };
 
+  const handleMonthSelect = (month: number) => {
+    setViewMonth(month);
+    const maxDay = getDaysInMonth(viewYear, month);
+    const clampedDay = Math.min(selectedDate.getDate(), maxDay);
+    setSelectedDate(new Date(viewYear, month, clampedDay));
+    setPickerMode('calendar');
+  };
+
   const handleConfirm = () => {
     onSelect(selectedDate);
     onClose();
   };
 
-  const canGoPrev = useMemo(() => {
-    const prevMonth = viewMonth === 0 ? 11 : viewMonth - 1;
-    const prevYear = viewMonth === 0 ? viewYear - 1 : viewYear;
-    const lastDayOfPrev = getDaysInMonth(prevYear, prevMonth);
-    const d = new Date(prevYear, prevMonth, lastDayOfPrev);
-    return d >= effectiveMin;
-  }, [viewMonth, viewYear, effectiveMin]);
-
-  const goToPrevMonth = () => {
-    if (viewMonth === 0) {
-      setViewMonth(11);
-      setViewYear(viewYear - 1);
-    } else {
-      setViewMonth(viewMonth - 1);
-    }
-  };
-
-  const goToNextMonth = () => {
-    if (viewMonth === 11) {
-      setViewMonth(0);
-      setViewYear(viewYear + 1);
-    } else {
-      setViewMonth(viewMonth + 1);
-    }
-  };
-
   if (!visible) return null;
 
+  const isCalendar = pickerMode === 'calendar';
   const isYearMode = pickerMode === 'year';
+  const isMonthMode = pickerMode === 'month';
 
   return (
     <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
@@ -217,7 +208,7 @@ export function PacificDatePicker({
 
           <View style={s.titleArea}>
             <View style={s.titleRow}>
-              {isYearMode ? (
+              {!isCalendar ? (
                 <Pressable onPress={() => setPickerMode('calendar')} hitSlop={12}>
                   <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
                 </Pressable>
@@ -225,7 +216,7 @@ export function PacificDatePicker({
                 <View style={{ width: 24 }} />
               )}
               <Text style={[s.titleText, { color: colors.contentPrimary }]}>{title}</Text>
-              {!isYearMode ? (
+              {isCalendar ? (
                 <Pressable onPress={onClose} hitSlop={12}>
                   <Feather name="x" size={24} color={colors.contentPrimary} />
                 </Pressable>
@@ -240,13 +231,14 @@ export function PacificDatePicker({
 
           <View style={s.controls}>
             <Pressable
-              onPress={isYearMode ? undefined : goToPrevMonth}
+              onPress={() => setPickerMode(isMonthMode ? 'calendar' : 'month')}
               style={[
                 s.pillControl,
-                { borderColor: colors.surfaceEdge },
-                !isYearMode && !canGoPrev && { opacity: 0.4 },
+                {
+                  borderColor: isMonthMode ? colors.contentPrimary : colors.surfaceEdge,
+                  borderWidth: isMonthMode ? 1.5 : 1,
+                },
               ]}
-              disabled={isYearMode || !canGoPrev}
               hitSlop={8}
             >
               <Text style={[s.pillText, { color: colors.contentPrimary }]}>{MONTH_SHORT[viewMonth]}</Text>
@@ -273,7 +265,7 @@ export function PacificDatePicker({
             </Pressable>
           </View>
 
-          {!isYearMode && (
+          {isCalendar && (
             <View style={s.calendar}>
               <View style={s.weekRow}>
                 {DAYS_OF_WEEK.map((d, i) => (
@@ -346,6 +338,38 @@ export function PacificDatePicker({
                       {year}
                     </Text>
                     {isCurrentYear && (
+                      <CheckMark color={colors.contentPrimary} />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          )}
+
+          {isMonthMode && (
+            <ScrollView
+              ref={monthScrollRef}
+              style={s.yearList}
+              contentContainerStyle={s.yearListContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {MONTH_NAMES.map((name, idx) => {
+                const isCurrentMonth = idx === viewMonth;
+                return (
+                  <Pressable
+                    key={idx}
+                    onPress={() => handleMonthSelect(idx)}
+                    style={s.yearRow}
+                  >
+                    <Text
+                      style={[
+                        s.yearText,
+                        { color: colors.contentPrimary },
+                      ]}
+                    >
+                      {name}
+                    </Text>
+                    {isCurrentMonth && (
                       <CheckMark color={colors.contentPrimary} />
                     )}
                   </Pressable>
