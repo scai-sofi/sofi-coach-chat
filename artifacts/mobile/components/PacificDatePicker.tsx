@@ -354,12 +354,14 @@ export function PacificDatePicker({
           )}
 
           <View style={[s.footer, { paddingBottom: insets.bottom || 16 }]}>
-            <Pressable
-              style={[s.confirmBtn, { backgroundColor: '#00a2c7' }]}
-              onPress={handleConfirm}
-            >
-              <Text style={[s.confirmText, { color: '#ffffff' }]}>Confirm</Text>
-            </Pressable>
+            {isCalendar && (
+              <Pressable
+                style={[s.confirmBtn, { backgroundColor: '#00a2c7' }]}
+                onPress={handleConfirm}
+              >
+                <Text style={[s.confirmText, { color: '#ffffff' }]}>Confirm</Text>
+              </Pressable>
+            )}
             <Pressable
               style={s.dismissBtn}
               onPress={onClose}
