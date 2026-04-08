@@ -217,11 +217,21 @@ export function PacificDatePicker({
 
           <View style={s.titleArea}>
             <View style={s.titleRow}>
-              <Pressable onPress={isYearMode ? () => setPickerMode('calendar') : onClose} hitSlop={12}>
-                <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
-              </Pressable>
+              {isYearMode ? (
+                <Pressable onPress={() => setPickerMode('calendar')} hitSlop={12}>
+                  <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
+                </Pressable>
+              ) : (
+                <View style={{ width: 24 }} />
+              )}
               <Text style={[s.titleText, { color: colors.contentPrimary }]}>{title}</Text>
-              <View style={{ width: 24 }} />
+              {!isYearMode ? (
+                <Pressable onPress={onClose} hitSlop={12}>
+                  <Feather name="x" size={24} color={colors.contentPrimary} />
+                </Pressable>
+              ) : (
+                <View style={{ width: 24 }} />
+              )}
             </View>
             {subtitle && (
               <Text style={[s.subtitleText, { color: colors.contentPrimary }]}>{subtitle}</Text>
