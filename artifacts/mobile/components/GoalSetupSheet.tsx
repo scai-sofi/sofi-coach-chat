@@ -7,6 +7,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useCoach, PendingGoalSetup } from '@/context/CoachContext';
 import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
+import { PacificDatePicker } from '@/components/PacificDatePicker';
 
 type GoalCategory = 'save-up' | 'pay-down' | 'investment';
 
@@ -145,6 +146,7 @@ export function GoalSetupSheet() {
   const [targetDate, setTargetDate] = useState(new Date());
   const [linkedAccount, setLinkedAccount] = useState('');
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const panelX = useSharedValue(screenWidth);
   const stripX = useSharedValue(0);
@@ -273,14 +275,8 @@ export function GoalSetupSheet() {
     setMonthlyContribution('');
   };
 
-  const adjustMonth = (delta: number) => {
-    setTargetDate(prev => {
-      const d = new Date(prev);
-      d.setMonth(d.getMonth() + delta);
-      if (d <= new Date()) return prev;
-      return d;
-    });
-  };
+  const fmtDateShort = (d: Date) =>
+    d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   const isPayDown = category === 'pay-down';
   const target = parse(targetAmount);
@@ -454,17 +450,14 @@ export function GoalSetupSheet() {
                   </View>
                   <View style={st.fieldGroup}>
                     <Text style={[st.fieldLabel, { color: colors.contentSecondary }]}>Target payoff date</Text>
-                    <View style={st.dateSelector}>
-                      <Pressable onPress={() => adjustMonth(-1)} style={[st.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
-                        <Feather name="chevron-left" size={18} color={colors.contentPrimary} />
-                      </Pressable>
-                      <View style={[st.dateDisplay, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
-                        <Text style={[st.dateText, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
-                      </View>
-                      <Pressable onPress={() => adjustMonth(1)} style={[st.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
-                        <Feather name="chevron-right" size={18} color={colors.contentPrimary} />
-                      </Pressable>
-                    </View>
+                    <Pressable
+                      onPress={() => setShowDatePicker(true)}
+                      style={[st.datePickerTrigger, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}
+                    >
+                      <Feather name="calendar" size={18} color={colors.contentSecondary} />
+                      <Text style={[st.datePickerTriggerText, { color: colors.contentPrimary }]}>{fmtDateShort(targetDate)}</Text>
+                      <Feather name="chevron-down" size={16} color={colors.contentSecondary} />
+                    </Pressable>
                   </View>
                 </>
               ) : (
@@ -500,15 +493,13 @@ export function GoalSetupSheet() {
                     <View style={[st.plannerDivider, { backgroundColor: colors.surfaceEdge }]} />
                     <View style={st.plannerRow}>
                       <Text style={[st.plannerLabel, { color: colors.contentSecondary }]}>By</Text>
-                      <View style={st.plannerDateRow}>
-                        <Pressable onPress={() => adjustMonth(-1)} style={[st.plannerDateArrow, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
-                          <Feather name="chevron-left" size={16} color={colors.contentPrimary} />
-                        </Pressable>
-                        <Text style={[st.plannerDateText, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
-                        <Pressable onPress={() => adjustMonth(1)} style={[st.plannerDateArrow, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
-                          <Feather name="chevron-right" size={16} color={colors.contentPrimary} />
-                        </Pressable>
-                      </View>
+                      <Pressable
+                        onPress={() => setShowDatePicker(true)}
+                        style={[st.plannerDateTrigger, { borderColor: colors.surfaceEdge }]}
+                      >
+                        <Text style={[st.plannerDateText, { color: colors.contentPrimary }]}>{fmtDateShort(targetDate)}</Text>
+                        <Feather name="chevron-down" size={14} color={colors.contentSecondary} />
+                      </Pressable>
                     </View>
                     <View style={[st.plannerDivider, { backgroundColor: colors.surfaceEdge }]} />
                     <View style={st.plannerRow}>
@@ -646,6 +637,15 @@ export function GoalSetupSheet() {
 
         </Animated.View>
       </View>
+
+      <PacificDatePicker
+        visible={showDatePicker}
+        date={targetDate}
+        onSelect={setTargetDate}
+        onClose={() => setShowDatePicker(false)}
+        title={isPayDown ? 'Payoff date' : 'Target date'}
+        subtitle={isPayDown ? 'When do you want to be debt-free?' : 'When do you want to reach your goal?'}
+      />
     </Animated.View>
   );
 }
@@ -693,9 +693,8 @@ const st = StyleSheet.create({
   plannerField: { flex: 1, fontSize: 17, fontFamily: Fonts.medium, padding: 0, textAlign: 'right' },
   plannerUnit: { fontSize: 14, fontFamily: Fonts.regular, marginLeft: 2 },
   plannerDivider: { height: 1, marginHorizontal: 16 },
-  plannerDateRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  plannerDateArrow: { width: 32, height: 32, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  plannerDateText: { fontSize: 15, fontFamily: Fonts.medium, minWidth: 120, textAlign: 'center' },
+  plannerDateTrigger: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8 },
+  plannerDateText: { fontSize: 15, fontFamily: Fonts.medium },
 
 
   fieldGroup: { marginBottom: 24 },
@@ -706,10 +705,8 @@ const st = StyleSheet.create({
   currencyField: { flex: 1, fontSize: 17, fontFamily: Fonts.regular, padding: 0 },
   perMo: { fontSize: 14, fontFamily: Fonts.regular, marginLeft: 4 },
 
-  dateSelector: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  dateArrow: { width: 44, height: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  dateDisplay: { flex: 1, height: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  dateText: { fontSize: 16, fontFamily: Fonts.medium },
+  datePickerTrigger: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 },
+  datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
   accountOptions: { gap: 8 },
   accountRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16, borderRadius: 12, borderWidth: 1, gap: 12 },
