@@ -84,7 +84,15 @@ const SAVE_UP_ITEMS: { label: string; icon: keyof typeof Feather.glyphMap; goalT
   { label: 'Other', icon: 'plus-circle', goalType: 'CUSTOM' },
 ];
 
-const TOTAL_PAGES = 4;
+type ContributionMethod = 'direct-deposit' | 'recurring' | 'one-time';
+
+const CONTRIBUTION_METHODS: { value: ContributionMethod; title: string; subtitle: string }[] = [
+  { value: 'direct-deposit', title: 'Save from every direct deposit', subtitle: 'Automatically move part of each direct deposit into your Vault' },
+  { value: 'recurring', title: 'Set up recurring transfers', subtitle: 'Schedule money to move from your balance on a regular basis' },
+  { value: 'one-time', title: 'Make a one-time transfer', subtitle: 'Add money whenever you choose' },
+];
+
+const TOTAL_PAGES = 5;
 const STEP_SPRING = { damping: 24, stiffness: 220, mass: 0.8 };
 
 function fmt(val: number): string {
@@ -176,6 +184,7 @@ export function GoalSetupSheet() {
   const [monthlyContribution, setMonthlyContribution] = useState('');
   const [targetDate, setTargetDate] = useState(new Date());
   const [linkedAccount, setLinkedAccount] = useState('');
+  const [contributionMethod, setContributionMethod] = useState<ContributionMethod>('recurring');
   const [goalType, setGoalType] = useState<GoalType>('SAVINGS_TARGET');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [userDebtAccounts, setUserDebtAccounts] = useState<DebtAccount[]>([]);
@@ -214,8 +223,8 @@ export function GoalSetupSheet() {
         const cat = p.type === 'DEBT_PAYOFF' ? 'pay-down' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
         setCategory(cat);
         setSelectedDebt(null);
-        setPage(3);
-        stripX.value = -3 * screenWidth;
+        setPage(4);
+        stripX.value = -4 * screenWidth;
       } else {
         const defaultDate = new Date();
         defaultDate.setMonth(defaultDate.getMonth() + 6);
@@ -229,6 +238,7 @@ export function GoalSetupSheet() {
         setSelectedDebt(null);
         setPage(0);
         stripX.value = 0;
+        setContributionMethod('recurring');
         setShowLinkForm(false);
         setLinkName('');
         setLinkBalance('');
@@ -271,7 +281,7 @@ export function GoalSetupSheet() {
   const goBack = () => {
     if (page === 0) { dismiss(); return; }
     if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
-    if (page === 3 && category === 'pay-down') { goToPage(2); return; }
+    if (page === 4 && category === 'pay-down') { goToPage(2); return; }
     goToPage(page - 1);
   };
 
@@ -394,10 +404,10 @@ export function GoalSetupSheet() {
 
   const reviewValid = planPageValid;
 
-  const stepCount = isPayDown ? 3 : 3;
+  const stepCount = isPayDown ? 3 : 4;
   const displayStep = isPayDown
-    ? (page <= 0 ? 1 : page === 2 ? 2 : page >= 3 ? 3 : 2)
-    : (page <= 1 ? 1 : page === 2 ? 2 : 3);
+    ? (page <= 0 ? 1 : page === 2 ? 2 : page >= 4 ? 3 : 2)
+    : (page <= 1 ? 1 : page === 2 ? 2 : page === 3 ? 3 : 4);
 
   const suggested = getSmartEstimate(title, target, months);
   const projected = monthly * months;
@@ -697,7 +707,7 @@ export function GoalSetupSheet() {
               {isPayDown ? (
                 <Pressable
                   style={[st.nextBtn, { backgroundColor: planPageValid ? colors.contentBrand : colors.contentDisabled }]}
-                  onPress={() => goToPage(3)}
+                  onPress={() => goToPage(4)}
                   disabled={!planPageValid}
                 >
                   <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
@@ -713,7 +723,54 @@ export function GoalSetupSheet() {
             </View>
           </View>
 
-          {/* ─── Page 3: Review ─── */}
+          {/* ─── Page 3: Contribution method (save-up / investment only) ─── */}
+          <View style={[st.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+              <Text style={[st.title, { color: colors.contentPrimary }]}>How do you want to save?</Text>
+              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                Pick the option that works best for you
+              </Text>
+              <View style={st.methodOptions}>
+                {CONTRIBUTION_METHODS.map(method => {
+                  const sel = method.value === contributionMethod;
+                  return (
+                    <Pressable
+                      key={method.value}
+                      onPress={() => setContributionMethod(method.value)}
+                      style={[
+                        st.methodCard,
+                        {
+                          backgroundColor: colors.surfaceElevated,
+                          borderColor: sel ? colors.contentPrimary : 'transparent',
+                          borderWidth: sel ? 2 : 0,
+                        },
+                      ]}
+                    >
+                      <View style={st.methodContent}>
+                        <View style={st.methodText}>
+                          <Text style={[st.methodTitle, { color: colors.contentPrimary }]}>{method.title}</Text>
+                          <Text style={[st.methodSubtitle, { color: colors.contentSecondary }]}>{method.subtitle}</Text>
+                        </View>
+                        <View style={[st.methodRadio, { borderColor: sel ? colors.contentPrimary : colors.contentMuted }]}>
+                          {sel && <View style={[st.methodRadioFill, { backgroundColor: colors.contentPrimary }]} />}
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+            <View style={[st.footer, { paddingBottom: insets.bottom || 16 }]}>
+              <Pressable
+                style={[st.nextBtn, { backgroundColor: colors.contentBrand }]}
+                onPress={goNext}
+              >
+                <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* ─── Page 4: Review ─── */}
           <View style={[st.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
               <Text style={[st.title, { color: colors.contentPrimary }]}>Review your goal</Text>
@@ -748,6 +805,14 @@ export function GoalSetupSheet() {
                     <Text style={[st.reviewLabel, { color: colors.contentSecondary }]}>Account</Text>
                     <Text style={[st.reviewValue, { color: colors.contentPrimary }]}>{linkedAccount || '—'}</Text>
                   </View>
+                  {!isPayDown && (
+                    <View style={st.reviewRow}>
+                      <Text style={[st.reviewLabel, { color: colors.contentSecondary }]}>Method</Text>
+                      <Text style={[st.reviewValue, { color: colors.contentPrimary }]}>
+                        {CONTRIBUTION_METHODS.find(m => m.value === contributionMethod)?.title || '—'}
+                      </Text>
+                    </View>
+                  )}
                   {isPayDown && selectedDebt && debtEstimate?.withExtra && monthly > selectedDebt.minPayment && (
                     <View style={[st.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
                       <Feather name="award" size={14} color="#2e7d32" />
@@ -869,6 +934,15 @@ const st = StyleSheet.create({
   datePickerTrigger: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 },
   datePickerTriggerText: { flex: 1, fontSize: 16, fontFamily: Fonts.medium },
 
+
+  methodOptions: { gap: 16 },
+  methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  methodContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  methodText: { flex: 1, gap: 2 },
+  methodTitle: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
+  methodSubtitle: { fontSize: 14, fontFamily: Fonts.medium, lineHeight: 20, opacity: 0.7 },
+  methodRadio: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  methodRadioFill: { width: 12, height: 12, borderRadius: 6 },
 
   reviewCard: { borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
   reviewHeader: { flexDirection: 'row', alignItems: 'center', padding: 20, gap: 14 },
