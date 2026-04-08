@@ -244,6 +244,14 @@ export function GoalSetupSheet() {
   const reviewValid = step2Valid && step3Valid;
   const displayStep = pageToStep(page);
 
+  const target = parseCurrency(targetAmount);
+  const monthsUntil = Math.max(1, Math.round((targetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30.44)));
+  const suggestedMonthly = target > 0 ? Math.ceil(target / monthsUntil) : 0;
+  const currentMonthly = parseCurrency(monthlyContribution);
+  const projectedTotal = currentMonthly * monthsUntil;
+  const onTrack = currentMonthly > 0 && projectedTotal >= target;
+  const shortfall = target - projectedTotal;
+
   return (
     <Animated.View style={[styles.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
@@ -363,6 +371,40 @@ export function GoalSetupSheet() {
               <Text style={[styles.stepSubtitle, { color: colors.contentSecondary }]}>
                 Set up your contribution and timeline.
               </Text>
+
+              {target > 0 && (
+                <View style={[styles.estimateCard, { backgroundColor: colors.surfaceElevated }]}>
+                  <View style={styles.estimateHeader}>
+                    <View style={[styles.estimateIconWrap, { backgroundColor: colors.surfaceTint }]}>
+                      <Feather name="zap" size={14} color={colors.contentBrand} />
+                    </View>
+                    <Text style={[styles.estimateTitle, { color: colors.contentPrimary }]}>Coach estimate</Text>
+                  </View>
+                  <Text style={[styles.estimateBody, { color: colors.contentSecondary }]}>
+                    To reach ${formatCurrency(target)} by {formatMonthYear(targetDate)}, you'd need about <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${formatCurrency(suggestedMonthly)}/mo</Text>.
+                  </Text>
+                  {suggestedMonthly > 0 && (
+                    <Pressable
+                      style={[styles.estimateApply, { borderColor: colors.contentBrand }]}
+                      onPress={() => setMonthlyContribution(formatCurrency(suggestedMonthly))}
+                    >
+                      <Text style={[styles.estimateApplyText, { color: colors.contentBrand }]}>Use this amount</Text>
+                    </Pressable>
+                  )}
+                  {currentMonthly > 0 && (
+                    <View style={[styles.estimateProjection, { backgroundColor: onTrack ? '#e8f5e9' : '#fff8e1' }]}>
+                      <Feather name={onTrack ? 'check-circle' : 'alert-circle'} size={14} color={onTrack ? '#2e7d32' : '#f9a825'} />
+                      <Text style={[styles.estimateProjectionText, { color: onTrack ? '#2e7d32' : '#795600' }]}>
+                        {onTrack
+                          ? `On track — you'll reach your goal${projectedTotal > target ? ` with ~$${formatCurrency(projectedTotal - target)} extra` : ''}`
+                          : `At $${formatCurrency(currentMonthly)}/mo you'd be ~$${formatCurrency(shortfall)} short`
+                        }
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+
               <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: colors.contentSecondary }]}>Monthly contribution</Text>
                 <View style={[styles.currencyInput, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
@@ -611,6 +653,67 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     lineHeight: 24,
     letterSpacing: -0.16,
+    flex: 1,
+  },
+  estimateCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: '#121211',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  estimateHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+  },
+  estimateIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  estimateTitle: {
+    fontSize: 14,
+    fontFamily: Fonts.bold,
+    letterSpacing: -0.1,
+  },
+  estimateBody: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  estimateApply: {
+    alignSelf: 'flex-start',
+    borderWidth: 1.5,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 4,
+  },
+  estimateApplyText: {
+    fontSize: 13,
+    fontFamily: Fonts.bold,
+  },
+  estimateProjection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  estimateProjectionText: {
+    fontSize: 13,
+    fontFamily: Fonts.medium,
+    lineHeight: 18,
     flex: 1,
   },
   fieldGroup: {
