@@ -67,7 +67,7 @@ export function PacificBottomSheet({ visible, onClose, children }: PacificBottom
     });
 
   const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [{ translateY: Math.round(translateY.value) }],
   }));
 
   const scrimStyle = useAnimatedStyle(() => ({

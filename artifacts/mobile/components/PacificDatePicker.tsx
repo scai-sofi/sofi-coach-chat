@@ -464,9 +464,9 @@ const s = StyleSheet.create({
   },
   yearList: {
     maxHeight: 476,
-    paddingHorizontal: 16,
   },
   yearListContent: {
+    gap: 4,
     paddingBottom: 8,
   },
   yearRow: {
@@ -481,6 +481,7 @@ const s = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.medium,
     lineHeight: 20,
+    letterSpacing: 0,
   },
   footer: {
     paddingHorizontal: 16,
