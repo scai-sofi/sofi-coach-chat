@@ -71,13 +71,6 @@ function monthsBetween(from: Date, to: Date): number {
   return Math.max(1, Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24 * 30.44)));
 }
 
-function pageToStep(page: number, isPayDown: boolean): number {
-  if (page <= 1) return 1;
-  if (page === 2) return 2;
-  if (page === 3) return isPayDown ? 3 : 3;
-  return 4;
-}
-
 function calcDebtPayoff(balance: number, apr: number, monthlyPayment: number): { months: number; totalInterest: number } {
   if (monthlyPayment <= 0 || balance <= 0) return { months: 0, totalInterest: 0 };
   const monthlyRate = apr / 100 / 12;
@@ -94,6 +87,12 @@ function calcDebtPayoff(balance: number, apr: number, monthlyPayment: number): {
     months++;
   }
   return { months, totalInterest: Math.round(totalInterest) };
+}
+
+function fmtPayoffTime(months: number): string {
+  if (months >= 600) return '50+ yrs';
+  if (months >= 24) return `${Math.round(months / 12)} yrs`;
+  return `${months} mo`;
 }
 
 function StepIndicator({ current, total }: { current: number; total: number }) {
@@ -208,7 +207,8 @@ export function GoalSetupSheet() {
 
   const goBack = useCallback(() => {
     if (page === 0) { dismiss(); return; }
-    if (page === 2 && category === 'investment') { goToPage(0); return; }
+    if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
+    if (page === 4 && category === 'pay-down') { goToPage(2); return; }
     goToPage(page - 1);
   }, [page, category, screenWidth]);
 
@@ -227,8 +227,19 @@ export function GoalSetupSheet() {
 
   const selectCategory = (cat: GoalCategory) => {
     setCategory(cat);
-    if (cat === 'save-up' || cat === 'pay-down') {
+    if (cat === 'save-up') {
       goToPage(1);
+    } else if (cat === 'pay-down') {
+      setGoalType('DEBT_PAYOFF');
+      if (!selectedDebt) {
+        const first = DEBT_ACCOUNTS[0];
+        setSelectedDebt(first);
+        setTitle(`Pay off ${first.name}`);
+        setTargetAmount(fmt(first.balance));
+        setLinkedAccount(first.name);
+        setMonthlyContribution('');
+      }
+      goToPage(2);
     } else {
       setGoalType('INVESTMENT');
       setTitle('Investment');
@@ -242,13 +253,12 @@ export function GoalSetupSheet() {
     goToPage(2);
   };
 
-  const selectDebtAccount = (debt: DebtAccount) => {
+  const pickDebt = (debt: DebtAccount) => {
     setSelectedDebt(debt);
-    setGoalType('DEBT_PAYOFF');
     setTitle(`Pay off ${debt.name}`);
     setTargetAmount(fmt(debt.balance));
     setLinkedAccount(debt.name);
-    goToPage(2);
+    setMonthlyContribution('');
   };
 
   const adjustMonth = (delta: number) => {
@@ -275,16 +285,18 @@ export function GoalSetupSheet() {
   const months = monthsBetween(new Date(), targetDate);
 
   const planPageValid = isPayDown
-    ? target > 0 && title.trim().length > 0
+    ? target > 0 && monthly > 0 && !!selectedDebt
     : target > 0 && title.trim().length > 0 && monthly > 0;
 
-  const payDownPlanValid = isPayDown && monthly > 0;
   const accountPageValid = linkedAccount.length > 0;
   const reviewValid = isPayDown
-    ? planPageValid && payDownPlanValid
+    ? planPageValid
     : planPageValid && accountPageValid;
 
-  const displayStep = pageToStep(page, isPayDown);
+  const stepCount = isPayDown ? 3 : 4;
+  const displayStep = isPayDown
+    ? (page <= 0 ? 1 : page === 2 ? 2 : page >= 4 ? 3 : 2)
+    : (page <= 1 ? 1 : page === 2 ? 2 : page === 3 ? 3 : 4);
 
   const suggested = target > 0 ? Math.ceil(target / months) : 0;
   const projected = monthly * months;
@@ -303,38 +315,38 @@ export function GoalSetupSheet() {
   }, [isPayDown, selectedDebt, target, monthly, months]);
 
   return (
-    <Animated.View style={[s.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
-      <View style={[s.header, { paddingTop: insets.top }]}>
-        <Pressable style={s.backBtn} onPress={goBack} hitSlop={12}>
+    <Animated.View style={[st.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
+      <View style={[st.header, { paddingTop: insets.top }]}>
+        <Pressable style={st.backBtn} onPress={goBack} hitSlop={12}>
           <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
         </Pressable>
-        <View style={s.headerCenter}>
-          <StepIndicator current={displayStep} total={4} />
+        <View style={st.headerCenter}>
+          <StepIndicator current={displayStep} total={stepCount} />
         </View>
-        <Pressable style={s.closeBtn} onPress={dismiss} hitSlop={12}>
+        <Pressable style={st.closeBtn} onPress={dismiss} hitSlop={12}>
           <Feather name="x" size={22} color={colors.contentPrimary} />
         </Pressable>
       </View>
 
-      <View style={s.body}>
-        <Animated.View style={[s.strip, { width: screenWidth * TOTAL_PAGES }, stripStyle]}>
+      <View style={st.body}>
+        <Animated.View style={[st.strip, { width: screenWidth * TOTAL_PAGES }, stripStyle]}>
 
           {/* ─── Page 0: Category ─── */}
-          <View style={[s.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-              <Text style={[s.title, { color: colors.contentPrimary }]}>Create a goal</Text>
-              <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
+          <View style={[st.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+              <Text style={[st.title, { color: colors.contentPrimary }]}>Create a goal</Text>
+              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
                 What type of goal do you want to set up?
               </Text>
-              <View style={s.categoryList}>
+              <View style={st.categoryList}>
                 {CATEGORIES.map(({ key, label, subtitle, icon }) => (
-                  <Pressable key={key} style={[s.categoryCard, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectCategory(key)}>
-                    <View style={[s.categoryIconWrap, { backgroundColor: colors.surfaceTint }]}>
+                  <Pressable key={key} style={[st.categoryCard, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectCategory(key)}>
+                    <View style={[st.categoryIconWrap, { backgroundColor: colors.surfaceTint }]}>
                       <Feather name={icon} size={22} color={colors.contentPrimary} />
                     </View>
-                    <View style={s.categoryText}>
-                      <Text style={[s.categoryLabel, { color: colors.contentPrimary }]}>{label}</Text>
-                      <Text style={[s.categorySub, { color: colors.contentSecondary }]}>{subtitle}</Text>
+                    <View style={st.categoryText}>
+                      <Text style={[st.categoryLabel, { color: colors.contentPrimary }]}>{label}</Text>
+                      <Text style={[st.categorySub, { color: colors.contentSecondary }]}>{subtitle}</Text>
                     </View>
                     <Feather name="chevron-right" size={20} color={colors.contentMuted} />
                   </Pressable>
@@ -343,318 +355,154 @@ export function GoalSetupSheet() {
             </ScrollView>
           </View>
 
-          {/* ─── Page 1: Sub-selection ─── */}
-          <View style={[s.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-              {category === 'pay-down' ? (
-                <>
-                  <Text style={[s.title, { color: colors.contentPrimary }]}>Which account?</Text>
-                  <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
-                    Select the debt you want to pay down. We'll pull in your current balance.
-                  </Text>
-                  <View style={s.debtList}>
-                    {DEBT_ACCOUNTS.map((debt) => (
-                      <Pressable key={debt.id} style={[s.debtCard, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectDebtAccount(debt)}>
-                        <View style={s.debtCardTop}>
-                          <View style={[s.debtIconWrap, { backgroundColor: colors.surfaceTint }]}>
-                            <Feather name={debt.icon} size={18} color={colors.contentPrimary} />
-                          </View>
-                          <View style={s.debtCardInfo}>
-                            <Text style={[s.debtName, { color: colors.contentPrimary }]}>{debt.name}</Text>
-                            <Text style={[s.debtBalance, { color: colors.contentPrimary }]}>${fmt(debt.balance)}</Text>
-                          </View>
-                        </View>
-                        <View style={[s.debtCardDivider, { backgroundColor: colors.surfaceEdge }]} />
-                        <View style={s.debtCardBottom}>
-                          <View style={s.debtStat}>
-                            <Text style={[s.debtStatLabel, { color: colors.contentSecondary }]}>APR</Text>
-                            <Text style={[s.debtStatValue, { color: colors.contentPrimary }]}>{debt.apr}%</Text>
-                          </View>
-                          <View style={[s.debtStatDivider, { backgroundColor: colors.surfaceEdge }]} />
-                          <View style={s.debtStat}>
-                            <Text style={[s.debtStatLabel, { color: colors.contentSecondary }]}>Min payment</Text>
-                            <Text style={[s.debtStatValue, { color: colors.contentPrimary }]}>${debt.minPayment}/mo</Text>
-                          </View>
-                        </View>
-                      </Pressable>
-                    ))}
-                  </View>
-                </>
-              ) : (
-                <>
-                  <Text style={[s.title, { color: colors.contentPrimary }]}>What are you saving for?</Text>
-                  <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
-                    Pick a category or choose "Other" to create your own.
-                  </Text>
-                  <View style={s.vaultList}>
-                    {SAVE_UP_ITEMS.map((item) => (
-                      <Pressable key={item.label} style={[s.vaultRow, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectSaveUpItem(item)}>
-                        <View style={s.vaultIconWrap}>
-                          <Feather name={item.icon} size={20} color={colors.contentPrimary} />
-                        </View>
-                        <Text style={[s.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
-                      </Pressable>
-                    ))}
-                  </View>
-                </>
-              )}
+          {/* ─── Page 1: Save-up vault list (pay-down skips this) ─── */}
+          <View style={[st.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+              <Text style={[st.title, { color: colors.contentPrimary }]}>What are you saving for?</Text>
+              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                Pick a category or choose "Other" to create your own.
+              </Text>
+              <View style={st.vaultList}>
+                {SAVE_UP_ITEMS.map((item) => (
+                  <Pressable key={item.label} style={[st.vaultRow, { backgroundColor: colors.surfaceElevated }]} onPress={() => selectSaveUpItem(item)}>
+                    <View style={st.vaultIconWrap}>
+                      <Feather name={item.icon} size={20} color={colors.contentPrimary} />
+                    </View>
+                    <Text style={[st.vaultLabel, { color: colors.contentPrimary }]}>{item.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
             </ScrollView>
           </View>
 
-          {/* ─── Page 2: Plan your goal (save-up) / Payoff goal (pay-down) ─── */}
-          <View style={[s.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          {/* ─── Page 2: Plan (save-up planner / pay-down unified / investment) ─── */}
+          <View style={[st.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               {isPayDown ? (
                 <>
-                  <Text style={[s.title, { color: colors.contentPrimary }]}>Your payoff goal</Text>
-                  <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
-                    We pulled in your current balance. Adjust if needed.
+                  <Text style={[st.title, { color: colors.contentPrimary }]}>Pay down a debt</Text>
+                  <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                    Pick the account, then set your plan.
                   </Text>
+
+                  {/* ── Compact debt selector tabs ── */}
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.debtTabScroll} contentContainerStyle={st.debtTabRow}>
+                    {DEBT_ACCOUNTS.map((debt) => {
+                      const sel = selectedDebt?.id === debt.id;
+                      return (
+                        <Pressable
+                          key={debt.id}
+                          style={[
+                            st.debtTab,
+                            { backgroundColor: sel ? colors.contentPrimary : colors.surfaceElevated, borderColor: sel ? colors.contentPrimary : colors.surfaceEdge },
+                          ]}
+                          onPress={() => pickDebt(debt)}
+                        >
+                          <Feather name={debt.icon} size={14} color={sel ? '#fff' : colors.contentPrimary} />
+                          <Text style={[st.debtTabLabel, { color: sel ? '#fff' : colors.contentPrimary }]}>{debt.name.replace('SoFi ', '')}</Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+
+                  {/* ── Selected debt detail strip ── */}
                   {selectedDebt && (
-                    <View style={[s.linkedBadge, { backgroundColor: colors.surfaceTint }]}>
-                      <Feather name="link" size={14} color={colors.contentBrand} />
-                      <Text style={[s.linkedBadgeText, { color: colors.contentSecondary }]}>
-                        Linked to <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>{selectedDebt.name}</Text> · {selectedDebt.apr}% APR
-                      </Text>
+                    <View style={[st.debtDetail, { backgroundColor: colors.surfaceElevated }]}>
+                      <View style={st.debtDetailItem}>
+                        <Text style={[st.debtDetailLabel, { color: colors.contentSecondary }]}>Balance</Text>
+                        <Text style={[st.debtDetailValue, { color: colors.contentPrimary }]}>${fmt(selectedDebt.balance)}</Text>
+                      </View>
+                      <View style={[st.debtDetailDiv, { backgroundColor: colors.surfaceEdge }]} />
+                      <View style={st.debtDetailItem}>
+                        <Text style={[st.debtDetailLabel, { color: colors.contentSecondary }]}>APR</Text>
+                        <Text style={[st.debtDetailValue, { color: colors.contentPrimary }]}>{selectedDebt.apr}%</Text>
+                      </View>
+                      <View style={[st.debtDetailDiv, { backgroundColor: colors.surfaceEdge }]} />
+                      <View style={st.debtDetailItem}>
+                        <Text style={[st.debtDetailLabel, { color: colors.contentSecondary }]}>Minimum</Text>
+                        <Text style={[st.debtDetailValue, { color: colors.contentPrimary }]}>${selectedDebt.minPayment}/mo</Text>
+                      </View>
                     </View>
                   )}
-                  <View style={s.fieldGroup}>
-                    <Text style={[s.fieldLabel, { color: colors.contentSecondary }]}>Name</Text>
-                    <TextInput
-                      style={[s.fieldInput, { color: colors.contentPrimary, borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
-                      value={title} onChangeText={setTitle}
-                      placeholder="e.g. Pay off Credit Card"
-                      placeholderTextColor={colors.contentDimmed}
-                    />
-                  </View>
-                  <View style={s.fieldGroup}>
-                    <Text style={[s.fieldLabel, { color: colors.contentSecondary }]}>Balance to pay off</Text>
-                    <View style={[s.currencyRow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
-                      <Text style={[s.currencySign, { color: colors.contentSecondary }]}>$</Text>
-                      <TextInput
-                        style={[s.currencyField, { color: colors.contentPrimary }]}
-                        value={targetAmount} onChangeText={setTargetAmount}
-                        keyboardType="numeric" placeholder="10,000"
-                        placeholderTextColor={colors.contentDimmed}
-                      />
-                    </View>
-                  </View>
-                </>
-              ) : (
-                <>
-                  <Text style={[s.title, { color: colors.contentPrimary }]}>Plan your goal</Text>
-                  <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
-                    Set your target, timeline, and contribution — they work together.
-                  </Text>
 
-                  <View style={s.fieldGroup}>
-                    <Text style={[s.fieldLabel, { color: colors.contentSecondary }]}>Name</Text>
-                    <TextInput
-                      style={[s.fieldInput, { color: colors.contentPrimary, borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
-                      value={title} onChangeText={setTitle}
-                      placeholder="e.g. Emergency Fund"
-                      placeholderTextColor={colors.contentDimmed}
-                    />
-                  </View>
-
-                  <View style={[s.plannerCard, { backgroundColor: colors.surfaceElevated }]}>
-                    <View style={s.plannerRow}>
-                      <Text style={[s.plannerLabel, { color: colors.contentSecondary }]}>I want to save</Text>
-                      <View style={[s.plannerInput, { borderColor: colors.surfaceEdge }]}>
-                        <Text style={[s.currencySign, { color: colors.contentSecondary }]}>$</Text>
-                        <TextInput
-                          style={[s.plannerField, { color: colors.contentPrimary }]}
-                          value={targetAmount} onChangeText={setTargetAmount}
-                          keyboardType="numeric" placeholder="10,000"
-                          placeholderTextColor={colors.contentDimmed}
-                        />
-                      </View>
-                    </View>
-
-                    <View style={[s.plannerDivider, { backgroundColor: colors.surfaceEdge }]} />
-
-                    <View style={s.plannerRow}>
-                      <Text style={[s.plannerLabel, { color: colors.contentSecondary }]}>By</Text>
-                      <View style={s.plannerDateRow}>
-                        <Pressable onPress={() => adjustMonth(-1)} style={[s.plannerDateArrow, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
-                          <Feather name="chevron-left" size={16} color={colors.contentPrimary} />
-                        </Pressable>
-                        <Text style={[s.plannerDateText, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
-                        <Pressable onPress={() => adjustMonth(1)} style={[s.plannerDateArrow, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
-                          <Feather name="chevron-right" size={16} color={colors.contentPrimary} />
-                        </Pressable>
-                      </View>
-                    </View>
-
-                    <View style={[s.plannerDivider, { backgroundColor: colors.surfaceEdge }]} />
-
-                    <View style={s.plannerRow}>
-                      <Text style={[s.plannerLabel, { color: colors.contentSecondary }]}>Saving</Text>
-                      <View style={[s.plannerInput, { borderColor: colors.surfaceEdge }]}>
-                        <Text style={[s.currencySign, { color: colors.contentSecondary }]}>$</Text>
-                        <TextInput
-                          style={[s.plannerField, { color: colors.contentPrimary }]}
-                          value={monthlyContribution} onChangeText={setMonthlyContribution}
-                          keyboardType="numeric" placeholder={suggested > 0 ? fmt(suggested) : '500'}
-                          placeholderTextColor={colors.contentDimmed}
-                        />
-                        <Text style={[s.plannerUnit, { color: colors.contentSecondary }]}>/mo</Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  {target > 0 && (
-                    <View style={[s.coachTip, { backgroundColor: colors.surfaceTint }]}>
-                      <View style={s.coachTipHeader}>
+                  {/* ── Coach estimate ── */}
+                  {debtEstimate && selectedDebt && (
+                    <View style={[st.coachTip, { backgroundColor: colors.surfaceTint }]}>
+                      <View style={st.coachTipHeader}>
                         <Feather name="zap" size={14} color={colors.contentBrand} />
-                        <Text style={[s.coachTipTitle, { color: colors.contentPrimary }]}>Coach suggests</Text>
+                        <Text style={[st.coachTipTitle, { color: colors.contentPrimary }]}>Coach estimate</Text>
+                      </View>
+
+                      <View style={[st.debtCompare, { borderColor: colors.surfaceEdge }]}>
+                        <View style={st.dcRow}>
+                          <Text style={[st.dcLabel, { color: colors.contentSecondary }]}>Minimum only</Text>
+                          <View style={st.dcRight}>
+                            <Text style={[st.dcTime, { color: colors.contentSecondary }]}>{fmtPayoffTime(debtEstimate.minOnly.months)}</Text>
+                            <Text style={[st.dcInterest, { color: '#c62828' }]}>${fmt(debtEstimate.minOnly.totalInterest)} int.</Text>
+                          </View>
+                        </View>
+                        <View style={[st.dcDivider, { backgroundColor: colors.surfaceEdge }]} />
+                        <View style={st.dcRow}>
+                          <Text style={[st.dcLabel, { color: colors.contentPrimary, fontFamily: Fonts.bold }]}>Coach suggests</Text>
+                          <View style={st.dcRight}>
+                            <Text style={[st.dcTime, { color: colors.contentPrimary, fontFamily: Fonts.bold }]}>{fmtPayoffTime(debtEstimate.withSuggested.months)}</Text>
+                            <Text style={[st.dcInterest, { color: '#2e7d32' }]}>${fmt(debtEstimate.withSuggested.totalInterest)} int.</Text>
+                          </View>
+                        </View>
                       </View>
 
                       {monthly === 0 ? (
-                        <Text style={[s.coachTipBody, { color: colors.contentSecondary }]}>
-                          To reach <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(target)}</Text> by {fmtDate(targetDate)}, save about{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(suggested)}/mo</Text>.
+                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
+                          Pay <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(debtEstimate.suggestedPayment)}/mo</Text> to be debt-free by {fmtDate(targetDate)} and save{' '}
+                          <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withSuggested.totalInterest)}</Text> in interest.
                         </Text>
-                      ) : onTrack ? (
-                        <Text style={[s.coachTipBody, { color: colors.contentSecondary }]}>
-                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, you'll hit your goal
-                          {projected > target
-                            ? <> with <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>~${fmt(projected - target)} extra</Text></>
-                            : <> right on time</>
-                          }. Nice.
+                      ) : monthly <= selectedDebt.minPayment ? (
+                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
+                          <Text style={{ fontFamily: Fonts.bold, color: '#c62828' }}>${fmt(monthly)}/mo</Text> is at or below your minimum. Paying more saves you money and time.
                         </Text>
-                      ) : (
-                        <Text style={[s.coachTipBody, { color: colors.contentSecondary }]}>
-                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, you'd be about{' '}
-                          <Text style={{ fontFamily: Fonts.bold, color: '#c62828' }}>${fmt(shortfall)} short</Text>.{' '}
-                          Try <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(suggested)}/mo</Text> or push the date out.
+                      ) : debtEstimate.withExtra ? (
+                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
+                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, debt-free in{' '}
+                          <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>{fmtPayoffTime(debtEstimate.withExtra.months)}</Text> — saving{' '}
+                          <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withExtra.totalInterest)}</Text> in interest.
                         </Text>
-                      )}
+                      ) : null}
 
-                      {monthly === 0 && suggested > 0 && (
+                      {(monthly === 0 || monthly <= selectedDebt.minPayment) && (
                         <Pressable
-                          style={[s.coachTipBtn, { borderColor: colors.contentBrand }]}
-                          onPress={() => setMonthlyContribution(fmt(suggested))}
+                          style={[st.coachTipBtn, { borderColor: colors.contentBrand }]}
+                          onPress={() => setMonthlyContribution(fmt(debtEstimate.suggestedPayment))}
                         >
-                          <Text style={[s.coachTipBtnText, { color: colors.contentBrand }]}>Use ${fmt(suggested)}/mo</Text>
-                        </Pressable>
-                      )}
-
-                      {!onTrack && monthly > 0 && suggested > 0 && (
-                        <Pressable
-                          style={[s.coachTipBtn, { borderColor: colors.contentBrand }]}
-                          onPress={() => setMonthlyContribution(fmt(suggested))}
-                        >
-                          <Text style={[s.coachTipBtnText, { color: colors.contentBrand }]}>Adjust to ${fmt(suggested)}/mo</Text>
+                          <Text style={[st.coachTipBtnText, { color: colors.contentBrand }]}>Use ${fmt(debtEstimate.suggestedPayment)}/mo</Text>
                         </Pressable>
                       )}
                     </View>
                   )}
-                </>
-              )}
-            </ScrollView>
-            <View style={[s.footer, { paddingBottom: insets.bottom || 16 }]}>
-              <Pressable
-                style={[s.nextBtn, { backgroundColor: planPageValid ? colors.contentBrand : colors.contentDisabled }]}
-                onPress={goNext} disabled={!planPageValid}
-              >
-                <Text style={[s.nextBtnText, { color: '#fff' }]}>Next</Text>
-              </Pressable>
-            </View>
-          </View>
 
-          {/* ─── Page 3: Account (save-up) / Payoff plan (pay-down) ─── */}
-          <View style={[s.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              {isPayDown ? (
-                <>
-                  <Text style={[s.title, { color: colors.contentPrimary }]}>Your payoff plan</Text>
-                  <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
-                    See how paying more can save you money and time.
-                  </Text>
-
-                  {debtEstimate && selectedDebt && (
-                    <View style={[s.estimateCard, { backgroundColor: colors.surfaceElevated }]}>
-                      <View style={s.estimateHeader}>
-                        <View style={[s.estimateIconWrap, { backgroundColor: colors.surfaceTint }]}>
-                          <Feather name="zap" size={14} color={colors.contentBrand} />
-                        </View>
-                        <Text style={[s.estimateTitle, { color: colors.contentPrimary }]}>Coach estimate</Text>
-                      </View>
-
-                      <View style={[s.debtCompare, { borderColor: colors.surfaceEdge }]}>
-                        <View style={s.debtCompareRow}>
-                          <Text style={[s.dcLabel, { color: colors.contentSecondary }]}>Minimum only</Text>
-                          <View style={s.dcValues}>
-                            <Text style={[s.dcTime, { color: colors.contentSecondary }]}>
-                              {debtEstimate.minOnly.months >= 600 ? '50+ yrs' : debtEstimate.minOnly.months >= 24 ? `${Math.round(debtEstimate.minOnly.months / 12)} yrs` : `${debtEstimate.minOnly.months} mo`}
-                            </Text>
-                            <Text style={[s.dcInterest, { color: '#c62828' }]}>${fmt(debtEstimate.minOnly.totalInterest)} interest</Text>
-                          </View>
-                        </View>
-                        <View style={[s.dcDivider, { backgroundColor: colors.surfaceEdge }]} />
-                        <View style={s.debtCompareRow}>
-                          <Text style={[s.dcLabel, { color: colors.contentPrimary, fontFamily: Fonts.bold }]}>Coach suggests</Text>
-                          <View style={s.dcValues}>
-                            <Text style={[s.dcTime, { color: colors.contentPrimary, fontFamily: Fonts.bold }]}>
-                              {debtEstimate.withSuggested.months >= 24 ? `${Math.round(debtEstimate.withSuggested.months / 12)} yrs` : `${debtEstimate.withSuggested.months} mo`}
-                            </Text>
-                            <Text style={[s.dcInterest, { color: '#2e7d32' }]}>${fmt(debtEstimate.withSuggested.totalInterest)} interest</Text>
-                          </View>
-                        </View>
-                      </View>
-
-                      <Text style={[s.estimateBody, { color: colors.contentSecondary }]}>
-                        Pay <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(debtEstimate.suggestedPayment)}/mo</Text> to be debt-free by {fmtDate(targetDate)} and save{' '}
-                        <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withSuggested.totalInterest)}</Text> in interest.
-                      </Text>
-
-                      <Pressable style={[s.estimateApply, { borderColor: colors.contentBrand }]} onPress={() => setMonthlyContribution(fmt(debtEstimate.suggestedPayment))}>
-                        <Text style={[s.estimateApplyText, { color: colors.contentBrand }]}>Use this amount</Text>
-                      </Pressable>
-
-                      {debtEstimate.withExtra && monthly > selectedDebt.minPayment && (
-                        <View style={[s.projection, { backgroundColor: '#e8f5e9' }]}>
-                          <Feather name="trending-down" size={14} color="#2e7d32" />
-                          <Text style={[s.projectionText, { color: '#2e7d32' }]}>
-                            At ${fmt(monthly)}/mo you'd be debt-free in {debtEstimate.withExtra.months} months — saving ${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withExtra.totalInterest)} in interest
-                          </Text>
-                        </View>
-                      )}
-                      {monthly > 0 && monthly <= selectedDebt.minPayment && (
-                        <View style={[s.projection, { backgroundColor: '#fff8e1' }]}>
-                          <Feather name="alert-circle" size={14} color="#f9a825" />
-                          <Text style={[s.projectionText, { color: '#795600' }]}>
-                            That's at or below your minimum (${selectedDebt.minPayment}/mo). Paying more saves you money.
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
-
-                  <View style={s.fieldGroup}>
-                    <Text style={[s.fieldLabel, { color: colors.contentSecondary }]}>Monthly payment</Text>
-                    <View style={[s.currencyRow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
-                      <Text style={[s.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                  {/* ── Payment + date inputs ── */}
+                  <View style={st.fieldGroup}>
+                    <Text style={[st.fieldLabel, { color: colors.contentSecondary }]}>Monthly payment</Text>
+                    <View style={[st.currencyRow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}>
+                      <Text style={[st.currencySign, { color: colors.contentSecondary }]}>$</Text>
                       <TextInput
-                        style={[s.currencyField, { color: colors.contentPrimary }]}
+                        style={[st.currencyField, { color: colors.contentPrimary }]}
                         value={monthlyContribution} onChangeText={setMonthlyContribution}
                         keyboardType="numeric" placeholder={selectedDebt ? String(selectedDebt.minPayment) : '500'}
                         placeholderTextColor={colors.contentDimmed}
                       />
-                      <Text style={[s.perMo, { color: colors.contentSecondary }]}>/mo</Text>
+                      <Text style={[st.perMo, { color: colors.contentSecondary }]}>/mo</Text>
                     </View>
                   </View>
-                  <View style={s.fieldGroup}>
-                    <Text style={[s.fieldLabel, { color: colors.contentSecondary }]}>Target payoff date</Text>
-                    <View style={s.dateSelector}>
-                      <Pressable onPress={() => adjustMonth(-1)} style={[s.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
+                  <View style={st.fieldGroup}>
+                    <Text style={[st.fieldLabel, { color: colors.contentSecondary }]}>Target payoff date</Text>
+                    <View style={st.dateSelector}>
+                      <Pressable onPress={() => adjustMonth(-1)} style={[st.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
                         <Feather name="chevron-left" size={18} color={colors.contentPrimary} />
                       </Pressable>
-                      <View style={[s.dateDisplay, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
-                        <Text style={[s.dateText, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
+                      <View style={[st.dateDisplay, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+                        <Text style={[st.dateText, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
                       </View>
-                      <Pressable onPress={() => adjustMonth(1)} style={[s.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
+                      <Pressable onPress={() => adjustMonth(1)} style={[st.dateArrow, { borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]} hitSlop={8}>
                         <Feather name="chevron-right" size={18} color={colors.contentPrimary} />
                       </Pressable>
                     </View>
@@ -662,84 +510,202 @@ export function GoalSetupSheet() {
                 </>
               ) : (
                 <>
-                  <Text style={[s.title, { color: colors.contentPrimary }]}>Where should we save?</Text>
-                  <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
-                    Pick the account to pull your monthly contribution from.
+                  <Text style={[st.title, { color: colors.contentPrimary }]}>Plan your goal</Text>
+                  <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                    Set your target, timeline, and contribution — they work together.
                   </Text>
-                  <View style={s.accountOptions}>
-                    {LINKED_ACCOUNTS.map(acct => {
-                      const sel = acct === linkedAccount;
-                      return (
-                        <Pressable key={acct} style={[s.accountRow, { backgroundColor: colors.surfaceElevated, borderColor: sel ? colors.contentPrimary : colors.surfaceEdge }, sel && { borderWidth: 2 }]} onPress={() => setLinkedAccount(acct)}>
-                          <View style={[s.radio, { borderColor: sel ? colors.contentPrimary : colors.contentMuted }]}>
-                            {sel && <View style={[s.radioFill, { backgroundColor: colors.contentPrimary }]} />}
-                          </View>
-                          <Text style={[s.accountLabel, { color: colors.contentPrimary }]}>{acct}</Text>
-                        </Pressable>
-                      );
-                    })}
+
+                  <View style={st.fieldGroup}>
+                    <Text style={[st.fieldLabel, { color: colors.contentSecondary }]}>Name</Text>
+                    <TextInput
+                      style={[st.fieldInput, { color: colors.contentPrimary, borderColor: colors.surfaceEdge, backgroundColor: colors.surfaceElevated }]}
+                      value={title} onChangeText={setTitle}
+                      placeholder="e.g. Emergency Fund"
+                      placeholderTextColor={colors.contentDimmed}
+                    />
                   </View>
+
+                  <View style={[st.plannerCard, { backgroundColor: colors.surfaceElevated }]}>
+                    <View style={st.plannerRow}>
+                      <Text style={[st.plannerLabel, { color: colors.contentSecondary }]}>I want to save</Text>
+                      <View style={[st.plannerInput, { borderColor: colors.surfaceEdge }]}>
+                        <Text style={[st.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                        <TextInput
+                          style={[st.plannerField, { color: colors.contentPrimary }]}
+                          value={targetAmount} onChangeText={setTargetAmount}
+                          keyboardType="numeric" placeholder="10,000"
+                          placeholderTextColor={colors.contentDimmed}
+                        />
+                      </View>
+                    </View>
+                    <View style={[st.plannerDivider, { backgroundColor: colors.surfaceEdge }]} />
+                    <View style={st.plannerRow}>
+                      <Text style={[st.plannerLabel, { color: colors.contentSecondary }]}>By</Text>
+                      <View style={st.plannerDateRow}>
+                        <Pressable onPress={() => adjustMonth(-1)} style={[st.plannerDateArrow, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
+                          <Feather name="chevron-left" size={16} color={colors.contentPrimary} />
+                        </Pressable>
+                        <Text style={[st.plannerDateText, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
+                        <Pressable onPress={() => adjustMonth(1)} style={[st.plannerDateArrow, { borderColor: colors.surfaceEdge }]} hitSlop={8}>
+                          <Feather name="chevron-right" size={16} color={colors.contentPrimary} />
+                        </Pressable>
+                      </View>
+                    </View>
+                    <View style={[st.plannerDivider, { backgroundColor: colors.surfaceEdge }]} />
+                    <View style={st.plannerRow}>
+                      <Text style={[st.plannerLabel, { color: colors.contentSecondary }]}>Saving</Text>
+                      <View style={[st.plannerInput, { borderColor: colors.surfaceEdge }]}>
+                        <Text style={[st.currencySign, { color: colors.contentSecondary }]}>$</Text>
+                        <TextInput
+                          style={[st.plannerField, { color: colors.contentPrimary }]}
+                          value={monthlyContribution} onChangeText={setMonthlyContribution}
+                          keyboardType="numeric" placeholder={suggested > 0 ? fmt(suggested) : '500'}
+                          placeholderTextColor={colors.contentDimmed}
+                        />
+                        <Text style={[st.plannerUnit, { color: colors.contentSecondary }]}>/mo</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {target > 0 && (
+                    <View style={[st.coachTip, { backgroundColor: colors.surfaceTint }]}>
+                      <View style={st.coachTipHeader}>
+                        <Feather name="zap" size={14} color={colors.contentBrand} />
+                        <Text style={[st.coachTipTitle, { color: colors.contentPrimary }]}>Coach suggests</Text>
+                      </View>
+                      {monthly === 0 ? (
+                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
+                          To reach <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(target)}</Text> by {fmtDate(targetDate)}, save about{' '}
+                          <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(suggested)}/mo</Text>.
+                        </Text>
+                      ) : onTrack ? (
+                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
+                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, you'll hit your goal
+                          {projected > target
+                            ? <> with <Text style={{ fontFamily: Fonts.bold, color: '#2e7d32' }}>~${fmt(projected - target)} extra</Text></>
+                            : <> right on time</>
+                          }. Nice.
+                        </Text>
+                      ) : (
+                        <Text style={[st.coachTipBody, { color: colors.contentSecondary }]}>
+                          At <Text style={{ fontFamily: Fonts.bold, color: colors.contentPrimary }}>${fmt(monthly)}/mo</Text>, you'd be about{' '}
+                          <Text style={{ fontFamily: Fonts.bold, color: '#c62828' }}>${fmt(shortfall)} short</Text>.{' '}
+                          Try <Text style={{ fontFamily: Fonts.bold, color: colors.contentBrand }}>${fmt(suggested)}/mo</Text> or push the date out.
+                        </Text>
+                      )}
+                      {monthly === 0 && suggested > 0 && (
+                        <Pressable style={[st.coachTipBtn, { borderColor: colors.contentBrand }]} onPress={() => setMonthlyContribution(fmt(suggested))}>
+                          <Text style={[st.coachTipBtnText, { color: colors.contentBrand }]}>Use ${fmt(suggested)}/mo</Text>
+                        </Pressable>
+                      )}
+                      {!onTrack && monthly > 0 && suggested > 0 && (
+                        <Pressable style={[st.coachTipBtn, { borderColor: colors.contentBrand }]} onPress={() => setMonthlyContribution(fmt(suggested))}>
+                          <Text style={[st.coachTipBtnText, { color: colors.contentBrand }]}>Adjust to ${fmt(suggested)}/mo</Text>
+                        </Pressable>
+                      )}
+                    </View>
+                  )}
                 </>
               )}
             </ScrollView>
-            <View style={[s.footer, { paddingBottom: insets.bottom || 16 }]}>
+            <View style={[st.footer, { paddingBottom: insets.bottom || 16 }]}>
+              {isPayDown ? (
+                <Pressable
+                  style={[st.nextBtn, { backgroundColor: planPageValid ? colors.contentBrand : colors.contentDisabled }]}
+                  onPress={() => goToPage(4)}
+                  disabled={!planPageValid}
+                >
+                  <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  style={[st.nextBtn, { backgroundColor: planPageValid ? colors.contentBrand : colors.contentDisabled }]}
+                  onPress={goNext} disabled={!planPageValid}
+                >
+                  <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
+                </Pressable>
+              )}
+            </View>
+          </View>
+
+          {/* ─── Page 3: Account picker (save-up only, pay-down skips) ─── */}
+          <View style={[st.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <Text style={[st.title, { color: colors.contentPrimary }]}>Where should we save?</Text>
+              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
+                Pick the account to pull your monthly contribution from.
+              </Text>
+              <View style={st.accountOptions}>
+                {LINKED_ACCOUNTS.map(acct => {
+                  const sel = acct === linkedAccount;
+                  return (
+                    <Pressable key={acct} style={[st.accountRow, { backgroundColor: colors.surfaceElevated, borderColor: sel ? colors.contentPrimary : colors.surfaceEdge }, sel && { borderWidth: 2 }]} onPress={() => setLinkedAccount(acct)}>
+                      <View style={[st.radio, { borderColor: sel ? colors.contentPrimary : colors.contentMuted }]}>
+                        {sel && <View style={[st.radioFill, { backgroundColor: colors.contentPrimary }]} />}
+                      </View>
+                      <Text style={[st.accountLabel, { color: colors.contentPrimary }]}>{acct}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+            <View style={[st.footer, { paddingBottom: insets.bottom || 16 }]}>
               <Pressable
-                style={[s.nextBtn, { backgroundColor: (isPayDown ? monthly > 0 : accountPageValid) ? colors.contentBrand : colors.contentDisabled }]}
-                onPress={goNext}
-                disabled={isPayDown ? monthly <= 0 : !accountPageValid}
+                style={[st.nextBtn, { backgroundColor: accountPageValid ? colors.contentBrand : colors.contentDisabled }]}
+                onPress={goNext} disabled={!accountPageValid}
               >
-                <Text style={[s.nextBtnText, { color: '#fff' }]}>Next</Text>
+                <Text style={[st.nextBtnText, { color: '#fff' }]}>Next</Text>
               </Pressable>
             </View>
           </View>
 
           {/* ─── Page 4: Review ─── */}
-          <View style={[s.stepPage, { width: screenWidth }]}>
-            <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-              <Text style={[s.title, { color: colors.contentPrimary }]}>Review your goal</Text>
-              <Text style={[s.subtitle, { color: colors.contentSecondary }]}>
+          <View style={[st.stepPage, { width: screenWidth }]}>
+            <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false}>
+              <Text style={[st.title, { color: colors.contentPrimary }]}>Review your goal</Text>
+              <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
                 Everything look right? You can edit anytime.
               </Text>
-              <View style={[s.reviewCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
-                <View style={s.reviewHeader}>
-                  <View style={[s.reviewIconWrap, { backgroundColor: colors.surfaceTint }]}>
+              <View style={[st.reviewCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.surfaceEdge }]}>
+                <View style={st.reviewHeader}>
+                  <View style={[st.reviewIconWrap, { backgroundColor: colors.surfaceTint }]}>
                     <Feather name={isPayDown ? 'trending-down' : 'target'} size={20} color={colors.contentPrimary} />
                   </View>
-                  <View style={s.reviewHeaderText}>
-                    <Text style={[s.reviewName, { color: colors.contentPrimary }]}>{title || 'Untitled Goal'}</Text>
-                    <Text style={[s.reviewType, { color: colors.contentSecondary }]}>{GOAL_TYPE_DISPLAY[goalType]}</Text>
+                  <View style={st.reviewHeaderText}>
+                    <Text style={[st.reviewName, { color: colors.contentPrimary }]}>{title || 'Untitled Goal'}</Text>
+                    <Text style={[st.reviewType, { color: colors.contentSecondary }]}>{GOAL_TYPE_DISPLAY[goalType]}</Text>
                   </View>
                 </View>
-                <View style={[s.reviewDivider, { backgroundColor: colors.surfaceEdge }]} />
-                <View style={s.reviewRows}>
-                  <View style={s.reviewRow}>
-                    <Text style={[s.reviewLabel, { color: colors.contentSecondary }]}>{isPayDown ? 'Balance' : 'Target'}</Text>
-                    <Text style={[s.reviewValue, { color: colors.contentPrimary }]}>${fmt(target)}</Text>
+                <View style={[st.reviewDivider, { backgroundColor: colors.surfaceEdge }]} />
+                <View style={st.reviewRows}>
+                  <View style={st.reviewRow}>
+                    <Text style={[st.reviewLabel, { color: colors.contentSecondary }]}>{isPayDown ? 'Balance' : 'Target'}</Text>
+                    <Text style={[st.reviewValue, { color: colors.contentPrimary }]}>${fmt(target)}</Text>
                   </View>
-                  <View style={s.reviewRow}>
-                    <Text style={[s.reviewLabel, { color: colors.contentSecondary }]}>{isPayDown ? 'Payment' : 'Monthly'}</Text>
-                    <Text style={[s.reviewValue, { color: colors.contentPrimary }]}>${fmt(monthly)}/mo</Text>
+                  <View style={st.reviewRow}>
+                    <Text style={[st.reviewLabel, { color: colors.contentSecondary }]}>{isPayDown ? 'Payment' : 'Monthly'}</Text>
+                    <Text style={[st.reviewValue, { color: colors.contentPrimary }]}>${fmt(monthly)}/mo</Text>
                   </View>
-                  <View style={s.reviewRow}>
-                    <Text style={[s.reviewLabel, { color: colors.contentSecondary }]}>{isPayDown ? 'Debt-free by' : 'Timeline'}</Text>
-                    <Text style={[s.reviewValue, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
+                  <View style={st.reviewRow}>
+                    <Text style={[st.reviewLabel, { color: colors.contentSecondary }]}>{isPayDown ? 'Debt-free by' : 'Timeline'}</Text>
+                    <Text style={[st.reviewValue, { color: colors.contentPrimary }]}>{fmtDate(targetDate)}</Text>
                   </View>
-                  <View style={s.reviewRow}>
-                    <Text style={[s.reviewLabel, { color: colors.contentSecondary }]}>Account</Text>
-                    <Text style={[s.reviewValue, { color: colors.contentPrimary }]}>{linkedAccount || '—'}</Text>
+                  <View style={st.reviewRow}>
+                    <Text style={[st.reviewLabel, { color: colors.contentSecondary }]}>Account</Text>
+                    <Text style={[st.reviewValue, { color: colors.contentPrimary }]}>{linkedAccount || '—'}</Text>
                   </View>
                   {isPayDown && selectedDebt && debtEstimate?.withExtra && monthly > selectedDebt.minPayment && (
-                    <View style={[s.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
+                    <View style={[st.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
                       <Feather name="award" size={14} color="#2e7d32" />
-                      <Text style={[s.reviewSavingsText, { color: '#2e7d32' }]}>
+                      <Text style={[st.reviewSavingsText, { color: '#2e7d32' }]}>
                         Saving ${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withExtra.totalInterest)} in interest vs. minimum payments
                       </Text>
                     </View>
                   )}
                   {!isPayDown && onTrack && projected > target && (
-                    <View style={[s.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
+                    <View style={[st.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
                       <Feather name="check-circle" size={14} color="#2e7d32" />
-                      <Text style={[s.reviewSavingsText, { color: '#2e7d32' }]}>
+                      <Text style={[st.reviewSavingsText, { color: '#2e7d32' }]}>
                         On track with ~${fmt(projected - target)} extra by {fmtDate(targetDate)}
                       </Text>
                     </View>
@@ -747,12 +713,12 @@ export function GoalSetupSheet() {
                 </View>
               </View>
             </ScrollView>
-            <View style={[s.footer, { paddingBottom: insets.bottom || 16 }]}>
+            <View style={[st.footer, { paddingBottom: insets.bottom || 16 }]}>
               <Pressable
-                style={[s.nextBtn, { backgroundColor: reviewValid ? colors.contentBrand : colors.contentDisabled }]}
+                style={[st.nextBtn, { backgroundColor: reviewValid ? colors.contentBrand : colors.contentDisabled }]}
                 onPress={handleCreate} disabled={!reviewValid}
               >
-                <Text style={[s.nextBtnText, { color: '#fff' }]}>Create goal</Text>
+                <Text style={[st.nextBtnText, { color: '#fff' }]}>Create goal</Text>
               </Pressable>
             </View>
           </View>
@@ -763,7 +729,7 @@ export function GoalSetupSheet() {
   );
 }
 
-const s = StyleSheet.create({
+const st = StyleSheet.create({
   fullScreen: { ...StyleSheet.absoluteFillObject, zIndex: 200, overflow: 'hidden' },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingBottom: 4 },
   backBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
@@ -788,22 +754,16 @@ const s = StyleSheet.create({
   vaultIconWrap: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   vaultLabel: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 24, letterSpacing: -0.16, flex: 1 },
 
-  debtList: { gap: 12 },
-  debtCard: { borderRadius: 16, overflow: 'hidden', shadowColor: '#121211', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
-  debtCardTop: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 },
-  debtIconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  debtCardInfo: { flex: 1, gap: 2 },
-  debtName: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 22, letterSpacing: -0.16 },
-  debtBalance: { fontSize: 20, fontFamily: Fonts.bold, lineHeight: 26, letterSpacing: -0.3 },
-  debtCardDivider: { height: 1, marginHorizontal: 16 },
-  debtCardBottom: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
-  debtStat: { flex: 1, gap: 2 },
-  debtStatLabel: { fontSize: 11, fontFamily: Fonts.regular, textTransform: 'uppercase', letterSpacing: 0.5 },
-  debtStatValue: { fontSize: 14, fontFamily: Fonts.medium },
-  debtStatDivider: { width: 1, height: 28, marginHorizontal: 12 },
+  debtTabScroll: { marginBottom: 16 },
+  debtTabRow: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
+  debtTab: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, borderWidth: 1.5 },
+  debtTabLabel: { fontSize: 13, fontFamily: Fonts.medium },
 
-  linkedBadge: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, marginBottom: 20 },
-  linkedBadgeText: { fontSize: 13, fontFamily: Fonts.regular, flex: 1 },
+  debtDetail: { flexDirection: 'row', alignItems: 'center', borderRadius: 14, padding: 14, marginBottom: 20 },
+  debtDetailItem: { flex: 1, alignItems: 'center', gap: 2 },
+  debtDetailLabel: { fontSize: 11, fontFamily: Fonts.regular, textTransform: 'uppercase', letterSpacing: 0.5 },
+  debtDetailValue: { fontSize: 15, fontFamily: Fonts.bold },
+  debtDetailDiv: { width: 1, height: 28 },
 
   plannerCard: { borderRadius: 16, overflow: 'hidden', marginBottom: 16, shadowColor: '#121211', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   plannerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },
@@ -823,20 +783,10 @@ const s = StyleSheet.create({
   coachTipBtn: { alignSelf: 'flex-start', borderWidth: 1.5, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 7, marginTop: 10 },
   coachTipBtnText: { fontSize: 13, fontFamily: Fonts.bold },
 
-  estimateCard: { borderRadius: 16, padding: 16, marginBottom: 24, shadowColor: '#121211', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
-  estimateHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  estimateIconWrap: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  estimateTitle: { fontSize: 14, fontFamily: Fonts.bold, letterSpacing: -0.1 },
-  estimateBody: { fontSize: 14, fontFamily: Fonts.regular, lineHeight: 20, marginBottom: 12 },
-  estimateApply: { alignSelf: 'flex-start', borderWidth: 1.5, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, marginBottom: 4 },
-  estimateApplyText: { fontSize: 13, fontFamily: Fonts.bold },
-  projection: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 10 },
-  projectionText: { fontSize: 13, fontFamily: Fonts.medium, lineHeight: 18, flex: 1 },
-
-  debtCompare: { borderWidth: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 14 },
-  debtCompareRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 12 },
+  debtCompare: { borderWidth: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
+  dcRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10 },
   dcLabel: { fontSize: 13, fontFamily: Fonts.medium, flex: 1 },
-  dcValues: { alignItems: 'flex-end', gap: 2 },
+  dcRight: { alignItems: 'flex-end', gap: 2 },
   dcTime: { fontSize: 13, fontFamily: Fonts.medium },
   dcInterest: { fontSize: 12, fontFamily: Fonts.medium },
   dcDivider: { height: 1 },
