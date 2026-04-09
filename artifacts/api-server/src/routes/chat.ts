@@ -1,6 +1,8 @@
 import { Router, type IRouter, type Request } from "express";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
+const MODEL = process.env.AI_MODEL ?? "gpt-4o-mini";
+
 const router: IRouter = Router();
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -518,7 +520,7 @@ router.post("/chat", async (req, res) => {
     ];
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: MODEL,
       messages,
       max_completion_tokens: 8192,
     }, { timeout: 45_000 });
@@ -571,7 +573,7 @@ router.post("/chat/stream", async (req, res) => {
     }, 60_000);
 
     const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: MODEL,
       messages,
       max_completion_tokens: 8192,
       stream: true,
@@ -621,7 +623,7 @@ router.post("/title", async (req, res) => {
     }));
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: MODEL,
       messages: [
         {
           role: "system",

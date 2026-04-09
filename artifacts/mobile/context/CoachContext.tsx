@@ -25,6 +25,9 @@ export interface ChatSession {
 }
 
 function getApiBaseUrl(): string {
+  // Explicit full URL override — useful for local dev (e.g. http://localhost:3001/api)
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (apiUrl) return apiUrl;
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
   if (domain) return `https://${domain}/api`;
   return '/api';
