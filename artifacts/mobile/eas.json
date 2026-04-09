@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "promptToConfigurePushNotifications": false
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {}
+  },
+  "update": {
+    "production": {
+      "channel": "production",
+      "environment": "production"
+    },
+    "preview": {
+      "channel": "preview",
+      "environment": "preview"
+    }
+  }
+}

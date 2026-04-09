@@ -9,6 +9,8 @@
     "dev:web": "EXPO_PUBLIC_API_URL=http://localhost:3001/api pnpm exec expo start --web",
     "build": "node scripts/build.js",
     "build:web": "pnpm exec expo export --platform web",
+    "update": "eas update --auto",
+    "update:preview": "eas update --branch preview --message \"preview\"",
     "serve": "node server/serve.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
