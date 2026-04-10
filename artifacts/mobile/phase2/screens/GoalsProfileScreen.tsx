@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { Fonts } from '../constants/fonts';
 import { useCoach } from '../context/CoachContext';
 import { usePhase2Nav } from '../context/Phase2NavContext';
 import { AppBar } from '../components/AppBar';
-import { GoalCard, SuggestedGoalCard } from '../components/GoalsDashboard';
+import { GoalCard, SuggestedGoalCard, SegmentedTabs } from '../components/GoalsDashboard';
 import { GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER } from '../constants/types';
 
 export default function GoalsProfileScreen() {
@@ -18,7 +18,7 @@ export default function GoalsProfileScreen() {
   const allGoals = goals.filter(g => g.status !== 'DRAFT');
   const draftGoals = goals.filter(g => g.status === 'DRAFT');
 
-  const tabCounts: Record<GoalTabCategory, number> = { 'save-up': 0, 'pay-down': 0, 'investment': 0 };
+  const tabCounts: Record<GoalTabCategory, number> = { 'save-up': 0, 'pay-off': 0, 'investment': 0 };
   goals.forEach(g => { tabCounts[GOAL_TAB_MAP[g.type]]++; });
 
   const tabs = GOAL_TAB_ORDER.map(key => ({
@@ -35,7 +35,15 @@ export default function GoalsProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar variant="back" title="Goals" onBack={() => goBack()} />
+      <AppBar
+        variant="back"
+        title="Goals"
+        onBack={() => goBack()}
+        rightActions={[{
+          icon: <Feather name="plus" size={22} color={colors.contentPrimary} />,
+          onPress: () => navigate('chat'),
+        }]}
+      />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {!hasAny ? (
@@ -47,32 +55,7 @@ export default function GoalsProfileScreen() {
           </View>
         ) : (
           <>
-            <View style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack, borderColor: colors.progressTrack }]}>
-              {tabs.map((tab) => {
-                const isActive = tab.key === activeTab;
-                return (
-                  <Pressable
-                    key={tab.key}
-                    style={[
-                      styles.segmentedTab,
-                      isActive && [styles.segmentedTabActive, { backgroundColor: colors.surfaceElevated }],
-                    ]}
-                    onPress={() => setActiveTab(tab.key)}
-                  >
-                    <Text
-                      style={[
-                        styles.segmentedTabText,
-                        { color: colors.contentSecondary },
-                        isActive && { color: colors.contentPrimary },
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {tab.label} {'\u2022'} {tab.count}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            <SegmentedTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
             {draftGoals.length > 0 && draftGoals.some(g => GOAL_TAB_MAP[g.type] === activeTab) && (
               <>
@@ -120,34 +103,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 20,
     gap: 16,
-  },
-  segmentedContainer: {
-    flexDirection: 'row',
-    borderRadius: 24,
-    borderWidth: 2,
-    height: 40,
-    alignItems: 'center',
-    padding: 0,
-  },
-  segmentedTab: {
-    flex: 1,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 24,
-  },
-  segmentedTabActive: {
-    shadowColor: 'rgba(0,0,0,0.06)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  segmentedTabText: {
-    fontSize: 12,
-    fontFamily: Fonts.medium,
-    letterSpacing: 0.1,
-    textAlign: 'center',
   },
   sectionHeader: {
     flexDirection: 'row',

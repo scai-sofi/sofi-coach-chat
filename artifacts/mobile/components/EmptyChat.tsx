@@ -20,9 +20,9 @@ const SPHERE_H = 86;
 const SHADOW_H = ORB_H - SPHERE_H;
 
 const SUGGESTIONS = [
-  { label: 'Support', text: 'I need help with my SoFi account.', type: 'full' as const },
+  { label: 'Support', text: 'I need help with my SoFi account', type: 'full' as const },
   { label: 'Credit score', text: 'Why did my credit score change?', type: 'half' as const },
-  { label: 'Spending', text: 'Review monthly spending.', type: 'half' as const },
+  { label: 'Spending', text: 'Review monthly spending', type: 'half' as const },
 ];
 
 export function EmptyChat() {

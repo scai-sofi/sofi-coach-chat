@@ -23,7 +23,7 @@ import { PERSONAS, PERSONA_ORDER } from '../constants/personas';
 import { Persona } from '../constants/types';
 
 const CARD_STAGGER_MS = 100;
-const SPRING_ENTER = { damping: 12, stiffness: 100, mass: 0.9 };
+const SPRING_ENTER = { damping: 24, stiffness: 90, mass: 0.9 };
 
 function darkenHex(hex: string, amount: number): string {
   const c = hex.replace('#', '');
@@ -67,9 +67,9 @@ function AvatarCard({
     enterScale.value = withDelay(delay, withSpring(1, SPRING_ENTER));
     enterOpacity.value = withDelay(delay, withTiming(1, { duration: 300 }));
     enterY.value = withDelay(delay, withSpring(0, SPRING_ENTER));
-    enterRotate.value = withDelay(delay, withSpring(0, { damping: 8, stiffness: 80, mass: 1 }));
+    enterRotate.value = withDelay(delay, withSpring(0, { damping: 22, stiffness: 70, mass: 1 }));
 
-    shadowScale.value = withDelay(delay + 200, withSpring(1, { damping: 14, stiffness: 90 }));
+    shadowScale.value = withDelay(delay + 200, withSpring(1, { damping: 24, stiffness: 80 }));
 
     const floatDelay = delay + 600;
     const period = 4200 + (index % 3) * 600;

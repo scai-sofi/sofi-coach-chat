@@ -26,7 +26,7 @@ This document covers two distinct but tightly interconnected features. They can 
 
 ### Feature 2 — Goals
 
-- **What it is:** A structured goal-tracking system surfaced through Coach Chat and accessible from app Settings. Members set financial goals (save up, pay down, invest toward a target), and Coach tracks progress against real account data, surfaces proactive alerts when goals are at risk, and celebrates milestones.
+- **What it is:** A structured goal-tracking system surfaced through Coach Chat and accessible from app Settings. Members set financial goals (save up, pay off debt, invest toward a target), and Coach tracks progress against real account data, surfaces proactive alerts when goals are at risk, and celebrates milestones.
 - **Core value:** Goals give Coach's responses a persistent target to aim at. Without goals, Coach answers questions. With goals, Coach connects every answer to something the member actually cares about.
 - **Access:** Goals can be created and reviewed from Coach Chat (conversational, contextual) and from app Settings (direct, structured). This dual entry point ensures goals are reachable even for members who don't regularly use Coach Chat. **Save Up goals are directly linked to SoFi Banking's existing Vault feature** — creating a Save Up goal either connects to an existing Vault or prompts the member to create one, making the goal tangible and actionable rather than abstract tracking.
 - **Who it's for:** Members with a specific financial intention — an emergency fund, a debt payoff plan, a savings target — who want accountability and progress visibility without leaving the app.
@@ -345,13 +345,17 @@ Two entry points: a new item under the "more menu" icon in the chat header, and 
 
 **Goal types:**
 
+There are three user-facing goal categories, each mapping to a dashboard tab. `CUSTOM` is a sub-type of Save up (flexible target with a user-defined name, no vault auto-link). `INVESTMENT` tracks contributions toward a brokerage or retirement account target.
 
-| Goal type        | Internal key       | Label     |
-| ---------------- | ------------------ | --------- |
-| Emergency Fund   | `EMERGENCY_FUND`   | Save Up   |
-| Debt Payoff      | `DEBT_PAYOFF`      | Pay Down  |
-| Savings Target   | `SAVINGS_TARGET`   | Save Up   |
-| Custom           | `CUSTOM`           | Custom    |
+| Goal type        | Internal key       | User-facing tab | Notes |
+| ---------------- | ------------------ | --------------- | ----- |
+| Emergency Fund   | `EMERGENCY_FUND`   | **Save up**     | Linked to SoFi Savings Vault |
+| Savings Target   | `SAVINGS_TARGET`   | **Save up**     | Named savings goal; Vault optional |
+| Custom           | `CUSTOM`           | **Save up**     | Free-form goal, user-defined name |
+| Debt Payoff      | `DEBT_PAYOFF`      | **Pay off**     | Tracks amount paid down against original balance |
+| Investment       | `INVESTMENT`       | **Investment**  | Tracks contributions toward a brokerage/IRA target |
+
+Tab order in Goals Dashboard: **Save up → Pay off → Investment**.
 
 ---
 

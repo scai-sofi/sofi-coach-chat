@@ -42,7 +42,7 @@ export const EMERGENCY_FUND_GOAL: Goal = {
 export const CREDIT_CARD_GOAL: Goal = {
   id: 'goal-cc',
   type: 'DEBT_PAYOFF',
-  title: 'Credit Card Payoff',
+  title: 'Credit Card',
   targetAmount: 4200,
   currentAmount: 2940,
   targetDate: daysFromNow(120),
@@ -53,6 +53,27 @@ export const CREDIT_CARD_GOAL: Goal = {
   milestones: makeMilestones([25, 50], [45, 12, 0, 0]),
   linkedAccount: 'SoFi Credit Card',
   createdAt: daysAgo(75),
+};
+
+export const WEDDING_GOAL: Goal = {
+  id: 'goal-wedding',
+  type: 'SAVINGS_TARGET',
+  title: 'Wedding',
+  targetAmount: 15000,
+  currentAmount: 0,
+  targetDate: daysFromNow(548),
+  monthlyContributionTarget: 650,
+  actualMonthlyContribution: 0,
+  status: 'DRAFT',
+  confidenceScore: 0.88,
+  milestones: [
+    { id: 'wm1', label: '25%', targetPct: 25, reached: false },
+    { id: 'wm2', label: '50%', targetPct: 50, reached: false },
+    { id: 'wm3', label: '75%', targetPct: 75, reached: false },
+    { id: 'wm4', label: '100%', targetPct: 100, reached: false },
+  ],
+  linkedAccount: 'SoFi Money',
+  createdAt: daysAgo(0),
 };
 
 function buildScenarios(): Scenario[] {
@@ -79,13 +100,13 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: 'I want to pay off the credit card first, then start investing', timestamp: new Date(now.getTime() - 180000) },
         {
-          id: uid(), role: 'ai', content: "**Smart prioritization — debt first, then invest.**\n\nThat's a solid approach. Clearing the credit card at 22.99% APR is effectively a guaranteed 23% return on every dollar you put toward it. No investment can promise that.\n\n**Your Payoff Plan — Balanced (10 months)**\n• **Monthly payment:** $420\n• **Total interest paid:** ~$380\n• **Paid off by:** " + new Date(Date.now() + 300 * 86400000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + "\n• **Monthly cash freed after payoff:** $420 → straight into investing\n\n**After the Card Is Gone**\nWith $420/month freed up plus your existing savings capacity, you could be investing $600+/month — that compounds fast. I can help you set up an automated investment plan when you're ready.\n\nWant me to set this up as a goal so we can track progress together?",
+          id: uid(), role: 'ai', content: "**Smart prioritization — debt first, then invest.**\n\nThat's a solid approach. Clearing the credit card at 22.99% APR eliminates high-cost interest — the math typically favors paying off high-rate debt before investing. No savings or investment account currently matches that rate.\n\n**Your Payoff Plan — Balanced (10 months)**\n• **Monthly payment:** $420\n• **Total interest paid:** ~$380\n• **Paid off by:** " + new Date(Date.now() + 300 * 86400000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + "\n• **Monthly cash freed after payoff:** $420 → straight into investing\n\n**After the Card Is Gone**\nWith $420/month freed up plus your existing savings capacity, you could be investing $600+/month — that compounds fast. I can help you set up an automated investment plan when you're ready.\n\nWant me to set this up as a goal so we can track progress together?",
           timestamp: new Date(now.getTime() - 170000),
           memoryProposal: { id: uid(), content: 'Wants to pay off credit card before starting investments', category: 'PRIORITIES' },
           goalProposal: {
             id: uid(),
             type: 'DEBT_PAYOFF',
-            title: 'Credit Card Payoff',
+            title: 'Credit Card',
             targetAmount: 4200,
             targetDate: daysFromNow(300),
             monthlyContribution: 420,
@@ -136,7 +157,7 @@ function buildScenarios(): Scenario[] {
         ...SHARED_MEMORIES,
         { id: 'mem-rm-1', category: 'ABOUT_ME', content: 'Annual income is $145,000', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
       ],
-      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
+      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }, { ...WEDDING_GOAL }],
     },
     {
       id: 'memory-lifecycle',

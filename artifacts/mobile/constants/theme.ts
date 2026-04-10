@@ -1,3 +1,5 @@
+import { pacificLight, pacificDark, pacificPrimitives } from './pacificTokens';
+
 export interface AppTheme {
   surfaceBase: string;
   surfaceElevated: string;
@@ -53,109 +55,163 @@ export interface AppTheme {
 }
 
 export const lightTheme: AppTheme = {
-  surfaceBase: '#faf8f5',
-  surfaceElevated: '#ffffff',
-  surfaceTint: '#f0ede8',
-  surfaceEdge: 'rgba(10,10,10,0.10)',
-  surfaceEdgeLight: 'rgba(10,10,10,0.05)',
-  surfaceMuted: '#f5f3f0',
-  contentPrimary: '#1a1919',
-  contentPrimaryInverse: '#ffffff',
-  contentSecondary: '#706f6e',
-  contentBone600: '#5c5b5a',
-  contentStatusbar: '#0a0a0a',
-  contentMuted: '#d0ccc5',
-  contentDimmed: '#bdbbb9',
-  contentDisabled: '#dbdad7',
-  contentDisabled2: '#bdbbb9',
-  danger: '#fa2d25',
-  dangerLight: '#ef4444',
-  dangerChipText: '#dc2626',
-  dangerChipBg: '#fee2e2',
-  success: '#22c55e',
-  successDark: '#16a34a',
-  successBg: '#dcfce7',
-  successBorder: '#bbf7d0',
-  successBgLight: '#f0fdf4',
-  warning: '#b45309',
-  warningBg: '#fef3c7',
-  info: '#2563eb',
-  infoBg: '#dbeafe',
-  progressTrack: '#e5e1da',
-  frameBg: '#e8e4de',
-  contentBrand: '#00a2c7',
-  surfaceToast: '#0f0f0f',
-  toastText: '#ffffff',
-  toastAction: '#32b7d9',
-  shadowColor: 'rgba(10,10,10,0.16)',
-  shadowEdge: 'rgba(10,10,10,0.06)',
-  scrimBackdrop: 'rgba(0,0,0,0.35)',
-  scrimHeavy: 'rgba(0,0,0,0.4)',
-  whiteOnDark: '#ffffff',
-  selectionColor: '#5c5b5a',
-  shimmerBase: '#c4a882',
-  shimmerTarget: '#00a2c7',
-  borderSubtle: 'rgba(10,10,10,0.08)',
-  borderMedium: 'rgba(10,10,10,0.20)',
-  inverseAlpha60: 'rgba(255,255,255,0.6)',
-  inverseAlpha20: 'rgba(255,255,255,0.2)',
-  chipUnselectedBg: '#ffffff',
-  chipUnselectedBorder: '#dbdad7',
-  chipSelectedBg: '#1a1919',
-  surfaceTip: '#edf8fc',
-  contentTip: '#006280',
+  // Backgrounds
+  surfaceBase:          pacificLight.surfaceBase,             // bone50   #faf8f5
+  surfaceElevated:      pacificLight.surfaceElevatedDefault,  // bone0    #ffffff
+  surfaceTint:          pacificLight.surfaceElevatedDisabled, // bone150  #f0eeeb
+  surfaceEdge:          pacificLight.strokeDividePrimary,     // rgba(10,10,10,0.10)
+  surfaceEdgeLight:     pacificLight.surfaceElevatedHover,    // rgba(10,10,10,0.04)
+  surfaceMuted:         pacificLight.surfaceInfoLabel,        // bone100  #f5f3f0
+
+  // Content
+  contentPrimary:        pacificLight.contentPrimaryDefault,  // bone850  #1a1919
+  contentPrimaryInverse: pacificLight.contentPrimaryInverse,  // bone0    #ffffff
+  contentSecondary:      pacificLight.contentSecondary,       // bone550  #706f6e
+  contentBone600:        pacificLight.contentIndicatorUnselected, // bone600 #5c5b5a
+  contentStatusbar:      pacificLight.contentStatusBar,       // bone1000 #0a0a0a
+  contentMuted:          pacificPrimitives.bone300,           // #cccac8 — no exact semantic, closest neutral
+  contentDimmed:         pacificLight.contentDisabled2,       // bone350  #bdbbb9
+  contentDisabled:       pacificLight.contentDisabled,        // bone250  #dbdad7
+  contentDisabled2:      pacificLight.contentDisabled2,       // bone350  #bdbbb9
+
+  // Danger / Error
+  danger:          pacificLight.contentDanger,          // red600  #fa2d25
+  dangerLight:     pacificLight.contentDanger,          // red600  #fa2d25 (was Tailwind #ef4444)
+  dangerChipText:  pacificLight.contentDangerEmphasized,// red650  #cd251e (was Tailwind #dc2626)
+  dangerChipBg:    pacificLight.surfaceDangerDefault,   // red50   #ffe5e5 (was Tailwind #fee2e2)
+
+  // Success
+  success:         pacificLight.contentSuccess,         // green550 #1bc245 (was Tailwind #22c55e)
+  successDark:     pacificLight.buttonSuccess,          // green600 #19a623 (was Tailwind #16a34a)
+  successBg:       pacificLight.surfaceSuccessDefault,  // green50  #ebf9ee (was Tailwind #dcfce7)
+  successBorder:   pacificLight.strokePositiveDefault,  // green550 #1bc245 (was Tailwind #bbf7d0)
+  successBgLight:  pacificLight.surfaceSuccessDefault,  // green50  #ebf9ee (was Tailwind #f0fdf4)
+
+  // Warning / Caution
+  warning:    pacificLight.contentCaution,      // yellow600 #8c6914 (was Tailwind #b45309)
+  warningBg:  pacificLight.surfaceCautionDefault,// yellow50  #fff5e5 (was Tailwind #fef3c7)
+
+  // Info / Tip
+  info:    pacificLight.contentBrand,     // blue550  #00a2c7 (was Tailwind #2563eb)
+  infoBg:  pacificLight.surfaceTipDefault,// blue50   #edf8fc (was Tailwind #dbeafe)
+
+  // Structural
+  progressTrack:   pacificLight.surfaceSwitchUnselectedHover, // bone200 #e5e4e1 (was #e5e1da)
+  frameBg:         pacificLight.surfaceSwitchUnselectedHover, // bone200 #e5e4e1 (was #e8e4de)
+
+  // Brand
+  contentBrand: pacificLight.contentBrand,   // blue550 #00a2c7
+
+  // Toast
+  surfaceToast: pacificLight.surfaceToast,   // bone950 #0f0f0f
+  toastText:    pacificLight.contentOnDark,  // bone0   #ffffff
+  toastAction:  pacificLight.buttonBrandDefaultInverse, // blue500 #32b7d9
+
+  // Shadows / overlays
+  shadowColor:    'rgba(10,10,10,0.16)',
+  shadowEdge:     'rgba(10,10,10,0.06)',
+  scrimBackdrop:  pacificLight.surfaceScrim, // rgba(10,10,10,0.50)
+  scrimHeavy:     pacificLight.surfaceScrim, // rgba(10,10,10,0.50)
+
+  // Misc
+  whiteOnDark:     pacificLight.contentOnDark,           // #ffffff
+  selectionColor:  pacificLight.contentIndicatorUnselected, // bone600 #5c5b5a
+  shimmerBase:     pacificPrimitives.bone300,            // #cccac8 — warm neutral shimmer base
+  shimmerTarget:   pacificLight.contentBrand,            // blue550 #00a2c7
+
+  // Borders (semi-transparent)
+  borderSubtle:    pacificLight.surfaceElevatedPressed,  // rgba(10,10,10,0.08)
+  borderMedium:    'rgba(10,10,10,0.20)',
+  inverseAlpha60:  'rgba(255,255,255,0.6)',
+  inverseAlpha20:  'rgba(255,255,255,0.2)',
+
+  // Chips
+  chipUnselectedBg:      pacificLight.surfaceElevatedDefault, // bone0   #ffffff
+  chipUnselectedBorder:  pacificLight.strokeIndicatorUnselectedDefault, // bone250 #dbdad7
+  chipSelectedBg:        pacificLight.surfaceElevatedSelected, // bone850 #1a1919
+
+  // Tip
+  surfaceTip:  pacificLight.surfaceTipDefault, // blue50  #edf8fc
+  contentTip:  pacificLight.contentTip,        // blue650 #006280
 };
 
 export const darkTheme: AppTheme = {
-  surfaceBase: '#0a0a0a',
-  surfaceElevated: '#1a1919',
-  surfaceTint: '#242323',
-  surfaceEdge: 'rgba(250,248,245,0.10)',
-  surfaceEdgeLight: 'rgba(250,248,245,0.05)',
-  surfaceMuted: '#242323',
-  contentPrimary: '#faf8f5',
-  contentPrimaryInverse: '#0a0a0a',
-  contentSecondary: '#858482',
-  contentBone600: '#adacaa',
-  contentStatusbar: '#ffffff',
-  contentMuted: '#4d4c4b',
-  contentDimmed: '#585756',
-  contentDisabled: '#3a3938',
-  contentDisabled2: '#585756',
-  danger: '#fa2d25',
-  dangerLight: '#fb4a43',
-  dangerChipText: '#fa2d25',
-  dangerChipBg: '#352120',
-  success: '#1bc245',
-  successDark: '#1bc245',
-  successBg: '#102916',
-  successBorder: '#102916',
-  successBgLight: '#102916',
-  warning: '#ffcc00',
-  warningBg: '#353320',
-  info: '#65cae5',
-  infoBg: '#002638',
-  progressTrack: '#3d3d3c',
-  frameBg: '#242323',
-  contentBrand: '#32b7d9',
-  surfaceToast: '#3d3d3c',
-  toastText: '#faf8f5',
-  toastAction: '#32b7d9',
-  shadowColor: 'rgba(0,0,0,0.40)',
-  shadowEdge: 'rgba(0,0,0,0.20)',
-  scrimBackdrop: 'rgba(0,0,0,0.55)',
-  scrimHeavy: 'rgba(0,0,0,0.65)',
-  whiteOnDark: '#ffffff',
-  selectionColor: '#adacaa',
-  shimmerBase: '#8c6914',
-  shimmerTarget: '#32b7d9',
-  borderSubtle: 'rgba(250,248,245,0.08)',
-  borderMedium: 'rgba(250,248,245,0.20)',
-  inverseAlpha60: 'rgba(0,0,0,0.6)',
-  inverseAlpha20: 'rgba(0,0,0,0.2)',
-  chipUnselectedBg: '#1a1919',
-  chipUnselectedBorder: '#4d4c4b',
-  chipSelectedBg: '#ffffff',
-  surfaceTip: '#0d2a33',
-  contentTip: '#5cc8e4',
+  // Backgrounds
+  surfaceBase:          pacificDark.surfaceBase,             // bone1000 #0a0a0a
+  surfaceElevated:      pacificDark.surfaceElevatedDefault,  // bone850  #1a1919
+  surfaceTint:          pacificDark.surfaceInfoDefault,      // bone800  #242323
+  surfaceEdge:          'rgba(250,248,245,0.10)',
+  surfaceEdgeLight:     'rgba(250,248,245,0.05)',
+  surfaceMuted:         pacificDark.surfaceInfoDefault,      // bone800  #242323
+
+  // Content
+  contentPrimary:        pacificDark.contentPrimaryDefault,  // bone50   #faf8f5
+  contentPrimaryInverse: pacificDark.contentPrimaryInverse,  // bone1000 #0a0a0a
+  contentSecondary:      pacificDark.contentSecondary,       // bone500  #858482
+  contentBone600:        pacificPrimitives.bone400,          // #adacaa  — no semantic, raw primitive
+  contentStatusbar:      pacificDark.contentStatusBar,       // bone0    #ffffff
+  contentMuted:          pacificPrimitives.bone650,          // #4d4c4b  — no semantic, raw primitive
+  contentDimmed:         pacificPrimitives.bone650,          // #4d4c4b  (was #585756, off-palette)
+  contentDisabled:       pacificDark.contentDisabled,        // bone700  #3d3d3c (was #3a3938, off-palette)
+  contentDisabled2:      pacificPrimitives.bone650,          // #4d4c4b  (was #585756, off-palette)
+
+  // Danger / Error
+  danger:          pacificDark.contentDanger,          // red600 #fa2d25
+  dangerLight:     pacificPrimitives.red550,           // #fb4a43 contentChart5
+  dangerChipText:  pacificDark.contentDanger,          // red600 #fa2d25
+  dangerChipBg:    pacificDark.surfaceDangerDefault,   // red850 #352120
+
+  // Success
+  success:         pacificDark.contentSuccess,         // green550 #1bc245
+  successDark:     pacificDark.contentSuccess,         // green550 #1bc245
+  successBg:       pacificDark.surfaceSuccessDefault,  // green900 #102916
+  successBorder:   pacificDark.surfaceSuccessDefault,  // green900 #102916
+  successBgLight:  pacificDark.surfaceSuccessDefault,  // green900 #102916
+
+  // Warning / Caution
+  warning:    pacificDark.contentCaution,       // yellow350 #ffcc00
+  warningBg:  pacificDark.surfaceCautionDefault,// yellow800 #353320
+
+  // Info / Tip
+  info:    pacificDark.contentTip,        // blue450 #65cae5
+  infoBg:  pacificDark.surfaceTipDefault, // blue900 #002638
+
+  // Structural
+  progressTrack:  pacificDark.buttonNeutralDisabled,          // bone700 #3d3d3c
+  frameBg:        pacificDark.surfaceInfoDefault,             // bone800 #242323
+
+  // Brand
+  contentBrand: pacificDark.contentBrand, // blue500 #32b7d9
+
+  // Toast
+  surfaceToast: pacificDark.surfaceToast,  // bone700 #3d3d3c
+  toastText:    pacificDark.contentPrimaryDefault, // bone50 #faf8f5
+  toastAction:  pacificDark.buttonBrandDefaultInverse, // blue500 #32b7d9
+
+  // Shadows / overlays
+  shadowColor:    'rgba(0,0,0,0.40)',
+  shadowEdge:     'rgba(0,0,0,0.20)',
+  scrimBackdrop:  pacificDark.surfaceScrim, // rgba(10,10,10,0.70)
+  scrimHeavy:     pacificDark.surfaceScrim, // rgba(10,10,10,0.70)
+
+  // Misc
+  whiteOnDark:     pacificDark.contentOnDark,                // #ffffff
+  selectionColor:  pacificPrimitives.bone400,                // #adacaa
+  shimmerBase:     pacificPrimitives.yellow600,              // #8c6914 contentCaution — warm shimmer
+  shimmerTarget:   pacificDark.contentBrand,                 // blue500 #32b7d9
+
+  // Borders (semi-transparent)
+  borderSubtle:    pacificDark.surfaceElevatedPressed,       // rgba(255,255,255,0.08)
+  borderMedium:    'rgba(250,248,245,0.20)',
+  inverseAlpha60:  'rgba(0,0,0,0.6)',
+  inverseAlpha20:  'rgba(0,0,0,0.2)',
+
+  // Chips
+  chipUnselectedBg:      pacificDark.surfaceElevatedDefault,          // bone850 #1a1919
+  chipUnselectedBorder:  pacificPrimitives.bone650,                   // #4d4c4b
+  chipSelectedBg:        pacificDark.surfaceElevatedSelected,         // bone0   #ffffff
+
+  // Tip
+  surfaceTip:  pacificDark.surfaceTipDefault, // blue900 #002638 (was #0d2a33, off-palette)
+  contentTip:  pacificDark.contentTip,        // blue450 #65cae5 (was #5cc8e4, off-palette)
 };

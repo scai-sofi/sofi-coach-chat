@@ -104,7 +104,7 @@ function ReactionButton({
       RNAnimated.parallel([
         RNAnimated.spring(scaleAnim, {
           toValue: 1,
-          friction: 4,
+          friction: 14,
           tension: 300,
           useNativeDriver: true,
         }),
@@ -117,7 +117,7 @@ function ReactionButton({
           }),
           RNAnimated.spring(rotateAnim, {
             toValue: 0,
-            friction: 5,
+            friction: 10,
             tension: 180,
             useNativeDriver: true,
           }),
@@ -209,7 +209,7 @@ export function ActionFooter({ message }: { message: Message }) {
         />
         {message.provenance && (
           <Pressable style={[styles.actionBtn, { marginLeft: 4, flexDirection: 'row', gap: 4 }]} onPress={() => setShowProvenance(!showProvenance)}>
-            <Text style={{ fontSize: 12, color: colors.contentSecondary, fontFamily: Fonts.regular }}>Why this?</Text>
+            <Text style={{ fontSize: 12, color: colors.contentSecondary, fontFamily: Fonts.regular }}>See sources</Text>
             <Feather name={showProvenance ? 'chevron-up' : 'chevron-down'} size={12} color={colors.contentSecondary} />
           </Pressable>
         )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Image, ImageSourcePropType, Platform, UIManager } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Animated, {
@@ -8,6 +8,7 @@ import Animated, {
   withSpring,
   withTiming,
   withDelay,
+  withSequence,
   interpolate,
   Easing,
   runOnJS,
@@ -26,6 +27,11 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 const goalHouseImg = require('../assets/images/goal-house.png');
 const goalPagodaImg = require('../assets/images/goal-pagoda.png');
+const goalWeddingImg = require('../assets/images/goal-wedding.png');
+
+const GOAL_TITLE_ILLUSTRATIONS: Record<string, ImageSourcePropType> = {
+  Wedding: goalWeddingImg,
+};
 
 const GOAL_ILLUSTRATIONS: Partial<Record<GoalType, ImageSourcePropType>> = {
   EMERGENCY_FUND: goalHouseImg,
@@ -215,7 +221,7 @@ function GoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
   const isCompleted = goal.status === 'COMPLETED';
   const tabCategory = GOAL_TAB_MAP[goal.type];
   const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
-  const illustration = GOAL_ILLUSTRATIONS[goal.type];
+  const illustration = GOAL_TITLE_ILLUSTRATIONS[goal.title] ?? GOAL_ILLUSTRATIONS[goal.type];
 
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
   const estDate = goal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -331,10 +337,48 @@ function SuggestedGoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) 
 
   const staggerDelay = index * 120;
 
+  // Shared values for manual exit animation
+  const cardOpacity = useSharedValue(1);
+  const cardScale = useSharedValue(1);
+  const cardTranslateY = useSharedValue(0);
+  const [busy, setBusy] = useState(false);
+
+  const cardExitStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [
+      { scale: cardScale.value },
+      { translateY: cardTranslateY.value },
+    ],
+  }));
+
+  // "Set up goal" — card briefly lifts (micro-confirm), then fades upward
+  const handleAccept = useCallback(() => {
+    if (busy) return;
+    setBusy(true);
+    // Quick pop up to 1.02, then shrink-and-rise as opacity fades
+    cardScale.value = withSequence(
+      withSpring(1.02, { damping: 18, stiffness: 500 }),
+      withDelay(60, withTiming(0.94, { duration: 220, easing: Easing.out(Easing.quad) }))
+    );
+    cardOpacity.value = withDelay(80, withTiming(0, { duration: 200, easing: Easing.out(Easing.quad) }));
+    cardTranslateY.value = withDelay(60, withTiming(-10, { duration: 240, easing: Easing.out(Easing.quad) }));
+    setTimeout(() => acceptDraftGoal(goal.id), 300);
+  }, [goal.id, acceptDraftGoal, busy]);
+
+  // "Dismiss" — card shrinks and fades downward (dropped)
+  const handleDismiss = useCallback(() => {
+    if (busy) return;
+    setBusy(true);
+    cardOpacity.value = withTiming(0, { duration: 180, easing: Easing.out(Easing.quad) });
+    cardScale.value = withTiming(0.95, { duration: 180, easing: Easing.out(Easing.quad) });
+    cardTranslateY.value = withTiming(8, { duration: 180, easing: Easing.out(Easing.quad) });
+    setTimeout(() => dismissDraftGoal(goal.id), 200);
+  }, [goal.id, dismissDraftGoal, busy]);
+
   return (
     <Animated.View
       entering={FadeInDown.delay(staggerDelay).duration(500).springify().damping(18).stiffness(100).reduceMotion(ReduceMotion.System)}
-      style={[styles.suggestedCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.contentBrand, shadowColor: colors.shadowColor }]}
+      style={[styles.suggestedCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.contentBrand, shadowColor: colors.shadowColor }, cardExitStyle]}
     >
       <View style={styles.suggestedLabelRow}>
         <View style={[styles.suggestedBadge, { backgroundColor: colors.surfaceTint }]}>
@@ -353,10 +397,10 @@ function SuggestedGoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) 
       </View>
 
       <View style={styles.actionButtons}>
-        <AnimatedButton style={[styles.editButton, { borderColor: colors.surfaceEdge }]} onPress={() => dismissDraftGoal(goal.id)}>
+        <AnimatedButton style={[styles.editButton, { borderColor: colors.surfaceEdge }]} onPress={handleDismiss}>
           <Text style={[styles.editButtonText, { color: colors.contentSecondary }]}>Dismiss</Text>
         </AnimatedButton>
-        <AnimatedButton style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]} onPress={() => acceptDraftGoal(goal.id)}>
+        <AnimatedButton style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]} onPress={handleAccept}>
           <Text style={[styles.setupButtonText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
         </AnimatedButton>
       </View>
@@ -372,7 +416,7 @@ export function GoalsDashboard() {
   const allGoals = goals.filter(g => g.status !== 'DRAFT');
   const draftGoals = goals.filter(g => g.status === 'DRAFT');
 
-  const tabCounts: Record<GoalTabCategory, number> = { 'save-up': 0, 'pay-down': 0, 'investment': 0 };
+  const tabCounts: Record<GoalTabCategory, number> = { 'save-up': 0, 'pay-off': 0, 'investment': 0 };
   goals.forEach(g => { tabCounts[GOAL_TAB_MAP[g.type]]++; });
 
   const tabs = GOAL_TAB_ORDER.map(key => ({
@@ -602,15 +646,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    backgroundColor: '#edf8fc',
+    backgroundColor: '#edf8fc',  // surfaceTipDefault
     borderWidth: 1.5,
-    borderColor: '#5aeaff',
+    borderColor: '#65cae5',      // blue450 (was #5aeaff, off-palette)
   },
   askCoachButtonText: {
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
-    color: '#00a2c7',
+    color: '#00a2c7',            // contentBrand
   },
   setupButton: {
     flex: 1,

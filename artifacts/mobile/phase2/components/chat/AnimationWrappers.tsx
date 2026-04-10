@@ -25,7 +25,7 @@ export function SoftReveal({ delay = 0, children }: { delay?: number; children: 
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      RNAnimated.spring(opacity, { toValue: 1, tension: 60, friction: 12, useNativeDriver: true }).start();
+      RNAnimated.spring(opacity, { toValue: 1, tension: 50, friction: 18, useNativeDriver: true }).start();
     }, delay);
     return () => clearTimeout(timer);
   }, [opacity, delay]);

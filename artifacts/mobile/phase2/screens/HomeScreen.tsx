@@ -138,7 +138,7 @@ export default function HomeScreen() {
               <CoachGlyph1Svg width={14.5} height={15} style={{ position: 'absolute' }} />
               <CoachGlyph2Svg width={11} height={12} style={{ position: 'absolute', transform: [{ rotate: '4.72deg' }] }} />
             </View>
-            <Text style={styles.askCoachText}>Ask Coach</Text>
+            <Text style={styles.askCoachText}>Open Coach</Text>
             </BlurView>
           </Pressable>
         </View>

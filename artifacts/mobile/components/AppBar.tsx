@@ -40,6 +40,7 @@ interface SheetAppBarProps extends AppBarBaseProps {
 
 export type AppBarProps = StandardAppBarProps | BackAppBarProps | SheetAppBarProps;
 
+// Pacific App Bar — 44pt bar height, bottom strokeEdge divider, 44×44 touch targets
 export function AppBar(props: AppBarProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -55,16 +56,21 @@ export function AppBar(props: AppBarProps) {
       <View style={[styles.headerWrap, { paddingTop: insets.top, backgroundColor: bgColor }]}>
         <View style={styles.titleBar}>
           <View style={styles.leftZone}>
-            <Pressable style={styles.iconBtn} onPress={props.onBack} hitSlop={8}>
+            <Pressable style={styles.iconBtn} onPress={props.onBack} hitSlop={4}>
               <ChevronLeftIcon size={24} color={colors.contentPrimary} />
             </Pressable>
           </View>
-          <View style={styles.centerZone}>
-            <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>{props.title}</Text>
+
+          {/* Center — absolutely positioned for true screen-center alignment */}
+          <View style={styles.centerAbsolute} pointerEvents="none">
+            <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>
+              {props.title}
+            </Text>
           </View>
+
           <View style={styles.rightZone}>
             {actions.map((action, i) => (
-              <Pressable key={i} style={styles.iconBtn} onPress={action.onPress} hitSlop={action.hitSlop ?? 8}>
+              <Pressable key={i} style={styles.iconBtn} onPress={action.onPress} hitSlop={action.hitSlop ?? 4}>
                 {action.icon}
               </Pressable>
             ))}
@@ -80,19 +86,24 @@ export function AppBar(props: AppBarProps) {
       <View style={styles.titleBar}>
         <View style={styles.leftZone}>
           {standardProps.leftAction && (
-            <Pressable style={styles.iconBtn} onPress={standardProps.leftAction.onPress} hitSlop={standardProps.leftAction.hitSlop}>
+            <Pressable style={styles.iconBtn} onPress={standardProps.leftAction.onPress} hitSlop={standardProps.leftAction.hitSlop ?? 4}>
               {standardProps.leftAction.icon}
             </Pressable>
           )}
           {standardProps.leftExtra}
         </View>
-        <View style={styles.centerZone}>
-          <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>{standardProps.title}</Text>
+
+        {/* Center — absolutely positioned for true screen-center alignment */}
+        <View style={styles.centerAbsolute} pointerEvents="none">
+          <Text style={[styles.title, { color: colors.contentPrimary }]} numberOfLines={1}>
+            {standardProps.title}
+          </Text>
           {standardProps.subtitle}
         </View>
+
         <View style={styles.rightZone}>
           {standardProps.rightActions?.map((action, i) => (
-            <Pressable key={i} style={styles.iconBtn} onPress={action.onPress} hitSlop={action.hitSlop}>
+            <Pressable key={i} style={styles.iconBtn} onPress={action.onPress} hitSlop={action.hitSlop ?? 4}>
               {action.icon}
             </Pressable>
           ))}
@@ -108,7 +119,7 @@ function SheetHeader(props: SheetAppBarProps) {
     <View style={styles.sheetHeader}>
       <Text style={[styles.sheetTitle, { color: colors.contentPrimary }]}>{props.title}</Text>
       {props.rightAction && (
-        <Pressable style={styles.sheetCloseBtn} onPress={props.rightAction.onPress} hitSlop={8}>
+        <Pressable style={styles.iconBtn} onPress={props.rightAction.onPress} hitSlop={4}>
           {props.rightAction.icon}
         </Pressable>
       )}
@@ -129,56 +140,63 @@ const styles = StyleSheet.create({
     height: 44,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
+
+  // Spans the full bar width, always centered to the screen regardless of icon count.
+  // Padding clears up to 2 icon buttons (44pt each) on either side.
+  centerAbsolute: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 100,
+  },
+
   leftZone: {
-    width: 104,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingLeft: 16,
     paddingRight: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 20,
-  },
-  centerZone: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
+    minWidth: 100,
   },
   rightZone: {
-    width: 104,
-    paddingRight: 16,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 20,
+    justifyContent: 'flex-end',
+    paddingRight: 16,
+    minWidth: 100,
   },
+
+  // 44×44 touch target — Pacific/WCAG minimum interactive size.
   iconBtn: {
-    width: 24,
-    height: 24,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
   },
+
   title: {
     fontSize: 16,
     fontFamily: Fonts.medium,
     lineHeight: 20,
     textAlign: 'center',
   },
+
   sheetHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingLeft: 20,
+    paddingRight: 8,
+    paddingVertical: 4,
+    height: 52,
   },
   sheetTitle: {
     fontSize: 16,
     fontFamily: Fonts.medium,
     lineHeight: 20,
-  },
-  sheetCloseBtn: {
-    padding: 4,
-    borderRadius: 9999,
+    flex: 1,
   },
 });

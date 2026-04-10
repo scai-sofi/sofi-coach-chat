@@ -1,0 +1,48 @@
+---
+description: Goal type taxonomy, tab structure, and persona goal data for SoFi Coach Chat
+alwaysApply: true
+---
+
+# Goal Taxonomy
+
+## Three user-facing categories (tabs)
+
+| Tab label   | Internal key | `GoalType` values                              |
+|-------------|--------------|------------------------------------------------|
+| **Save up** | `save-up`    | `EMERGENCY_FUND`, `SAVINGS_TARGET`, `CUSTOM`   |
+| **Pay off** | `pay-off`    | `DEBT_PAYOFF`                                  |
+| **Investment** | `investment` | `INVESTMENT`                                |
+
+Tab order: **Save up → Pay off → Investment**
+
+The internal category key is `'pay-off'` — never `'pay-down'`. All `GoalTabCategory` types, labels, subtitles, and tab count objects must use `pay-off`.
+
+## Goal statuses
+
+`DRAFT` · `ON_TRACK` · `AT_RISK` · `PAUSED` · `COMPLETED`
+
+- `DRAFT` → renders as "Suggested" card with Set up / Dismiss actions
+- `COMPLETED` → renders in a separate "Completed" section below active goals
+- `PAUSED` → renders in active tab section with paused styling
+
+## Progress semantics
+
+`currentAmount` = amount saved/paid so far. `targetAmount` = total goal.
+For `DEBT_PAYOFF`: remaining balance = `targetAmount − currentAmount`.
+
+## Subtitle copy by tab
+
+- Save up → "Saved up for [title]"
+- Pay off → "Paid off on [title]"
+- Investment → "Invested in [title]"
+
+## Persona goal data
+
+Source of truth: `constants/personaGoals.ts` → injected via `constants/seededHistory.ts`
+
+| Persona | Goals |
+|---------|-------|
+| **Maya** | CC Payoff `DEBT_PAYOFF` ON_TRACK · Europe Trip `SAVINGS_TARGET` DRAFT |
+| **Marcus** | Emergency Fund `EMERGENCY_FUND` ON_TRACK · CC Payoff `DEBT_PAYOFF` AT_RISK · Wedding Fund `SAVINGS_TARGET` ON_TRACK |
+| **Jordan** | CC Payoff `DEBT_PAYOFF` ON_TRACK · Emergency Starter `EMERGENCY_FUND` PAUSED · Move-In Fund `CUSTOM` DRAFT |
+| **David** | Emergency Fund `EMERGENCY_FUND` ON_TRACK · Kitchen Remodel `SAVINGS_TARGET` COMPLETED · Roth IRA `INVESTMENT` ON_TRACK · Annual Brokerage `INVESTMENT` ON_TRACK |

@@ -85,10 +85,10 @@ export function WelcomeEntry() {
         paddingInline: 16,
         width: '100%',
       }}>
-        <EmptyChatCard label="Support" text="I need help with my SoFi account." wide={true} />
+        <EmptyChatCard label="Support" text="I need help with my SoFi account" wide={true} />
         <div style={{ display: 'flex', gap: 12 }}>
           <EmptyChatCard label="Credit score" text="Why did my credit score change?" wide={false} />
-          <EmptyChatCard label="Spending" text="Review monthly spending." wide={false} />
+          <EmptyChatCard label="Spending" text="Review monthly spending" wide={false} />
         </div>
       </div>
 

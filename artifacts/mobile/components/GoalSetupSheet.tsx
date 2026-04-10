@@ -8,11 +8,14 @@ import { useCoach, PendingGoalSetup } from '@/context/CoachContext';
 import { Fonts } from '@/constants/fonts';
 import { GoalType } from '@/constants/types';
 import { PacificDatePicker } from '@/components/PacificDatePicker';
+import { AppBar } from '@/components/AppBar';
+import { CloseIcon } from '@/components/icons';
 import { getMember360Profile } from '@/constants/member360';
+import { shadowDownTwo } from '@/constants/shadows';
 
 const orbGif = require('@/assets/images/orb-analyzing.gif');
 
-type GoalCategory = 'save-up' | 'pay-down' | 'investment';
+type GoalCategory = 'save-up' | 'pay-off' | 'investment';
 
 interface DebtAccount {
   id: string;
@@ -32,7 +35,7 @@ const SOFI_DEBT_ACCOUNTS: DebtAccount[] = [
 
 const CATEGORIES: { key: GoalCategory; label: string; subtitle: string; icon: keyof typeof Feather.glyphMap }[] = [
   { key: 'save-up', label: 'Save up', subtitle: 'Set aside money for something you want', icon: 'target' },
-  { key: 'pay-down', label: 'Pay down', subtitle: 'Track progress paying off debt', icon: 'trending-down' },
+  { key: 'pay-off', label: 'Pay off', subtitle: 'Track progress paying off debt', icon: 'trending-down' },
   { key: 'investment', label: 'Investment', subtitle: 'Grow your money over time', icon: 'bar-chart-2' },
 ];
 
@@ -189,7 +192,7 @@ const siStyles = StyleSheet.create({
 
 const GOAL_TYPE_DISPLAY: Record<GoalType, string> = {
   EMERGENCY_FUND: 'Save up',
-  DEBT_PAYOFF: 'Pay down',
+  DEBT_PAYOFF: 'Pay off',
   SAVINGS_TARGET: 'Save up',
   INVESTMENT: 'Investment',
   CUSTOM: 'Save up',
@@ -249,7 +252,7 @@ export function GoalSetupSheet() {
         setTargetDate(p.targetDate);
         setLinkedAccount(p.linkedAccount);
         setGoalType(p.type);
-        const cat = p.type === 'DEBT_PAYOFF' ? 'pay-down' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
+        const cat = p.type === 'DEBT_PAYOFF' ? 'pay-off' : p.type === 'INVESTMENT' ? 'investment' : 'save-up';
         setCategory(cat);
         setSelectedDebt(null);
         setIsEfGoal(p.type === 'EMERGENCY_FUND');
@@ -311,8 +314,8 @@ export function GoalSetupSheet() {
 
   const goBack = () => {
     if (page === 0) { dismiss(); return; }
-    if (page === 2 && (category === 'investment' || category === 'pay-down')) { goToPage(0); return; }
-    if (page === 4 && category === 'pay-down') { goToPage(2); return; }
+    if (page === 2 && (category === 'investment' || category === 'pay-off')) { goToPage(0); return; }
+    if (page === 4 && category === 'pay-off') { goToPage(2); return; }
     goToPage(page - 1);
   };
 
@@ -333,7 +336,7 @@ export function GoalSetupSheet() {
     setCategory(cat);
     if (cat === 'save-up') {
       goToPage(1);
-    } else if (cat === 'pay-down') {
+    } else if (cat === 'pay-off') {
       setGoalType('DEBT_PAYOFF');
       setShowLinkForm(false);
       if (!selectedDebt) {
@@ -405,7 +408,7 @@ export function GoalSetupSheet() {
     setLinkMin('');
   };
 
-  const isPayDown = category === 'pay-down';
+  const isPayDown = category === 'pay-off';
   const target = parse(targetAmount);
   const monthly = parse(monthlyContribution);
   const months = monthsBetween(new Date(), targetDate);
@@ -448,18 +451,16 @@ export function GoalSetupSheet() {
 
   return (
     <Animated.View style={[st.fullScreen, panelStyle, { backgroundColor: colors.surfaceBase }]}>
-      <View style={[st.header, { paddingTop: insets.top }]}>
-        <Pressable style={st.backBtn} onPress={goBack} hitSlop={12}>
-          <Feather name="chevron-left" size={24} color={colors.contentPrimary} />
-        </Pressable>
-        <View style={st.headerCenter}>
-          <StepIndicator current={displayStep} total={stepCount} />
-        </View>
-        <Pressable style={st.closeBtn} onPress={dismiss} hitSlop={12}>
-          <Feather name="x" size={22} color={colors.contentPrimary} />
-        </Pressable>
-      </View>
-
+      <AppBar
+        variant="back"
+        title="Create goal"
+        onBack={goBack}
+        rightActions={[{
+          icon: <CloseIcon size={22} color={colors.contentPrimary} />,
+          onPress: dismiss,
+        }]}
+        backgroundColor={colors.surfaceBase}
+      />
       <View style={st.body}>
         <Animated.View style={[st.strip, { width: screenWidth * TOTAL_PAGES }, stripStyle]}>
 
@@ -507,12 +508,12 @@ export function GoalSetupSheet() {
             </ScrollView>
           </View>
 
-          {/* ─── Page 2: Plan (save-up planner / pay-down unified / investment) ─── */}
+          {/* ─── Page 2: Plan (save-up planner / pay-off unified / investment) ─── */}
           <View style={[st.stepPage, { width: screenWidth }]}>
             <ScrollView contentContainerStyle={st.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               {isPayDown ? (
                 <>
-                  <Text style={[st.title, { color: colors.contentPrimary }]}>Pay down a debt</Text>
+                  <Text style={[st.title, { color: colors.contentPrimary }]}>Pay off a debt</Text>
                   <Text style={[st.subtitle, { color: colors.contentSecondary }]}>
                     Pick the account, then set your plan.
                   </Text>
@@ -856,17 +857,17 @@ export function GoalSetupSheet() {
                     </View>
                   )}
                   {isPayDown && selectedDebt && debtEstimate?.withExtra && monthly > selectedDebt.minPayment && (
-                    <View style={[st.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
-                      <Feather name="award" size={14} color="#2e7d32" />
-                      <Text style={[st.reviewSavingsText, { color: '#2e7d32' }]}>
+                    <View style={[st.reviewSavings, { backgroundColor: colors.successBg }]}>
+                      <Feather name="award" size={14} color={colors.successDark} />
+                      <Text style={[st.reviewSavingsText, { color: colors.successDark }]}>
                         Saving ${fmt(debtEstimate.minOnly.totalInterest - debtEstimate.withExtra.totalInterest)} in interest vs. minimum payments
                       </Text>
                     </View>
                   )}
                   {!isPayDown && onTrack && projected > target && (
-                    <View style={[st.reviewSavings, { backgroundColor: '#e8f5e9' }]}>
-                      <Feather name="check-circle" size={14} color="#2e7d32" />
-                      <Text style={[st.reviewSavingsText, { color: '#2e7d32' }]}>
+                    <View style={[st.reviewSavings, { backgroundColor: colors.successBg }]}>
+                      <Feather name="check-circle" size={14} color={colors.successDark} />
+                      <Text style={[st.reviewSavingsText, { color: colors.successDark }]}>
                         On track with ~${fmt(projected - target)} extra by {fmtDate(targetDate)}
                       </Text>
                     </View>
@@ -901,10 +902,6 @@ export function GoalSetupSheet() {
 
 const st = StyleSheet.create({
   fullScreen: { ...StyleSheet.absoluteFillObject, zIndex: 200, overflow: 'hidden' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingBottom: 4 },
-  backBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  headerCenter: { flex: 1 },
-  closeBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   body: { flex: 1, overflow: 'hidden' },
   strip: { flexDirection: 'row', flex: 1 },
   stepPage: { flex: 1 },
@@ -913,14 +910,14 @@ const st = StyleSheet.create({
   subtitle: { fontSize: 14, fontFamily: Fonts.regular, lineHeight: 20, marginBottom: 24, letterSpacing: -0.16 },
 
   categoryList: { gap: 12 },
-  categoryCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 16, borderRadius: 16, gap: 14, shadowColor: '#121211', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 2 },
+  categoryCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 16, borderRadius: 16, gap: 14, ...shadowDownTwo },
   categoryIconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   categoryText: { flex: 1, gap: 2 },
   categoryLabel: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 24, letterSpacing: -0.16 },
   categorySub: { fontSize: 13, fontFamily: Fonts.regular, lineHeight: 18 },
 
   vaultList: { gap: 16 },
-  vaultRow: { flexDirection: 'row', alignItems: 'center', height: 56, paddingHorizontal: 16, borderRadius: 16, gap: 8, shadowColor: '#121211', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.1, shadowRadius: 1, elevation: 1 },
+  vaultRow: { flexDirection: 'row', alignItems: 'center', height: 56, paddingHorizontal: 16, borderRadius: 16, gap: 8, ...shadowDownTwo },
   vaultIconWrap: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   vaultLabel: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 24, letterSpacing: -0.16, flex: 1 },
 
@@ -954,7 +951,7 @@ const st = StyleSheet.create({
   debtDetailValue: { fontSize: 15, fontFamily: Fonts.bold },
   debtDetailDiv: { width: 1, height: 28 },
 
-  plannerCard: { borderRadius: 20, overflow: 'hidden', marginBottom: 16, shadowColor: '#121211', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
+  plannerCard: { borderRadius: 20, overflow: 'hidden', marginBottom: 16, ...shadowDownTwo },
   plannerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },
   plannerLabel: { fontSize: 15, fontFamily: Fonts.regular },
   plannerInput: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, minWidth: 140 },
@@ -983,7 +980,7 @@ const st = StyleSheet.create({
   coachTipText: { flex: 1, fontSize: 12, fontFamily: Fonts.medium, lineHeight: 16, letterSpacing: 0.1, paddingHorizontal: 2 },
 
   methodOptions: { gap: 16 },
-  methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#0a0a0a', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  methodCard: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 16, ...shadowDownTwo },
   methodContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   methodText: { flex: 1, gap: 2 },
   methodTitle: { fontSize: 16, fontFamily: Fonts.medium, lineHeight: 20 },
@@ -991,7 +988,7 @@ const st = StyleSheet.create({
   methodRadio: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   methodRadioFill: { width: 12, height: 12, borderRadius: 6 },
 
-  reviewCard: { borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
+  reviewCard: { borderRadius: 16, borderWidth: 1, overflow: 'hidden', ...shadowDownTwo },
   reviewHeader: { flexDirection: 'row', alignItems: 'center', padding: 20, gap: 14 },
   reviewIconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   reviewHeaderText: { flex: 1, gap: 2 },

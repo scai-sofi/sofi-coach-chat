@@ -66,7 +66,7 @@ export function ChipBadge({ chip, animate = true }: { chip: MessageChip; animate
     if (!animate) return;
     RNAnimated.parallel([
       RNAnimated.timing(fadeAnim, { toValue: 1, duration: 350, delay: 100, useNativeDriver: true }),
-      RNAnimated.spring(slideAnim, { toValue: 0, tension: 120, friction: 8, delay: 100, useNativeDriver: true }),
+      RNAnimated.spring(slideAnim, { toValue: 0, tension: 100, friction: 16, delay: 100, useNativeDriver: true }),
     ]).start();
   }, [fadeAnim, slideAnim, animate]);
 

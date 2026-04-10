@@ -1,30 +1,41 @@
+// Static light-mode color snapshot for phase2 components that don't use the theme hook.
+// Sourced from Pacific Design System tokens (pacificLight).
+import { pacificLight, pacificPrimitives } from '../../constants/pacificTokens';
+
 export default {
-  surfaceBase: '#faf8f5',
-  surfaceElevated: '#ffffff',
-  surfaceTint: '#f0ede8',
-  surfaceEdge: 'rgba(10,10,10,0.10)',
-  surfaceEdgeLight: 'rgba(10,10,10,0.05)',
-  surfaceMuted: '#f5f3f0',
-  contentPrimary: '#1a1919',
-  contentSecondary: '#706f6e',
-  contentBone600: '#5C5B5A',
-  contentStatusbar: '#0a0a0a',
-  contentMuted: '#d0ccc5',
-  contentDimmed: '#BDBBB9',
-  danger: '#fa2d25',
-  dangerLight: '#ef4444',
-  dangerChipText: '#dc2626',
-  dangerChipBg: '#fee2e2',
-  success: '#22c55e',
-  successDark: '#16a34a',
-  successBg: '#dcfce7',
-  successBorder: '#bbf7d0',
-  successBgLight: '#f0fdf4',
-  warning: '#b45309',
-  warningBg: '#fef3c7',
-  info: '#2563eb',
-  infoBg: '#dbeafe',
-  progressTrack: '#e5e1da',
-  frameBg: '#e8e4de',
-  contentBrand: '#00a2c7',
+  surfaceBase:      pacificLight.surfaceBase,
+  surfaceElevated:  pacificLight.surfaceElevatedDefault,
+  surfaceTint:      pacificLight.surfaceElevatedDisabled,
+  surfaceEdge:      pacificLight.strokeDividePrimary,
+  surfaceEdgeLight: pacificLight.surfaceElevatedHover,
+  surfaceMuted:     pacificLight.surfaceInfoLabel,
+
+  contentPrimary:    pacificLight.contentPrimaryDefault,
+  contentSecondary:  pacificLight.contentSecondary,
+  contentBone600:    pacificLight.contentIndicatorUnselected,
+  contentStatusbar:  pacificLight.contentStatusBar,
+  contentMuted:      pacificPrimitives.bone300,
+  contentDimmed:     pacificLight.contentDisabled2,
+
+  danger:         pacificLight.contentDanger,
+  dangerLight:    pacificLight.contentDanger,
+  dangerChipText: pacificLight.contentDangerEmphasized,
+  dangerChipBg:   pacificLight.surfaceDangerDefault,
+
+  success:        pacificLight.contentSuccess,
+  successDark:    pacificLight.buttonSuccess,
+  successBg:      pacificLight.surfaceSuccessDefault,
+  successBorder:  pacificLight.strokePositiveDefault,
+  successBgLight: pacificLight.surfaceSuccessDefault,
+
+  warning:    pacificLight.contentCaution,
+  warningBg:  pacificLight.surfaceCautionDefault,
+
+  info:    pacificLight.contentBrand,
+  infoBg:  pacificLight.surfaceTipDefault,
+
+  progressTrack:  pacificLight.surfaceSwitchUnselectedHover,
+  frameBg:        pacificLight.surfaceSwitchUnselectedHover,
+
+  contentBrand: pacificLight.contentBrand,
 };

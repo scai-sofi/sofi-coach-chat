@@ -253,11 +253,13 @@ MemoryCategory labels:
 
 MemoryCategory display order: ABOUT_ME, PREFERENCES, PRIORITIES
 
-GoalType labels:
-  EMERGENCY_FUND → "Save Up"
-  DEBT_PAYOFF → "Pay Down"
-  SAVINGS_TARGET → "Save Up"
-  CUSTOM → "Custom"
+GoalType labels (user-facing tab → goal types):
+  Save up tab    → EMERGENCY_FUND ("Save Up"), SAVINGS_TARGET ("Save Up"), CUSTOM ("Custom")
+  Pay off tab    → DEBT_PAYOFF ("Pay Off")
+  Investment tab → INVESTMENT ("Investment")
+
+Tab order: Save up → Pay off → Investment
+Internal category key: 'pay-off' (not 'pay-down')
 ```
 
 ### ChatSession (in-memory storage)
@@ -808,7 +810,7 @@ Slide-in from right (same animation pattern as ChatHistory). Accessible from ove
 - **Top section:** Progress ring (72px SVG circle) + goal info
   - Progress ring: 4px stroke, track color #e5e1da, fill color varies by status (primary/red/green)
   - Percentage text centered inside ring
-  - Goal title + type badge ("Save Up" / "Pay Down")
+  - Goal title + type badge ("Save Up" / "Pay Off" / "Investment" / "Custom")
   - Amount text: "$X of $Y"
   - Status row: icon + status text + confidence percentage
 

@@ -40,17 +40,17 @@ import GlyphReferSvg from '@/assets/svg/glyph-refer.svg';
 import GlyphArrowRightSvg from '@/assets/svg/glyph-arrow-right.svg';
 
 const COLORS = {
-  teal: '#00a2c7',
-  surfaceBase: '#faf8f5',
-  white: '#ffffff',
-  primaryText: '#1c1b1b',
-  secondaryText: '#706f6e',
-  tabSelected: '#1a1919',
-  tabUnselected: '#5c5b5a',
-  positive: '#1bc245',
-  caution: '#8c6914',
-  cautionSurface: '#ffcc00',
-  accent: '#00a2c7',
+  teal: '#00a2c7',          // contentBrand
+  surfaceBase: '#faf8f5',   // surfaceBase
+  white: '#ffffff',         // contentOnDark / bone0
+  primaryText: '#1a1919',   // contentPrimaryDefault (was #1c1b1b, off-palette)
+  secondaryText: '#706f6e', // contentSecondary
+  tabSelected: '#1a1919',   // contentPrimaryDefault
+  tabUnselected: '#5c5b5a', // contentIndicatorUnselected
+  positive: '#1bc245',      // contentSuccess
+  caution: '#8c6914',       // contentCaution
+  cautionSurface: '#ffcc00',// surfaceCautionEmphasize
+  accent: '#00a2c7',        // contentBrand
   divider: 'rgba(10,10,10,0.1)',
   askCoachBg: 'rgba(0,70,97,0.2)',
   askCoachText: 'rgba(255,255,255,0.7)',
@@ -58,7 +58,7 @@ const COLORS = {
   shadowMid: 'rgba(10,10,10,0.04)',
   shadowFar: 'rgba(10,10,10,0.02)',
   dotInactive: 'rgba(255,255,255,0.3)',
-  pillText: '#006280',
+  pillText: '#006280',      // contentTip
 };
 
 const cardShadowStyle: ViewStyle = {

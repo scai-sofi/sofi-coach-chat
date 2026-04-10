@@ -37,7 +37,7 @@ export default function PreferencesScreen() {
           <View style={[styles.rowDivider, { backgroundColor: colors.surfaceEdge }]} />
           <SectionNavRow icon="lock" label="Privacy" />
           <View style={[styles.rowDivider, { backgroundColor: colors.surfaceEdge }]} />
-          <SectionNavRow icon="sun" label="App appearances" />
+          <SectionNavRow icon="sun" label="app appearances" />
         </View>
       </ScrollView>
     </View>

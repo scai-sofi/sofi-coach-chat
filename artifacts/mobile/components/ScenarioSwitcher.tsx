@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet, Image, Platform } from 'react-native';
+import Svg, { Ellipse, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -184,13 +185,39 @@ function AvatarCard({
               </View>
             </Animated.View>
 
-            <Animated.View
-              style={[
-                styles.avatarShadow,
-                { backgroundColor: persona.accentColor },
-                shadowAnimStyle,
-              ]}
-            />
+            <Animated.View style={[styles.avatarShadow, shadowAnimStyle]}>
+              {Platform.OS === 'web' ? (
+                <View style={[styles.avatarShadowLayer, {
+                  backgroundColor: persona.accentColor,
+                  // @ts-expect-error web-only CSS property
+                  filter: 'blur(6px)',
+                }]} />
+              ) : (
+                // SVG feGaussianBlur = exact equivalent of CSS filter:blur()
+                <Svg width={96} height={36} style={styles.avatarShadowSvg}>
+                  <Defs>
+                    <Filter
+                      id={`shadow-${persona.id}`}
+                      x="-25%"
+                      y="-100%"
+                      width="150%"
+                      height="300%"
+                    >
+                      <FeGaussianBlur stdDeviation="4" />
+                    </Filter>
+                  </Defs>
+                  <Ellipse
+                    cx={48}
+                    cy={18}
+                    rx={30}
+                    ry={5}
+                    fill={persona.accentColor}
+                    opacity={0.7}
+                    filter={`url(#shadow-${persona.id})`}
+                  />
+                </Svg>
+              )}
+            </Animated.View>
           </View>
 
           <Animated.View style={textAnimStyle}>
@@ -383,21 +410,22 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   avatarShadow: {
+    width: 96,
+    height: 36,
+    position: 'absolute',
+    bottom: -12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Web only — solid pill, CSS blur handles softness
+  avatarShadowLayer: {
     width: 72,
     height: 12,
     borderRadius: 36,
+  },
+  // Native SVG blur container
+  avatarShadowSvg: {
     position: 'absolute',
-    bottom: 0,
-    opacity: 0.5,
-    ...(Platform.OS === 'web' ? {
-      filter: 'blur(6px)',
-    } : {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 6,
-      elevation: 4,
-    }),
   },
   avatarName: {
     fontSize: 16,

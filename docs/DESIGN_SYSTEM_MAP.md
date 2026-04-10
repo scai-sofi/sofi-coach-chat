@@ -600,7 +600,32 @@ All proposal cards share a unified visual language.
 | Margin top | `SizedBox(height: 4)` |
 | Text | `TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: contentSecondary, height: 1.33)` |
 
-### 3.8 Suggested Goals Section (Goals Center)
+### 3.8 Goals Dashboard — Tab Structure
+
+The Goals Dashboard organises goals into three tabs. The internal category key is `pay-off` (not `pay-down`).
+
+| Tab label | Internal key | `GoalType` values |
+|---|---|---|
+| **Save up** | `save-up` | `EMERGENCY_FUND`, `SAVINGS_TARGET`, `CUSTOM` |
+| **Pay off** | `pay-off` | `DEBT_PAYOFF` |
+| **Investment** | `investment` | `INVESTMENT` |
+
+Tab order: Save up → Pay off → Investment.
+
+**Goal statuses:** `DRAFT` (suggested, not yet active), `ON_TRACK`, `AT_RISK`, `PAUSED`, `COMPLETED`.
+
+- `DRAFT` goals render as "Suggested" cards with **Set up goal** / **Dismiss** actions — not shown in the tabbed active/completed lists.
+- `COMPLETED` goals render in a separate "Completed" section below active goals within the same tab.
+- `PAUSED` goals render in the active section of their tab with a paused visual treatment.
+
+**Progress semantics:** For all types, `currentAmount` = amount accumulated/paid so far toward the target. For `DEBT_PAYOFF`, remaining balance = `targetAmount − currentAmount`.
+
+**Subtitle copy by tab:**
+- Save up: *"Saved up for [goal title]"*
+- Pay off: *"Paid off on [goal title]"*
+- Investment: *"Invested in [goal title]"*
+
+### 3.9 Suggested Goals Section (Goals Center)
 
 Added in Task #12. When the AI detects a goal opportunity, it creates a DRAFT goal in state and sends a chat nudge. DRAFT goals appear in the Goals Center's "Suggested" section above active goals.
 
@@ -983,7 +1008,7 @@ Stack(
 - Resolved in Task #10. All proposal cards now share unified icon treatment, text sizes (13 body, 12 detail), button patterns (confirm pill + dismiss outlined pill), and spacing (`SizedBox(width: 8)`, `EdgeInsets.all(12)`). See Section 3.1 for the normalized spec.
 
 ### Theme System
-- Full light/dark theming implemented. All widgets reference theme tokens — zero hardcoded colors in build methods. In Flutter, use `Theme.of(context).extension<CoachTheme>()` or an `InheritedWidget` to provide the token map. See MEMORY_AND_GOALS.md "Theme System" section for migration pattern details.
+- Full light/dark theming implemented. All widgets reference theme tokens — zero hardcoded colors in build methods. In Flutter, use `Theme.of(context).extension<CoachTheme>()` or an `InheritedWidget` to provide the token map. See `PHASE 1.md` "Theme System" section for migration pattern details.
 
 ### Flutter-Specific Notes
 - **PNG icon tinting:** Use `Image.asset(..., color: tokenColor, colorBlendMode: BlendMode.srcIn)` or `ColorFiltered(colorFilter: ColorFilter.mode(color, BlendMode.srcIn))`.

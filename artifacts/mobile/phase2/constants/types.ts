@@ -182,26 +182,26 @@ export const GOAL_TYPE_LABELS: Record<GoalType, string> = {
   CUSTOM: 'Custom',
 };
 
-export type GoalTabCategory = 'save-up' | 'pay-down' | 'investment';
+export type GoalTabCategory = 'save-up' | 'pay-off' | 'investment';
 
 export const GOAL_TAB_MAP: Record<GoalType, GoalTabCategory> = {
   EMERGENCY_FUND: 'save-up',
   SAVINGS_TARGET: 'save-up',
   CUSTOM: 'save-up',
-  DEBT_PAYOFF: 'pay-down',
+  DEBT_PAYOFF: 'pay-off',
   INVESTMENT: 'investment',
 };
 
 export const GOAL_TAB_LABELS: Record<GoalTabCategory, string> = {
   'save-up': 'Save up',
-  'pay-down': 'Pay down',
+  'pay-off': 'Pay off',
   'investment': 'Investment',
 };
 
-export const GOAL_TAB_ORDER: GoalTabCategory[] = ['save-up', 'pay-down', 'investment'];
+export const GOAL_TAB_ORDER: GoalTabCategory[] = ['save-up', 'pay-off', 'investment'];
 
 export const GOAL_TAB_SUBTITLE: Record<GoalTabCategory, string> = {
-  'save-up': 'Saved up for',
-  'pay-down': 'Paid down on',
-  'investment': 'Invested in',
+  'save-up': 'Saving for',
+  'pay-off': 'Paying off',
+  'investment': 'Investing in',
 };

@@ -80,7 +80,7 @@ echo "▶ [3/3] Starting Expo (scan QR with Expo Go)..."
 (
   export EXPO_PUBLIC_API_URL="http://localhost:$API_PORT/api"
   cd "$ROOT/artifacts/mobile"
-  pnpm exec expo start 2>&1 | sed 's/^/[expo] /'
+  pnpm exec expo start
 ) &
 
 echo ""

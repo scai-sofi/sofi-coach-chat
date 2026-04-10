@@ -42,7 +42,7 @@ export const EMERGENCY_FUND_GOAL: Goal = {
 export const CREDIT_CARD_GOAL: Goal = {
   id: 'goal-cc',
   type: 'DEBT_PAYOFF',
-  title: 'Credit Card Payoff',
+  title: 'Credit Card',
   targetAmount: 4200,
   currentAmount: 2940,
   targetDate: daysFromNow(120),
@@ -53,6 +53,27 @@ export const CREDIT_CARD_GOAL: Goal = {
   milestones: makeMilestones([25, 50], [45, 12, 0, 0]),
   linkedAccount: 'SoFi Credit Card',
   createdAt: daysAgo(75),
+};
+
+export const WEDDING_GOAL: Goal = {
+  id: 'goal-wedding',
+  type: 'SAVINGS_TARGET',
+  title: 'Wedding',
+  targetAmount: 15000,
+  currentAmount: 0,
+  targetDate: daysFromNow(548),
+  monthlyContributionTarget: 650,
+  actualMonthlyContribution: 0,
+  status: 'DRAFT',
+  confidenceScore: 0.88,
+  milestones: [
+    { id: 'wm1', label: '25%', targetPct: 25, reached: false },
+    { id: 'wm2', label: '50%', targetPct: 50, reached: false },
+    { id: 'wm3', label: '75%', targetPct: 75, reached: false },
+    { id: 'wm4', label: '100%', targetPct: 100, reached: false },
+  ],
+  linkedAccount: 'SoFi Money',
+  createdAt: daysAgo(0),
 };
 
 function buildScenarios(): Scenario[] {
@@ -80,13 +101,13 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: 'I want to pay off the credit card first, then save for a house', timestamp: new Date(now.getTime() - 180000) },
         {
-          id: uid(), role: 'ai', content: "**Smart prioritization — debt first, then save.**\n\nThat's a solid approach. Clearing the credit card at 22.99% APR is effectively a guaranteed 23% return on every dollar you put toward it. No savings account can match that.\n\n**Your Payoff Plan — Balanced (10 months)**\n• **Monthly payment:** $420\n• **Total interest paid:** ~$380\n• **Paid off by:** " + new Date(Date.now() + 300 * 86400000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + "\n• **Monthly cash freed after payoff:** $420 → straight into down payment savings\n\n**After the Card Is Gone**\nWith $420/month freed up plus your existing savings capacity, you could be putting $800+/month toward a down payment — that compounds fast in a high-yield account at 4.00% APY.\n\nI can set this up as a tracked goal linked directly to your SoFi Credit Card — so I'll monitor your actual payments and alert you if you fall behind. Want me to set it up?",
+          id: uid(), role: 'ai', content: "**Smart prioritization — debt first, then save.**\n\nThat's a solid approach. Clearing the credit card at 22.99% APR eliminates high-cost interest — the math typically favors paying off high-rate debt before adding to savings. No savings account currently matches that rate.\n\n**Your Payoff Plan — Balanced (10 months)**\n• **Monthly payment:** $420\n• **Total interest paid:** ~$380\n• **Paid off by:** " + new Date(Date.now() + 300 * 86400000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + "\n• **Monthly cash freed after payoff:** $420 → straight into down payment savings\n\n**After the Card Is Gone**\nWith $420/month freed up plus your existing savings capacity, you could be putting $800+/month toward a down payment — that compounds fast in a high-yield account at 4.00% APY.\n\nI can set this up as a tracked goal linked directly to your SoFi Credit Card — so I'll monitor your actual payments and alert you if you fall behind. Want me to set it up?",
           timestamp: new Date(now.getTime() - 170000),
           memoryProposal: { id: uid(), content: 'Wants to pay off credit card before saving for a home', category: 'PRIORITIES' },
           goalProposal: {
             id: uid(),
             type: 'DEBT_PAYOFF',
-            title: 'Credit Card Payoff',
+            title: 'Credit Card',
             targetAmount: 4200,
             targetDate: daysFromNow(300),
             monthlyContribution: 420,
@@ -122,7 +143,7 @@ function buildScenarios(): Scenario[] {
         },
         { id: uid(), role: 'user', content: "Good to know. By the way, I got a raise — I'm making $135k now", timestamp: new Date(now.getTime() - 180000) },
         {
-          id: uid(), role: 'ai', content: "**Congrats on the raise, Olivia!**\n\nThat's a meaningful jump — here's what it changes:\n\n**Updated Picture**\n• **New gross monthly:** ~$11,250 (was ~$9,583)\n• **After taxes (est.):** ~$8,650/month (no state income tax in TX)\n• **Current spending:** ~$4,680/month\n• **New savings capacity:** ~$3,970/month (up from ~$2,820)\n\n**What This Unlocks**\nWith ~$1,150 more per month, you could:\n• **Accelerate credit card payoff** — clear it 3 months sooner\n• **Max out emergency fund** — hit $12k by next quarter\n• **Boost down payment savings** — start building toward your goal\n\nThe key is capturing this raise before lifestyle creep sets in.\n\n**⚠️ Profile Notice**\nYour About Me tab shows $115k from your SoFi profile. I've noted the $135k you just shared — you can verify or update this in your About Me tab.\n\nWant me to model an allocation plan for the extra income?",
+          id: uid(), role: 'ai', content: "**Congrats on the raise, Olivia!**\n\nThat's a meaningful jump — here's what it changes:\n\n**Updated Picture**\n• **New gross monthly:** ~$11,250 (was ~$9,583)\n• **After taxes (est.):** ~$8,650/month (no state income tax in TX)\n• **Current spending:** ~$4,680/month\n• **New savings capacity:** ~$3,970/month (up from ~$2,820)\n\n**What This Unlocks**\nWith ~$1,150 more per month, you could:\n• **Accelerate credit card payoff** — clear it 3 months sooner\n• **Max out emergency fund** — hit $12k by next quarter\n• **Boost down payment savings** — start building toward your goal\n\nThe key is capturing this raise before lifestyle creep sets in.\n\n**Profile discrepancy**\nYour About Me tab shows $115k from your SoFi profile. I've noted the $135k you just shared — you can verify or update this in your About Me tab.\n\nWant me to model an allocation plan for the extra income?",
           timestamp: new Date(now.getTime() - 170000),
           autoSaveMemory: { content: 'Annual income increased to $135,000', category: 'ABOUT_ME' },
           chips: [{ type: 'memory-saved', label: 'Saved to About Me', memoryIds: ['mem-rm-1'] }],
@@ -139,8 +160,9 @@ function buildScenarios(): Scenario[] {
       memories: [
         ...SHARED_MEMORIES,
         { id: 'mem-rm-1', category: 'ABOUT_ME', content: 'Annual income is $135,000', source: 'IMPLICIT_CONFIRMED', status: 'ACTIVE', createdAt: daysAgo(0), updatedAt: daysAgo(0) },
+        { id: 'mem-rm-2', category: 'PRIORITIES', content: 'Getting married in October 2027 — saving for wedding', source: 'EXPLICIT', status: 'ACTIVE', createdAt: daysAgo(10), updatedAt: daysAgo(10) },
       ],
-      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }],
+      goals: [{ ...EMERGENCY_FUND_GOAL }, { ...CREDIT_CARD_GOAL }, { ...WEDDING_GOAL }],
     },
     {
       id: 'memory-lifecycle',
@@ -204,7 +226,7 @@ function buildScenarios(): Scenario[] {
       ],
       goals: [
         { ...EMERGENCY_FUND_GOAL },
-        { id: 'draft-cc-payoff', type: 'DEBT_PAYOFF', title: 'Credit Card Payoff', targetAmount: 4200, currentAmount: 0, targetDate: daysFromNow(180), monthlyContributionTarget: 380, actualMonthlyContribution: 380, status: 'DRAFT', confidenceScore: 0.88, milestones: [{ id: 'dm1', label: '25%', targetPct: 25, reached: false }, { id: 'dm2', label: '50%', targetPct: 50, reached: false }, { id: 'dm3', label: '75%', targetPct: 75, reached: false }, { id: 'dm4', label: '100%', targetPct: 100, reached: false }], linkedAccount: 'SoFi Credit Card', createdAt: daysAgo(0) },
+        { id: 'draft-cc-payoff', type: 'DEBT_PAYOFF', title: 'Credit Card', targetAmount: 4200, currentAmount: 0, targetDate: daysFromNow(180), monthlyContributionTarget: 380, actualMonthlyContribution: 380, status: 'DRAFT', confidenceScore: 0.88, milestones: [{ id: 'dm1', label: '25%', targetPct: 25, reached: false }, { id: 'dm2', label: '50%', targetPct: 50, reached: false }, { id: 'dm3', label: '75%', targetPct: 75, reached: false }, { id: 'dm4', label: '100%', targetPct: 100, reached: false }], linkedAccount: 'SoFi Credit Card', createdAt: daysAgo(0) },
       ],
     },
     {
@@ -238,7 +260,7 @@ function buildScenarios(): Scenario[] {
           id: uid(), role: 'system', content: 'Your Emergency Fund hit a milestone!', timestamp: new Date(now.getTime() - 120000), isProactive: true,
         },
         {
-          id: uid(), role: 'ai', content: "**Emergency Fund — 75% Milestone! 🎉**\n\nOlivia, you just hit **75% of your Emergency Fund goal!** That's $9,000 out of $12,000.\n\n**Your Journey**\n• **25% ($3,000)** — reached 60 days ago\n• **50% ($6,000)** — reached 20 days ago\n• **75% ($9,000)** — reached today\n• **100% ($12,000)** — on track for ~6 months from now\n\n**What's Working**\nYour SoFi Money Vault contributions have been $460/month — $10 above your $450 target, every single month. That consistency is exactly why you're 2 weeks ahead of schedule.\n\n**The Home Stretch**\n• **Remaining:** $3,000\n• **At your current pace:** ~6.5 months to go\n• **Interest earned so far:** ~$150 at 4.00% APY\n• **What $12,000 covers:** ~3 months of essential expenses at your spending level\n\n**💡 What's Next?**\nYou've mentioned saving for a down payment a few times. Once this goal completes, I can set up a new goal linked to a dedicated SoFi Money Vault — that $460/month flows straight into your next priority without missing a beat.\n\nWant me to set up the down payment goal now so it's ready when your emergency fund completes?",
+          id: uid(), role: 'ai', content: "**Emergency Fund — 75% milestone reached**\n\nOlivia, you just hit 75% of your Emergency Fund goal. That's $9,000 out of $12,000.\n\n**Your Journey**\n• **25% ($3,000)** — reached 60 days ago\n• **50% ($6,000)** — reached 20 days ago\n• **75% ($9,000)** — reached today\n• **100% ($12,000)** — on track for ~6 months from now\n\n**What's Working**\nYour SoFi Money Vault contributions have been $460/month — $10 above your $450 target, every single month. That consistency is exactly why you're 2 weeks ahead of schedule.\n\n**The Home Stretch**\n• **Remaining:** $3,000\n• **At your current pace:** ~6.5 months to go\n• **Interest earned so far:** ~$150 at 4.00% APY\n• **What $12,000 covers:** ~3 months of essential expenses at your spending level\n\n**💡 What's Next?**\nYou've mentioned saving for a down payment a few times. Once this goal completes, I can set up a new goal linked to a dedicated SoFi Money Vault — that $460/month flows straight into your next priority without missing a beat.\n\nWant me to set up the down payment goal now so it's ready when your emergency fund completes?",
           timestamp: new Date(now.getTime() - 60000),
           chips: [{ type: 'milestone', label: '75% milestone reached!' }],
           provenance: 'Vault balance and contributions from your SoFi Money account. Milestone calculated from actual deposits vs. goal target in My Goals. Down payment intent referenced 3 times across About Me and chat history.',
@@ -261,7 +283,7 @@ function buildScenarios(): Scenario[] {
       messages: [
         { id: uid(), role: 'user', content: 'I just got a $3,000 bonus at work. What should I do with it?', timestamp: new Date(now.getTime() - 120000) },
         {
-          id: uid(), role: 'ai', content: "**Your $3,000 Bonus — Optimized Across Your SoFi Products**\n\nCongrats, Olivia! I've mapped this against your active goals — here's how I'd split it:\n\n**1. Credit Card Payoff — $1,260 → SoFi Credit Card**\n• Clears your entire remaining balance — goal completes!\n• Eliminates 22.99% APR — every dollar here is a guaranteed 23% return\n• Frees up $380/month for your next priority\n\n**2. Emergency Fund — $1,200 → SoFi Money Vault**\n• Jumps from $8,400 → $9,600 (80%), 6 weeks ahead of schedule\n• Goes straight into your linked Vault at 4.00% APY\n\n**3. Long-Term Growth — $540 → SoFi Invest**\n• Seeds your investment portfolio\n• With debt eliminated and emergency fund nearly complete, this is the right time\n• Diversified index portfolio — matches your risk preference\n• 💡 Want me to set this up as a tracked \"Start Investing\" goal?\n\n**The Big Picture**\nThis single move touches 3 SoFi products, completes 1 goal, accelerates another, and opens a new one. Plus, the $380/month freed from Credit Card payments can flow directly into your down payment goal.\n\nWant me to execute all three moves?",
+          id: uid(), role: 'ai', content: "**Your $3,000 Bonus — Optimized Across Your SoFi Products**\n\nCongrats, Olivia! I've mapped this against your active goals — here's how I'd split it:\n\n**1. Credit Card Payoff — $1,260 → SoFi Credit Card**\n• Clears your entire remaining balance — goal completes!\n• Eliminates 22.99% APR — the math typically favors paying off high-rate debt before investing\n• Frees up $380/month for your next priority\n\n**2. Emergency Fund — $1,200 → SoFi Money Vault**\n• Jumps from $8,400 → $9,600 (80%), 6 weeks ahead of schedule\n• Goes straight into your linked Vault at 4.00% APY\n\n**3. Long-Term Growth — $540 → SoFi Invest**\n• Seeds your investment portfolio\n• With debt eliminated and emergency fund nearly complete, this is the right time\n• Diversified index portfolio — matches your risk preference\n• Want me to set this up as a tracked \"Start Investing\" goal?\n\n**The Big Picture**\nThis single move touches 3 SoFi products, completes 1 goal, accelerates another, and opens a new one. Plus, the $380/month freed from Credit Card payments can flow directly into your down payment goal.\n\nWant me to execute all three moves?",
           timestamp: new Date(now.getTime() - 60000),
           memoryProposal: { id: uid(), content: 'Received $3,000 work bonus, interested in optimized allocation', category: 'ABOUT_ME' },
           provenance: 'SoFi Money, Credit Card, and Invest account data (real-time). Goal progress from My Goals. APR and APY rates as of today. Risk preference from My Preferences.',

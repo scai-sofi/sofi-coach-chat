@@ -377,15 +377,17 @@ function MorphingProposalCard({
 
   const allAnims = [collapse, flipAnim, labelSlide, labelOpacity, chevronOpacity];
 
-  const frontRotateY = flipAnim.interpolate({ inputRange: [0, 360], outputRange: ['0deg', '360deg'] });
-  const backRotateY = flipAnim.interpolate({ inputRange: [0, 360], outputRange: ['180deg', '540deg'] });
+  const frontRotateY = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] });
+  const backRotateY = flipAnim.interpolate({ inputRange: [0, 180], outputRange: ['180deg', '360deg'] });
   const frontFaceOpacity = flipAnim.interpolate({
-    inputRange: [0, 89, 90, 269, 270, 360],
-    outputRange: [1, 1, 0, 0, 1, 1],
+    inputRange: [0, 85, 90, 180],
+    outputRange: [1, 1, 0, 0],
+    extrapolate: 'clamp',
   });
   const backFaceOpacity = flipAnim.interpolate({
-    inputRange: [0, 89, 90, 269, 270, 360],
-    outputRange: [0, 0, 1, 1, 0, 0],
+    inputRange: [0, 85, 90, 180],
+    outputRange: [0, 0, 1, 1],
+    extrapolate: 'clamp',
   });
 
   useEffect(() => {
@@ -400,16 +402,39 @@ function MorphingProposalCard({
     if (isExiting && !prevExiting.current) {
       setPhase('morphing');
 
+      // Phase 1: collapse content (300ms)
       RNAnimated.timing(collapse, {
-        toValue: 1, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: false,
+        toValue: 1, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: false,
       }).start(() => {
         if (!mountedRef.current) return;
-        setPhase('check');
 
-        timerRef.current = setTimeout(() => {
+        // Phase 2: flip icon + slide label in parallel (280ms)
+        RNAnimated.parallel([
+          RNAnimated.timing(flipAnim, {
+            toValue: 180, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true,
+          }),
+          RNAnimated.sequence([
+            RNAnimated.delay(80),
+            RNAnimated.parallel([
+              RNAnimated.timing(labelOpacity, {
+                toValue: 1, duration: 200, easing: Easing.out(Easing.quad), useNativeDriver: true,
+              }),
+              RNAnimated.timing(labelSlide, {
+                toValue: 1, duration: 200, easing: Easing.out(Easing.quad), useNativeDriver: true,
+              }),
+              RNAnimated.timing(chevronOpacity, {
+                toValue: 1, duration: 180, easing: Easing.out(Easing.quad), useNativeDriver: true,
+              }),
+            ]),
+          ]),
+        ]).start(() => {
           if (!mountedRef.current) return;
-          setPhase('done');
-        }, 2000);
+          setPhase('check');
+          timerRef.current = setTimeout(() => {
+            if (!mountedRef.current) return;
+            setPhase('done');
+          }, 2000);
+        });
       });
     }
     prevExiting.current = isExiting;
@@ -473,7 +498,10 @@ function MorphingProposalCard({
           {confirmedLabel}
         </Text>
       ) : (
-        <RNAnimated.View style={{ opacity: labelOpacity }}>
+        <RNAnimated.View style={{
+          opacity: labelOpacity,
+          transform: [{ translateX: labelSlide.interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) }],
+        }}>
           <Text style={[styles.chipText, { color: colors.contentPrimary }]}>
             {confirmedLabel}
           </Text>
@@ -484,9 +512,11 @@ function MorphingProposalCard({
           <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
         ) : null
       ) : (
-        <RNAnimated.View style={{ opacity: chevronOpacity }}>
-          <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
-        </RNAnimated.View>
+        memoryIds && memoryIds.length > 0 ? (
+          <RNAnimated.View style={{ opacity: chevronOpacity }}>
+            <Feather name="chevron-right" size={12} color={colors.contentPrimary} />
+          </RNAnimated.View>
+        ) : null
       )}
     </View>
   );

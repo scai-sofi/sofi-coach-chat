@@ -85,7 +85,10 @@ export function InputBar() {
             AI can make mistakes.{' '}
             <Text style={styles.disclaimerLink}>Learn more</Text>
             {'   '}
-            <Text style={styles.disclaimerLink}>Privacy policy</Text>
+            <Text
+              style={styles.disclaimerLink}
+              onPress={() => { /* Link to https://www.sofi.com/online-privacy-policy/ */ }}
+            >Privacy policy</Text>
           </Text>
         </View>
       )}
