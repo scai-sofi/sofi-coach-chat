@@ -11,7 +11,6 @@ import { TypingIndicator } from '../components/TypingIndicator';
 import { InputBar } from '../components/InputBar';
 import { EmptyChat, SuggestionCards } from '../components/EmptyChat';
 
-import { GoalsDashboard } from '../components/GoalsDashboard';
 import { FlowPickerSheet } from '../components/FlowPickerSheet';
 import { ChatHistory } from '../components/ChatHistory';
 import { SettingsPanel } from '../components/SettingsPanel';
@@ -263,8 +262,6 @@ export default function ChatScreen() {
       </KeyboardAvoidingView>
 
       {messages.length === 0 && activePanel === 'none' && <SuggestionCards bottomOffset={inputBarHeight} />}
-
-      {activePanel === 'goals' && <GoalsDashboard />}
 
       {showHistory && (
         <ChatHistory onClose={() => {

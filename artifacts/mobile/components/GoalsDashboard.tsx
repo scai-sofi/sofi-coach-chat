@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Image, ImageSourcePropType, Platform, UIManager } from 'react-native';
+// Shared source for both Phase 1 and Phase 2 — phase2/components/GoalsDashboard.tsx re-exports from here.
+import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable, ScrollView, StyleSheet, Image, ImageSourcePropType, AccessibilityInfo, Platform, UIManager, LayoutAnimation } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -8,46 +9,54 @@ import Animated, {
   withSpring,
   withTiming,
   withDelay,
-  withSequence,
   interpolate,
+  interpolateColor,
   Easing,
   runOnJS,
   FadeInDown,
+  FadeOut,
   ReduceMotion,
 } from 'react-native-reanimated';
 import { useTheme } from '@/context/ThemeContext';
 import { Fonts } from '@/constants/fonts';
+import { shadowDownTwo } from '@/constants/shadows';
 import { useCoach } from '@/context/CoachContext';
 import { Goal, GoalType, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '@/constants/types';
 import { AppBar } from '@/components/AppBar';
-
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+const goalKidsImg = require('../assets/images/goal-kids.png');
+const goalInvestmentImg = require('../assets/images/goal-investment.png');
+const goalRetirementImg = require('../assets/images/goal-retirement.png');
+const goalTravelImg = require('../assets/images/goal-travel.png');
 const goalHouseImg = require('../assets/images/goal-house.png');
-const goalPagodaImg = require('../assets/images/goal-pagoda.png');
-const goalWeddingImg = require('../assets/images/goal-wedding.png');
-
-const GOAL_TITLE_ILLUSTRATIONS: Record<string, ImageSourcePropType> = {
-  Wedding: goalWeddingImg,
-};
+const goalDebtPayoffImg = require('../assets/images/goal-debt-payoff.png');
+const goalSavingsImg = require('../assets/images/goal-savings.png');
 
 const GOAL_ILLUSTRATIONS: Partial<Record<GoalType, ImageSourcePropType>> = {
-  EMERGENCY_FUND: goalHouseImg,
-  SAVINGS_TARGET: goalHouseImg,
-  DEBT_PAYOFF: goalPagodaImg,
-  INVESTMENT: goalPagodaImg,
-  CUSTOM: goalHouseImg,
+  EMERGENCY_FUND: goalSavingsImg,
+  SAVINGS_TARGET: goalSavingsImg,
+  CUSTOM: goalSavingsImg,
+  DEBT_PAYOFF: goalDebtPayoffImg,
+  INVESTMENT: goalInvestmentImg,
+};
+// Title-specific overrides take precedence over type-based illustrations.
+const GOAL_TITLE_ILLUSTRATIONS: Record<string, ImageSourcePropType> = {
+  Kids: goalKidsImg,
+  Retirement: goalRetirementImg,
+  Travel: goalTravelImg,
+  House: goalHouseImg,
 };
 
 const PROGRESS_SPRING = { damping: 28, stiffness: 60, mass: 1.2, reduceMotion: ReduceMotion.System };
-const ILLUSTRATION_SPRING = { damping: 14, stiffness: 100, mass: 0.8, reduceMotion: ReduceMotion.System };
-const TAB_SPRING = { damping: 22, stiffness: 200, mass: 0.8, reduceMotion: ReduceMotion.System };
-const BUTTON_SPRING_IN = { damping: 15, stiffness: 400, reduceMotion: ReduceMotion.System };
-const BUTTON_SPRING_OUT = { damping: 12, stiffness: 300, reduceMotion: ReduceMotion.System };
+const ILLUSTRATION_SPRING = { damping: 26, stiffness: 80, mass: 0.8, reduceMotion: ReduceMotion.System };
+const TAB_SPRING = { damping: 28, stiffness: 200, mass: 0.8, reduceMotion: ReduceMotion.System };
+const BUTTON_SPRING_IN = { damping: 22, stiffness: 400, reduceMotion: ReduceMotion.System };
+const BUTTON_SPRING_OUT = { damping: 20, stiffness: 300, reduceMotion: ReduceMotion.System };
 
-function AnimatedProgressBar({ percentage, delay = 0 }: { percentage: number; delay?: number }) {
+function AnimatedProgressBar({ percentage, delay = 0, color }: { percentage: number; delay?: number; color?: string }) {
   const { colors } = useTheme();
   const progress = useSharedValue(0);
 
@@ -58,7 +67,7 @@ function AnimatedProgressBar({ percentage, delay = 0 }: { percentage: number; de
 
   const fillStyle = useAnimatedStyle(() => ({
     width: `${progress.value}%`,
-    backgroundColor: colors.contentPrimary,
+    backgroundColor: color ?? colors.contentPrimary,
     height: '100%',
     borderRadius: 20,
   }));
@@ -127,7 +136,7 @@ function AnimatedTabIndicator({
     width: tabWidth,
     height: '100%',
     position: 'absolute' as const,
-    left: 2,
+    left: 0,
     top: 0,
     borderRadius: 24,
     backgroundColor: colors.surfaceElevated,
@@ -143,7 +152,7 @@ function AnimatedTabIndicator({
   return <Animated.View style={indicatorStyle} />;
 }
 
-function SegmentedTabs({
+export function SegmentedTabs({
   tabs,
   activeTab,
   onTabChange,
@@ -158,7 +167,7 @@ function SegmentedTabs({
 
   return (
     <View
-      style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack }]}
+      style={[styles.segmentedContainer, { backgroundColor: colors.progressTrack, borderColor: colors.progressTrack }]}
       onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
       <AnimatedTabIndicator
@@ -214,13 +223,12 @@ function AnimatedButton({ onPress, style, children }: { onPress?: () => void; st
   );
 }
 
-function GoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
+export function GoalCard({ goal, onAskPress, onEditPress, index = 0, skipEnterAnimation = false }: { goal: Goal; onAskPress?: () => void; onEditPress?: () => void; index?: number; skipEnterAnimation?: boolean }) {
   const { colors } = useTheme();
-  const { setActivePanel } = useCoach();
   const percentage = Math.round((goal.currentAmount / goal.targetAmount) * 100);
   const isCompleted = goal.status === 'COMPLETED';
   const tabCategory = GOAL_TAB_MAP[goal.type];
-  const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
+  const isPayOff = tabCategory === 'pay-off';
   const illustration = GOAL_TITLE_ILLUSTRATIONS[goal.title] ?? GOAL_ILLUSTRATIONS[goal.type];
 
   const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
@@ -243,29 +251,39 @@ function GoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(staggerDelay).duration(500).springify().damping(18).stiffness(100).reduceMotion(ReduceMotion.System)}
-      style={[styles.goalCard, { backgroundColor: colors.surfaceElevated, shadowColor: colors.shadowColor }]}
+      entering={skipEnterAnimation ? undefined : FadeInDown.delay(staggerDelay).duration(500).springify().damping(28).stiffness(80).reduceMotion(ReduceMotion.System)}
+      style={[styles.goalCardWrapper, !isCompleted && illustration && styles.goalCardWrapperWithIllo, isCompleted && { opacity: 0.72 }]}
     >
-      {illustration && (
+      {!isCompleted && illustration && (
         <Animated.View style={[styles.goalIllustration, illustrationStyle]}>
           <Image source={illustration} style={styles.goalIllustrationImage} />
         </Animated.View>
       )}
+      <View style={[styles.goalCard, { backgroundColor: colors.surfaceElevated }]}>
       <View style={styles.goalHeader}>
-        <View style={styles.goalHeaderText}>
-          <AnimatedPercentage value={percentage} delay={staggerDelay + 200} />
-          <Text style={[styles.goalSubtitle, { color: colors.contentSecondary }]}>{subtitle}</Text>
+        <View style={[styles.goalHeaderText, !isCompleted && illustration && { paddingRight: 112 }]}>
+          <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{goal.title}</Text>
         </View>
+        {isCompleted && (
+          <View style={[styles.completedBadge, { backgroundColor: colors.successBg }]}>
+            <Feather name="check" size={12} color={colors.successDark} />
+            <Text style={[styles.completedBadgeText, { color: colors.successDark }]}>Completed</Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.meterSection}>
-        <AnimatedProgressBar percentage={percentage} delay={staggerDelay + 400} />
+        <AnimatedProgressBar percentage={percentage} delay={staggerDelay + 400} color={isCompleted ? colors.successDark : undefined} />
         <View style={styles.meterLabels}>
           <Text style={[styles.meterLabel, { color: colors.contentPrimary }]}>
-            ${goal.currentAmount.toLocaleString()} saved
+            {isPayOff
+              ? `$${goal.currentAmount.toLocaleString()} paid off`
+              : `$${goal.currentAmount.toLocaleString()} saved`}
           </Text>
           <Text style={[styles.meterLabel, styles.meterLabelRight, { color: colors.contentPrimary }]}>
-            ${goal.targetAmount.toLocaleString()} target
+            {isPayOff
+              ? `$${goal.targetAmount.toLocaleString()} total`
+              : `$${goal.targetAmount.toLocaleString()} target`}
           </Text>
         </View>
       </View>
@@ -276,13 +294,13 @@ function GoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
 
           <View style={styles.detailRows}>
             <View style={styles.detailRow}>
-              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Est. completion</Text>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Est. payoff' : 'Est. completion'}</Text>
               <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>
                 ~ {monthsRemaining} months {'\u2022'} {estDate}
               </Text>
             </View>
             <View style={styles.detailRow}>
-              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Recurring contribution</Text>
+              <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Payment' : 'Recurring contribution'}</Text>
               <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>
                 ${goal.monthlyContributionTarget}/mo
               </Text>
@@ -294,11 +312,14 @@ function GoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
           </View>
 
           <View style={styles.actionButtons}>
-            <AnimatedButton style={[styles.editButton, { borderColor: colors.borderMedium }]}>
+            <AnimatedButton
+              onPress={onEditPress}
+              style={[styles.editButton, { borderColor: colors.borderMedium }]}
+            >
               <Text style={[styles.editButtonText, { color: colors.contentPrimary }]}>Edit</Text>
             </AnimatedButton>
             <AnimatedButton
-              onPress={() => setActivePanel('none')}
+              onPress={onAskPress}
               style={styles.askCoachButton}
             >
               <Text style={styles.askCoachButtonText}>Ask Coach</Text>
@@ -324,94 +345,206 @@ function GoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
           </View>
         </>
       )}
+      </View>
     </Animated.View>
   );
 }
 
-function SuggestedGoalCard({ goal, index = 0 }: { goal: Goal; index?: number }) {
+export function SuggestedGoalCard({
+  goal,
+  index = 0,
+  onAccepted,
+  onDismiss,
+}: {
+  goal: Goal;
+  index?: number;
+  onAccepted?: () => void;
+  onDismiss?: () => void;
+}) {
   const { colors } = useTheme();
-  const { acceptDraftGoal, dismissDraftGoal } = useCoach();
   const tabCategory = GOAL_TAB_MAP[goal.type];
-  const subtitle = `${GOAL_TAB_SUBTITLE[tabCategory]} ${goal.title}`;
-  const monthsRemaining = Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)));
+  const isPayOff = tabCategory === 'pay-off';
+  const illustration = GOAL_TITLE_ILLUSTRATIONS[goal.title] ?? GOAL_ILLUSTRATIONS[goal.type];
+
+  const hasTarget = goal.targetAmount > 0;
+  const hasMonthly = goal.monthlyContributionTarget > 0;
+  const hasDate = goal.targetDate && goal.targetDate.getFullYear() > 2000;
+  const isPartial = !hasTarget || !hasMonthly || !hasDate;
+  const targetDateStr = hasDate
+    ? goal.targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : null;
+  const monthsRemaining = hasDate
+    ? Math.max(1, Math.ceil((goal.targetDate.getTime() - Date.now()) / (30 * 86400000)))
+    : null;
 
   const staggerDelay = index * 120;
+  const morphProgress = useSharedValue(0);
 
-  // Shared values for manual exit animation
-  const cardOpacity = useSharedValue(1);
-  const cardScale = useSharedValue(1);
-  const cardTranslateY = useSharedValue(0);
-  const [busy, setBusy] = useState(false);
+  const handleAccept = () => {
+    morphProgress.value = withTiming(1, {
+      duration: 480,
+      easing: Easing.bezier(0.4, 0, 0.2, 1),
+      reduceMotion: ReduceMotion.System,
+    }, (finished) => {
+      if (finished && onAccepted) {
+        runOnJS(onAccepted)();
+      }
+    });
+  };
 
-  const cardExitStyle = useAnimatedStyle(() => ({
-    opacity: cardOpacity.value,
-    transform: [
-      { scale: cardScale.value },
-      { translateY: cardTranslateY.value },
-    ],
+  const cardAnimStyle = useAnimatedStyle(() => {
+    const bg = interpolateColor(morphProgress.value, [0, 1], [colors.surfaceTint, colors.surfaceElevated]);
+    const borderW = interpolate(morphProgress.value, [0, 0.5], [1, 0], 'clamp');
+    return {
+      backgroundColor: bg,
+      borderColor: colors.progressTrack,
+      borderWidth: borderW,
+    };
+  });
+
+  // Draft fades out in the first half
+  const draftOpacity = useAnimatedStyle(() => ({
+    opacity: interpolate(morphProgress.value, [0, 0.5], [1, 0], 'clamp'),
   }));
 
-  // "Set up goal" — card briefly lifts (micro-confirm), then fades upward
-  const handleAccept = useCallback(() => {
-    if (busy) return;
-    setBusy(true);
-    // Quick pop up to 1.02, then shrink-and-rise as opacity fades
-    cardScale.value = withSequence(
-      withSpring(1.02, { damping: 18, stiffness: 500 }),
-      withDelay(60, withTiming(0.94, { duration: 220, easing: Easing.out(Easing.quad) }))
-    );
-    cardOpacity.value = withDelay(80, withTiming(0, { duration: 200, easing: Easing.out(Easing.quad) }));
-    cardTranslateY.value = withDelay(60, withTiming(-10, { duration: 240, easing: Easing.out(Easing.quad) }));
-    setTimeout(() => acceptDraftGoal(goal.id), 300);
-  }, [goal.id, acceptDraftGoal, busy]);
+  // Active fades in over the second half, with slight overlap for a smooth blend
+  const activeOpacity = useAnimatedStyle(() => ({
+    opacity: interpolate(morphProgress.value, [0.4, 1], [0, 1], 'clamp'),
+  }));
 
-  // "Dismiss" — card shrinks and fades downward (dropped)
-  const handleDismiss = useCallback(() => {
-    if (busy) return;
-    setBusy(true);
-    cardOpacity.value = withTiming(0, { duration: 180, easing: Easing.out(Easing.quad) });
-    cardScale.value = withTiming(0.95, { duration: 180, easing: Easing.out(Easing.quad) });
-    cardTranslateY.value = withTiming(8, { duration: 180, easing: Easing.out(Easing.quad) });
-    setTimeout(() => dismissDraftGoal(goal.id), 200);
-  }, [goal.id, dismissDraftGoal, busy]);
+  // Illustration appears mid-morph
+  const illustrationAnimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(morphProgress.value, [0.35, 0.75], [0, 1], 'clamp'),
+    transform: [{ scale: interpolate(morphProgress.value, [0.35, 0.75], [0.88, 1], 'clamp') }],
+  }));
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(staggerDelay).duration(500).springify().damping(18).stiffness(100).reduceMotion(ReduceMotion.System)}
-      style={[styles.suggestedCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.contentBrand, shadowColor: colors.shadowColor }, cardExitStyle]}
+      entering={FadeInDown.delay(staggerDelay).duration(500).springify().damping(28).stiffness(80).reduceMotion(ReduceMotion.System)}
+      exiting={FadeOut.duration(50)}
+      style={[styles.goalCardWrapper, illustration && styles.goalCardWrapperWithIllo]}
     >
-      <View style={styles.suggestedLabelRow}>
-        <View style={[styles.suggestedBadge, { backgroundColor: colors.surfaceTint }]}>
-          <Text style={[styles.suggestedBadgeText, { color: colors.contentBrand }]}>Suggested</Text>
-        </View>
-      </View>
+      {/* Illustration — sibling of card, at top of wrapper, animates in mid-morph */}
+      {illustration && (
+        <Animated.View style={[styles.goalIllustration, illustrationAnimStyle]}>
+          <Image source={illustration} style={styles.goalIllustrationImage} />
+        </Animated.View>
+      )}
+      <Animated.View style={[styles.suggestedCard, cardAnimStyle]}>
 
-      <View style={styles.goalHeaderText}>
-        <Text style={[styles.goalSubtitle, { color: colors.contentPrimary }]}>{subtitle}</Text>
-        <Text style={[styles.suggestedMeta, { color: colors.contentSecondary }]}>
-          ${goal.targetAmount.toLocaleString()} {'\u2022'} ${goal.monthlyContributionTarget}/mo {'\u2022'} ~{monthsRemaining} months
-        </Text>
-        <Text style={[styles.suggestedMeta, { color: colors.contentSecondary }]}>
-          Linked: {goal.linkedAccount}
-        </Text>
-      </View>
+        {/* Draft content — normal flow, drives card height, buttons remain interactive */}
+        <Animated.View style={[{ gap: 16 }, draftOpacity]}>
+          <View style={styles.goalHeader}>
+            <View style={styles.goalHeaderText}>
+              <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{goal.title}</Text>
+            </View>
+            <View style={[styles.pendingPill, { backgroundColor: colors.progressTrack }]}>
+              <Text style={[styles.pendingPillText, { color: colors.contentSecondary }]}>Proposed by Coach</Text>
+            </View>
+          </View>
 
-      <View style={styles.actionButtons}>
-        <AnimatedButton style={[styles.editButton, { borderColor: colors.surfaceEdge }]} onPress={handleDismiss}>
-          <Text style={[styles.editButtonText, { color: colors.contentSecondary }]}>Dismiss</Text>
-        </AnimatedButton>
-        <AnimatedButton style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]} onPress={handleAccept}>
-          <Text style={[styles.setupButtonText, { color: colors.contentPrimaryInverse }]}>Set up goal</Text>
-        </AnimatedButton>
-      </View>
+          <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
+
+          <View style={styles.detailRows}>
+            {hasTarget && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Balance' : 'Target'}</Text>
+                <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>${goal.targetAmount.toLocaleString()}</Text>
+              </View>
+            )}
+            {hasMonthly && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Payment' : 'Monthly'}</Text>
+                <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>${goal.monthlyContributionTarget}/mo</Text>
+              </View>
+            )}
+            {targetDateStr && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Debt-free by' : 'Target date'}</Text>
+                <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{targetDateStr}</Text>
+              </View>
+            )}
+            {isPartial && (
+              <Text style={[styles.partialHint, { color: colors.contentSecondary }]}>
+                {'\u2139\uFE0F'} Some details will be set during setup
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.actionButtons}>
+            <AnimatedButton
+              style={[styles.dismissButton, { borderColor: colors.progressTrack }]}
+              onPress={onDismiss}
+            >
+              <Text style={[styles.editButtonText, { color: colors.contentSecondary }]}>Dismiss</Text>
+            </AnimatedButton>
+            <AnimatedButton
+              style={[styles.setupButton, { backgroundColor: colors.contentPrimary }]}
+              onPress={handleAccept}
+            >
+              <Text style={[styles.setupButtonText, { color: colors.contentPrimaryInverse }]}>
+                {isPartial ? 'Complete setup' : 'Set up'}
+              </Text>
+            </AnimatedButton>
+          </View>
+        </Animated.View>
+
+        {/* Active goal-card content — absolute overlay, fades in over draft, non-interactive */}
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { paddingTop: 20, paddingBottom: 20, paddingHorizontal: 16, gap: 16 }, activeOpacity]}
+          pointerEvents="none"
+        >
+          <View style={styles.goalHeader}>
+            <View style={styles.goalHeaderText}>
+              <Text style={[styles.goalTitle, { color: colors.contentPrimary }]}>{goal.title}</Text>
+            </View>
+          </View>
+
+          <View style={styles.meterSection}>
+            <AnimatedProgressBar percentage={0} delay={0} />
+            <View style={styles.meterLabels}>
+              <Text style={[styles.meterLabel, { color: colors.contentPrimary }]}>$0 saved</Text>
+              {hasTarget && (
+                <Text style={[styles.meterLabel, styles.meterLabelRight, { color: colors.contentPrimary }]}>
+                  ${goal.targetAmount.toLocaleString()} target
+                </Text>
+              )}
+            </View>
+          </View>
+
+          <View style={[styles.dividerLine, { backgroundColor: colors.progressTrack }]} />
+
+          <View style={styles.detailRows}>
+            {monthsRemaining && targetDateStr && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Est. payoff' : 'Est. completion'}</Text>
+                <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>~ {monthsRemaining} months {'\u2022'} {targetDateStr}</Text>
+              </View>
+            )}
+            {hasMonthly && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>{isPayOff ? 'Payment' : 'Recurring contribution'}</Text>
+                <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>${goal.monthlyContributionTarget}/mo</Text>
+              </View>
+            )}
+            {goal.linkedAccount && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailLabel, { color: colors.contentSecondary }]}>Linked account</Text>
+                <Text style={[styles.detailValue, { color: colors.contentPrimary }]}>{goal.linkedAccount}</Text>
+              </View>
+            )}
+          </View>
+        </Animated.View>
+      </Animated.View>
     </Animated.View>
   );
 }
 
 export function GoalsDashboard() {
   const { colors } = useTheme();
-  const { goals, setActivePanel, openNewGoalSetup } = useCoach();
+  const { goals, setActivePanel, acceptDraftGoal, dismissDraftGoal } = useCoach();
   const [activeTab, setActiveTab] = useState<GoalTabCategory>('save-up');
+  const [recentlyAccepted, setRecentlyAccepted] = useState<string | null>(null);
 
   const allGoals = goals.filter(g => g.status !== 'DRAFT');
   const draftGoals = goals.filter(g => g.status === 'DRAFT');
@@ -433,22 +566,14 @@ export function GoalsDashboard() {
 
   return (
     <View style={[styles.panel, { backgroundColor: colors.surfaceBase }]}>
-      <AppBar
-        variant="back"
-        title="Goals"
-        onBack={() => setActivePanel('none')}
-        rightActions={[{
-          icon: <Feather name="plus" size={22} color={colors.contentPrimary} />,
-          onPress: openNewGoalSetup,
-        }]}
-      />
+      <AppBar variant="back" title="Goals" onBack={() => setActivePanel('none')} />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {!hasAny ? (
           <View style={styles.empty}>
             <Feather name="target" size={32} color={colors.contentMuted} />
             <Text style={[styles.emptyText, { color: colors.contentSecondary }]}>
-              No goals yet. Create one to start tracking your progress.
+              No goals yet. Tell the coach what you're working toward and it will help you set one up.
             </Text>
           </View>
         ) : (
@@ -457,27 +582,41 @@ export function GoalsDashboard() {
 
             {draftGoals.length > 0 && draftGoals.some(g => GOAL_TAB_MAP[g.type] === activeTab) && (
               <>
-                <View style={styles.sectionHeader}>
-                  <Feather name="star" size={13} color={colors.contentBrand} />
-                  <Text style={[styles.sectionHeaderText, { color: colors.contentBrand }]}>Suggested</Text>
-                </View>
                 {draftGoals
                   .filter(g => GOAL_TAB_MAP[g.type] === activeTab)
-                  .map((g, i) => <SuggestedGoalCard key={g.id} goal={g} index={i} />)}
+                  .map((g, i) => (
+                    <SuggestedGoalCard
+                      key={g.id}
+                      goal={g}
+                      index={i}
+                      onDismiss={() => dismissDraftGoal(g.id)}
+                      onAccepted={() => {
+                        setRecentlyAccepted(g.id);
+                        acceptDraftGoal(g.id);
+                      }}
+                    />
+                  ))}
               </>
             )}
 
             {activeGoals.map((g, i) => (
-              <GoalCard key={g.id} goal={g} index={i} />
+              <GoalCard
+                key={g.id}
+                goal={g}
+                index={i}
+                skipEnterAnimation={g.id === recentlyAccepted}
+                onAskPress={() => setActivePanel('none')}
+              />
             ))}
 
             {activeGoals.length > 0 && completedGoals.length > 0 && (
-              <View style={styles.sectionDivider}>
-                <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
-                <Text style={[styles.sectionDividerText, { color: colors.contentSecondary }]}>COMPLETED</Text>
-                <View style={[styles.sectionDividerLine, { backgroundColor: colors.progressTrack }]} />
+              <View style={styles.completedDivider}>
+                <View style={[styles.completedDividerLine, { backgroundColor: colors.progressTrack }]} />
+                <Text style={[styles.completedDividerText, { color: colors.contentSecondary }]}>COMPLETED</Text>
+                <View style={[styles.completedDividerLine, { backgroundColor: colors.progressTrack }]} />
               </View>
             )}
+
             {completedGoals.map((g, i) => <GoalCard key={g.id} goal={g} index={activeGoals.length + i} />)}
 
             {filteredGoals.length === 0 && draftGoals.filter(g => GOAL_TAB_MAP[g.type] === activeTab).length === 0 && (
@@ -503,13 +642,14 @@ const styles = StyleSheet.create({
   contentInner: {
     paddingHorizontal: 16,
     paddingBottom: 20,
-    gap: 16,
+    gap: 20,
   },
   segmentedContainer: {
     flexDirection: 'row',
     borderRadius: 24,
     height: 40,
     alignItems: 'center',
+    borderWidth: 2,
   },
   segmentedTab: {
     flex: 1,
@@ -522,8 +662,15 @@ const styles = StyleSheet.create({
   segmentedTabText: {
     fontSize: 12,
     fontFamily: Fonts.medium,
+    lineHeight: 16,
     letterSpacing: 0.1,
     textAlign: 'center',
+  },
+  goalCardWrapper: {
+    paddingTop: 0,
+  },
+  goalCardWrapperWithIllo: {
+    paddingTop: 64,
   },
   goalCard: {
     borderRadius: 20,
@@ -531,27 +678,33 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingHorizontal: 16,
     gap: 16,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-    overflow: 'hidden',
+    ...shadowDownTwo,
+    overflow: 'visible',
+  },
+  suggestedCard: {
+    borderRadius: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+    gap: 16,
+    overflow: 'visible',
   },
   goalIllustration: {
     position: 'absolute',
-    top: -4,
-    right: 0,
-    width: 94,
-    height: 94,
+    top: 0,
+    right: -4,
+    width: 144,
+    height: 144,
     zIndex: 1,
   },
   goalIllustrationImage: {
-    width: 94,
-    height: 94,
+    width: 144,
+    height: 144,
   },
   goalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   goalHeaderText: {
     flex: 1,
@@ -646,15 +799,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    backgroundColor: '#edf8fc',  // surfaceTipDefault
     borderWidth: 1.5,
-    borderColor: '#65cae5',      // blue450 (was #5aeaff, off-palette)
+    borderColor: '#65cae5',      // blue450 / contentBrand border
   },
   askCoachButtonText: {
     fontSize: 14,
     fontFamily: Fonts.bold,
     lineHeight: 20,
     color: '#00a2c7',            // contentBrand
+  },
+  dismissButton: {
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
   },
   setupButton: {
     flex: 1,
@@ -668,39 +828,33 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bold,
     lineHeight: 20,
   },
-  suggestedCard: {
-    borderRadius: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-    paddingHorizontal: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  suggestedLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  suggestedBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
   suggestedBadgeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: Fonts.medium,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    lineHeight: 16,
+    letterSpacing: 0.1,
   },
-  suggestedMeta: {
+  pendingPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  pendingPillText: {
     fontSize: 13,
-    fontFamily: Fonts.regular,
+    fontFamily: Fonts.medium,
     lineHeight: 18,
+  },
+  partialHint: {
+    fontSize: 12,
+    fontFamily: Fonts.regular,
+    lineHeight: 16,
     marginTop: 2,
+  },
+  goalTitle: {
+    fontSize: 20,
+    fontFamily: Fonts.medium,
+    lineHeight: 24,
+    letterSpacing: -0.2,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -712,17 +866,18 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     lineHeight: 20,
   },
-  sectionDivider: {
+  completedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
   },
-  sectionDividerLine: { flex: 1, height: 1 },
-  sectionDividerText: {
-    fontSize: 11,
+  completedBadgeText: {
+    fontSize: 13,
     fontFamily: Fonts.medium,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    lineHeight: 18,
   },
   empty: {
     alignItems: 'center',
@@ -735,6 +890,18 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     textAlign: 'center',
     maxWidth: 260,
+  },
+  completedDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  completedDividerLine: { flex: 1, height: 1 },
+  completedDividerText: {
+    fontSize: 11,
+    fontFamily: Fonts.medium,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   emptyTab: {
     alignItems: 'center',

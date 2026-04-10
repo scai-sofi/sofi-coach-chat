@@ -140,8 +140,30 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     ? (PERSONAS.find(p => p.id === sharedPersonaId) || PERSONAS[0] || null)
     : null;
   const [messages, setMessages] = useState<Message[]>([]);
-  const [memories, setMemories] = useState<Memory[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const [memories, setMemories] = useState<Memory[]>(() => {
+    if (!initialPersona) return [];
+    const seeded = buildSeededHistory(initialPersona.id);
+    const seenIds = new Set<string>();
+    const agg: Memory[] = [];
+    for (const s of seeded) {
+      for (const m of s.memories ?? []) {
+        if (!seenIds.has(m.id)) { seenIds.add(m.id); agg.push(m); }
+      }
+    }
+    return agg;
+  });
+  const [goals, setGoals] = useState<Goal[]>(() => {
+    if (!initialPersona) return [];
+    const seeded = buildSeededHistory(initialPersona.id);
+    const seenIds = new Set<string>();
+    const agg: Goal[] = [];
+    for (const s of seeded) {
+      for (const g of s.goals ?? []) {
+        if (!seenIds.has(g.id)) { seenIds.add(g.id); agg.push(g); }
+      }
+    }
+    return agg;
+  });
   const [isTyping, setIsTyping] = useState(false);
   const [memoryMode, setMemoryMode] = useState<MemoryMode>('ask-first');
   const [activePanel, setActivePanelState] = useState<PanelType>('none');

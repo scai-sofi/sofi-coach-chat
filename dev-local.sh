@@ -75,12 +75,18 @@ if [[ "$API_ONLY" == "true" ]]; then
 fi
 
 # ── 3. Expo / mobile ───────────────────────────────────────────────────────
+# Resolve the host IP for Expo Go on physical devices.
+# Priority: EXPO_PUBLIC_API_URL already set by caller > auto-detected LAN IP > localhost
+if [[ -z "${EXPO_PUBLIC_API_URL:-}" ]]; then
+  LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
+  export EXPO_PUBLIC_API_URL="http://${LOCAL_IP}:$API_PORT/api"
+fi
+
 echo ""
-echo "▶ [3/3] Starting Expo (scan QR with Expo Go)..."
+echo "▶ [3/3] Starting Expo (web + Expo Go QR)..."
 (
-  export EXPO_PUBLIC_API_URL="http://localhost:$API_PORT/api"
   cd "$ROOT/artifacts/mobile"
-  pnpm exec expo start
+  pnpm exec expo start --web --clear
 ) &
 
 echo ""
@@ -89,7 +95,9 @@ echo " All services running:"
 echo ""
 echo "  [mock-openai]  http://localhost:$MOCK_PORT"
 echo "  [api-server]   http://localhost:$API_PORT/api"
-echo "  [expo]         scan QR code with Expo Go app"
+echo "  [expo web]     http://localhost:8081   ← open in Cursor preview"
+echo "  [expo mobile]  scan QR code with Expo Go app"
+echo "  [api url]      $EXPO_PUBLIC_API_URL"
 echo ""
 echo "  Press Ctrl+C to stop everything"
 echo "═══════════════════════════════════════════════════════"

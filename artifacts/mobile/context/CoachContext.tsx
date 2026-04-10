@@ -6,6 +6,7 @@ import { PERSONAS } from '@/constants/personas';
 import { buildSeededHistory } from '@/constants/seededHistory';
 import { generateAIResponse } from '@/constants/aiResponse';
 import { usePrototype } from '@/prototype/PrototypeContext';
+import Constants from 'expo-constants';
 
 const uid = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
@@ -25,11 +26,32 @@ export interface ChatSession {
 }
 
 function getApiBaseUrl(): string {
-  // Explicit full URL override — useful for local dev (e.g. http://localhost:3001/api)
+  // Explicit full URL override — useful for CI or production deploys
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (apiUrl) return apiUrl;
+  if (apiUrl) {
+    console.log('[API] Using EXPO_PUBLIC_API_URL:', apiUrl);
+    return apiUrl;
+  }
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
   if (domain) return `https://${domain}/api`;
+
+  // In Expo Go on a physical device, derive the API host from the Metro bundler
+  // host so we automatically use the dev machine's LAN IP (e.g. 10.0.0.216:3001).
+  // SDK 54 exposes this via expoGoConfig.debuggerHost.
+  const debuggerHost =
+    (Constants as any).expoGoConfig?.debuggerHost ??
+    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost ??
+    (Constants as any).manifest?.debuggerHost ??
+    Constants.expoConfig?.hostUri;
+  console.log('[API] debuggerHost:', debuggerHost, '| Constants keys:', Object.keys(Constants));
+  if (debuggerHost) {
+    const host = debuggerHost.split(':')[0];
+    const url = `http://${host}:3001/api`;
+    console.log('[API] Resolved API base:', url);
+    return url;
+  }
+
+  console.log('[API] Falling back to /api');
   return '/api';
 }
 
@@ -148,8 +170,30 @@ export function CoachProvider({ children }: { children: React.ReactNode }) {
     ? (PERSONAS.find(p => p.id === sharedPersonaId) || PERSONAS[0] || null)
     : null;
   const [messages, setMessages] = useState<Message[]>([]);
-  const [memories, setMemories] = useState<Memory[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const [memories, setMemories] = useState<Memory[]>(() => {
+    if (!initialPersona) return [];
+    const seeded = buildSeededHistory(initialPersona.id);
+    const seenIds = new Set<string>();
+    const agg: Memory[] = [];
+    for (const s of seeded) {
+      for (const m of s.memories ?? []) {
+        if (!seenIds.has(m.id)) { seenIds.add(m.id); agg.push(m); }
+      }
+    }
+    return agg;
+  });
+  const [goals, setGoals] = useState<Goal[]>(() => {
+    if (!initialPersona) return [];
+    const seeded = buildSeededHistory(initialPersona.id);
+    const seenIds = new Set<string>();
+    const agg: Goal[] = [];
+    for (const s of seeded) {
+      for (const g of s.goals ?? []) {
+        if (!seenIds.has(g.id)) { seenIds.add(g.id); agg.push(g); }
+      }
+    }
+    return agg;
+  });
   const [isTyping, setIsTyping] = useState(false);
   const [memoryMode, setMemoryMode] = useState<MemoryMode>('ask-first');
   const [activePanel, setActivePanelState] = useState<PanelType>('none');

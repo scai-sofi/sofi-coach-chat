@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: 16,
     gap: 12,
-    zIndex: -1,
+    zIndex: 10,
   },
   fullCard: {
     borderRadius: 16,

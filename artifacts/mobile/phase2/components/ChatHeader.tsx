@@ -11,7 +11,6 @@ import {
   MoreIcon,
   ChatNewIcon,
   MemoryMenuIcon,
-  GoalsMenuIcon,
   SettingsMenuIcon,
   PencilMenuIcon,
   DeleteMenuIcon,
@@ -22,8 +21,7 @@ import {
 export function ChatHeader() {
   const { colors } = useTheme();
   const { goBack, navigate } = usePhase2Nav();
-  const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle, goals } = useCoach();
-  const draftGoalCount = goals.filter(g => g.status === 'DRAFT').length;
+  const { setActivePanel, clearConversation, chatMode, startLiveChat, messages, saveAndClose, sessionTitle } = useCoach();
   const [menuOpen, setMenuOpen] = useState(false);
   const headerHeight = useAppBarHeight();
 
@@ -47,19 +45,6 @@ export function ChatHeader() {
   ) : undefined;
 
   const rightActions = [
-    {
-      icon: (
-        <View>
-          <GoalsMenuIcon size={20} color={colors.contentPrimary} />
-          {draftGoalCount > 0 && (
-            <View style={[styles.headerBadge, { backgroundColor: colors.contentBrand }]}>
-              <Text style={[styles.headerBadgeText, { color: colors.whiteOnDark }]}>{draftGoalCount}</Text>
-            </View>
-          )}
-        </View>
-      ),
-      onPress: () => { Keyboard.dismiss(); setActivePanel('goals'); },
-    },
     {
       icon: <MemoryMenuIcon size={20} color={colors.contentPrimary} />,
       onPress: () => { Keyboard.dismiss(); navigate('about-me'); },
@@ -154,21 +139,5 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     lineHeight: 16,
     letterSpacing: 0.1,
-  },
-  headerBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -6,
-    minWidth: 14,
-    height: 14,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 3,
-  },
-  headerBadgeText: {
-    fontSize: 9,
-    fontFamily: Fonts.medium,
-    lineHeight: 12,
   },
 });

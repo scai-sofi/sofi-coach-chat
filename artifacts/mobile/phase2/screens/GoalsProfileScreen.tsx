@@ -12,7 +12,7 @@ import { GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER } from '
 export default function GoalsProfileScreen() {
   const { colors } = useTheme();
   const { navigate, goBack } = usePhase2Nav();
-  const { goals } = useCoach();
+  const { goals, dismissDraftGoal, acceptDraftGoal } = useCoach();
   const [activeTab, setActiveTab] = useState<GoalTabCategory>('save-up');
 
   const allGoals = goals.filter(g => g.status !== 'DRAFT');
@@ -59,13 +59,17 @@ export default function GoalsProfileScreen() {
 
             {draftGoals.length > 0 && draftGoals.some(g => GOAL_TAB_MAP[g.type] === activeTab) && (
               <>
-                <View style={styles.sectionHeader}>
-                  <Feather name="star" size={13} color={colors.contentBrand} />
-                  <Text style={[styles.sectionHeaderText, { color: colors.contentBrand }]}>Suggested</Text>
-                </View>
                 {draftGoals
                   .filter(g => GOAL_TAB_MAP[g.type] === activeTab)
-                  .map((g, i) => <SuggestedGoalCard key={g.id} goal={g} index={i} />)}
+                  .map((g, i) => (
+                    <SuggestedGoalCard
+                      key={g.id}
+                      goal={g}
+                      index={i}
+                      onDismiss={() => dismissDraftGoal(g.id)}
+                      onAccepted={() => acceptDraftGoal(g.id)}
+                    />
+                  ))}
               </>
             )}
 
@@ -102,17 +106,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 20,
-    gap: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  sectionHeaderText: {
-    fontSize: 14,
-    fontFamily: Fonts.medium,
-    lineHeight: 20,
+    gap: 20,
   },
   divider: {
     flexDirection: 'row',
