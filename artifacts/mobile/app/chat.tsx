@@ -12,7 +12,7 @@ import { TypingIndicator } from '@/components/TypingIndicator';
 import { InputBar } from '@/components/InputBar';
 import { EmptyChat, SuggestionCards } from '@/components/EmptyChat';
 import { MemoryCenter } from '@/components/MemoryCenter';
-import { GoalsDashboard } from '@/components/GoalsDashboard';
+import { GoalsDashboard } from '@/phase2/components/GoalsDashboard';
 import { ChatHistory } from '@/components/ChatHistory';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { GoalSetupSheet } from '@/components/GoalSetupSheet';

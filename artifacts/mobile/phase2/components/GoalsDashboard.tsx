@@ -16,12 +16,12 @@ import Animated, {
   FadeOut,
   ReduceMotion,
 } from 'react-native-reanimated';
-import { useTheme } from '../context/ThemeContext';
-import { Fonts } from '../constants/fonts';
-import { shadowDownTwo } from '../constants/shadows';
-import { useCoach } from '../context/CoachContext';
-import { Goal, GoalType, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '../constants/types';
-import { AppBar } from './AppBar';
+import { useTheme } from '@/context/ThemeContext';
+import { Fonts } from '@/constants/fonts';
+import { shadowDownTwo } from '@/constants/shadows';
+import { useCoach } from '@/context/CoachContext';
+import { Goal, GoalType, GoalTabCategory, GOAL_TAB_MAP, GOAL_TAB_LABELS, GOAL_TAB_ORDER, GOAL_TAB_SUBTITLE } from '@/constants/types';
+import { AppBar } from '@/components/AppBar';
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
